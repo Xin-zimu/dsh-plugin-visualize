@@ -21,83 +21,72 @@ to the history. If you are an agent starting work, read this first.
 | --- | --- |
 | Stage | 2 — OpenUI language core |
 | Goal | Evaluate programs, not just validate them; widen the tables toward 48/73 |
-| Status | Not started |
+| Status | Not started; stage 1.2 closed first |
 
 ## 3. Current progress
 
 **Discussed** — `PLAN.md`, `STAGE.md`, `docs/decisions/`.
 
 - Unified host + dual backends (ADR-001); one tool, backend by argument
-  (ADR-002); versioned envelope with flat legacy fields (ADR-003); per-backend
-  security boundaries (ADR-004); five-layer documentation (ADR-005).
-- Order changed: close the OpenUI render loop before migrating 73 functions.
+  (ADR-002); versioned envelope (ADR-003); per-backend security (ADR-004);
+  five-layer documentation (ADR-005).
 
 **Implemented** — in the tree, `tsc` clean.
 
-- Everything from session 1 (host core, registry, dispatcher, both backend
-  adapters, tokenizer + parser, nested-dispatch fix).
-- `VisualizationDescriptor = VisualizeMeta | OpenUIMeta` — an explicit
-  discriminant, not a program disguised as a fragment.
-- `openuiMetaFrom`, `openuiMetaFromArgs`, `visualizationFrom` in `fragment.ts`,
-  including recovery of a program from half-streamed arguments.
-- `src/client/OpenUICard.tsx` — the second renderer. Draws host components
-  from a component table; no iframe, no `innerHTML`, no `eval`.
-- Lazy reference resolution, so a statement may be used before it is defined.
-- A second keyed toolview (`intelligent_ui`), so legacy cards replay.
+- Host core, registry, dispatcher, both backend adapters, tokenizer + parser.
+- `VisualizationDescriptor = VisualizeMeta | OpenUIMeta`, and `OpenUICard`,
+  the second renderer (host components, no iframe, no `eval`).
+- `tsdown.config.ts` now reads the bundle id from `package.json`.
+- Card body and `Col` stretch their children; `Button` keeps its own width.
 
-**Verified** — ran, output in `evidence/phase-1/`.
+**Verified** — ran, output in `evidence/`.
 
-- `tsc` host + client: clean.
-- `npx vitest run`: **465 passed / 15 failed / 480 total**.
-- Failure set is **identical** to the upstream baseline (15 / 426 → 15 / 465).
-- `npx tsdown`: `lib/index.js` 220.42 kB, `lib/client.js` 198.71 kB.
-- End to end: a persisted program meta is recognised by `openuiMetaFrom`,
-  declined by `visualizeMetaFrom`, dispatched as `intelligent_ui`, and renders
-  to a React element tree without error (`e2e-openui-dispatch.txt`).
+- `npx vitest run`: **467 passed / 15 failed / 482 total**; failure set still
+  identical to the upstream baseline.
+- `tsc` host + client: clean. `npx tsdown`: builds both halves.
+- **In a real browser, in a real DSH session** (`evidence/browser-phase-1/`):
+  the plugin loads with an empty console (B01, B11); an OpenUI card drawn by the
+  model renders as real components (B03); an HTML card still renders in its
+  iframe (B04); `<img onerror>` shows as text with no dialog (B06); the card
+  replays after a full reload with no model call (B09).
 
 **Not verified** — do not claim these work.
 
-- **No browser has driven an OpenUI card.** The render is proven server-side
-  only. Whether it lays out correctly in the chat, follows the theme, or
-  survives a reload is untested.
-- Interaction is inert: `Slider` is drawn disabled and `Button` has no action,
-  because actions need `$state` and the evaluator (stage 2/3).
-- Nothing is evaluated. `@function` calls render as text where the table has a
-  component, and as null otherwise; no arithmetic, no `@Each`, no `@Format`.
-- 8 of 48 components, 17 of 73 functions.
+- B05 streaming: the model emitted the program in one chunk; nothing partial
+  was observed. The recovery path is unit-tested only.
+- B08 dark theme: only light was exercised.
+- B10 session switching: no second session opened.
+- The alignment fix (B07) is covered by unit tests only — the corrected card
+  was not re-screenshotted in a browser.
+- Interaction is inert: `Slider` draws disabled, `Button` has no action.
+- Nothing is evaluated. 8 of 48 components, 17 of 73 functions.
 
 ## 4. This session's changes
 
 | File | Change | Why |
 | --- | --- | --- |
-| `.gitignore` | root-anchored patterns | an unanchored `lib/` was silently excluding `upstream/open-intelligent-ui/src/lib/` from the baseline commit |
-| `src/fragment.ts` | `OpenUIMeta`, `VisualizationDescriptor`, three readers | the client needs an explicit discriminant, not a guessed field |
-| `src/client/OpenUICard.tsx` | new | the second renderer |
-| `src/client/VisualizeCard.tsx` | dispatch on `kind` | a program card must reach its own renderer |
-| `src/client/index.tsx` | second keyed toolview | legacy `intelligent_ui` cards replay |
-| `tests/openui-card.spec.tsx` | new, 10 tests | dispatch, boundary, forward references, no-markup-interpretation |
-| `tests/prompt-bridge.spec.tsx` | fake made key-aware | the fake keyed by name only; with two keyed toolviews, one shadowed the other |
-| docs | manifest, stage, log | this entry |
+| `tsdown.config.ts` | `PLUGIN_ID` read from `package.json` | a hard-coded id made the host refuse to activate the plugin; only a real load exposed it |
+| `src/client/OpenUICard.tsx` | `align-items: stretch`, `Button` `align-self` | a lone Button was centred in the card |
+| `tests/openui-card.spec.tsx` | +2 layout tests | lock the alignment contract |
+| `evidence/browser-phase-1/` | new | B01–B11 results, logs, screenshots, manifest |
 
 ## 5. Test results
 
 | Test | Command | Result | Evidence |
 | --- | --- | --- | --- |
 | Types | `npx tsc -p tsconfig.json --noEmit` / `-p tsconfig.client.json` | PASS | — |
-| Build | `npx tsdown` | PASS | `evidence/phase-1/build-after-p11.txt` |
-| Fork suite | `npx vitest run` | 465 pass / 15 fail | `evidence/phase-1/test-fork-after-p11.txt` |
-| Upstream baseline | same, in `upstream/dsh-visualize` | 426 pass / 15 fail | `evidence/phase-1/test-upstream-baseline.txt` |
-| No new failures | normalised FAIL-set diff | IDENTICAL | `MANIFEST.json` |
-| OpenUI dispatch e2e | `npx vite-node evidence/phase-1/e2e-openui-dispatch.mjs` | PASS | `evidence/phase-1/e2e-openui-dispatch.txt` |
+| Suite | `npx vitest run` | 467 / 15 | `evidence/phase-1/test-fork-after-browser.txt` |
+| Baseline parity | normalised FAIL-set diff | IDENTICAL | `evidence/phase-1/MANIFEST.json` |
+| Browser B01–B11 | live DSH session at :3081 | 7 PASS, 1 FIXED, 3 NOT VERIFIED | `evidence/browser-phase-1/MANIFEST.json` |
 
 ## 6. Open issues
 
 | Issue | Impact | Status |
 | --- | --- | --- |
-| OpenUI card unverified in a browser | The second backend is server-proven only | Stage 3 |
+| B05/B08/B10 unverified | Three claims about the card are untested | Stage 3 |
+| Alignment fix not re-rendered in a browser | The fix is proven by unit test only | Cheap to close |
 | No evaluator | Programs render structure but compute nothing | Stage 2 |
-| Interaction inert | Slider disabled, Button actionless | Stage 2/3 |
-| 15 Windows test failures | Noise that could hide a real regression | Accepted; `docs/testing/TEST_PLAN.md` |
+| 15 Windows test failures | Noise that could hide a regression | Accepted; `docs/testing/TEST_PLAN.md` |
 
 ## 7. Next step
 
@@ -105,26 +94,30 @@ to the history. If you are an agent starting work, read this first.
 and `tests/`. Do not touch `src/client/`. Done when the exit criteria in
 `STAGE.md` are each backed by evidence under `evidence/phase-2/`.
 
-Before starting, consider closing the browser-verification gap first: loading
-the built plugin in a real DSH session and screenshotting one OpenUI card
-would turn `openuiRendersInBrowser` from NOT VERIFIED into a real result, and
-it is cheaper now than after the language core grows.
+Before that, two cheap closures: re-screenshot the aligned card (B07), and
+toggle the theme once to cover B08. Both are minutes, and both remove a
+NOT VERIFIED from the record.
 
 ---
 
 ## History
 
+### Session 3 — 2026-11-02
+
+Stage 1.2: verified the OpenUI card in a real DSH web session on an isolated
+profile (viztest12; production untouched). Found and fixed two defects that unit
+tests could not catch — a bundle id that only fails at host load, and a flex
+alignment default. B01–B11 recorded; three are NOT VERIFIED by scope.
+
 ### Session 2 — 2026-11-02
 
 Git initialised; baseline commit `9341c8d`, then `2e5afc9` fixing an unanchored
 `.gitignore` that had excluded upstream reference source. Upstream snapshots
-committed as plain source (no `.git`, no `node_modules`). Stage 1.1 done: the
-OpenUI render loop is closed on the host and in the renderer, verified
-server-side. One regression caught and fixed (a key-blind test fake).
+committed as plain source. Stage 1.1: the OpenUI render loop closed on the host
+and in the renderer, verified server-side.
 
 ### Session 1 — 2026-11-02
 
-Fork created from `cf6b3a3`. Three upstream snapshots pinned under `upstream/`.
-Stage 1 implemented and accepted with the openui rendering gap. Fixed the
-nested-dispatch card loss inherited from the base. Documentation system
-established.
+Fork created from `cf6b3a3`. Three upstream snapshots pinned. Stage 1 implemented
+and accepted with the openui rendering gap. Fixed the nested-dispatch card loss
+inherited from the base. Documentation system established.

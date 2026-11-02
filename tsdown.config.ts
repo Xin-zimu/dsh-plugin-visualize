@@ -7,9 +7,21 @@
  * keeps the platform module table external (React, Cordis, loader seeds) and
  * bundles everything else inline.
  */
+import { readFileSync } from 'node:fs'
 import type { UserConfig } from 'tsdown'
 
-const PLUGIN_ID = '@nagi-ovo/dsh-visualize'
+/**
+ * Module id the browser bundle registers under.
+ *
+ * The host resolves a profile's client entries by the **package name** it was
+ * installed as, so this must be read from package.json rather than written out:
+ * a hard-coded id is correct exactly until the package is renamed, and then it
+ * fails at runtime with "loaded without registering", long after the build
+ * looked fine.
+ */
+const PLUGIN_ID: string = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+).name
 
 /** Module specifiers the dsh web shell shares into its frozen module table. */
 const PLATFORM_MODULES = [

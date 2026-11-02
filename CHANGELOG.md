@@ -39,10 +39,19 @@ Versioning: semver. Nothing is released yet.
 - A second keyed toolview (`intelligent_ui`), so cards written by the pre-fork
   plugin replay through this one.
 
+### Fixed (stage 1.2, found in a real browser)
+
+- The client bundle registered the pre-fork package id, so the host loaded it
+  "without registering" and the plugin never activated. The id now comes from
+  `package.json`.
+- A lone Button was centred in an OpenUI card: the card body and `Col` now set
+  `align-items: stretch`, and `Button` keeps its own width.
+
 ### Known issues
 
-- The OpenUI card is verified by a server-side render only; no browser has
-  driven it. Interaction is inert until the evaluator and `$state` land.
+- The OpenUI card is verified in a real browser for load, render, safety and
+  reload. Streaming preview, dark theme and session switching are NOT VERIFIED.
+  Interaction is inert until the evaluator and `$state` land.
 - No evaluator (stage 2); 8/48 components and 17/73 functions.
 - 15 inherited test failures on Windows (CRLF and symlink assumptions);
   identical in the upstream baseline. See `docs/testing/TEST_PLAN.md`.

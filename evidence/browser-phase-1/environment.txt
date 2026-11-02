@@ -1,0 +1,9 @@
+DSH version: 0.2.1-rc.5
+Plugin: @dsh-unified/visualize@0.1.0
+Plugin bundle built: 2026-11-02T15:29:16.7242410+08:00
+Git HEAD: 188d84a19f0cc81e5d9febdbcaa0b6432af72dfd
+Test profile: viztest12 (isolated; production desktop untouched)
+Test URL: http://127.0.0.1:3081/
+Node: v24.22.1
+Captured: 2026-11-02T15:33:39.1537906+08:00
+Windows: Microsoft Windows NT 10.0.26100.0

@@ -45,7 +45,42 @@ visualizationFrom: intelligent_ui
 render error     : none
 ```
 
-Still open, and recorded as NOT VERIFIED: no browser has driven the card.
+Still open at the end of stage 1.1: no browser had driven the card.
+
+## Stage 1.2 — real browser verification
+
+Run against an isolated profile (`viztest12`) on `http://127.0.0.1:3081/`,
+with the model driven live. Full record: `evidence/browser-phase-1/MANIFEST.json`.
+
+| Case | Verdict |
+| --- | --- |
+| B01 plugin load | PASS |
+| B02 both toolviews | PASS |
+| B03 OpenUI card displays | PASS |
+| B04 HTML card displays | PASS |
+| B05 streaming preview | NOT VERIFIED |
+| B06 text safety | PASS |
+| B07 layout | FAIL then FIXED |
+| B08 dark theme | NOT VERIFIED |
+| B09 reload / replay | PASS |
+| B10 session switching | NOT VERIFIED |
+| B11 console clean | PASS |
+
+### Two defects only a browser could find
+
+**D1 (blocker).** The client bundle registered `@nagi-ovo/dsh-visualize` while
+the host resolved the plugin as `@dsh-unified/visualize`, so the entry loaded
+"without registering" and the plugin never activated. The build was clean and
+466 unit tests passed. `tsdown.config.ts` had the pre-fork id hard-coded; it now
+reads `package.json`.
+
+**D2 (minor).** A lone Button was centred in the card: a flex column defaults to
+`align-items: center` in this renderer's absence of an explicit value. Fixed
+with `align-items: stretch` plus `align-self: flex-start` on Button, and two
+regression tests.
+
+Both are the same lesson: a server-side render and a green suite cannot see the
+host's loader contract or a browser's flex defaults.
 
 ## Incidental fix
 

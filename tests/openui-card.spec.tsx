@@ -93,3 +93,19 @@ describe('openui renderer', () => {
     expect(html).toContain('from a statement')
   })
 })
+
+describe('layout contract', () => {
+  it('stretches column children instead of centring them', () => {
+    const { node } = renderProgram('root = Col([Text("a"), Button("b")])')
+    const html = renderToStaticMarkup(node as never)
+    // A flex column defaults to align-items: stretch; the renderer states it so
+    // a lone Button cannot drift to the middle of the card.
+    expect(html).toContain('align-items:stretch')
+  })
+
+  it('keeps a Button to its own width inside a stretched column', () => {
+    const { node } = renderProgram('root = Col([Button("Test Button")])')
+    const html = renderToStaticMarkup(node as never)
+    expect(html).toContain('align-self:flex-start')
+  })
+})

@@ -1,0 +1,25 @@
+Stage 1.2 — OpenUI real-browser verification
+Date: 2026-11-02T15:40+08:00
+
+## Environment
+- DSH 0.2.1-rc.5 (bundled CLI)
+- profile viztest12, created from the shipped web template; production desktop profile untouched
+- http://127.0.0.1:3081/
+- Chromium Agent Window driven over CDP (browser-skill)
+
+## Steps
+1. Created viztest12 from the web template (--from-default-profile web), installed the plugin by absolute path.
+2. Booted: dsh --profile viztest12 --port 3081 --no-open
+3. First load FAILED: 'did not activate @dsh-unified/visualize ... loaded without registering'.
+4. Root cause: tsdown.config.ts hard-coded the pre-fork package id. Fixed to read package.json name.
+5. Rebuilt, restarted, reloaded. No load error; console buffer empty.
+6. Asked the model to draw an OpenUI card (backend=openui). Card rendered.
+7. Full-page navigation, folds re-expanded: card replayed from the log with no model call.
+8. Asked for an HTML card containing <img onerror>: rendered inside the iframe as text; no dialog.
+9. Observed a lone Button centred in the OpenUI card; fixed alignment, added regression tests.
+
+## What was NOT verified, and why
+- B05 streaming: the model emitted the whole program in one chunk; no partial stream to observe.
+- B08 dark theme: only the light theme was exercised.
+- B10 session switching: no second session was opened.
+- B07 re-render: the aligned card was not re-screenshotted with a fresh card after the fix; the fix is covered by unit tests only.

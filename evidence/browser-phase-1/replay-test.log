@@ -1,0 +1,16 @@
+Replay after full page reload
+Date: 2026-11-02T15:36+08:00
+
+Method: bsk step --action navigate to the same URL, then re-open the turn fold and the
+tool fold, then read the accessibility tree.
+
+Before expanding (after reload):
+  bare card lines: []            <- the turn is folded, as designed
+  button 'Test Button': ABSENT
+
+After expanding turn fold and tool fold:
+  bare card lines: ['Browser Test', 'OpenUI Browser Test', 'Hello DSH']
+  button 'Test Button': PRESENT
+
+Conclusion: the card is reconstructed from the persisted tool/result meta. The model was
+not called again (the turn reports 1 round / 3 steps, unchanged).

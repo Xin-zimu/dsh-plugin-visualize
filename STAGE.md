@@ -10,17 +10,25 @@ this says what the current slice is allowed to do.
 | --- | --- | --- |
 | 0 | Baseline | **Done** |
 | 1 | Fork skeleton, dual-backend seat | **Done** |
-| 1.1 | OpenUI render loop (was the stage-1 gap) | **Done — server-rendered; browser unverified** |
+| 1.1 | OpenUI render loop (was the stage-1 gap) | **Done** |
+| 1.2 | Real-browser integration verification | **Done — B01–B11 recorded; three NOT VERIFIED by scope** |
 | 2 | OpenUI language core | Not started |
 | 3 | OpenUI render backend | Not started |
 | 4 | Capability expansion (open-intelligent-ui reference) | Not started |
 | 5 | Unified prompt, security review, release | Not started |
 
-Stage 1.1 closed the gap that stage 1 shipped with: the client now dispatches on
-the card's discriminant, so a program card reaches the OpenUI renderer instead of
-falling back to text. That is verified by a server-side render and an end-to-end
-dispatch probe. It is **not** verified in a browser — no browser session has
-driven the card yet. Stage 3 covers interaction and reload.
+Stage 1.1 closed the gap stage 1 shipped with: the client dispatches on the
+card's discriminant. Stage 1.2 then verified it in a real DSH web session — and
+found two defects that no unit test could have caught:
+
+- the bundle registered the pre-fork package id, so the host refused to activate
+  the plugin at all;
+- a lone Button was centred because a flex column defaults to centring.
+
+Both are fixed. B01–B11 are recorded in `evidence/browser-phase-1/MANIFEST.json`;
+B05 (streaming), B08 (dark theme) and B10 (session switching) are **NOT
+VERIFIED** by scope, not by failure. Re-rendering the aligned card in a browser
+is still outstanding.
 
 ---
 

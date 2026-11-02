@@ -151,6 +151,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
       style: {
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'stretch',
         gap: space(props[1], 3),
         minWidth: 0,
       } satisfies CSSProperties,
@@ -246,6 +247,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
         style: {
           font: 'inherit',
           fontSize: SIZES.sm,
+          alignSelf: 'flex-start',
           padding: '5px 14px',
           borderRadius: 'calc(var(--radius) * 1.4)',
           border: '1px solid var(--border)',
@@ -398,12 +400,19 @@ export function renderProgram(source: string): RenderedProgram {
   return { node, error: undefined }
 }
 
-/** Style of the card body: a plain surface, never a frame. */
+/**
+ * Style of the card body: a plain surface, never a frame.
+ *
+ * `alignItems: 'stretch'` keeps every child full width, which is what a column
+ * layout means; without it a flex column centres each child on the cross axis,
+ * and a lone Button drifted to the middle of the card.
+ */
 const ROOT_STYLE: CSSProperties = {
   fontFamily: 'var(--font-sans)',
   color: 'var(--foreground)',
   display: 'flex',
   flexDirection: 'column',
+  alignItems: 'stretch',
   gap: 12,
   minWidth: 0,
 }

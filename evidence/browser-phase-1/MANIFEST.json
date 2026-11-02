@@ -1,0 +1,50 @@
+{
+  "phase": "1.2",
+  "title": "OpenUI real-browser integration verification",
+  "capturedAt": "2026-11-02T15:41+08:00",
+  "environment": {
+    "dsh": "0.2.1-rc.5",
+    "plugin": "@dsh-unified/visualize@0.1.0",
+    "gitHead": "188d84a19f0cc81e5d9febdbcaa0b6432af72dfd",
+    "profile": "viztest12 (isolated; production desktop profile untouched)",
+    "url": "http://127.0.0.1:3081/",
+    "browser": "Chromium Agent Window (browser-skill, CDP)",
+    "model": "DeepSeek-V4.1-Flash",
+    "os": "Windows 10.0.26100",
+    "node": "v24.22.1"
+  },
+  "summary": {
+    "PASS": ["B01", "B02", "B03", "B04", "B06", "B09", "B11"],
+    "FIXED": ["B07"],
+    "NOT VERIFIED": ["B05", "B08", "B10"],
+    "FAIL": []
+  },
+  "defects": [
+    { "id": "D1", "severity": "blocker", "status": "fixed",
+      "summary": "Bundle registered the pre-fork package id; the host refused to activate the plugin.",
+      "fix": "tsdown.config.ts reads PLUGIN_ID from package.json." },
+    { "id": "D2", "severity": "minor", "status": "fixed",
+      "summary": "A lone Button was centred in the OpenUI card.",
+      "fix": "align-items: stretch on the card body and Col; align-self: flex-start on Button; 2 regression tests." }
+  ],
+  "notVerifiedReasons": {
+    "B05": "The model emitted the whole program in one chunk; no partial argument stream was observable. The partial-recovery path is unit-tested only.",
+    "B08": "Only the light theme was exercised.",
+    "B10": "No second session was opened, so session-to-card binding was not exercised.",
+    "B07_reverified": "The aligned render was not re-screenshotted with a fresh card after the fix; the fix is covered by unit tests only."
+  },
+  "conclusion": "An OpenUI card renders in a real DSH web session and replays after a reload. Two defects were found that no unit test could have caught: a runtime-only bundle-id mismatch, and a flex alignment default.",
+  "files": [
+    { "name": "environment.txt", "bytes": 376, "sha256": "b04f1dc8ac0d46678144878a6102fcc0d1c044b36eeeffe9d2e43cff1658e394" },
+    { "name": "plugin-load.log", "bytes": 1479, "sha256": "d211cc83132066b51cc0358b96fbc03a86e474666b1b0b27016025b8479ff98d" },
+    { "name": "replay-test.log", "bytes": 627, "sha256": "cc108cd63a1c53ba487d9915d07ac16c404d884fb0a0455e25cfafa692ffaeff" },
+    { "name": "test-results.json", "bytes": 4886, "sha256": "fbd47ef388bfc27c61c922d0ecf65166ef07e2c65601e06f2172c3438403c26d" },
+    { "name": "probes/html-verify.mjs", "bytes": 1214, "sha256": "b1e00d2c496cc5cdbf571da333a544c404dbb10f9c0e085dae50bfb359ec21a2" },
+    { "name": "probes/probe.mjs", "bytes": 445, "sha256": "5021b0ec5b5608fde33d6a01e2e58813df3e975374186a3d1454d8e1c5fad161" },
+    { "name": "probes/replay-expand.mjs", "bytes": 1281, "sha256": "59f85cdd89f7c2b5e56c8c8099630f54fda3fbf51e3e957f204353cfd1ab66e5" },
+    { "name": "probes/security-check.mjs", "bytes": 1241, "sha256": "767914adb53f191696b75296bd1aa6146aaea845760c99c272f394202b6232f2" },
+    { "name": "screenshots/html-card.png", "bytes": 142277, "sha256": "5847e0edd2a635091eb1a32b7593d39d10b135e8d1958d638a060982d72ad4aa" },
+    { "name": "screenshots/openui-basic.png", "bytes": 127075, "sha256": "12f568ab0965bade13d1b0e40eeb30f67b4cabc458b7e932bb55cea021b448f7" },
+    { "name": "screenshots/session-replay.png", "bytes": 127075, "sha256": "12f568ab0965bade13d1b0e40eeb30f67b4cabc458b7e932bb55cea021b448f7" }
+  ]
+}
