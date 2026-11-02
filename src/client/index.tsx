@@ -15,6 +15,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-tool/client'
 import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { ConversationNodeDefinition } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { sessionInjection, VisualizeCard } from './VisualizeCard.tsx'
+import { OpenUICard, OpenUIToolView } from './OpenUICard.tsx'
 import { StreamingPreview, streamDefinition } from './StreamingPreview.tsx'
 import { foldingSource, type FoldingHost } from './folding.ts'
 import { selectTurnCards, turnCardsDefinition, TurnCards } from './TurnCards.tsx'
@@ -83,6 +84,13 @@ export function apply(ctx: ClientContext): void {
       inject: (sessionId: unknown) => sessionInjection(promptSinkFor(ctx, sessionId), sessionId),
     },
     VisualizeCard,
+  ))
+  // The second keyed toolview, so a card written before the fork by
+  // dsh-intelligent-ui replays through this plugin instead of the generic row.
+  // New cards reach it through the `visualize` view's own dispatch.
+  ctx.slots.inject('tool.call.toolview', () => ctx.slots.register(
+    { name: 'tool.call.toolview', key: 'intelligent_ui' },
+    OpenUIToolView,
   ))
   // The dock reads the argument stream from Turn data the stream Definition
   // folds; without the registry (dsh 0.1.1) it reads the session partial. The

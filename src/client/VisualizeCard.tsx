@@ -43,7 +43,11 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
-import { visualizeMetaFrom, visualizeMetaFromArgs, type VisualizeMeta } from '../fragment.ts'
+import {
+  openuiMetaFrom, openuiMetaFromArgs, visualizeMetaFrom, visualizeMetaFromArgs,
+  type OpenUIMeta, type VisualizeMeta,
+} from '../fragment.ts'
+import { OpenUICard } from './OpenUICard.tsx'
 import { buildFrameDoc, HEIGHT_MESSAGE_TYPE, type FrameVariant } from '../shell.ts'
 import { PROMPT_INTERVAL_MS, readerIsInFrame, readPromptMessage, type PromptSink } from './prompt-bridge.ts'
 import { buildWindowDoc, FRAME_SANDBOX } from '../window-doc.ts'
@@ -579,10 +583,20 @@ export function VisualizeCard({ callId, block, visualizePrompt, visualizeSession
   if (!('kind' in block)) {
     const live = visualizeMetaFromArgs(argsRaw)
     if (live !== undefined) return <Frame meta={{ ...live, style: liveStyle() }} callId={callId} />
+    const streamingProgram = openuiMetaFromArgs(argsRaw)
+    if (streamingProgram !== undefined) return <OpenUICard meta={{ ...streamingProgram, style: liveStyle() }} />
     return <div style={headerStyle}>Visualize · rendering…</div>
   }
   if (block.isError) {
     return <div style={headerStyle}>Visualize · {firstResultLine(block.content)}</div>
+  }
+  // Dispatch on the discriminant, not on which field happens to be present.
+  // A program card is a different document from a fragment card, and each one
+  // goes to the renderer built for it.
+  const program = openuiMetaFrom(block.meta)
+    ?? (visualizeMetaFrom(block.meta) === undefined ? openuiMetaFromArgs(argsRaw) : undefined)
+  if (program !== undefined) {
+    return <OpenUICard meta={{ ...program, style: program.style ?? liveStyle() }} />
   }
   const persisted = visualizeMetaFrom(block.meta)
   if (persisted !== undefined) noteSettledStyle(persisted.style, argsRaw)

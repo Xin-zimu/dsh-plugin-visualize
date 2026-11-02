@@ -11,99 +11,93 @@ to the history. If you are an agent starting work, read this first.
 | --- | --- |
 | Package | `@dsh-unified/visualize` |
 | Version | `0.1.0` (unreleased) |
-| Branch | none — the working copy is **not a git repository yet** |
-| HEAD | n/a |
+| Branch | `main` |
+| HEAD | see `git log -1` |
 | Upstream baseline | dsh-visualize `cf6b3a3`, dsh-intelligent-ui `0b08749`, open-intelligent-ui `16ef264` |
 
 ## 2. Current stage
 
 | Field | Value |
 | --- | --- |
-| Stage | 1 — Fork skeleton, dual-backend seat |
-| Goal | One host, one tool, two registered backends, nothing regressed |
-| Status | **Accepted, with one recorded gap** |
+| Stage | 2 — OpenUI language core |
+| Goal | Evaluate programs, not just validate them; widen the tables toward 48/73 |
+| Status | Not started |
 
 ## 3. Current progress
 
-**Discussed** — recorded in `PLAN.md`, `STAGE.md`, `docs/decisions/`.
+**Discussed** — `PLAN.md`, `STAGE.md`, `docs/decisions/`.
 
-- Unified host + dual backends + capability adapter is the chosen architecture
-  (ADR-001).
-- One tool, backend selected by argument (ADR-002).
-- A versioned envelope with flat legacy fields beside it (ADR-003).
-- Per-backend security boundaries that are not negotiable (ADR-004).
+- Unified host + dual backends (ADR-001); one tool, backend by argument
+  (ADR-002); versioned envelope with flat legacy fields (ADR-003); per-backend
+  security boundaries (ADR-004); five-layer documentation (ADR-005).
+- Order changed: close the OpenUI render loop before migrating 73 functions.
 
 **Implemented** — in the tree, `tsc` clean.
 
-- `core/render-contract.ts`, `core/registry.ts`, `core/dispatcher.ts`,
-  `core/legacy-tool.ts`.
-- `backends/html/renderer.ts` — adapter over the inherited lint + fragment rules.
-- `backends/openui/{renderer,tokenize,parse,signatures}.ts`.
-- `src/tool.ts` — compatibility entry accepting both call shapes.
-- `src/index.ts` — registers the registry (HTML first, so it stays the default).
-- Client fix: `client/TurnCards.tsx` now collects cards from `tool/ptc-dispatch`.
-- `skill.ts` — backend-selection section plus a language reference generated
-  from the signature tables.
+- Everything from session 1 (host core, registry, dispatcher, both backend
+  adapters, tokenizer + parser, nested-dispatch fix).
+- `VisualizationDescriptor = VisualizeMeta | OpenUIMeta` — an explicit
+  discriminant, not a program disguised as a fragment.
+- `openuiMetaFrom`, `openuiMetaFromArgs`, `visualizationFrom` in `fragment.ts`,
+  including recovery of a program from half-streamed arguments.
+- `src/client/OpenUICard.tsx` — the second renderer. Draws host components
+  from a component table; no iframe, no `innerHTML`, no `eval`.
+- Lazy reference resolution, so a statement may be used before it is defined.
+- A second keyed toolview (`intelligent_ui`), so legacy cards replay.
 
-**Verified** — ran, output saved under `evidence/phase-1/`.
+**Verified** — ran, output in `evidence/phase-1/`.
 
-- `npx tsc -p tsconfig.json` and `-p tsconfig.client.json`: clean.
-- `npx tsdown`: `lib/index.js` 216.82 kB, `lib/client.js` 159.26 kB.
-- `npx vitest run` in the fork: **455 passed, 15 failed, 470 total**.
-- The same suite in `upstream/dsh-visualize`: **426 passed, 15 failed, 441 total**.
-- The 15 failing tests are **byte-identical** between the two runs
-  (sha256 of the sorted failure list matches). Net new tests: 29, all passing.
-- Plugin installs into a scratch profile and appears in `--dump-config`.
+- `tsc` host + client: clean.
+- `npx vitest run`: **465 passed / 15 failed / 480 total**.
+- Failure set is **identical** to the upstream baseline (15 / 426 → 15 / 465).
+- `npx tsdown`: `lib/index.js` 220.42 kB, `lib/client.js` 198.71 kB.
+- End to end: a persisted program meta is recognised by `openuiMetaFrom`,
+  declined by `visualizeMetaFrom`, dispatched as `intelligent_ui`, and renders
+  to a React element tree without error (`e2e-openui-dispatch.txt`).
 
 **Not verified** — do not claim these work.
 
-- **An openui card does not render.** The backend validates, the tool persists
-  the envelope, and `descriptorFrom` reads it back — but the browser half still
-  reads `visualizeMetaFrom`, which requires `kind === 'visualize'` and a
-  `fragment` field. A program card carries `kind: 'intelligent_ui'` and
-  `program`, so `visualizeMetaFrom` returns `undefined` and the card falls back
-  to generic text. Proven by a runtime probe, not assumed. Stage 3 closes this.
-- No openui card has been seen in a browser.
-- The evaluator does not exist yet; nothing is evaluated, only validated.
-- Only 8 of 48 components and 17 of 73 functions are present.
+- **No browser has driven an OpenUI card.** The render is proven server-side
+  only. Whether it lays out correctly in the chat, follows the theme, or
+  survives a reload is untested.
+- Interaction is inert: `Slider` is drawn disabled and `Button` has no action,
+  because actions need `$state` and the evaluator (stage 2/3).
+- Nothing is evaluated. `@function` calls render as text where the table has a
+  component, and as null otherwise; no arithmetic, no `@Each`, no `@Format`.
+- 8 of 48 components, 17 of 73 functions.
 
 ## 4. This session's changes
 
 | File | Change | Why |
 | --- | --- | --- |
-| `src/client/TurnCards.tsx` | `match` accepts `tool/ptc-dispatch`; `tool/call` records its turn | A card drawn through `run_code` settled in the fold and never reappeared under the answer |
-| `src/core/*` | new | The host core the fork is for |
-| `src/backends/html/renderer.ts` | new | HTML behind the neutral contract, rules untouched |
-| `src/backends/openui/*` | new | tokenizer + parser ported to TypeScript; signatures table |
-| `src/tool.ts` | wrapper | Keeps the pre-fork `(ctx, maxBytes, style, images)` call shape working |
-| `src/index.ts` | registry wiring | HTML registered first, so it stays the default |
-| `tests/core.spec.ts` | new, 24 tests | The contract, the registry, the router, both validators |
-| `tests/turn-cards.spec.tsx` | +5 tests | Regression cover for the nested-dispatch fix |
-| Docs | new | This five-layer set |
+| `.gitignore` | root-anchored patterns | an unanchored `lib/` was silently excluding `upstream/open-intelligent-ui/src/lib/` from the baseline commit |
+| `src/fragment.ts` | `OpenUIMeta`, `VisualizationDescriptor`, three readers | the client needs an explicit discriminant, not a guessed field |
+| `src/client/OpenUICard.tsx` | new | the second renderer |
+| `src/client/VisualizeCard.tsx` | dispatch on `kind` | a program card must reach its own renderer |
+| `src/client/index.tsx` | second keyed toolview | legacy `intelligent_ui` cards replay |
+| `tests/openui-card.spec.tsx` | new, 10 tests | dispatch, boundary, forward references, no-markup-interpretation |
+| `tests/prompt-bridge.spec.tsx` | fake made key-aware | the fake keyed by name only; with two keyed toolviews, one shadowed the other |
+| docs | manifest, stage, log | this entry |
 
 ## 5. Test results
 
 | Test | Command | Result | Evidence |
 | --- | --- | --- | --- |
-| Host + client types | `npx tsc -p tsconfig.json --noEmit` / `-p tsconfig.client.json` | PASS | — |
-| Bundle build | `npx tsdown` | PASS | `evidence/phase-1/build.txt` |
-| Fork suite | `npx vitest run` | 455 pass / 15 fail | `evidence/phase-1/test-fork.txt` |
-| Upstream baseline | `npx vitest run` in `upstream/dsh-visualize` | 426 pass / 15 fail | `evidence/phase-1/test-upstream-baseline.txt` |
-| No new failures | sha256 of sorted FAIL list | IDENTICAL | `evidence/phase-1/failures-*.txt` |
-
-The 15 failures are pre-existing on Windows: assertions that assume `/n`
-newlines against a CRLF checkout, and symlink creation that needs a privilege
-the runner lacks. They fail identically in the pristine upstream clone.
+| Types | `npx tsc -p tsconfig.json --noEmit` / `-p tsconfig.client.json` | PASS | — |
+| Build | `npx tsdown` | PASS | `evidence/phase-1/build-after-p11.txt` |
+| Fork suite | `npx vitest run` | 465 pass / 15 fail | `evidence/phase-1/test-fork-after-p11.txt` |
+| Upstream baseline | same, in `upstream/dsh-visualize` | 426 pass / 15 fail | `evidence/phase-1/test-upstream-baseline.txt` |
+| No new failures | normalised FAIL-set diff | IDENTICAL | `MANIFEST.json` |
+| OpenUI dispatch e2e | `npx vite-node evidence/phase-1/e2e-openui-dispatch.mjs` | PASS | `evidence/phase-1/e2e-openui-dispatch.txt` |
 
 ## 6. Open issues
 
 | Issue | Impact | Status |
 | --- | --- | --- |
-| openui cards do not render | The second backend is not usable by a user yet | Stage 3 |
-| No evaluator | Programs are checked for unknown names only | Stage 2 |
-| Working copy is not a git repo | No history, no diffable baseline, `AGENTS.md` rule 2 cannot be followed | **Needs a decision** |
-| 15 Windows test failures | Noise that hides a real regression | Accepted; documented in `docs/testing/TEST_PLAN.md` |
-| `lib/` is committed next to `src/` | Portable here, but `AGENTS.md` rule 7 wants it release-only | Decide before the first release |
+| OpenUI card unverified in a browser | The second backend is server-proven only | Stage 3 |
+| No evaluator | Programs render structure but compute nothing | Stage 2 |
+| Interaction inert | Slider disabled, Button actionless | Stage 2/3 |
+| 15 Windows test failures | Noise that could hide a real regression | Accepted; `docs/testing/TEST_PLAN.md` |
 
 ## 7. Next step
 
@@ -111,16 +105,26 @@ the runner lacks. They fail identically in the pristine upstream clone.
 and `tests/`. Do not touch `src/client/`. Done when the exit criteria in
 `STAGE.md` are each backed by evidence under `evidence/phase-2/`.
 
-Before starting: decide whether this directory becomes a git repository. The
-rules in `AGENTS.md` assume one, and the fork has no recorded history yet.
+Before starting, consider closing the browser-verification gap first: loading
+the built plugin in a real DSH session and screenshotting one OpenUI card
+would turn `openuiRendersInBrowser` from NOT VERIFIED into a real result, and
+it is cheaper now than after the language core grows.
 
 ---
 
 ## History
 
+### Session 2 — 2026-11-02
+
+Git initialised; baseline commit `9341c8d`, then `2e5afc9` fixing an unanchored
+`.gitignore` that had excluded upstream reference source. Upstream snapshots
+committed as plain source (no `.git`, no `node_modules`). Stage 1.1 done: the
+OpenUI render loop is closed on the host and in the renderer, verified
+server-side. One regression caught and fixed (a key-blind test fake).
+
 ### Session 1 — 2026-11-02
 
-Fork created from `cf6b3a3`. Three upstream snapshots pinned under
-`upstream/`. Stage 1 implemented and accepted with the openui rendering gap.
-Fixed the nested-dispatch card loss inherited from the base. Documentation
-system established.
+Fork created from `cf6b3a3`. Three upstream snapshots pinned under `upstream/`.
+Stage 1 implemented and accepted with the openui rendering gap. Fixed the
+nested-dispatch card loss inherited from the base. Documentation system
+established.

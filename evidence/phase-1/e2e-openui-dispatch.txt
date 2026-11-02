@@ -1,0 +1,6 @@
+dispatch        : openui
+openuiMetaFrom  : recognised
+visualizeMetaFrom: declines (correct)
+visualizationFrom: intelligent_ui
+render error    : none
+rendered html   : <div style="display:flex;flex-direction:column;gap:12px;min-width:0"><div style="font-size:1rem;font-weight:600;color:va

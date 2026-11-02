@@ -133,7 +133,10 @@ describe('promptSinkFor', () => {
 
 describe('registrations', () => {
   it('inject a per-session sink into the toolview and the turn tail', () => {
-    const options = new Map<string, { inject?: (sessionId: unknown) => Record<string, unknown> }>()
+    // The real registry distinguishes entries by name AND key: this plugin
+    // registers two keyed toolviews (`visualize` and `intelligent_ui`) on the
+    // same hole, so a name-only fake would let one shadow the other.
+    const options = new Map<string, { key?: string; inject?: (sessionId: unknown) => Record<string, unknown> }>()
     const conversation = { input: { for: () => composer().input } }
     const scope = { get: (name: string) => name === 'conversation' ? conversation : undefined }
     const all: Record<string, unknown> = {
@@ -143,8 +146,8 @@ describe('registrations', () => {
     const host = {
       slots: {
         inject(_name: string, install: () => unknown) { install() },
-        register(entry: { name: string; inject?: (sessionId: unknown) => Record<string, unknown> }) {
-          options.set(entry.name, entry)
+        register(entry: { name: string; key?: string; inject?: (sessionId: unknown) => Record<string, unknown> }) {
+          options.set(entry.key === undefined ? entry.name : `${entry.name}:${entry.key}`, entry)
           return () => undefined
         },
       },
@@ -154,14 +157,17 @@ describe('registrations', () => {
       },
     }
     apply(host as never)
-    for (const name of ['tool.call.toolview', 'conversation.chat.turnTail']) {
+    for (const name of ['tool.call.toolview:visualize', 'conversation.chat.turnTail']) {
       const injected = options.get(name)?.inject?.('s1')
       expect(typeof injected?.visualizePrompt, name).toBe('function')
       // The session id also keys each card's saved state.
       expect(injected?.visualizeSession, name).toBe('s1')
     }
+    // The second keyed toolview is the legacy Intelligent UI seat; it takes no
+    // composer sink because it draws host components rather than a frame.
+    expect(options.has('tool.call.toolview:intelligent_ui')).toBe(true)
     // No session, no sink: the card builds its frame with canPrompt false.
-    expect(options.get('tool.call.toolview')?.inject?.(undefined).visualizePrompt).toBeUndefined()
+    expect(options.get('tool.call.toolview:visualize')?.inject?.(undefined).visualizePrompt).toBeUndefined()
   })
 })
 

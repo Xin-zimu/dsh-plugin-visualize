@@ -1,6 +1,6 @@
 {
-  "phase": 1,
-  "stage": "Fork skeleton, dual-backend seat",
+  "phase": "1 + 1.1",
+  "stage": "Fork skeleton, dual-backend seat; OpenUI render loop closed",
   "capturedAt": "2026-11-02",
   "platform": "win32 x64, node 24, pnpm 11.28",
   "upstreamBaseline": {
@@ -10,28 +10,35 @@
   },
   "commands": {
     "testFork": "npx vitest run",
-    "testUpstream": "npx vitest run   (cwd: upstream/dsh-visualize)",
+    "testUpstream": "npx vitest run   (cwd: upstream/dsh-visualize, before its .git was removed)",
     "build": "npx tsdown",
-    "typecheck": "npx tsc -p tsconfig.json --noEmit && npx tsc -p tsconfig.client.json --noEmit"
+    "typecheck": "npx tsc -p tsconfig.json --noEmit && npx tsc -p tsconfig.client.json --noEmit",
+    "e2eDispatch": "npx vite-node evidence/phase-1/e2e-openui-dispatch.mjs"
   },
   "results": {
-    "testFork": { "passed": 455, "failed": 15, "total": 470, "verdict": "PASS (baseline parity)" },
+    "testFork": { "passed": 465, "failed": 15, "total": 480, "verdict": "PASS (baseline parity)" },
     "testUpstream": { "passed": 426, "failed": 15, "total": 441, "verdict": "PASS (reference)" },
-    "newFailures": { "count": 0, "verdict": "PASS" },
+    "newFailures": { "count": 0, "verdict": "PASS", "note": "failure set identical to upstream baseline" },
     "typecheck": { "verdict": "PASS" },
     "build": { "verdict": "PASS" },
-    "openuiCardRenders": { "verdict": "NOT VERIFIED", "reason": "client requires kind=visualize; openui cards fall back to text" }
+    "openuiMetaRecognised": { "verdict": "PASS", "via": "e2e-openui-dispatch.txt" },
+    "openuiRenders": { "verdict": "PASS (server render)", "note": "React element tree produced from a persisted program meta" },
+    "openuiRendersInBrowser": { "verdict": "NOT VERIFIED", "reason": "no browser session driven; server-side render only" }
   },
   "files": [
     { "name": "build.txt", "sha256": "f24baf3d039440e3907891f26aae5a224272751cd6263eef1f4c160c249f12a7", "bytes": 603 },
+    { "name": "build-after-p11.txt", "sha256": "e2159b03f5c7ddf0f52170fba673822f0c363629a14a0583232b133afbb2ed8b", "bytes": 602 },
     { "name": "test-fork.txt", "sha256": "24c1068f1b954c3d4006ca8e99af834491fc92385442cab5171f6df500869208", "bytes": 20859 },
+    { "name": "test-fork-after-p11.txt", "sha256": "fe393de615ec3fb6eab79faaa75141b813a2c1e2dd7eddd938e3618cefcf13bf", "bytes": 21441 },
     { "name": "test-upstream-baseline.txt", "sha256": "f1a27fd83496bf395c00d68eafda5a806b562794b46ad773a5983d62a5469863", "bytes": 21098 },
     { "name": "failures-test-fork.txt", "sha256": "ce53312325321ef4011cb74503e25c2e9afd3470918ccdf49992b7d9f1ccb2ba", "bytes": 1726 },
-    { "name": "failures-test-upstream-baseline.txt", "sha256": "ce53312325321ef4011cb74503e25c2e9afd3470918ccdf49992b7d9f1ccb2ba", "bytes": 1726 }
+    { "name": "failures-test-upstream-baseline.txt", "sha256": "ce53312325321ef4011cb74503e25c2e9afd3470918ccdf49992b7d9f1ccb2ba", "bytes": 1726 },
+    { "name": "e2e-openui-dispatch.mjs", "sha256": "46679a4f582fe728443500ad4081d3b394222c95b409447f2eecd82773061898", "bytes": 1759 },
+    { "name": "e2e-openui-dispatch.txt", "sha256": "06fc86aad03675ddab2290698abbe4b1ed58cda005642e4a7799a376fea8ae62", "bytes": 294 }
   ],
   "notes": [
     "The two failures-*.txt files share one sha256 on purpose: that equality IS the no-regression evidence.",
     "The 15 failures are pre-existing on Windows (CRLF and symlink assumptions); see docs/testing/TEST_PLAN.md.",
-    "openuiCardRenders is recorded as NOT VERIFIED rather than omitted, so no reader can mistake stage 1 for a working second backend."
+    "openuiRenders is server-side only. openuiRendersInBrowser stays NOT VERIFIED until a browser session drives the card."
   ]
 }

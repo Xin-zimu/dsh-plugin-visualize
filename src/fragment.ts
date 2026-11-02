@@ -184,6 +184,146 @@ function countOccurrences(base: string, needle: string): number {
 }
 
 /**
+ * The meta a program card persists.
+ *
+ * Deliberately a different discriminant from {@link VisualizeMeta}, not a
+ * `fragment` holding a program: the two backends produce different documents,
+ * and the card has to tell them apart before it can draw either. Pretending a
+ * program is a fragment would work for exactly one renderer and break the day a
+ * third one arrives.
+ */
+export interface OpenUIMeta {
+  /** Discriminant that sends this card to the OpenUI renderer. */
+  kind: 'intelligent_ui'
+  /** The validated openui-lang program, inlined so replay never re-reads a file. */
+  program: string
+  /** Concise human title shown in the card header. */
+  title: string
+  /** Surface the card occupies. */
+  mode: VisualizeMode
+  /** Session-relative or absolute source path, kept for provenance display. */
+  path: string
+  /** One-line description a page launcher shows; absent when none was given. */
+  summary?: string
+  /** Card style the card was created under. */
+  style: StyleId
+}
+
+/**
+ * What a card can be. The client switches on {@link kind} and hands the value
+ * to the matching renderer; nothing downstream inspects a field the other
+ * variant owns.
+ */
+export type VisualizationDescriptor = VisualizeMeta | OpenUIMeta
+
+/**
+ * Narrow one persisted meta value to an {@link OpenUIMeta}.
+ * @param meta - the raw persisted meta value.
+ * @returns the narrowed descriptor, or undefined when the value is not a program card.
+ */
+export function openuiMetaFrom(meta: unknown): OpenUIMeta | undefined {
+  if (typeof meta !== 'object' || meta === null) return undefined
+  const record = meta as Record<string, unknown>
+  if (record['kind'] !== 'intelligent_ui') return undefined
+  const { program, title, mode, path, summary } = record
+  if (typeof program !== 'string' || typeof title !== 'string' || typeof path !== 'string') return undefined
+  if (!isVisualizeMode(mode)) return undefined
+  return {
+    kind: 'intelligent_ui',
+    program,
+    title,
+    mode,
+    path,
+    ...summaryField(summary),
+    style: styleIdFrom(record['style']),
+  }
+}
+
+/**
+ * Read a program card out of a call's own arguments.
+ *
+ * A streaming call has no persisted meta yet, and a call made before the fork
+ * by dsh-intelligent-ui wrote its program only into `tool/call` arguments. This
+ * is the same fallback `visualizeMetaFromArgs` provides for fragments.
+ * @param argsRaw - the raw arguments string, possibly an incomplete prefix.
+ * @returns the program card, or undefined when the arguments are not one.
+ */
+export function openuiMetaFromArgs(argsRaw: unknown): OpenUIMeta | undefined {
+  if (typeof argsRaw !== 'string' || argsRaw.trim() === '') return undefined
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(argsRaw)
+  } catch {
+    // Mid-stream arguments are not valid JSON yet: take the program seen so far,
+    // so the card can start drawing while the model is still writing.
+    const partial = partialProgram(argsRaw)
+    if (partial === undefined) return undefined
+    return {
+      kind: 'intelligent_ui',
+      program: partial,
+      title: 'Visualization',
+      mode: 'inline',
+      path: 'streaming',
+      style: DEFAULT_STYLE,
+    }
+  }
+  if (typeof parsed !== 'object' || parsed === null) return undefined
+  const record = parsed as Record<string, unknown>
+  const program = record['program'] ?? record['source']
+  if (typeof program !== 'string' || program.trim() === '') return undefined
+  // A call that names the html backend is not ours, even if it carries a
+  // `program`-named field.
+  if (record['backend'] === 'html' || record['fragment'] !== undefined) return undefined
+  const mode = isVisualizeMode(record['mode']) ? record['mode'] : 'inline'
+  return {
+    kind: 'intelligent_ui',
+    program,
+    title: typeof record['title'] === 'string' && record['title'].trim() !== '' ? record['title'] : 'Visualization',
+    mode,
+    path: typeof record['path'] === 'string' ? record['path'] : 'streaming',
+    ...typeof record['summary'] === 'string' ? { summary: record['summary'] } : {},
+    style: styleIdFrom(record['style']),
+  }
+}
+
+/**
+ * Recover the still-open `program` string of a half-streamed arguments object.
+ * @param argsRaw - the partial JSON.
+ * @returns the program text seen so far, or undefined when it has not started.
+ */
+function partialProgram(argsRaw: string): string | undefined {
+  const at = /"program"\s*:\s*"/u.exec(argsRaw)
+  if (at === null) return undefined
+  let out = ''
+  for (let index = at.index + at[0].length; index < argsRaw.length; index++) {
+    const ch = argsRaw[index]!
+    if (ch === '\\') {
+      const next = argsRaw[index + 1]
+      if (next === undefined) break
+      out += next === 'n' ? '\n' : next === 't' ? '\t' : next
+      index += 1
+      continue
+    }
+    if (ch === '"') break
+    out += ch
+  }
+  return out.trim() === '' ? undefined : out
+}
+
+/**
+ * Narrow one persisted meta value to whichever card variant it is.
+ *
+ * This is the dispatch the client uses. A value that names neither variant —
+ * an older or newer host, a malformed record — declines, and the card falls
+ * back to the generic presentation instead of throwing on replay.
+ * @param meta - the raw persisted meta value.
+ * @returns the descriptor, or undefined for the generic path.
+ */
+export function visualizationFrom(meta: unknown): VisualizationDescriptor | undefined {
+  return visualizeMetaFrom(meta) ?? openuiMetaFrom(meta)
+}
+
+/**
  * Narrow one persisted `tool/result` meta value to a {@link VisualizeMeta}.
  * Wire data cannot be trusted to match the compiled shape (an older or newer
  * host may have logged it), so a mismatch declines to `undefined` — the caller

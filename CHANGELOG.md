@@ -29,10 +29,20 @@ Versioning: semver. Nothing is released yet.
   turn's answer. The turn-tail collector now accepts both event types and
   attributes a nested dispatch to the turn of its enclosing call.
 
+### Added (stage 1.1)
+
+- `VisualizationDescriptor = VisualizeMeta | OpenUIMeta`: the client dispatches on
+  an explicit discriminant instead of guessing from which field is present.
+- `OpenUICard`, the second renderer: draws host components from a table, with no
+  iframe, no `innerHTML` and no `eval`. Lazy reference resolution, so a statement
+  may be used before it is defined.
+- A second keyed toolview (`intelligent_ui`), so cards written by the pre-fork
+  plugin replay through this one.
+
 ### Known issues
 
-- An openui card does not render yet: the client still requires
-  `kind: 'visualize'`. Stage 3.
+- The OpenUI card is verified by a server-side render only; no browser has
+  driven it. Interaction is inert until the evaluator and `$state` land.
 - No evaluator (stage 2); 8/48 components and 17/73 functions.
 - 15 inherited test failures on Windows (CRLF and symlink assumptions);
   identical in the upstream baseline. See `docs/testing/TEST_PLAN.md`.

@@ -17,25 +17,35 @@ character, and that nothing that worked before stopped working.
 | The base suite runs and matches its baseline | PASS | 15 failed / 455 passed vs 15 / 426; failure sets sha256-identical |
 | `RendererAdapter` and `RenderResult` exist | PASS | `src/core/render-contract.ts` |
 | The HTML backend is behind the dispatcher, behaviour unchanged | PASS | `tests/tool.spec.ts`, `tests/lint-gate.spec.ts` |
-| An openui backend exists and renders Row/Text/Button | **PARTIAL** | validates and persists; **the client cannot draw it** |
+| An openui backend exists and renders Row/Text/Button | PASS (server) | dispatches and renders to elements; **browser unverified** |
 
-## The gap, stated plainly
+## Stage 1.1 — the gap, and how it was closed
 
-The openui backend is complete on the host side: it parses, diagnoses, and
-writes a correct `RenderDescriptor`. The browser half still reads
-`visualizeMetaFrom`, which requires `kind === 'visualize'`; an openui card
-carries `kind: 'intelligent_ui'`, so it falls back to generic text.
+The openui backend was complete on the host side: it parsed, diagnosed and
+wrote a correct `RenderDescriptor`. The browser half read `visualizeMetaFrom`,
+which requires `kind === 'visualize'`; a program card carries
+`kind: 'intelligent_ui'`, so it fell back to generic text.
 
-Proven, not assumed:
+**Closed in stage 1.1** with an explicit discriminant rather than a disguise:
 
-```text
-openui descriptorFrom : openui
-openui visualizeMetaFrom (what the client reads): undefined
-html   visualizeMetaFrom: card OK
+```ts
+type VisualizationDescriptor = VisualizeMeta | OpenUIMeta
 ```
 
-Closing it is stage 3's first exit criterion. It is recorded here, in
-`session-log.md`, `STAGE.md` and `ADR-003`, rather than described as done.
+The client switches on `kind` and hands the value to the renderer built for it.
+A program is never rewritten into a fragment to satisfy an existing check.
+
+Now, proven by `evidence/phase-1/e2e-openui-dispatch.txt`:
+
+```text
+dispatch         : openui
+openuiMetaFrom   : recognised
+visualizeMetaFrom: declines (correct)
+visualizationFrom: intelligent_ui
+render error     : none
+```
+
+Still open, and recorded as NOT VERIFIED: no browser has driven the card.
 
 ## Incidental fix
 

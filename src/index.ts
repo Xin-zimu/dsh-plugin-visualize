@@ -25,7 +25,10 @@ import { handleImageRequest, storeRoot } from './storage.ts'
 import { installSelfRepair } from './self-repair.ts'
 
 export { VISUALIZE_TOOL_NAME } from './tool.ts'
-export { visualizeMetaFrom, type VisualizeMeta, type VisualizeMode } from './fragment.ts'
+export {
+  openuiMetaFrom, openuiMetaFromArgs, visualizationFrom, visualizeMetaFrom,
+  type OpenUIMeta, type VisualizationDescriptor, type VisualizeMeta, type VisualizeMode,
+} from './fragment.ts'
 export { validateFragment } from './lint.ts'
 export { STYLE_IDS, type StyleId } from './style.ts'
 export { readStyle, type StyleSetting } from './style-setting.ts'

@@ -9,16 +9,18 @@ this says what the current slice is allowed to do.
 | Stage | Name | Status |
 | --- | --- | --- |
 | 0 | Baseline | **Done** |
-| 1 | Fork skeleton, dual-backend seat | **Done — accepted with a recorded gap** |
+| 1 | Fork skeleton, dual-backend seat | **Done** |
+| 1.1 | OpenUI render loop (was the stage-1 gap) | **Done — server-rendered; browser unverified** |
 | 2 | OpenUI language core | Not started |
 | 3 | OpenUI render backend | Not started |
 | 4 | Capability expansion (open-intelligent-ui reference) | Not started |
 | 5 | Unified prompt, security review, release | Not started |
 
-Stage 1 is accepted with a gap: the openui backend validates and persists, but
-the browser cannot draw its cards yet. That is stage 3's job. The gap is
-recorded in `session-log.md` and `docs/testing/TEST_PLAN.md` rather than
-hidden behind a "done".
+Stage 1.1 closed the gap that stage 1 shipped with: the client now dispatches on
+the card's discriminant, so a program card reaches the OpenUI renderer instead of
+falling back to text. That is verified by a server-side render and an end-to-end
+dispatch probe. It is **not** verified in a browser — no browser session has
+driven the card yet. Stage 3 covers interaction and reload.
 
 ---
 

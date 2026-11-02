@@ -1,0 +1,359 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ✓ tests/fragment.spec.ts (28 tests) 48ms
+ ✓ tests/lint.spec.ts (49 tests) 147ms
+ ❯ tests/style-files.spec.ts (9 tests | 2 failed) 455ms
+     ✓ lists the global file and one file per workspace with what exists 116ms
+     ✓ lists nothing on a host without a home 16ms
+     ✓ writes through a temporary file and leaves the rest of the directory alone 99ms
+     ✓ creates the workspace file under the registered workspace only 46ms
+     ✓ removes the file when saved empty 47ms
+     ✓ refuses text over the byte limit, counted in UTF-8 39ms
+     × refuses a style file that is a symlink, for reads and writes 47ms
+     × refuses a workspace whose .dsh directory links out of it 25ms
+     ✓ accepts only a JSON POST besides GET 15ms
+ ✓ tests/core.spec.ts (24 tests) 52ms
+ ❯ tests/tool.spec.ts (7 tests | 1 failed) 160ms
+     ✓ resolves the session policy and forwards it to the workspace write 35ms
+     ✓ patches the workspace copy on update and writes the result beside it 17ms
+     ✓ chains a second patch in the same reply onto the first 59ms
+     ✓ fails loud on the arguments each action cannot run without 19ms
+     ✓ lets creates run in parallel but serialises updates against their base 4ms
+     ✓ still writes without a sandboxPolicy service in the composition 5ms
+     × names an on-disk contract for agents that cannot load skills 16ms
+ ✓ tests/lint-gate.spec.ts (15 tests) 125ms
+ ✓ tests/page-mode.spec.ts (5 tests) 71ms
+ ✓ tests/style-setting.spec.ts (9 tests) 88ms
+ ✓ tests/self-repair.spec.ts (27 tests) 88ms
+ ❯ tests/images.spec.ts (39 tests | 1 failed) 1153ms
+     ✓ identifies each accepted format by its bytes 6ms
+     ✓ refuses everything else, whatever it is called 1ms
+     ✓ refuses 127.0.0.1 1ms
+     ✓ refuses 10.1.2.3 0ms
+     ✓ refuses 172.20.0.1 0ms
+     ✓ refuses 192.168.1.1 0ms
+     ✓ refuses 169.254.169.254 0ms
+     ✓ refuses 100.64.0.1 0ms
+     ✓ refuses 0.0.0.0 0ms
+     ✓ refuses 224.0.0.1 0ms
+     ✓ refuses 255.255.255.255 0ms
+     ✓ refuses ::1 1ms
+     ✓ refuses :: 0ms
+     ✓ refuses fe80::1 0ms
+     ✓ refuses fd00::1 0ms
+     ✓ refuses ff02::1 0ms
+     ✓ refuses ::ffff:127.0.0.1 0ms
+     ✓ refuses ::ffff:7f00:1 0ms
+     ✓ refuses ::ffff:a9fe:a9fe 0ms
+     ✓ refuses 64:ff9b::a00:1 0ms
+     ✓ admits 93.184.215.14 0ms
+     ✓ admits 1.1.1.1 0ms
+     ✓ admits 2606:4700:4700::1111 0ms
+     ✓ admits ::ffff:5db8:d70e 0ms
+     ✓ admits 64:ff9b::101:101 0ms
+     ✓ reads a workspace file relative to the root 114ms
+     × refuses paths that leave the workspace, lexically or through a symlink 85ms
+     ✓ names what is wrong with a file inside it 52ms
+     ✓ caps one image and the whole card 84ms
+     ✓ charges an image once per reference, since every reference embeds a full copy 79ms
+     ✓ degrades with a message on a host whose fs cannot read bytes 184ms
+     ✓ reports every image undeliverable, without reading anything, when the host cannot deliver them 94ms
+     ✓ refuses loopback, private and metadata targets before connecting (default policy) 38ms
+     ✓ connects to a name only through the guarded lookup 36ms
+     ✓ fetches an image and follows a redirect 28ms
+     ✓ checks every redirect hop against the policy and the scheme 40ms
+     ✓ refuses what is not an image, missing, too large, or too slow 234ms
+     ✓ drops an unread redirect or error body at once instead of draining it to the deadline 30ms
+     ✓ carries a URL image an earlier call fetched instead of fetching it again 7ms
+ ❯ tests/storage.spec.ts (16 tests | 6 failed) 740ms
+     × writes a new card into the session store, not the workspace, and patches it there 111ms
+     ✓ keeps conversations apart 61ms
+     ✓ patches a legacy viz/ workspace copy in place through the sandboxed fs seam 27ms
+     × keeps the style a card was created with when it is patched after the setting changed 78ms
+     ✓ patches a card named before styles existed in the current setting 30ms
+     ✓ falls back to the workspace copy when the host has no home path 19ms
+     × never reads a file outside the store with its own fs 55ms
+     × creates the same card concurrently in the same millisecond (Codex repro) 119ms
+     × patches a legacy card inside the workspace by relative and absolute path 44ms
+     ✓ refuses an absolute path outside the workspace without reading it (Codex repro) 33ms
+     ✓ refuses .. traversal out of the workspace 30ms
+     × refuses a symlink inside the workspace that points out of it 34ms
+     ✓ expands ~ and contains the result like any other path 35ms
+     ✓ refuses a non-.html file and a session without a workspace 36ms
+     ✓ encodes any id as one segment that cannot climb 11ms
+     ✓ expands the ~ display form the result reports back to the store path 11ms
+ ✓ tests/shell.spec.ts (6 tests) 7ms
+ ✓ tests/streaming-preview.spec.ts (7 tests) 12ms
+ ✓ tests/stream-assembly.spec.ts (3 tests) 22ms
+ ✓ tests/style.spec.ts (13 tests) 270ms
+ ✓ tests/window-doc.spec.ts (3 tests) 54ms
+ ✓ tests/card-state.spec.ts (11 tests) 23ms
+ ✓ tests/openui-card.spec.tsx (10 tests) 23ms
+ ✓ tests/frame-helpers.spec.ts (11 tests) 373ms
+ ✓ tests/frame-scheme.spec.tsx (2 tests) 195ms
+ ✓ tests/live-style.spec.tsx (2 tests) 227ms
+ ✓ tests/page-launcher.spec.tsx (6 tests) 247ms
+stderr | tests/turn-cards.spec.tsx > turn cards view > shows the cards while the host folds
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/turn-cards.spec.tsx > turn cards view > stays empty when the toolview card is already in view
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/turn-cards.spec.tsx (18 tests) 145ms
+ ✓ tests/frame-images.spec.tsx (8 tests) 272ms
+ ✓ tests/prompt-bridge.spec.tsx (18 tests) 229ms
+ ✓ tests/frame-state.spec.tsx (14 tests) 486ms
+ ✓ tests/settings-section.spec.tsx (13 tests) 648ms
+ ❯ tests/card-images.spec.ts (7 tests | 5 failed) 5856ms
+     × stores the bytes beside the card and keeps them out of the fragment, the result text and the meta 224ms
+     × re-reads workspace files and carries fetched URLs on update 140ms
+     × leaves the card untouched when an update is cancelled while its images resolve 5024ms
+     × renders the card and says why on a host that cannot deliver images 16ms
+     ✓ leaves a card without images exactly as before 17ms
+     ✓ serves a stored image as an opaque, sandboxed download  416ms
+     × opens nothing but a well-formed id of an intact regular file below the store 15ms
+stdout | tests/lint-adversarial.spec.ts > lintFragment on adversarial input > reports the slowest case
+slowest lint cases (ms): deep template nesting=347.3, regex restart on /[ (Codex repro, scaled)=337.9, many </=323.4, realistic cards=315.6, many script blocks with unterminated comments=220.9
+
+ ✓ tests/lint-adversarial.spec.ts (100 tests) 7122ms
+     ✓ stays under the machine budget (200 ms on the reference machine) and never throws: realistic cards  324ms
+     ✓ stays under the machine budget (200 ms on the reference machine) and never throws: regex restart on /[ (Codex repro, scaled)  342ms
+     ✓ stays under the machine budget (200 ms on the reference machine) and never throws: deep template nesting  351ms
+     ✓ stays under the machine budget (200 ms on the reference machine) and never throws: many </  326ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-LHWdrX\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:92:12
+     90|     // The fragment the model wrote is what the card stores and replay…
+     91|     expect(value.fragment).toBe(FRAGMENT)
+     92|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+     93|     expect(value.images!.map(i => [i.src, i.type, i.bytes])).toEqual([
+     94|       ['./figs/loss.png', 'image/png', FIGURE.byteLength],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read src/storage.ts:457:40
+    455|       return {
+    456|         displayPath: target.displayPath,
+    457|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    458|         async write(content) {
+    459|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ run tests/card-images.spec.ts:74:56
+ ❯ tests/card-images.spec.ts:125:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/card-images.spec.ts:141:3
+    139|   })
+    140|
+    141|   it('leaves the card untouched when an update is cancelled while its …
+       |   ^
+    142|     let started: () => void = () => {}
+    143|     const fetching = new Promise<void>(done => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-6JDnV0\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:177:12
+    175|     const value = await run({ fragment: FRAGMENT, title: 'Lab' })
+    176|     expect(value.images).toBeUndefined()
+    177|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+    178|     expect(text(value)).toContain('3 images could not be embedded')
+    179|     expect(text(value)).toContain('needs dsh 0.1.7 or later')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-ws-ytARA8\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-brjMin\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+ ❯ tests/card-images.spec.ts:216:5
+    214|     const outside = join(workspace, 'secret.png')
+    215|     await writeFile(outside, PNG)
+    216|     await symlink(outside, join(dir, `${digest}.png`))
+       |     ^
+    217|     await writeFile(join(dir, `${'0'.repeat(64)}.png`), PNG)
+    218|     for (const id of [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  tests/images.spec.ts > workspace images > refuses paths that leave the workspace, lexically or through a symlink
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-img-099PQi\outside\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-img-099PQi\ws\figs\link.png'
+ ❯ tests/images.spec.ts:146:5
+    144|
+    145|   it('refuses paths that leave the workspace, lexically or through a s…
+    146|     await symlink(join(outside, 'secret.png'), join(workspace, 'figs',…
+       |     ^
+    147|     await symlink(outside, join(workspace, 'escape'))
+    148|     for (const src of ['../outside/secret.png', join(outside, 'secret.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+AssertionError: expected '~\AppData\Local\Temp\viz-home-oZYNe2\…' to match /^C:/Users/<user>\AppData\Loc…/visualize\
+
+- Expected:
+/^C:/Users/<user>\AppData\Local\Temp\viz-home-oZYNe2\/visualize\/sessions\/sess-1\/lab-[0-9a-f]{8}\.whale\.html$/
+
++ Received:
+"~\\AppData\\Local\\Temp\\viz-home-oZYNe2\\visualize\\sessions\\sess-1\\lab-2f2b2eea.whale.html"
+
+ ❯ tests/storage.spec.ts:61:26
+     59|     const created = await tool.execute({ fragment: '<p>p99 480ms</p>',…
+     60|
+     61|     expect(created.path).toMatch(new RegExp(`^${home}/visualize/sessio…
+       |                          ^
+     62|     expect(await readFile(created.path, 'utf8')).toBe('<p>p99 480ms</p…
+     63|     expect(seam.resolved).toEqual([])
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+Error: ENOENT ~\AppData\Local\Temp\viz-home-w6PjrM\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ❯ Object.readText tests/storage.spec.ts:40:39
+     38|       readText: async (target: { path: string }) => {
+     39|         const text = files[target.path]
+     40|         if (text === undefined) throw new Error(`ENOENT ${target.path}…
+       |                                       ^
+     41|         return text
+     42|       },
+ ❯ Object.read src/storage.ts:457:40
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ tests/storage.spec.ts:106:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-nJmsn1\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-nJmsn1\visualize\sessions\linked'
+ ❯ tests/storage.spec.ts:140:5
+    138|     await writeFile(join(outside, 'card.html'), '<p>secret</p>')
+    139|     await mkdir(join(home, 'visualize', 'sessions'), { recursive: true…
+    140|     await symlink(outside, join(home, 'visualize', 'sessions', 'linked…
+       |     ^
+    141|
+    142|     const { ctx, seam } = host()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+Error: EPERM: operation not permitted, rename 'C:/Users/<user>\AppData\Local\Temp\viz-home-Zsm6Vk\visualize\sessions\sess-5\lab-03ef8274.whale.html.23256.1464eae7d1dd.tmp' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-Zsm6Vk\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ❯ writeFileAtomic src/storage.ts:415:5
+    413|   try {
+    414|     await writeFile(temp, content, { encoding: 'utf8', mode: 0o600, fl…
+    415|     await rename(temp, path)
+       |     ^
+    416|   } catch (error) {
+    417|     // EEXIST means the name was taken and the file is not ours to rem…
+ ❯ Object.write src/storage.ts:257:29
+ ❯ execute src/core/legacy-tool.ts:340:7
+ ❯ tests/storage.spec.ts:166:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path
+Error: ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-cP2H0j\C:/Users/<user>\AppData\Local\Temp\viz-ws-cP2H0j\viz\lab-0badf00d.html'
+ ❯ Object.readText tests/storage.spec.ts:189:55
+    187|           return { displayPath: path, path: absolute }
+    188|         },
+    189|         readText: async (target: { path: string }) => await readFile(t…
+       |                                                       ^
+    190|         writeText: async (target: { path: string }, content: string) =…
+    191|           await writeFile(target.path, content)
+ ❯ Object.read src/storage.ts:457:27
+ ❯ execute src/core/legacy-tool.ts:268:16
+ ❯ tests/storage.spec.ts:226:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-dG96Sb\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-69RwWW\viz\link.html'
+ ❯ tests/storage.spec.ts:249:5
+    247|
+    248|   it('refuses a symlink inside the workspace that points out of it', a…
+    249|     await symlink(join(secretDir, 'secret.html'), join(workspace, 'viz…
+       |     ^
+    250|     await symlink(secretDir, join(workspace, 'viz', 'dir'))
+    251|     const { tool, resolved } = diskHost()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+
+ FAIL  tests/style-files.spec.ts > style files route > refuses a style file that is a symlink, for reads and writes
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-files-out-i4na6J\secret.txt' -> 'C:/Users/<user>\AppData\Local\Temp\viz-files-home-FLhWvH\visualize\style.md'
+ ❯ tests/style-files.spec.ts:107:5
+    105|     await writeFile(join(outside, 'secret.txt'), 'secret')
+    106|     await mkdir(join(home, 'visualize'), { recursive: true })
+    107|     await symlink(join(outside, 'secret.txt'), globalPath())
+       |     ^
+    108|     const view = await (await get()).json() as StyleFilesView
+    109|     expect(view.files[0]).toMatchObject({ exists: true, text: '', bloc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+
+ FAIL  tests/style-files.spec.ts > style files route > refuses a workspace whose .dsh directory links out of it
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-files-out-K4lQDE' -> 'C:/Users/<user>\AppData\Local\Temp\viz-files-ws-b55Wug\.dsh'
+ ❯ tests/style-files.spec.ts:115:5
+    113|
+    114|   it('refuses a workspace whose .dsh directory links out of it', async…
+    115|     await symlink(outside, join(workspace, '.dsh'))
+       |     ^
+    116|     const response = await post({ scope: 'workspace', workspaceId: 'ws…
+    117|     expect(response.status).toBe(409)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+
+ FAIL  tests/tool.spec.ts > visualizeTool description > names an on-disk contract for agents that cannot load skills
+AssertionError: expected undefined to be defined
+ ❯ tests/tool.spec.ts:190:18
+    188|     const tool = visualizeTool({} as Context, 1000)
+    189|     const path = /read the same contract from (\S+\.md)/.exec(tool.des…
+    190|     expect(path).toBeDefined()
+       |                  ^
+    191|     expect(existsSync(path!)).toBe(true)
+    192|     expect(tool.description).toContain('do not search for it anywhere …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read src/storage.ts:457:40
+    455|       return {
+    456|         displayPath: target.displayPath,
+    457|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    458|         async write(content) {
+    459|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+
+This error originated in "tests/card-images.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  5 failed | 24 passed (29)
+      Tests  15 failed | 465 passed (480)
+     Errors  1 error
+   Start at  15:18:39
+   Duration  9.02s (transform 5.14s, setup 0ms, import 18.35s, tests 19.34s, environment 29.33s)
+

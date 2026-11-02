@@ -1,0 +1,16 @@
+ℹ tsdown v0.22.14 powered by rolldown v1.2.3
+ℹ config file: D:/work/dsh-plugin-visualize\tsdown.config.ts 
+ℹ entry: src/client/index.tsx
+ℹ tsconfig: tsconfig.json
+ℹ entry: src/index.ts
+ℹ target: es2024
+ℹ tsconfig: tsconfig.json
+ℹ Build start
+ℹ Cleaning 4 files
+ℹ [CJS] lib\client.js  198.71 kB │ gzip: 57.64 kB
+ℹ [CJS] 1 files, total: 198.71 kB
+✔ Build complete in 902ms
+ℹ [ESM] lib\index.js    220.42 kB │ gzip: 69.03 kB
+ℹ [ESM] lib\index.d.ts   10.07 kB │ gzip:  3.81 kB
+ℹ [ESM] 2 files, total: 230.49 kB
+✔ Build complete in 1010ms
