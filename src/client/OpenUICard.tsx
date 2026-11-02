@@ -84,17 +84,73 @@ function children(value: unknown): ReactNode {
   return value as ReactNode
 }
 
+/**
+ * Frame variable → host design token, with a literal fallback.
+ *
+ * The DSH host publishes its palette as `--dsw-alias-*` and `--dsw-static-*`
+ * design tokens; it does NOT publish `--foreground`, `--primary` or
+ * `--border`. Declaring those names here, on the card root, bridges the two so
+ * the component table below can keep using one vocabulary inside and outside
+ * DSH. Without this every `var(--…)` in the table is invalid at computed-value
+ * time and collapses to the property's initial value — a Button with no
+ * background, no border and square corners, which is exactly what a real
+ * browser showed and no unit test could see.
+ *
+ * The fallbacks keep a non-DSH host legible; `light-dark()` is deliberately not
+ * used, because these are plain values the host already resolved for the
+ * current appearance, and re-interpreting them per scheme would double-apply
+ * the theme.
+ */
+const HOST_TOKENS: Readonly<Record<string, readonly [string, string]>> = {
+  '--foreground': ['--dsw-alias-label-primary', 'light-dark(rgb(26 28 31), rgb(240 242 245))'],
+  // Tertiary, not caption: the host's caption tier measures 2.13:1 on white,
+  // which is below AA for text. Tertiary is the tier the host itself uses for
+  // small meta text (timestamps, key hints) and measures 3.71:1.
+  '--muted-foreground': ['--dsw-alias-label-tertiary', 'light-dark(rgb(26 28 31 / 55%), rgb(240 242 245 / 55%))'],
+  '--border': ['--dsw-alias-border-l2', 'light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 12%))'],
+  '--card': ['--dsw-alias-bg-layer-2', 'light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 6%))'],
+  '--primary': ['--dsw-alias-brand-primary-new-colorprimary-new-color', 'light-dark(rgb(65 118 230), rgb(110 150 240))'],
+  // The text that pairs with the brand fill. The host's *-inverted token is NOT
+  // it: in dark mode that one resolves to #353638, which measures 3.59:1 on the
+  // brand blue and fails AA. --dsw-alias-label-primary-foreground is the token
+  // the host itself pairs with a filled brand surface (5.61:1 on #5686fe, and
+  // 5.61:1 on #4176e6 in light mode).
+  '--primary-foreground': ['--dsw-alias-label-primary-foreground', 'light-dark(rgb(255 255 255), rgb(13 13 13))'],
+  // The series order matches frame-css.ts, so one colour name means the same
+  // colour in both backends: 1 brand, 2 amber, 3 green, 4 purple, 5 red.
+  '--viz-series-1': ['--dsw-static-deepseek-500', '#4176e6'],
+  '--viz-series-2': ['--dsw-static-amber-500', '#f59e0b'],
+  '--viz-series-3': ['--dsw-static-green-500', '#22c55e'],
+  '--viz-series-4': ['--dsw-static-purple-500', '#9359b9'],
+  '--viz-series-5': ['--dsw-static-red-500', '#ef4444'],
+  '--viz-grid': ['--dsw-alias-border-l1', 'light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 10%))'],
+  '--radius': ['--dsw-radius-sm', '8px'],
+  '--font-sans': ['--dsh-font-family-text-default', 'system-ui, -apple-system, \'Segoe UI\', \'PingFang SC\', \'Microsoft YaHei\', sans-serif'],
+}
+
+/**
+ * Declare the bridged variables on an element.
+ * @returns a style object carrying the custom properties, ready to spread.
+ */
+function hostTokenStyle(): CSSProperties {
+  const style: Record<string, string> = {}
+  for (const [name, [hostToken, fallback]] of Object.entries(HOST_TOKENS)) {
+    style[name] = `var(${hostToken}, ${fallback})`
+  }
+  return style as CSSProperties
+}
+
 /** Colour tokens the language names, resolved through the host's CSS variables. */
 const COLOR_VARS: Readonly<Record<string, string>> = {
   ink: 'var(--foreground)',
   muted: 'var(--muted-foreground)',
   faint: 'var(--muted-foreground)',
   info: 'var(--primary)',
-  success: 'var(--viz-series-2)',
-  warning: 'var(--viz-series-3)',
-  danger: 'var(--viz-series-4)',
-  purple: 'var(--viz-series-5)',
-  pink: 'var(--viz-series-4)',
+  success: 'var(--viz-series-3)',
+  warning: 'var(--viz-series-2)',
+  danger: 'var(--viz-series-5)',
+  purple: 'var(--viz-series-4)',
+  pink: 'var(--viz-series-5)',
 }
 
 /**
@@ -135,7 +191,7 @@ const BUTTON_KINDS: Readonly<Record<string, CSSProperties>> = {
   secondary: { background: 'var(--viz-grid)', color: 'var(--foreground)', borderColor: 'var(--border)' },
   ghost: { background: 'transparent', color: 'var(--foreground)', borderColor: 'transparent' },
   outline: { background: 'transparent', color: 'var(--foreground)', borderColor: 'var(--border)' },
-  danger: { background: 'var(--viz-series-4)', color: '#fff', borderColor: 'var(--viz-series-4)' },
+  danger: { background: 'var(--viz-series-5)', color: 'var(--primary-foreground)', borderColor: 'var(--viz-series-5)' },
 }
 
 /**
@@ -250,7 +306,12 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
           alignSelf: 'flex-start',
           padding: '5px 14px',
           borderRadius: 'calc(var(--radius) * 1.4)',
-          border: '1px solid var(--border)',
+          // Longhands, not the `border` shorthand: the variant table below sets
+          // borderColor, and mixing the two made the shorthand's style and width
+          // resolve to nothing.
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'var(--border)',
           cursor: 'pointer',
           ...BUTTON_KINDS[variant] ?? BUTTON_KINDS.primary,
         } satisfies CSSProperties,
@@ -436,10 +497,16 @@ export function OpenUICard({ meta }: { readonly meta: OpenUIMeta }): ReactNode {
   const { node, error } = renderProgram(meta.program)
   return createElement(
     'div',
-    { style: ROOT_STYLE, 'data-openui-card': meta.path },
+    // The bridged custom properties must sit on the card root itself: a
+    // var() only sees declarations on the element or an ancestor, so putting
+    // them anywhere lower would leave the table's colours unresolved.
+    { style: { ...hostTokenStyle(), ...ROOT_STYLE }, 'data-openui-card': meta.path },
+    // Same treatment as the HTML card's header (VisualizeCard.tsx): foreground
+    // ink at 0.65 opacity. Using muted ink here made the two backends disagree
+    // about what a card title looks like — and dropped it under AA (2.13:1).
     createElement(
       'div',
-      { style: { fontSize: '0.75rem', color: 'var(--muted-foreground)' } },
+      { style: { fontSize: '0.75rem', color: 'var(--foreground)', opacity: 0.65 } },
       meta.title,
     ),
     error === undefined

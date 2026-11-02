@@ -1,0 +1,15 @@
+card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
+card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update
+card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images
+card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+images.spec.ts > workspace images > refuses paths that leave the workspace, lexically or through a symlink
+storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+storage.spec.ts > card storage > never reads a file outside the store with its own fs
+storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path
+storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it
+style-files.spec.ts > style files route > refuses a style file that is a symlink, for reads and writes
+style-files.spec.ts > style files route > refuses a workspace whose .dsh directory links out of it
+tool.spec.ts > visualizeTool description > names an on-disk contract for agents that cannot load skills

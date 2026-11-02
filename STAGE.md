@@ -11,7 +11,8 @@ this says what the current slice is allowed to do.
 | 0 | Baseline | **Done** |
 | 1 | Fork skeleton, dual-backend seat | **Done** |
 | 1.1 | OpenUI render loop (was the stage-1 gap) | **Done** |
-| 1.2 | Real-browser integration verification | **Done — B01–B11 recorded; three NOT VERIFIED by scope** |
+| 1.2 | Real-browser integration verification | **Done — B01–B11 recorded** |
+| 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
 | 2 | OpenUI language core | Not started |
 | 3 | OpenUI render backend | Not started |
 | 4 | Capability expansion (open-intelligent-ui reference) | Not started |
@@ -26,9 +27,18 @@ found two defects that no unit test could have caught:
 - a lone Button was centred because a flex column defaults to centring.
 
 Both are fixed. B01–B11 are recorded in `evidence/browser-phase-1/MANIFEST.json`;
-B05 (streaming), B08 (dark theme) and B10 (session switching) are **NOT
-VERIFIED** by scope, not by failure. Re-rendering the aligned card in a browser
-is still outstanding.
+B05 (streaming) and B10 (session switching) remain **NOT VERIFIED** by scope,
+not by failure.
+
+Stage 1.3 then closed B07 and B08 with browser evidence, and found something
+bigger than either case: **not one of the 12 CSS variables the OpenUI card
+referenced had ever resolved.** The card was written in the frame vocabulary
+that only exists inside the HTML backend's sandboxed iframe, so every
+`var(--…)` was invalid at computed-value time. The Button had no background,
+no border and square corners throughout stage 1.2, while every unit test
+passed. Fixed with a `HOST_TOKENS` bridge on the card root; four further
+defects (border shorthand, an AA-failing dark button, a divergent title, an
+offset palette) went with it. Record: `evidence/browser-phase-1/MANIFEST-1.3.json`.
 
 ---
 

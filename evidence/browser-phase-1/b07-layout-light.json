@@ -1,0 +1,86 @@
+{
+  "tag": "light",
+  "scheme": {
+    "root": "light",
+    "body": "light",
+    "darkAttr": false
+  },
+  "card": {
+    "width": 724,
+    "height": 117,
+    "contentWidth": 724,
+    "alignItems": "stretch",
+    "display": "flex",
+    "color": "rgb(15, 17, 21)",
+    "fontFamily": "-apple-system, BlinkMacS"
+  },
+  "vars": {
+    "--foreground": "#0f1115",
+    "--muted-foreground": "#81858c",
+    "--primary": "#4176e6",
+    "--primary-foreground": "#fff",
+    "--border": "#0000001a",
+    "--radius": "8px",
+    "--font-sans": "-apple-system, BlinkMacSystemFont, \"Sego"
+  },
+  "varsResolved": 7,
+  "rows": [
+    {
+      "tag": "div",
+      "text": "Browser Test",
+      "leftOffset": 0,
+      "width": 723.65,
+      "color": "rgb(15, 17, 21)",
+      "background": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(15, 17, 21)",
+      "borderWidth": "0px",
+      "borderRadius": "0px",
+      "fontSize": "12px"
+    },
+    {
+      "tag": "div",
+      "text": "OpenUI Browser Test",
+      "leftOffset": 0,
+      "width": 723.65,
+      "color": "rgb(15, 17, 21)",
+      "background": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(15, 17, 21)",
+      "borderWidth": "0px",
+      "borderRadius": "0px",
+      "fontSize": "14px"
+    },
+    {
+      "tag": "div",
+      "text": "Hello DSH",
+      "leftOffset": 0,
+      "width": 723.65,
+      "color": "rgb(15, 17, 21)",
+      "background": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(15, 17, 21)",
+      "borderWidth": "0px",
+      "borderRadius": "0px",
+      "fontSize": "14px"
+    },
+    {
+      "tag": "button",
+      "text": "Test Button",
+      "leftOffset": 0,
+      "width": 88.8,
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(65, 118, 230)",
+      "borderColor": "rgb(65, 118, 230)",
+      "borderWidth": "0.666667px",
+      "borderRadius": "11.2px",
+      "fontSize": "12px"
+    }
+  ],
+  "button": {
+    "leftOffset": 0,
+    "width": 88.8,
+    "spansContentWidth": false,
+    "background": "rgb(65, 118, 230)",
+    "color": "rgb(255, 255, 255)",
+    "border": "0.666667px solid rgb(65, 118, 230)",
+    "radius": "11.2px"
+  }
+}

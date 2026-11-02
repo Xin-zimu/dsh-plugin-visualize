@@ -9,9 +9,22 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { openuiMetaFrom, openuiMetaFromArgs, visualizationFrom } from '../src/fragment.ts'
-import { renderProgram } from '../src/client/OpenUICard.tsx'
+import { OpenUICard, renderProgram } from '../src/client/OpenUICard.tsx'
+
+/**
+ * Markup for one component with props, without JSX in this spec.
+ *
+ * `unknown` (rather than React's own prop types) keeps the helper usable for a
+ * component whose props are required: createElement's overloads would otherwise
+ * demand a props object matching the component exactly.
+ */
+const renderElement = (
+  type: (props: never) => unknown,
+  props: Record<string, unknown>,
+) => renderToStaticMarkup(createElement(type as never, props as never))
 
 const META = {
   kind: 'intelligent_ui',
@@ -107,5 +120,40 @@ describe('layout contract', () => {
     const { node } = renderProgram('root = Col([Button("Test Button")])')
     const html = renderToStaticMarkup(node as never)
     expect(html).toContain('align-self:flex-start')
+  })
+})
+describe('host token bridge', () => {
+  it('declares every variable the component table references', () => {
+    // The bridge belongs to the card root, not to the program tree: a var()
+    // resolves against the element or an ancestor, so the declaration has to
+    // sit above every component the table draws.
+    const html = renderElement(
+      OpenUICard,
+      { meta: { ...META, program: 'root = Col([Title("t"), Text("x"), Button("b"), Caption("c")])' } },
+    )
+    // The DSH host publishes --dsw-* tokens only; without an explicit bridge on
+    // the card root every var() below is invalid at computed-value time and the
+    // element falls back to initial values (a Button with no background).
+    // React escapes the style attribute, so compare against the decoded text.
+    const decoded = html.replace(/&quot;/g, '"').replace(/&amp;/g, '&')
+    for (const name of ['--foreground', '--muted-foreground', '--border', '--primary', '--primary-foreground', '--radius']) {
+      expect(decoded).toContain(`${name}:var(--dsw-`)
+    }
+    // --font-sans is the one bridged name whose host token is a --dsh-* token.
+    expect(decoded).toContain('--font-sans:var(--dsh-font-family-text-default')
+  })
+
+  it('keeps the semantic colour names on their own series', () => {
+    const success = renderToStaticMarkup(renderProgram('root = Text("ok", "md", "success")').node as never)
+    const danger = renderToStaticMarkup(renderProgram('root = Text("no", "md", "danger")').node as never)
+    // success must not resolve to the amber slot, and danger must not reuse it.
+    expect(success).toContain('var(--viz-series-3)')
+    expect(danger).toContain('var(--viz-series-5)')
+  })
+
+  it('gives a Button a real border rather than a shorthand conflict', () => {
+    const html = renderToStaticMarkup(renderProgram('root = Button("b")').node as never)
+    expect(html).toContain('border-width:1px')
+    expect(html).toContain('border-style:solid')
   })
 })

@@ -1,0 +1,40 @@
+{
+  "tag": "light",
+  "scheme": {
+    "root": "light",
+    "body": "light",
+    "darkAttr": false
+  },
+  "varsResolved": "7/7",
+  "buttonContrast": 4.23,
+  "rows": [
+    {
+      "text": "Browser Test",
+      "tag": "div",
+      "fg": "rgb(173, 178, 184)",
+      "bg": "(inherited)",
+      "contrastOnOwnBg": null
+    },
+    {
+      "text": "OpenUI Browser Test",
+      "tag": "div",
+      "fg": "rgb(15, 17, 21)",
+      "bg": "(inherited)",
+      "contrastOnOwnBg": null
+    },
+    {
+      "text": "Hello DSH",
+      "tag": "div",
+      "fg": "rgb(15, 17, 21)",
+      "bg": "(inherited)",
+      "contrastOnOwnBg": null
+    },
+    {
+      "text": "Test Button",
+      "tag": "button",
+      "fg": "rgb(255, 255, 255)",
+      "bg": "rgb(65, 118, 230)",
+      "contrastOnOwnBg": 4.23
+    }
+  ]
+}

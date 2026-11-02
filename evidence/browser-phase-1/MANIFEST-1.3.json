@@ -1,0 +1,332 @@
+{
+  "phase": "1.3",
+  "title": "B07 layout re-verification and B08 dark theme",
+  "capturedAt": "2026-11-02T16:00+08:00",
+  "closes": [
+    "B07",
+    "B08"
+  ],
+  "stillOpen": [
+    "B05",
+    "B10"
+  ],
+  "environment": {
+    "dsh": "0.2.1-rc.5",
+    "plugin": "@dsh-unified/visualize@0.1.0",
+    "profile": "vizb78 (isolated; production desktop profile untouched)",
+    "url": "http://127.0.0.1:3081/",
+    "browser": "Chromium Agent Window (browser-skill, CDP)",
+    "os": "Windows 10.0.26100",
+    "node": "v24.22.1"
+  },
+  "summary": {
+    "B07": "PASS",
+    "B08": "PASS"
+  },
+  "method": [
+    "The card was measured through its real root ([data-openui-card]). An earlier attempt walked up from the Button and landed on a transparent wrapper, which would have let an unstyled card pass; that mistake is why the first B07 measurement reported a healthy card that the screenshot contradicted.",
+    "Layout acceptance is numeric: every leaf node left edge must equal the card content left edge within 1px, and a Button must not span the content width.",
+    "Theme acceptance is numeric: every bridged CSS variable must resolve, and every text/background pair must clear WCAG AA 4.5:1 for body text, measured against the nearest ancestor that actually paints a background.",
+    "Both schemes were switched through the host's own Settings > 通用设置 > 外观 control, so the theme change is the host's, not a class the probe added."
+  ],
+  "results": {
+    "B07": {
+      "verdict": "PASS",
+      "card": {
+        "width": 724,
+        "contentWidth": 724,
+        "alignItems": "stretch",
+        "display": "flex"
+      },
+      "rows": [
+        {
+          "text": "Browser Test",
+          "leftOffset": 0,
+          "note": "card title"
+        },
+        {
+          "text": "OpenUI Browser Test",
+          "leftOffset": 0
+        },
+        {
+          "text": "Hello DSH",
+          "leftOffset": 0
+        },
+        {
+          "text": "Test Button",
+          "leftOffset": 0,
+          "width": 88.8,
+          "spansContentWidth": false
+        }
+      ],
+      "screenshot": "screenshots/b07-aligned-light.png",
+      "data": "b07-layout-light.json",
+      "note": "Every leaf sits at leftOffset 0 and the Button keeps its own 88.8px width instead of stretching."
+    },
+    "B08": {
+      "verdict": "PASS",
+      "schemes": {
+        "light": "root=light, body=light, data-ds-dark-theme absent",
+        "dark": "root=dark, body=dark, data-ds-dark-theme present"
+      },
+      "varsResolved": {
+        "light": "7/7",
+        "dark": "7/7"
+      },
+      "tokens": {
+        "light": {
+          "--foreground": "#0f1115",
+          "--primary": "#4176e6",
+          "--primary-foreground": "#fff",
+          "--border": "#0000001a",
+          "--radius": "8px"
+        },
+        "dark": {
+          "--foreground": "#f9fafb",
+          "--primary": "#5686fe",
+          "--primary-foreground": "#0f1115",
+          "--border": "#ffffff1f",
+          "--radius": "8px"
+        }
+      },
+      "contrast": {
+        "light": {
+          "cardTitle": 18.9,
+          "bodyText": 18.9,
+          "button": 4.23,
+          "backdrop": "rgb(255, 255, 255)"
+        },
+        "dark": {
+          "cardTitle": 17.45,
+          "bodyText": 17.45,
+          "button": 5.61,
+          "backdrop": "rgb(21, 21, 23)"
+        }
+      },
+      "screenshot": "screenshots/b08-dark.png",
+      "data": [
+        "b08-theme-dark.json",
+        "b08-theme-dark-contrast.json"
+      ],
+      "note": "The light button pair (4.23:1) is the host's own: the DSH send button and the \"1017\" badge use the identical #4176e6/#fff pairing. Dark measures 5.61:1."
+    }
+  },
+  "defects": [
+    {
+      "id": "D3",
+      "severity": "major",
+      "status": "fixed",
+      "summary": "Every CSS variable the OpenUI card referenced resolved to empty, so the whole component table rendered unstyled: a Button with no background, no border and square corners.",
+      "evidence": "probes/var-resolution.mjs: 0 of 12 declared variables resolved. Screenshot screenshots/b07-before-themefix.png shows the result.",
+      "rootCause": "The card used the frame-CSS vocabulary (--foreground, --primary, --border, --radius, --font-sans), which the HTML backend declares inside its own iframe document. A host-mounted card has no such document, and DSH publishes its palette only as --dsw-alias-* and --dsw-static-* tokens (458 custom properties on the card, none of them named --foreground). A var() that does not resolve is invalid at computed-value time, so every declaration using one fell back to its initial value.",
+      "fix": "OpenUICard.tsx declares a HOST_TOKENS bridge on the card root, mapping each frame variable to its host token with a literal fallback, reusing the same token names theme.ts already established for the HTML backend.",
+      "lesson": "The card had rendered \"correctly\" in the stage-1.2 screenshot because text inherits colour from the chat; only a screenshot showed the missing button, and only a computed-style probe explained it."
+    },
+    {
+      "id": "D4",
+      "severity": "minor",
+      "status": "fixed",
+      "summary": "The Button set a `border` shorthand alongside a borderColor longhand from its variant table, so border-width and border-style resolved to nothing.",
+      "evidence": "Computed border came back as \"0px none rgb(15,17,21)\" while the inline style listed empty border-top-style and border-top-width longhands.",
+      "fix": "Use borderWidth / borderStyle / borderColor longhands consistently, in both the base rule and BUTTON_KINDS."
+    },
+    {
+      "id": "D5",
+      "severity": "major",
+      "status": "fixed",
+      "summary": "The primary Button failed WCAG AA in dark mode: #353638 on #5686fe measured 3.59:1.",
+      "evidence": "probes/effective-contrast.mjs before the fix.",
+      "rootCause": "--primary-foreground was bridged to --dsw-alias-label-primary-inverted, which the host does not pair with its brand fill. In dark mode that token is #353638, a dark grey, because \"inverted\" there means inverted against the page, not against the accent.",
+      "fix": "Bridge to --dsw-alias-label-primary-foreground instead, the token the host itself pairs with a filled brand surface. Measures 5.61:1 on the dark brand and 5.61:1 on the light brand."
+    },
+    {
+      "id": "D6",
+      "severity": "minor",
+      "status": "fixed",
+      "summary": "The two backends disagreed about what a card title looks like, and the OpenUI one put it below AA.",
+      "evidence": "The HTML card title measured 18.9:1; the OpenUI card title measured 2.13:1 using the caption tier.",
+      "fix": "Use the same treatment as VisualizeCard.tsx: foreground ink at 0.65 opacity. --muted-foreground also moved from the caption tier (2.13:1) to the tertiary tier (3.71:1), the one the host uses for its own small meta text.",
+      "note": "The caption tier is a host-wide choice, not something this plugin introduced: the host paints its own \"High\" label in the same 2.13:1 colour. The card no longer adds to it."
+    },
+    {
+      "id": "D7",
+      "severity": "minor",
+      "status": "fixed",
+      "summary": "The semantic colour names in the component table were offset by one against the series palette: success pointed at amber, warning at green, danger at purple.",
+      "fix": "Realigned COLOR_VARS with the series order frame-css.ts uses, so one colour name means the same colour in both backends."
+    }
+  ],
+  "newTests": [
+    "tests/openui-card.spec.tsx: declares every variable the component table references (renders OpenUICard and asserts the bridge is on the card root, because a var() only resolves against the element or an ancestor).",
+    "tests/openui-card.spec.tsx: keeps the semantic colour names on their own series.",
+    "tests/openui-card.spec.tsx: gives a Button a real border rather than a shorthand conflict."
+  ],
+  "files": [
+    {
+      "name": "environment.txt",
+      "bytes": 376,
+      "sha256": "b04f1dc8ac0d46678144878a6102fcc0d1c044b36eeeffe9d2e43cff1658e394"
+    },
+    {
+      "name": "plugin-load.log",
+      "bytes": 1479,
+      "sha256": "d211cc83132066b51cc0358b96fbc03a86e474666b1b0b27016025b8479ff98d"
+    },
+    {
+      "name": "replay-test.log",
+      "bytes": 627,
+      "sha256": "cc108cd63a1c53ba487d9915d07ac16c404d884fb0a0455e25cfafa692ffaeff"
+    },
+    {
+      "name": "test-results.json",
+      "bytes": 4886,
+      "sha256": "fbd47ef388bfc27c61c922d0ecf65166ef07e2c65601e06f2172c3438403c26d"
+    },
+    {
+      "name": "b07-layout-light.json",
+      "bytes": 2093,
+      "sha256": "6ef9afe99eb1bce02a567512574985540f472c6b84795a98458c22286560110c"
+    },
+    {
+      "name": "b07-layout-light-contrast.json",
+      "bytes": 793,
+      "sha256": "d5cb66e4ecf7ef458df1fa1905e63695a29c288349a1d04ef3af011c02437eef"
+    },
+    {
+      "name": "b08-theme-dark.json",
+      "bytes": 2107,
+      "sha256": "171c0065f4494fbb02b794ee3268b14441e0bc8a14690d12ce068b443f926538"
+    },
+    {
+      "name": "b08-theme-dark-contrast.json",
+      "bytes": 792,
+      "sha256": "3cfb83755d09b10c7b54086d4345ab266a725c3de5bc340fc064cb171e43d453"
+    },
+    {
+      "name": "screenshots/openui-basic.png",
+      "bytes": 127075,
+      "sha256": "12f568ab0965bade13d1b0e40eeb30f67b4cabc458b7e932bb55cea021b448f7"
+    },
+    {
+      "name": "screenshots/html-card.png",
+      "bytes": 142277,
+      "sha256": "5847e0edd2a635091eb1a32b7593d39d10b135e8d1958d638a060982d72ad4aa"
+    },
+    {
+      "name": "screenshots/session-replay.png",
+      "bytes": 127075,
+      "sha256": "12f568ab0965bade13d1b0e40eeb30f67b4cabc458b7e932bb55cea021b448f7"
+    },
+    {
+      "name": "screenshots/b07-before-themefix.png",
+      "bytes": 158875,
+      "sha256": "5b459211582b9522721ff1b8185f8903f065641f89b147d3228c3702c13dd711"
+    },
+    {
+      "name": "screenshots/b07-aligned-light.png",
+      "bytes": 193985,
+      "sha256": "a5dd077850c1d14ce8b2ee58e2d10e256ca39f7a8e6b55caa423c80b29677284"
+    },
+    {
+      "name": "screenshots/b08-dark.png",
+      "bytes": 190415,
+      "sha256": "8ad14a21fa252653ca7a86e87594f960b6c9d0927b60c2d7a51e639540063ed0"
+    },
+    {
+      "name": "probes/cdp.mjs",
+      "bytes": 1810,
+      "sha256": "0fb9d59b867d2d942a9713e05ca01ce01e1eae2aa8d76b3834a36629a82a9dac"
+    },
+    {
+      "name": "probes/contrast-lib.mjs",
+      "bytes": 1045,
+      "sha256": "bef0e90075371dca2d01c2ec5f080d2f86170d104ecdba1c6dafab9f3b13a299"
+    },
+    {
+      "name": "probes/measure.mjs",
+      "bytes": 2772,
+      "sha256": "c8dc8c013e71a996559a2ff02b4d9dbfaf4185d48bbd9ccfcc235b35adb03370"
+    },
+    {
+      "name": "probes/run-measure.mjs",
+      "bytes": 272,
+      "sha256": "3a2b040d65fd4d07a9f822f0bbfd22d916c1c10a2461651e179dd92e0ad81f1b"
+    },
+    {
+      "name": "probes/effective-contrast.mjs",
+      "bytes": 1665,
+      "sha256": "3d14e7bf4564757eaf8a2b9229013793c96cb8cb8dd37bd0958633f4e03ef015"
+    },
+    {
+      "name": "probes/host-small-text.mjs",
+      "bytes": 1142,
+      "sha256": "48ecc5dbb75cc891a4c62f9e5e36c2282ddfe9ad004e004cb92b7489a76d8041"
+    },
+    {
+      "name": "probes/var-resolution.mjs",
+      "bytes": 1801,
+      "sha256": "5702a0ce299a1c4cd90dcbd612d2ec06a4a6dbc2acdc79320d73e4b519764dbb"
+    },
+    {
+      "name": "probes/host-tokens2.mjs",
+      "bytes": 1147,
+      "sha256": "9993a014adedbd95bb8fb728a72893f9ab27596decf713e80bfcc70bc899fb99"
+    },
+    {
+      "name": "probes/b07-light-final.mjs",
+      "bytes": 1753,
+      "sha256": "4450464528a1a46e26a44ba06fb9817f2a04081224441d56461caa1de257220c"
+    },
+    {
+      "name": "probes/b08-shot.mjs",
+      "bytes": 904,
+      "sha256": "cd481e3d3432994def1b503f7e14c5030b76586cbea0c949781cd1a89e42868b"
+    },
+    {
+      "name": "probes/capture-dark-final.mjs",
+      "bytes": 2640,
+      "sha256": "f764767f4e24766b4ec495e5add74068986e9dabef6e66af1a57948068dafc48"
+    },
+    {
+      "name": "probes/set-dark.mjs",
+      "bytes": 1172,
+      "sha256": "08ac7110154745a46b6ef0f97d7d9c9fe431a1f72aad813e611395efc2c8236b"
+    },
+    {
+      "name": "probes/set-light.mjs",
+      "bytes": 1644,
+      "sha256": "7633c59ebea356ee526ab27d58641beede39975a254c4cd51950ad208c794cb3"
+    },
+    {
+      "name": "probes/reload.mjs",
+      "bytes": 496,
+      "sha256": "7a08bd5d25fbaad9bd4dcdb556731ca3cb0d01ddbb4bdb582bc6d80418d6110e"
+    },
+    {
+      "name": "probes/close-dialog.mjs",
+      "bytes": 1283,
+      "sha256": "76f1538fee676d5785e9ea5216350b30c2f87289a8ec82952b7b1279c5aaabc8"
+    },
+    {
+      "name": "probes/probe.mjs",
+      "bytes": 445,
+      "sha256": "5021b0ec5b5608fde33d6a01e2e58813df3e975374186a3d1454d8e1c5fad161"
+    },
+    {
+      "name": "probes/html-verify.mjs",
+      "bytes": 1214,
+      "sha256": "b1e00d2c496cc5cdbf571da333a544c404dbb10f9c0e085dae50bfb359ec21a2"
+    },
+    {
+      "name": "probes/replay-expand.mjs",
+      "bytes": 1281,
+      "sha256": "59f85cdd89f7c2b5e56c8c8099630f54fda3fbf51e3e957f204353cfd1ab66e5"
+    },
+    {
+      "name": "probes/security-check.mjs",
+      "bytes": 1241,
+      "sha256": "767914adb53f191696b75296bd1aa6146aaea845760c99c272f394202b6232f2"
+    }
+  ],
+  "conclusion": "B07 and B08 are closed with browser evidence, not unit tests. Closing them exposed five further defects that the stage-1.2 record had marked as a styling detail: the OpenUI card was rendering with no CSS variables resolved at all."
+}

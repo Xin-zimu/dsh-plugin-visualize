@@ -58,9 +58,20 @@ in `evidence/`.
 | `src/lang/functions.js` | `src/backends/openui/functions.ts` | pending | pending (stage 2) |
 | `src/lang/spec.js` | — | replaced — skill text generated from our tables | done |
 | `src/client/**` | — | dropped — the fork uses the host's card shell | dropped |
+| `src/client/theme/**` (host token lookup) | `src/client/OpenUICard.tsx` `HOST_TOKENS` | rewritten — the fork mounts the card in the host document, so it must read the host's `--dsw-*` tokens; upstream only ever read its own scope | verified (`evidence/browser-phase-1/MANIFEST-1.3.json`) |
 | `index.js` | — | dropped — the fork has one tool, not one per backend | dropped (ADR-002) |
 | `scripts/build-client.mjs` | — | dropped — tsdown builds both halves | dropped |
 | `test/lang.test.mjs` | `tests/openui-language.spec.ts` | pending — reused as the stage-2 differential oracle | pending |
+
+## Fork-only divergences
+
+Rows here have no upstream counterpart; they exist because the fork changed the
+shape of the problem. Recording them keeps "kept from upstream" honest.
+
+| Divergence | Where | Why |
+| --- | --- | --- |
+| `HOST_TOKENS` bridge | `src/client/OpenUICard.tsx` | The OpenUI card is mounted **in the host document**, not inside a frame. `src/frame-css.ts` declares `--foreground`, `--primary` etc. inside the HTML backend's iframe `srcdoc`; those names do not exist in the host. DSH publishes only `--dsw-alias-*` / `--dsw-static-*`. Using the frame vocabulary on a host-mounted card silently resolves every variable to nothing. |
+| `theme.ts` token list as the authority | `src/client/theme.ts` → `OpenUICard.tsx` | One file decides which host token means "foreground"; both renderers read it, so the two backends cannot drift apart again (D6 was exactly that drift). |
 
 ## open-intelligent-ui (`16ef264`)
 

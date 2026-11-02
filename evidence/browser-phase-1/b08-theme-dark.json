@@ -1,0 +1,86 @@
+{
+  "tag": "dark",
+  "scheme": {
+    "root": "dark",
+    "body": "dark",
+    "darkAttr": true
+  },
+  "card": {
+    "width": 724,
+    "height": 117,
+    "contentWidth": 724,
+    "alignItems": "stretch",
+    "display": "flex",
+    "color": "rgb(249, 250, 251)",
+    "fontFamily": "-apple-system, BlinkMacS"
+  },
+  "vars": {
+    "--foreground": "#f9fafb",
+    "--muted-foreground": "#adb2b8",
+    "--primary": "#5686fe",
+    "--primary-foreground": "#0f1115",
+    "--border": "#ffffff1f",
+    "--radius": "8px",
+    "--font-sans": "-apple-system, BlinkMacSystemFont, \"Sego"
+  },
+  "varsResolved": 7,
+  "rows": [
+    {
+      "tag": "div",
+      "text": "Browser Test",
+      "leftOffset": 0,
+      "width": 723.65,
+      "color": "rgb(249, 250, 251)",
+      "background": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(249, 250, 251)",
+      "borderWidth": "0px",
+      "borderRadius": "0px",
+      "fontSize": "12px"
+    },
+    {
+      "tag": "div",
+      "text": "OpenUI Browser Test",
+      "leftOffset": 0,
+      "width": 723.65,
+      "color": "rgb(249, 250, 251)",
+      "background": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(249, 250, 251)",
+      "borderWidth": "0px",
+      "borderRadius": "0px",
+      "fontSize": "14px"
+    },
+    {
+      "tag": "div",
+      "text": "Hello DSH",
+      "leftOffset": 0,
+      "width": 723.65,
+      "color": "rgb(249, 250, 251)",
+      "background": "rgba(0, 0, 0, 0)",
+      "borderColor": "rgb(249, 250, 251)",
+      "borderWidth": "0px",
+      "borderRadius": "0px",
+      "fontSize": "14px"
+    },
+    {
+      "tag": "button",
+      "text": "Test Button",
+      "leftOffset": 0,
+      "width": 88.8,
+      "color": "rgb(15, 17, 21)",
+      "background": "rgb(86, 134, 254)",
+      "borderColor": "rgb(86, 134, 254)",
+      "borderWidth": "0.666667px",
+      "borderRadius": "11.2px",
+      "fontSize": "12px"
+    }
+  ],
+  "button": {
+    "leftOffset": 0,
+    "width": 88.8,
+    "spansContentWidth": false,
+    "background": "rgb(86, 134, 254)",
+    "color": "rgb(15, 17, 21)",
+    "border": "0.666667px solid rgb(86, 134, 254)",
+    "radius": "11.2px"
+  }
+}
