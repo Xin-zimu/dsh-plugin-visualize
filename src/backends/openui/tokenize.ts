@@ -168,6 +168,7 @@ export function tokenize(source: string): TokenizeResult {
         diagnostics.push({
           severity: 'error',
           code: 'VZO101',
+          line: startLine,
           message: 'unterminated string: a string must close on the same line',
         })
       }
@@ -188,7 +189,7 @@ export function tokenize(source: string): TokenizeResult {
     if (ch === '$') {
       index += 1
       if (!isIdentStart(text[index])) {
-        diagnostics.push({ severity: 'error', code: 'VZO102', message: 'a name must follow "$"' })
+        diagnostics.push({ severity: 'error', code: 'VZO102', line: startLine, message: 'a name must follow "$"' })
         tokens.push({ kind: 'op', value: '$', line: startLine })
         continue
       }
@@ -217,7 +218,10 @@ export function tokenize(source: string): TokenizeResult {
     diagnostics.push({
       severity: 'error',
       code: 'VZO103',
-      message: `line ${startLine}: unexpected character ${JSON.stringify(ch)} — names are ASCII, and an object key that is not a bare ASCII identifier must be quoted`,
+      line: startLine,
+      // Upstream names only the character. The extra clause was added here, and a
+      // differential run flags it: the message is part of the observable contract.
+      message: `unexpected character ${JSON.stringify(ch)}`,
     })
     index += 1
   }

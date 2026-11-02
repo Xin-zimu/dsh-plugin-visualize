@@ -1,0 +1,43 @@
+{
+  "phase": "2.1",
+  "title": "OpenUI language core, verified in a real browser",
+  "capturedAt": "2026-11-02T08:33:05.432Z",
+  "profile": "vizs2 (isolated; production desktop untouched)",
+  "url": "http://127.0.0.1:3082/",
+  "checks": [
+    {
+      "id": "S01",
+      "name": "evaluated program renders in the host",
+      "verdict": "PASS",
+      "detail": "Card title \"互动测试\" then \"count 3\" and \"item 0/1/2\". Those are @Count, @Format, @Range and @Each results, not literal text.",
+      "screenshot": "screenshots/stage2-interactive.png"
+    },
+    {
+      "id": "S02",
+      "name": "bound Slider is interactive",
+      "verdict": "PASS",
+      "detail": "input[type=range] reports disabled=false, min=1 max=6 value=3. Before this stage it was rendered disabled:true.",
+      "screenshot": "screenshots/stage2-slider.png"
+    },
+    {
+      "id": "S03",
+      "name": "a control changes OTHER components",
+      "verdict": "PASS",
+      "detail": "Dragging the slider 3 -> 6 changed the sibling Text from \"count 3\" to \"count 6\" and the @Each output from 3 rows (row 0..2) to 6 rows (row 0..5).",
+      "screenshot": "screenshots/stage2-slider.png"
+    },
+    {
+      "id": "S04",
+      "name": "replay after reload",
+      "verdict": "PARTIAL",
+      "detail": "Both cards reappear from the persisted meta with no model call. BUT $state is not persisted: the slider returns to its default 3.",
+      "screenshot": "screenshots/stage2-replay.png",
+      "gap": "Card state persistence is not implemented. A reload re-evaluates from defaults."
+    }
+  ],
+  "notVerified": [
+    "Button action steps (@Set/@Reset/@OpenUrl) are still inert: the table renders a Button but no action wiring exists yet.",
+    "Only Slider writes state back. Input, Select, Checkbox, RadioGroup and DatePicker are not in the component table yet (8 of 48 render).",
+    "B05 streaming preview and B10 session switching remain from phase 1."
+  ]
+}

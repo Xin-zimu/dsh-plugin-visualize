@@ -1,0 +1,157 @@
+[
+  {
+    "name": "corpus-001",
+    "program": "root = Col([title])\ntitle = Text(\"Hi\")\n$name = \"Ada\"\n$count = 3",
+    "state": {}
+  },
+  {
+    "name": "corpus-002",
+    "program": "root = Col([answer])\nanswer = Title(text)\ntext = \"later\"",
+    "state": {}
+  },
+  {
+    "name": "corpus-003",
+    "program": "root = Text(($missing == null) + \"\")",
+    "state": {}
+  },
+  {
+    "name": "corpus-004",
+    "program": "root = Col([nope])",
+    "state": {}
+  },
+  {
+    "name": "corpus-005",
+    "program": "root = Col([a])\na = b\nb = a",
+    "state": {}
+  },
+  {
+    "name": "corpus-006",
+    "program": "root = Text($x + \"\")\n$x = $y\n$y = $x",
+    "state": {}
+  },
+  {
+    "name": "corpus-007",
+    "program": "root = Col(@Each(\"text\", \"x\", Text(x)))",
+    "state": {}
+  },
+  {
+    "name": "corpus-008",
+    "program": "root = Col(@Each([1], 2, Text(\"x\")))",
+    "state": {}
+  },
+  {
+    "name": "corpus-009",
+    "program": "root = Col([v == null ? \"safe\" : v.deep.field])\nv = null",
+    "state": {}
+  },
+  {
+    "name": "corpus-010",
+    "program": "root = x\nx = 1 / 0",
+    "state": {}
+  },
+  {
+    "name": "corpus-011",
+    "program": "root = x\nx = \"abc\" < 1",
+    "state": {}
+  },
+  {
+    "name": "corpus-012",
+    "program": "x = 6 // 2\nroot = Text(\"\" + x)",
+    "state": {}
+  },
+  {
+    "name": "corpus-013",
+    "program": "x = 6//2\nroot = Text(\"\" + x)",
+    "state": {}
+  },
+  {
+    "name": "corpus-014",
+    "program": "root = Text(\"https://example.com\") // trailing note",
+    "state": {}
+  },
+  {
+    "name": "corpus-015",
+    "program": "root = Mystery(1)",
+    "state": {}
+  },
+  {
+    "name": "corpus-016",
+    "program": "root = Col([@Nope(1)])",
+    "state": {}
+  },
+  {
+    "name": "corpus-017",
+    "program": "root = Text(@Sum(\"abc\") + \"\")",
+    "state": {}
+  },
+  {
+    "name": "corpus-018",
+    "program": "root = Col([a])\n$count = 2\n",
+    "state": {}
+  },
+  {
+    "name": "corpus-019",
+    "program": "",
+    "state": {}
+  },
+  {
+    "name": "corpus-020",
+    "program": "a = 1",
+    "state": {}
+  },
+  {
+    "name": "corpus-021",
+    "program": "x = Col([a], gap: 2)",
+    "state": {}
+  },
+  {
+    "name": "corpus-022",
+    "program": "x 1",
+    "state": {}
+  },
+  {
+    "name": "corpus-023",
+    "program": "x = \"abc",
+    "state": {}
+  },
+  {
+    "name": "corpus-024",
+    "program": "x = Col([a]",
+    "state": {}
+  },
+  {
+    "name": "corpus-025",
+    "program": "= 5",
+    "state": {}
+  },
+  {
+    "name": "corpus-026",
+    "program": "x =",
+    "state": {}
+  },
+  {
+    "name": "corpus-027",
+    "program": "x = 1 2",
+    "state": {}
+  },
+  {
+    "name": "corpus-028",
+    "program": "x = 1 ; 2",
+    "state": {}
+  },
+  {
+    "name": "corpus-029",
+    "program": "root = Col([a])\n???\na = 1",
+    "state": {}
+  },
+  {
+    "name": "corpus-030",
+    "program": "root = Text($count + \"\")\n$count = 1",
+    "state": {}
+  },
+  {
+    "name": "corpus-031",
+    "program": "// a comment line\nroot = Col([])",
+    "state": {}
+  }
+]

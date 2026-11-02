@@ -21,7 +21,7 @@ to the history. If you are an agent starting work, read this first.
 | --- | --- |
 | Stage | 2 — OpenUI language core |
 | Goal | Evaluate programs, not just validate them; widen the tables toward 48/73 |
-| Status | Not started; stages 1.2 and 1.3 closed first |
+| Status | **Done** — ported, differentially matched, verified in a browser with two recorded gaps |
 
 ## 3. Current progress
 
@@ -54,14 +54,24 @@ to the history. If you are an agent starting work, read this first.
   width; 7 of 7 bridged CSS variables resolve in both schemes; text measures
   17.45–18.9:1 and the Button 5.61:1 in dark. Both themes were switched through
   the host's own Settings → 通用设置 → 外观 control.
+- **Stage 2 — the language core** (`evidence/phase-2/`):
+  `npx vitest run` = **576 passed / 15 failed**, failure set byte-identical to the
+  upstream baseline. The differential run compares **31 programs across 7 fields
+  each and finds 0 differences** against the pinned upstream module. Both
+  `tsc` projects are clean; `npx tsdown` builds.
+- **In a real browser** (`evidence/browser-phase-2/results.json`): a card shows
+  `count 3` and `item 0/1/2` computed by `@Count`/`@Format`/`@Each` (S01); a
+  bound Slider is draggable (S02); dragging it 3 → 6 changed a sibling to
+  `count 6` and grew the list from 3 rows to 6 (S03).
 
 **Not verified** — do not claim these work.
 
-- B05 streaming: the model emitted the program in one chunk; nothing partial
-  was observed. The recovery path is unit-tested only.
-- B10 session switching: no second session opened.
-- Interaction is inert: `Slider` draws disabled, `Button` has no action.
-- Nothing is evaluated. 8 of 48 components, 17 of 73 functions.
+- `$state` is **not persisted**: a reload re-evaluates from defaults (S04 is
+  PARTIAL for this reason).
+- `Button` actions are inert — `@Set`/`@Reset`/`@OpenUrl` evaluate into
+  descriptors that nothing consumes.
+- 8 of 48 components render; the language understands all 48.
+- B05 streaming and B10 session switching remain unverified from phase 1.
 
 **Known, not fixed** — the light Button pair is 4.23:1, below AA for body text.
 This is the host's own pairing (its send button and "1017" badge use the same
@@ -77,7 +87,14 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | `src/client/OpenUICard.tsx` | Button border longhands; `--primary-foreground` → `--dsw-alias-label-primary-foreground` | a shorthand conflict erased the border; the `*-inverted` token failed AA (3.59:1) |
 | `src/client/OpenUICard.tsx` | title in foreground at 0.65 opacity; series palette realigned | the title was 2.13:1 and the two backends disagreed; `success`/`warning`/`danger` were offset by one |
 | `tests/openui-card.spec.tsx` | +5 tests (2 layout, 3 token/colour) | lock the alignment, the token bridge and the colour semantics |
-| `evidence/browser-phase-1/` | new | B01–B11 results, logs, screenshots, manifiests, probes |
+| `evidence/browser-phase-1/` | new | B01–B11 results, logs, screenshots, manifests, probes |
+| `src/backends/openui/functions.ts` | new, 1652 lines | ported from upstream; 72 implementations, every quirk kept and commented |
+| `src/backends/openui/evaluate.ts` | new, 835 lines | ported from upstream; lazy resolution, cycles as diagnostics |
+| `src/backends/openui/signatures.ts` | regenerated, 1015 lines | 48 components / 73 functions, names and order identical to upstream |
+| `src/backends/openui/parse.ts`, `tokenize.ts` | `line` moved out of the message into the field | an identical error has to compare equal against upstream |
+| `src/core/render-contract.ts` | `Diagnostic.line` added | the host, not the backend, decides how to show a location |
+| `src/client/OpenUICard.tsx` | cut-down `Scope` replaced with the real evaluator; Slider writes `$state`; positional React keys | two evaluators would drift, and `@Each` siblings shared one key |
+| `tests/openui-*` | 5 new specs, 106 tests | functions, evaluate, signatures, render, interaction |
 
 ## 5. Test results
 
@@ -88,6 +105,8 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | Baseline parity | normalised FAIL-set diff | IDENTICAL | `evidence/phase-1/MANIFEST.json` |
 | Browser B01–B11 | live DSH session at :3081 | 7 PASS, 1 FIXED, 2 NOT VERIFIED | `evidence/browser-phase-1/MANIFEST.json` |
 | Browser B07/B08 | live DSH session, both schemes | PASS | `evidence/browser-phase-1/MANIFEST-1.3.json` |
+| Differential | `node --experimental-strip-types evidence/phase-2/differential.mjs` | 31/31, 0 differences | `evidence/phase-2/differential.json` |
+| Browser S01–S04 | live DSH session at :3082 | 3 PASS, 1 PARTIAL | `evidence/browser-phase-2/results.json` |
 | Card unit tests | `npx vitest run tests/openui-card.spec.tsx` | 15 / 15 PASS | — |
 
 ## 6. Open issues
@@ -96,23 +115,45 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | --- | --- | --- |
 | B05/B10 unverified | Two claims about the card are untested | Later stage |
 | Light Button pair is 4.23:1 | Below AA for body text; matches the host's own pairing | Recorded, not changed |
-| No evaluator | Programs render structure but compute nothing | Stage 2 |
+| `$state` not persisted | A reload loses what the user set | Stage 3 |
+| Button actions inert | `@Set` etc. evaluate but nothing consumes them | Stage 3 |
+| 8 of 48 components render | The language knows all 48; the renderer draws 8 | Stage 3 |
 | 15 Windows test failures | Noise that could hide a regression | Accepted; `docs/testing/TEST_PLAN.md` |
 
 ## 7. Next step
 
-**Stage 2 — OpenUI language core.** Permitted edits: `src/backends/openui/`
-and `tests/`. Do not touch `src/client/`. Done when the exit criteria in
-`STAGE.md` are each backed by evidence under `evidence/phase-2/`.
+**Stage 3 — OpenUI render backend, part two.** Permitted edits: `src/client/`.
+Nothing in stage 3 may change language semantics: if a program evaluates
+differently after stage 3, the differential run has regressed.
 
-The two cheap closures are done (stage 1.3). They cost more than "minutes"
-because closing them exposed five defects, one of which meant the card had never
-been styled at all. That is the argument for closing a known gap while you are
-still standing in the code that owns it.
+Scope, in order: card-state persistence (so S04 becomes PASS), Button action
+steps, then widening the renderer from 8 components toward 48.
+
+Open question for the user before starting: persisting `$state` means deciding
+where it lives — the session store (shared with the card's saved frame state) or
+a new per-card key. That is a decision, not an implementation detail, and it
+should be recorded as an ADR before code.
 
 ---
 
 ## History
+
+### Session 5 — 2026-11-02
+
+Stage 2: the OpenUI language core is ported and differentially matched. 31
+programs × 7 fields, 0 differences against the pinned upstream module. The
+signature table is now generated from upstream (48 / 73, identical names and
+order). Three defects in existing code fell out of the port: parse and tokenizer
+diagnostics embedded the line in the message, and the client had a second,
+cut-down evaluator. All three fixed.
+
+In a real browser a bound Slider now drives other components — 3 → 6 changed a
+sibling's `@Count` and grew the `@Each` list from 3 rows to 6. `$state`
+persistence, Button actions and 40 unrendered components are the recorded gaps.
+
+Also corrected: the "70 implementations" figure was wrong (a grep for
+`Name(args) {` misses `Now()` and `Today()`); the real count is 72, plus `@Each`
+in the evaluator, which accounts for all 73 signatures.
 
 ### Session 4 — 2026-11-02
 

@@ -1,0 +1,599 @@
+{
+  "total": 73,
+  "byOwner": {
+    "functions.ts": 72,
+    "evaluate.ts": 1
+  },
+  "unresolved": [],
+  "impure": [
+    "Now",
+    "Today"
+  ],
+  "note": "Implementation count is 72, not 70: a grep for \"Name(args) {\" misses Now() and Today(), which take no arguments.",
+  "rows": [
+    {
+      "name": "Count",
+      "signature": "@Count(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "First",
+      "signature": "@First(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Last",
+      "signature": "@Last(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Sum",
+      "signature": "@Sum(nums)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Avg",
+      "signature": "@Avg(nums)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Min",
+      "signature": "@Min(nums)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Max",
+      "signature": "@Max(nums)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Sort",
+      "signature": "@Sort(list,field,dir?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Filter",
+      "signature": "@Filter(list,field,op,value)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Round",
+      "signature": "@Round(num,dec?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Abs",
+      "signature": "@Abs(num)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Floor",
+      "signature": "@Floor(num)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Ceil",
+      "signature": "@Ceil(num)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Append",
+      "signature": "@Append(list,item)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Prepend",
+      "signature": "@Prepend(list,item)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Concat",
+      "signature": "@Concat(list,more)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Remove",
+      "signature": "@Remove(list,field,value)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "RemoveAt",
+      "signature": "@RemoveAt(list,index)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Update",
+      "signature": "@Update(list,field,value,setField,setValue)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Toggle",
+      "signature": "@Toggle(list,item)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Includes",
+      "signature": "@Includes(list,item)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Find",
+      "signature": "@Find(list,field,value)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "IndexOf",
+      "signature": "@IndexOf(list,item)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Take",
+      "signature": "@Take(list,n)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Slice",
+      "signature": "@Slice(list,start,end?)→list | string",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Unique",
+      "signature": "@Unique(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Reverse",
+      "signature": "@Reverse(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Range",
+      "signature": "@Range(start,end,step?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Pick",
+      "signature": "@Pick(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Shuffle",
+      "signature": "@Shuffle(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Flatten",
+      "signature": "@Flatten(list)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Chunk",
+      "signature": "@Chunk(list,size)→list[]",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Pow",
+      "signature": "@Pow(base,exp)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Sqrt",
+      "signature": "@Sqrt(num)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Random",
+      "signature": "@Random(min,max,int?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Clamp",
+      "signature": "@Clamp(num,min,max)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Percent",
+      "signature": "@Percent(part,total)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Lerp",
+      "signature": "@Lerp(a,b,t)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Allocate",
+      "signature": "@Allocate(total,weights,dec?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Payment",
+      "signature": "@Payment(principal,rate,periods)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Convert",
+      "signature": "@Convert(value,from,to)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Format",
+      "signature": "@Format(value,kind?,dec?,currency?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Join",
+      "signature": "@Join(list,sep?,field?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Plural",
+      "signature": "@Plural(n,word,plural?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Pad",
+      "signature": "@Pad(value,length,char?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Upper",
+      "signature": "@Upper(text)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Lower",
+      "signature": "@Lower(text)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Trim",
+      "signature": "@Trim(text)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Capitalize",
+      "signature": "@Capitalize(text)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Split",
+      "signature": "@Split(text,sep?)→string[]",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Replace",
+      "signature": "@Replace(text,find,with)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Duration",
+      "signature": "@Duration(seconds,style?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Default",
+      "signature": "@Default(value,fallback)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "MixColor",
+      "signature": "@MixColor(from,to,t)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Now",
+      "signature": "@Now()",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": true,
+      "note": "Reads the clock, so a program using it is not reproducible across runs."
+    },
+    {
+      "name": "Today",
+      "signature": "@Today()",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": true,
+      "note": "Reads the clock, so a program using it is not reproducible across runs."
+    },
+    {
+      "name": "FormatDate",
+      "signature": "@FormatDate(date,style?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "AddDays",
+      "signature": "@AddDays(date,days)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "AddMonths",
+      "signature": "@AddMonths(date,months)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "DaysBetween",
+      "signature": "@DaysBetween(from,to)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "MonthsBetween",
+      "signature": "@MonthsBetween(from,to)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "StartOf",
+      "signature": "@StartOf(date,unit)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "GroupBy",
+      "signature": "@GroupBy(rows,key,field?,agg?)→{key,value}[]",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Pivot",
+      "signature": "@Pivot(rows,rowKey,colKey,field?,agg?)→object[]",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Top",
+      "signature": "@Top(rows,field,n,dir?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Between",
+      "signature": "@Between(rows,field,min?,max?)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Bucket",
+      "signature": "@Bucket(rows,dateField,unit,field?,agg?)→{key,value}[]",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Cumulative",
+      "signature": "@Cumulative(rows,field)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "MovingAvg",
+      "signature": "@MovingAvg(rows,field,window)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Change",
+      "signature": "@Change(now,before)",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Histogram",
+      "signature": "@Histogram(values,bins,min?,max?)→{key,value,start,end}[]",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Stats",
+      "signature": "@Stats(values)→{count,min,max,mean,median,stdev}",
+      "owner": "functions.ts",
+      "upstreamImplemented": true,
+      "impure": false,
+      "note": ""
+    },
+    {
+      "name": "Each",
+      "signature": "@Each(list,\"varName\",template)",
+      "owner": "evaluate.ts",
+      "upstreamImplemented": false,
+      "impure": false,
+      "note": "Intercepted by name before the function table is consulted: an @Each template is evaluated once per item, which a value-only function cannot express."
+    }
+  ]
+}

@@ -111,10 +111,14 @@ export function openuiBackend(): RendererAdapter {
       }
 
       const program = parseProgram(request.source)
+      // Carry the location through as a field. Dropping it here would leave the
+      // host unable to point at the offending line, and would make the openui
+      // backend's diagnostics incomparable with upstream's.
       const errors: Diagnostic[] = program.diagnostics.map(finding => ({
         severity: finding.severity,
         code: finding.code,
         ...finding.fix === undefined ? {} : { fix: finding.fix },
+        ...finding.line === undefined ? {} : { line: finding.line },
         message: finding.message,
       }))
       if (program.rootName === undefined) {

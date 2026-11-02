@@ -1,0 +1,172 @@
+{
+  "comparedFields": [
+    "parseOk",
+    "rootName",
+    "parseDiagnostics",
+    "ok",
+    "root",
+    "stateDefaults",
+    "diagnostics"
+  ],
+  "cases": 31,
+  "matched": 31,
+  "differing": 0,
+  "records": [
+    {
+      "name": "corpus-001",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-002",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-003",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-004",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-005",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-006",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-007",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-008",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-009",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-010",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-011",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-012",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-013",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-014",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-015",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-016",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-017",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-018",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-019",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-020",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-021",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-022",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-023",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-024",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-025",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-026",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-027",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-028",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-029",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-030",
+      "match": true,
+      "differing": []
+    },
+    {
+      "name": "corpus-031",
+      "match": true,
+      "differing": []
+    }
+  ],
+  "differences": []
+}

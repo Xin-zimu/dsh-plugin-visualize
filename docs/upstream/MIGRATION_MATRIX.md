@@ -51,17 +51,17 @@ in `evidence/`.
 
 | Upstream file | Fork location | How | Status |
 | --- | --- | --- | --- |
-| `src/lang/tokenize.js` | `src/backends/openui/tokenize.ts` | ported — diagnostics given codes | implemented, tests pending |
+| `src/lang/tokenize.js` | `src/backends/openui/tokenize.ts` | ported — diagnostics given codes | verified (differential: `evidence/phase-2/differential.json`) |
 | `src/lang/parse.js` | `src/backends/openui/parse.ts` | ported — typed AST, call collection | verified (`tests/core.spec.ts` parse cases) |
-| `src/lang/signatures.js` | `src/backends/openui/signatures.ts` | rewritten — 8 components / 17 functions | pending (stage 2 widens to 48/73) |
-| `src/lang/evaluate.js` | `src/backends/openui/evaluate.ts` | pending | pending (stage 2) |
-| `src/lang/functions.js` | `src/backends/openui/functions.ts` | pending | pending (stage 2) |
+| `src/lang/signatures.js` | `src/backends/openui/signatures.ts` | generated from the upstream module — 48 components / 73 functions, names and order identical | verified (`tests/openui-signatures.spec.ts`) |
+| `src/lang/evaluate.js` | `src/backends/openui/evaluate.ts` | ported — lazy resolution, cycles as diagnostics, stateDefaults independent of caller state | verified (`tests/openui-evaluate.spec.ts`, 25 tests) |
+| `src/lang/functions.js` | `src/backends/openui/functions.ts` | ported — 72 implementations, every upstream quirk kept and commented | verified (`tests/openui-functions.spec.ts`, 64 tests) |
 | `src/lang/spec.js` | — | replaced — skill text generated from our tables | done |
 | `src/client/**` | — | dropped — the fork uses the host's card shell | dropped |
 | `src/client/theme/**` (host token lookup) | `src/client/OpenUICard.tsx` `HOST_TOKENS` | rewritten — the fork mounts the card in the host document, so it must read the host's `--dsw-*` tokens; upstream only ever read its own scope | verified (`evidence/browser-phase-1/MANIFEST-1.3.json`) |
 | `index.js` | — | dropped — the fork has one tool, not one per backend | dropped (ADR-002) |
 | `scripts/build-client.mjs` | — | dropped — tsdown builds both halves | dropped |
-| `test/lang.test.mjs` | `tests/openui-language.spec.ts` | pending — reused as the stage-2 differential oracle | pending |
+| `test/lang.test.mjs` | `evidence/phase-2/differential.mjs` + `tests/fixtures/openui-corpus.json` | replaced — the corpus is extracted from it and run against the live upstream module | verified (31/31 programs, 0 differences) |
 
 ## Fork-only divergences
 

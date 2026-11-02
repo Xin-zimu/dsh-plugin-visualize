@@ -161,8 +161,12 @@ describe('openui backend validation', () => {
       source: 'root = Col([\n  Title("x")\n])',
     }, LIMITS)
     expect(report.errors.length).toBeGreaterThan(0)
-    expect(report.errors[0]?.message).toMatch(/line 1/u)
+    // The location is a field, not part of the message: a message that embeds
+    // "line 1: " can never be compared against a backend that does not, and the
+    // differential run against upstream depends on the two agreeing.
+    expect(report.errors[0]?.line).toBe(1)
     expect(report.errors[0]?.message).toMatch(/expected "\]"/u)
+    expect(report.errors[0]?.message).not.toMatch(/^line \d+:/u)
   })
 
   it('reports a non-ASCII bare object key', () => {

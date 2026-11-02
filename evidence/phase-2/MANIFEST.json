@@ -1,0 +1,136 @@
+{
+  "phase": "2",
+  "title": "OpenUI language core: port, differential, browser interaction",
+  "capturedAt": "2026-11-02T08:34:02.664Z",
+  "environment": {
+    "dsh": "0.2.1-rc.5",
+    "plugin": "@dsh-unified/visualize@0.1.0",
+    "upstream": "dsh-intelligent-ui @ 0b08749",
+    "profile": "vizs2 (isolated; production desktop profile untouched)",
+    "url": "http://127.0.0.1:3082/",
+    "node": "v24.22.1"
+  },
+  "signatureTables": {
+    "components": 48,
+    "functions": 73,
+    "generatedFromUpstream": true
+  },
+  "functionOwnership": {
+    "total": 73,
+    "byOwner": {
+      "functions.ts": 72,
+      "evaluate.ts": 1
+    },
+    "unresolved": [],
+    "impure": [
+      "Now",
+      "Today"
+    ],
+    "correction": "Earlier notes said 70 implementations. That was a grep artefact: Now() and Today() take no arguments and were invisible to \"Name(args) {\". The real count is 72, plus @Each in the evaluator."
+  },
+  "differential": {
+    "command": "node --experimental-strip-types evidence/phase-2/differential.mjs",
+    "programs": 31,
+    "matched": 31,
+    "differing": 0,
+    "comparedFields": [
+      "parseOk",
+      "rootName",
+      "parseDiagnostics",
+      "ok",
+      "root",
+      "stateDefaults",
+      "diagnostics"
+    ],
+    "exitCode": 0
+  },
+  "regression": {
+    "command": "npx vitest run",
+    "passed": 576,
+    "failed": 15,
+    "total": 591,
+    "failureSetIdenticalToUpstreamBaseline": true
+  },
+  "browser": {
+    "record": "evidence/browser-phase-2/results.json",
+    "S01": "PASS",
+    "S02": "PASS",
+    "S03": "PASS",
+    "S04": "PARTIAL",
+    "s04Gap": "$state is not persisted; a reload re-evaluates from defaults."
+  },
+  "defects": [
+    {
+      "id": "D8",
+      "severity": "minor",
+      "status": "fixed",
+      "summary": "Parse diagnostics embedded \"line N: \" in the message and sometimes omitted the line field, so an identical error compared unequal against upstream."
+    },
+    {
+      "id": "D9",
+      "severity": "minor",
+      "status": "fixed",
+      "summary": "The tokenizer did the same and added an explanatory clause upstream does not have."
+    },
+    {
+      "id": "D10",
+      "severity": "major",
+      "status": "fixed",
+      "summary": "The client kept its own cut-down evaluator supporting only \"+\", so the engine that validated and the engine that drew were not the same engine."
+    },
+    {
+      "id": "D11",
+      "severity": "minor",
+      "status": "fixed",
+      "summary": "@Each output gave every generated sibling the same React key; React logged duplicate-key warnings, which in production means an item can reuse the wrong DOM node."
+    }
+  ],
+  "files": [
+    {
+      "name": "differential.json",
+      "bytes": 2839,
+      "sha256": "92dffa9f38f9052add7f2b519f1a4cf674ee5dc2ff5c86cd5a4dae79709d6936"
+    },
+    {
+      "name": "function-ownership.json",
+      "bytes": 14268,
+      "sha256": "85e643ceff8d3879b91284034035b37950b4f6d0912d11b8e09e10d37b422c3c"
+    },
+    {
+      "name": "upstream-oracle.json",
+      "bytes": 15284,
+      "sha256": "f2176f0b481d2b855b9ed887d66923345243dfb5cd08a272a2416a76732c2382"
+    },
+    {
+      "name": "test-gate3.txt",
+      "bytes": 22903,
+      "sha256": "c025540f81d064c8f864f7cde03973b35265693e0bb103bcd6e7474506aac5cc"
+    },
+    {
+      "name": "differential.mjs",
+      "bytes": 3463,
+      "sha256": "3fd282684dd155201e68a27b57bc8bc270ff5d71d1e83da13fe30eebaba327bf"
+    },
+    {
+      "name": "interaction-probe.mjs",
+      "bytes": 1506,
+      "sha256": "7697712c57c06f0fe01937d3f3e98c27c5cee430809b49c7b3b5a4f273462be2"
+    },
+    {
+      "name": "state-probe.mjs",
+      "bytes": 763,
+      "sha256": "b457f2d876cf6394246d229215e6ddee2148e3d7d12e7483355eb03bc3ae2c4d"
+    },
+    {
+      "name": "derived-state-probe.mjs",
+      "bytes": 1752,
+      "sha256": "35581cebe788983c6bdffe47dbd42671936afceff69a706252586087e53e1795"
+    },
+    {
+      "name": "trim-messages.mjs",
+      "bytes": 428,
+      "sha256": "ed4792c4a7338c07642972bca41b69675dd0f539cc48c134f1ab658da3482c8a"
+    }
+  ],
+  "conclusion": "The language core agrees with upstream on every program in the reference suite, and the state loop is closed in a real browser. What is missing is persistence, action steps, and a renderer for 40 of the 48 components."
+}

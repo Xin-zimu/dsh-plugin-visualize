@@ -1,0 +1,700 @@
+{
+  "cases": [
+    {
+      "name": "corpus-001",
+      "program": "root = Col([title])\ntitle = Text(\"Hi\")\n$name = \"Ada\"\n$count = 3",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            [
+              {
+                "args": [
+                  "Hi"
+                ],
+                "kind": "element",
+                "line": 2,
+                "name": "Text"
+              }
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {
+          "count": 3,
+          "name": "Ada"
+        },
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-002",
+      "program": "root = Col([answer])\nanswer = Title(text)\ntext = \"later\"",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            [
+              {
+                "args": [
+                  "later"
+                ],
+                "kind": "element",
+                "line": 2,
+                "name": "Title"
+              }
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-003",
+      "program": "root = Text(($missing == null) + \"\")",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            "true"
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Text"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-004",
+      "program": "root = Col([nope])",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            [
+              null
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|unknown reference \"nope\": no statement defines it"
+        ]
+      }
+    },
+    {
+      "name": "corpus-005",
+      "program": "root = Col([a])\na = b\nb = a",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            [
+              null
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|2|circular reference: \"a\" eventually refers to itself"
+        ]
+      }
+    },
+    {
+      "name": "corpus-006",
+      "program": "root = Text($x + \"\")\n$x = $y\n$y = $x",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            ""
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Text"
+        },
+        "stateDefaults": {
+          "x": null,
+          "y": null
+        },
+        "diagnostics": [
+          "error|2|circular reference: \"$x\" eventually refers to itself"
+        ]
+      }
+    },
+    {
+      "name": "corpus-007",
+      "program": "root = Col(@Each(\"text\", \"x\", Text(x)))",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            null
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|@Each expects an array as its first argument"
+        ]
+      }
+    },
+    {
+      "name": "corpus-008",
+      "program": "root = Col(@Each([1], 2, Text(\"x\")))",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            null
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|@Each needs the loop variable name as a string, like @Each(rows, \"row\", ...)"
+        ]
+      }
+    },
+    {
+      "name": "corpus-009",
+      "program": "root = Col([v == null ? \"safe\" : v.deep.field])\nv = null",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            [
+              "safe"
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-010",
+      "program": "root = x\nx = 1 / 0",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|2|division by zero in \"/\""
+        ]
+      }
+    },
+    {
+      "name": "corpus-011",
+      "program": "root = x\nx = \"abc\" < 1",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|2|\"<\" needs numbers"
+        ]
+      }
+    },
+    {
+      "name": "corpus-012",
+      "program": "x = 6 // 2\nroot = Text(\"\" + x)",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            "6"
+          ],
+          "kind": "element",
+          "line": 2,
+          "name": "Text"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-013",
+      "program": "x = 6//2\nroot = Text(\"\" + x)",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            "6"
+          ],
+          "kind": "element",
+          "line": 2,
+          "name": "Text"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-014",
+      "program": "root = Text(\"https://example.com\") // trailing note",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            "https://example.com"
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Text"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-015",
+      "program": "root = Mystery(1)",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            1
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Mystery"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-016",
+      "program": "root = Col([@Nope(1)])",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            [
+              null
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-017",
+      "program": "root = Text(@Sum(\"abc\") + \"\")",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            ""
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Text"
+        },
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|@Sum expects an array"
+        ]
+      }
+    },
+    {
+      "name": "corpus-018",
+      "program": "root = Col([a])\n$count = 2\n",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            [
+              null
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {
+          "count": 2
+        },
+        "diagnostics": [
+          "error|1|unknown reference \"a\": no statement defines it"
+        ]
+      }
+    },
+    {
+      "name": "corpus-019",
+      "program": "",
+      "parse": {
+        "ok": true,
+        "rootName": null,
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-020",
+      "program": "a = 1",
+      "parse": {
+        "ok": true,
+        "rootName": null,
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-021",
+      "program": "x = Col([a], gap: 2)",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|named arguments (name: value) are not supported: every argument is positional"
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|named arguments (name: value) are not supported: every argument is positional",
+          "error|1|unknown reference \"a\": no statement defines it"
+        ]
+      }
+    },
+    {
+      "name": "corpus-022",
+      "program": "x 1",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|expected \"=\" after x"
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|expected \"=\" after x"
+        ]
+      }
+    },
+    {
+      "name": "corpus-023",
+      "program": "x = \"abc",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|unterminated string: a string must close on the same line"
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|unterminated string: a string must close on the same line"
+        ]
+      }
+    },
+    {
+      "name": "corpus-024",
+      "program": "x = Col([a]",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|expected \")\" to close the argument list"
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|expected \")\" to close the argument list",
+          "error|1|unknown reference \"a\": no statement defines it"
+        ]
+      }
+    },
+    {
+      "name": "corpus-025",
+      "program": "= 5",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|a statement must start with a name, not \"=\""
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|a statement must start with a name, not \"=\""
+        ]
+      }
+    },
+    {
+      "name": "corpus-026",
+      "program": "x =",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|x is missing a value after \"=\""
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|x is missing a value after \"=\""
+        ]
+      }
+    },
+    {
+      "name": "corpus-027",
+      "program": "x = 1 2",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|unexpected the number 2 after the expression of x"
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|unexpected the number 2 after the expression of x"
+        ]
+      }
+    },
+    {
+      "name": "corpus-028",
+      "program": "x = 1 ; 2",
+      "parse": {
+        "ok": false,
+        "rootName": null,
+        "diagnostics": [
+          "error|1|unexpected character \";\"",
+          "error|1|unexpected the number 2 after the expression of x"
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": null,
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|1|unexpected character \";\"",
+          "error|1|unexpected the number 2 after the expression of x"
+        ]
+      }
+    },
+    {
+      "name": "corpus-029",
+      "program": "root = Col([a])\n???\na = 1",
+      "parse": {
+        "ok": false,
+        "rootName": "root",
+        "diagnostics": [
+          "error|2|a statement must start with a name, not \"?\""
+        ]
+      },
+      "evaluate": {
+        "ok": false,
+        "root": {
+          "args": [
+            [
+              1
+            ]
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": [
+          "error|2|a statement must start with a name, not \"?\""
+        ]
+      }
+    },
+    {
+      "name": "corpus-030",
+      "program": "root = Text($count + \"\")\n$count = 1",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            "1"
+          ],
+          "kind": "element",
+          "line": 1,
+          "name": "Text"
+        },
+        "stateDefaults": {
+          "count": 1
+        },
+        "diagnostics": []
+      }
+    },
+    {
+      "name": "corpus-031",
+      "program": "// a comment line\nroot = Col([])",
+      "parse": {
+        "ok": true,
+        "rootName": "root",
+        "diagnostics": []
+      },
+      "evaluate": {
+        "ok": true,
+        "root": {
+          "args": [
+            []
+          ],
+          "kind": "element",
+          "line": 2,
+          "name": "Col"
+        },
+        "stateDefaults": {},
+        "diagnostics": []
+      }
+    }
+  ]
+}

@@ -13,7 +13,7 @@ this says what the current slice is allowed to do.
 | 1.1 | OpenUI render loop (was the stage-1 gap) | **Done** |
 | 1.2 | Real-browser integration verification | **Done — B01–B11 recorded** |
 | 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
-| 2 | OpenUI language core | Not started |
+| 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | OpenUI render backend | Not started |
 | 4 | Capability expansion (open-intelligent-ui reference) | Not started |
 | 5 | Unified prompt, security review, release | Not started |
@@ -84,16 +84,27 @@ written at `docs/reports/PHASE-2-REPORT.md` (to be created on exit).
 
 ---
 
-## Stage 3 — OpenUI render backend
+## Stage 3 — OpenUI render backend, part two
 
-**Goal.** Close the stage-1 gap: an openui card actually appears in the chat.
+**Goal.** Finish what stage 2 started in the browser: the loop works, but its
+state does not survive a reload, Button actions do nothing, and 40 of the 48
+components still have no renderer.
 
-**In scope.** `src/client/` gains a dispatch on `backend`; the openui React
-component tree; `$state`; card-state persistence for openui cards.
+**Already done in stage 2** (recorded so this stage is not credited twice): the
+card dispatches on the descriptor, draws from the real evaluator, and a bound
+Slider re-evaluates the tree. See `docs/reports/PHASE-2-REPORT.md`.
 
-**Exit criteria.** A program card renders, its controls change state without a
-model call, it survives a page reload, and a legacy `intelligent_ui` meta
-replays through the same path.
+**In scope.** `src/client/` only.
+- Persist `$state` so S04 becomes PASS. **Decide where first** — an ADR, not an
+  implementation detail.
+- Consume action descriptors so `Button` does something.
+- Widen the component table from 8 toward 48.
+
+**Out of scope.** Any change to language semantics. The differential run must
+still report 0 differences after every stage-3 commit.
+
+**Exit criteria.** A reload restores what the user set; a Button's action changes
+state; at least the Inputs group renders; the differential run is unchanged.
 
 ---
 

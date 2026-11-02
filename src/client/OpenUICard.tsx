@@ -18,14 +18,23 @@
  * reproduces the card without calling the model again.
  */
 
-import { createElement, type CSSProperties, type ReactNode } from 'react'
+import { createElement, useCallback, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { openuiMetaFrom } from '../fragment.ts'
 import type { OpenUIMeta } from '../fragment.ts'
-import type { Expr, Statement } from '../backends/openui/parse.ts'
 import { parseProgram } from '../backends/openui/parse.ts'
+import { evaluateProgram } from '../backends/openui/evaluate.ts'
+import type { BindingDescriptor, EvaluationValue } from '../backends/openui/evaluate.ts'
 
-/** One component this renderer can draw. */
-type Renderer = (props: readonly unknown[], key: string) => ReactNode
+/**
+ * One component this renderer can draw.
+ *
+ * `write` carries a `$variable` change back to the card's state, which is what
+ * closes the loop: input -> state -> re-evaluate -> new tree.
+ */
+type Renderer = (props: readonly unknown[], write: WriteChannel, key: string) => ReactNode
+
+/** Writes one bound variable and triggers re-evaluation. */
+type WriteChannel = (name: string, next: EvaluationValue) => void
 
 /** Space scale: the language counts gap and padding in 4px steps. */
 const STEP = 4
@@ -200,7 +209,7 @@ const BUTTON_KINDS: Readonly<Record<string, CSSProperties>> = {
  * makes the prompt, the validator and the renderer agree.
  */
 const COMPONENTS: Readonly<Record<string, Renderer>> = {
-  Col: (props, key) => createElement(
+  Col: (props, _write, key) => createElement(
     'div',
     {
       key,
@@ -214,7 +223,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     },
     children(props[0]),
   ),
-  Row: (props, key) => createElement(
+  Row: (props, _write, key) => createElement(
     'div',
     {
       key,
@@ -229,7 +238,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     },
     children(props[0]),
   ),
-  Card: (props, key) => {
+  Card: (props, _write, key) => {
     const variant = text(props[1], 'soft')
     return createElement(
       'div',
@@ -252,7 +261,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
       children(props[0]),
     )
   },
-  Title: (props, key) => createElement(
+  Title: (props, _write, key) => createElement(
     'div',
     {
       key,
@@ -265,7 +274,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     },
     text(props[0]),
   ),
-  Text: (props, key) => createElement(
+  Text: (props, _write, key) => createElement(
     'div',
     {
       key,
@@ -279,7 +288,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     },
     Array.isArray(props[0]) ? (props[0] as ReactNode[]) : text(props[0]),
   ),
-  Caption: (props, key) => createElement(
+  Caption: (props, _write, key) => createElement(
     'div',
     {
       key,
@@ -290,7 +299,7 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     },
     text(props[0]),
   ),
-  Button: (props, key) => {
+  Button: (props, _write, key) => {
     const variant = text(props[2], 'primary')
     return createElement(
       'button',
@@ -319,32 +328,47 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
       text(props[0]),
     )
   },
-  Slider: (props, key) => createElement(
-    'label',
-    {
-      key,
-      style: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        fontSize: SIZES.sm,
-        color: 'var(--muted-foreground)',
-        minWidth: 0,
-      } satisfies CSSProperties,
-    },
-    text(props[4], ''),
-    createElement('input', {
-      type: 'range',
-      min: num(props[1], 0),
-      max: num(props[2], 100),
-      step: num(arg(props[3], 1), 1),
-      defaultValue: num(props[0], 0),
-      // Interaction needs `$state`, which arrives with the evaluator; drawing
-      // it read-only is honest about where this milestone stops.
-      disabled: true,
-      style: { flex: '1 1 auto', minWidth: 60, accentColor: 'var(--primary)' } satisfies CSSProperties,
-    }),
-  ),
+  Slider: (props, write, key) => {
+    const bound = asBinding(props[0])
+    const current = num(bound === undefined ? props[0] : bound.value, 0)
+    const min = num(props[1], 0)
+    const max = num(props[2], 100)
+    return createElement(
+      'label',
+      {
+        key,
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: SIZES.sm,
+          color: 'var(--muted-foreground)',
+          minWidth: 0,
+        } satisfies CSSProperties,
+      },
+      text(props[4], ''),
+      createElement('input', {
+        type: 'range',
+        min,
+        max,
+        step: num(arg(props[3], 1), 1),
+        // A bound Slider is controlled by $state and can be dragged; an unbound
+        // one has nowhere to write to, so it stays read-only rather than
+        // pretending to move.
+        value: current,
+        ...bound === undefined ? {} : {
+          onChange: (event: { target: { value: string } }) => {
+            const parsed = Number(event.target.value)
+            if (Number.isFinite(parsed)) write(bound.name, parsed)
+          },
+        },
+        disabled: bound === undefined,
+        'aria-label': text(props[4], 'value'),
+        style: { flex: '1 1 auto', minWidth: 60, accentColor: 'var(--primary)' } satisfies CSSProperties,
+      }),
+      createElement('span', { style: { minWidth: 24, textAlign: 'right' } }, text(current)),
+    )
+  },
 }
 
 /** What the parser and the walker hand the renderer. */
@@ -353,112 +377,128 @@ interface RenderedProgram {
   readonly error: string | undefined
 }
 
-/**
- * Statement values, resolved on demand.
- *
- * openui-lang lets a statement be referenced before it is defined, so a
- * one-pass walk is wrong: `root = Col([Text(label)])` followed by
- * `label = "hi"` must still read the label. This resolves a name the first
- * time it is asked for, memoizes the result, and treats a cycle as null rather
- * than recursing forever.
- */
-class Scope {
-  readonly #statements: ReadonlyMap<string, Expr>
-  readonly #values = new Map<string, unknown>()
-  readonly #resolving = new Set<string>()
-
-  /**
-   * @param statements - every non-state statement, by name.
-   */
-  constructor(statements: ReadonlyMap<string, Expr>) {
-    this.#statements = statements
-  }
-
-  /**
-   * Read one name.
-   * @param name - the statement name.
-   * @returns the rendered value, or null when the name is undefined or cyclic.
-   */
-  get(name: string): unknown {
-    if (this.#values.has(name)) return this.#values.get(name)
-    const expr = this.#statements.get(name)
-    if (expr === undefined) return null
-    if (this.#resolving.has(name)) return null
-    this.#resolving.add(name)
-    const value = this.value(expr)
-    this.#resolving.delete(name)
-    this.#values.set(name, value)
-    return value
-  }
-
-  /**
-   * Evaluate an argument expression to a plain value.
-   * @param expr - the expression.
-   * @returns the value.
-   */
-  value(expr: Expr): unknown {
-    switch (expr.t) {
-      case 'str':
-      case 'num':
-      case 'bool':
-        return expr.v
-      case 'null':
-        return null
-      case 'ref':
-        return this.get(expr.name)
-      case 'arr':
-        return expr.items.map(item => this.value(item))
-      case 'call':
-        return this.render(expr, `k${this.#values.size}:${expr.name}`)
-      case 'bin':
-        if (expr.op === '+') return `${text(this.value(expr.left))}${text(this.value(expr.right))}`
-        return null
-      default:
-        return null
-    }
-  }
-
-  /**
-   * Draw one component call.
-   * @param expr - the call node.
-   * @param key - React key.
-   * @returns the element, or null when the table has no such component.
-   */
-  render(expr: Extract<Expr, { t: 'call' }>, key: string): ReactNode {
-    const renderer = COMPONENTS[expr.name]
-    if (renderer === undefined) return null
-    return renderer(expr.args.map(item => this.value(item)), key)
-  }
+/** One `$variable` a component may write back to. */
+interface Binding {
+  readonly name: string
+  readonly value: EvaluationValue
 }
 
 /**
- * Walk the program into elements.
+ * Turn one evaluated value into React nodes.
+ *
+ * The evaluator has resolved statements, `@functions`, `@Each`, arithmetic and
+ * conditionals already; this maps the resulting descriptor tree onto the
+ * component table. That split is the point of stage 2: the engine the host
+ * validates with is the engine the card renders with.
+ *
+ * A `$variable` argument is passed through as a {@link Binding} rather than a
+ * bare value, because an input has to know which variable to write back to.
+ * Flattening it is exactly what kept the Slider read-only.
+ *
+ * @param value - an evaluated value.
+ * @param write - writes one bound variable.
+ * @param depth - nesting depth, so a hostile tree cannot exhaust the stack.
+ * @returns the node.
+ */
+function drawValue(
+  value: EvaluationValue,
+  write: (name: string, next: EvaluationValue) => void,
+  depth = 0,
+  path = '',
+): ReactNode {
+  if (depth > 200) return null
+  if (value === null || value === undefined) return null
+  if (Array.isArray(value)) {
+    // Each item needs its OWN key, or React sees N siblings with one identity.
+    // @Each output made that visible: every generated Text shared `o3:Text`.
+    return value.map((item, index) => drawValue(item, write, depth + 1, `${path}/${index}`))
+  }
+  if (typeof value !== 'object') return value as ReactNode
+
+  const descriptor = value as {
+    kind?: string
+    name?: string
+    args?: readonly EvaluationValue[]
+    value?: EvaluationValue
+  }
+
+  if (descriptor.kind === 'binding' && typeof descriptor.name === 'string') {
+    return bindingNode({ name: descriptor.name, value: descriptor.value ?? null })
+  }
+
+  if (descriptor.kind !== 'element' || typeof descriptor.name !== 'string') return null
+
+  const renderer = COMPONENTS[descriptor.name]
+  if (renderer === undefined) return null
+  const args = (descriptor.args ?? []).map((arg, index) =>
+    drawValue(arg, write, depth + 1, `${path}/${descriptor.name}${index}`))
+  return renderer(args, write, `o${path}:${descriptor.name}`)
+}
+
+/**
+ * Marker for a bound argument.
+ *
+ * A binding travels through the same array as ordinary arguments, so it is
+ * carried in a shape the component table can recognise rather than being
+ * flattened before the component ever sees it.
+ * @param binding - the binding.
+ * @returns the marker.
+ */
+function bindingNode(binding: Binding): ReactNode {
+  return { __openuiBinding: binding } as unknown as ReactNode
+}
+
+/**
+ * Read a bound argument, if this argument is one.
+ * @param value - one component argument.
+ * @returns the binding, or undefined.
+ */
+function asBinding(value: unknown): Binding | undefined {
+  if (value === null || typeof value !== 'object') return undefined
+  const marked = (value as { __openuiBinding?: Binding }).__openuiBinding
+  return marked === undefined ? undefined : marked
+}
+
+/**
+ * Evaluate a program and draw it.
  * @param source - the program.
+ * @param state - current `$variable` values.
+ * @param write - writes one variable back.
  * @returns the rendered tree, or the reason it cannot be drawn.
  */
-export function renderProgram(source: string): RenderedProgram {
+export function drawProgram(
+  source: string,
+  state: Readonly<Record<string, EvaluationValue>>,
+  write: (name: string, next: EvaluationValue) => void,
+): RenderedProgram {
   const parsed = parseProgram(source)
   if (!parsed.ok) {
     return { node: null, error: parsed.diagnostics[0]?.message ?? 'the program could not be parsed' }
   }
-
-  const statements = new Map<string, Expr>()
-  let rootExpr: Expr | undefined
-  for (const statement of parsed.statements as readonly Statement[]) {
-    if (statement.name === 'root' && !statement.state) {
-      rootExpr = statement.expr
-      continue
-    }
-    statements.set(statement.name, statement.expr)
+  if (parsed.rootName === undefined) {
+    return { node: null, error: 'the program never defines `root`' }
   }
 
-  if (rootExpr === undefined) {
-    return { node: null, error: 'the program never defines \`root\`' }
-  }
+  const result = evaluateProgram(parsed, { state })
+  const failed = result.diagnostics.find(diagnostic => diagnostic.severity === 'error')
+  if (failed !== undefined) return { node: null, error: failed.message }
 
-  const scope = new Scope(statements)
-  const node = rootExpr.t === 'call' ? scope.render(rootExpr, 'root') : (scope.value(rootExpr) as ReactNode)
-  return { node, error: undefined }
+  return { node: drawValue(result.root, write), error: undefined }
+}
+
+/**
+ * Evaluate a program with no interaction.
+ *
+ * Kept for the many callers that only need to know whether a program draws.
+ * @param source - the program.
+ * @param state - current `$variable` values.
+ * @returns the rendered tree, or the reason it cannot be drawn.
+ */
+export function renderProgram(
+  source: string,
+  state: Readonly<Record<string, EvaluationValue>> = {},
+): RenderedProgram {
+  return drawProgram(source, state, () => {})
 }
 
 /**
@@ -494,7 +534,17 @@ const NOTICE_STYLE: CSSProperties = {
  * @returns the card body.
  */
 export function OpenUICard({ meta }: { readonly meta: OpenUIMeta }): ReactNode {
-  const { node, error } = renderProgram(meta.program)
+  // The card owns its `$state`. Writing a variable re-evaluates the whole
+  // program, which is what makes one control change another component: the
+  // tree is not patched, it is rebuilt from the same program with new state.
+  const [state, setState] = useState<Record<string, EvaluationValue>>({})
+  const write = useCallback((name: string, next: EvaluationValue) => {
+    setState(previous => ({ ...previous, [name]: next }))
+  }, [])
+  const { node, error } = useMemo(
+    () => drawProgram(meta.program, state, write),
+    [meta.program, state, write],
+  )
   return createElement(
     'div',
     // The bridged custom properties must sit on the card root itself: a

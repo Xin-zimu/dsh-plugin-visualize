@@ -126,7 +126,8 @@ function tooDeep(cursor: Cursor): Expr {
     cursor.diagnostics.push({
       severity: 'error',
       code: 'VZO110',
-      message: `line ${cursor.line}: the expression is nested too deeply`,
+      line: cursor.line,
+message: `the expression is nested too deeply`,
     })
   }
   return errorNode('expression nested too deeply')
@@ -193,7 +194,8 @@ function parseStatement(
     diagnostics.push({
       severity: 'error',
       code: 'VZO111',
-      message: `line ${line}: a statement must start with a name, not ${describeToken(first)}`,
+      line: line,
+message: `a statement must start with a name, not ${describeToken(first)}`,
     })
     return
   }
@@ -204,7 +206,8 @@ function parseStatement(
     diagnostics.push({
       severity: 'error',
       code: 'VZO112',
-      message: `line ${line}: expected "=" after ${label}`,
+      line: line,
+message: `expected "=" after ${label}`,
     })
     return
   }
@@ -214,7 +217,8 @@ function parseStatement(
     diagnostics.push({
       severity: 'error',
       code: 'VZO113',
-      message: `line ${line}: ${label} is missing a value after "="`,
+      line: line,
+message: `${label} is missing a value after "="`,
     })
     statements.push({ name, state, expr: errorNode('missing value'), line })
     return
@@ -227,7 +231,8 @@ function parseStatement(
     diagnostics.push({
       severity: 'error',
       code: 'VZO114',
-      message: `line ${line}: unexpected ${describeToken(extra)} after the expression of ${label}`,
+      line: line,
+message: `unexpected ${describeToken(extra)} after the expression of ${label}`,
     })
   }
   statements.push({ name, state, expr, line })
@@ -364,7 +369,8 @@ function parsePostfix(cursor: Cursor): Expr {
         cursor.diagnostics.push({
           severity: 'error',
           code: 'VZO116',
-          message: `line ${next.line}: expected a property name after "."`,
+          line: next.line,
+message: `expected a property name after "."`,
         })
         return errorNode('missing property name')
       }
@@ -382,7 +388,8 @@ function parsePostfix(cursor: Cursor): Expr {
         cursor.diagnostics.push({
           severity: 'error',
           code: 'VZO117',
-          message: `line ${next.line}: expected "]" to close the index`,
+          line: next.line,
+message: `expected "]" to close the index`,
         })
       }
       node = { t: 'idx', obj: node, index: indexExpr }
@@ -404,7 +411,8 @@ function parsePrimary(cursor: Cursor): Expr {
     cursor.diagnostics.push({
       severity: 'error',
       code: 'VZO118',
-      message: `line ${cursor.line}: expected an expression`,
+      line: cursor.line,
+message: `expected an expression`,
     })
     return errorNode('missing expression')
   }
@@ -444,7 +452,8 @@ function parsePrimary(cursor: Cursor): Expr {
         cursor.diagnostics.push({
           severity: 'error',
           code: 'VZO119',
-          message: `line ${token.line}: expected ")"`,
+          line: token.line,
+message: `expected ")"`,
         })
       }
       return inner
@@ -456,7 +465,8 @@ function parsePrimary(cursor: Cursor): Expr {
   cursor.diagnostics.push({
     severity: 'error',
     code: 'VZO120',
-    message: `line ${token.line}: unexpected ${describeToken(token)}`,
+    line: token.line,
+message: `unexpected ${describeToken(token)}`,
   })
   cursor.index += 1
   return errorNode(`unexpected ${describeToken(token)}`)
@@ -475,7 +485,8 @@ function parseAtCall(cursor: Cursor, atToken: Token): Expr {
     cursor.diagnostics.push({
       severity: 'error',
       code: 'VZO121',
-      message: `line ${atToken.line}: expected a function name after "@"`,
+      line: atToken.line,
+message: `expected a function name after "@"`,
     })
     return errorNode('missing function name')
   }
@@ -485,7 +496,8 @@ function parseAtCall(cursor: Cursor, atToken: Token): Expr {
     cursor.diagnostics.push({
       severity: 'error',
       code: 'VZO122',
-      message: `line ${atToken.line}: expected "(" after "@${String(nameToken.value)}"`,
+      line: atToken.line,
+message: `expected "(" after "@${String(nameToken.value)}"`,
     })
     return errorNode('missing argument list')
   }
@@ -507,7 +519,8 @@ function parseArgList(cursor: Cursor): Expr[] {
       cursor.diagnostics.push({
         severity: 'error',
         code: 'VZO123',
-        message: `line ${cursor.line}: expected ")" to close the argument list`,
+        line: cursor.line,
+message: `expected ")" to close the argument list`,
       })
       return args
     }
@@ -528,7 +541,8 @@ function parseArgList(cursor: Cursor): Expr[] {
       cursor.diagnostics.push({
         severity: 'error',
         code: 'VZO124',
-        message: `line ${after.line}: named arguments (name: value) are not supported: every argument is positional`,
+        line: after.line,
+message: `named arguments (name: value) are not supported: every argument is positional`,
       })
       while (cursor.index < cursor.tokens.length) {
         const stop = cursor.tokens[cursor.index]!
@@ -559,7 +573,8 @@ function parseArrayLiteral(cursor: Cursor, openToken: Token): Expr {
       cursor.diagnostics.push({
         severity: 'error',
         code: 'VZO125',
-        message: `line ${openToken.line}: expected "]" to close the array — a statement must stay on one physical line`,
+        line: openToken.line,
+message: `expected "]" to close the array — a statement must stay on one physical line`,
       })
       return { t: 'arr', items }
     }
@@ -592,7 +607,8 @@ function parseObjectLiteral(cursor: Cursor, openToken: Token): Expr {
       cursor.diagnostics.push({
         severity: 'error',
         code: 'VZO126',
-        message: `line ${openToken.line}: expected "}" to close the object`,
+        line: openToken.line,
+message: `expected "}" to close the object`,
       })
       return { t: 'obj', entries }
     }
@@ -611,7 +627,8 @@ function parseObjectLiteral(cursor: Cursor, openToken: Token): Expr {
       cursor.diagnostics.push({
         severity: 'error',
         code: 'VZO127',
-        message: `line ${next.line}: expected a key, not ${describeToken(next)}`,
+        line: next.line,
+message: `expected a key, not ${describeToken(next)}`,
       })
       cursor.index += 1
       continue
@@ -623,7 +640,8 @@ function parseObjectLiteral(cursor: Cursor, openToken: Token): Expr {
       cursor.diagnostics.push({
         severity: 'error',
         code: 'VZO128',
-        message: `line ${next.line}: expected ":" after the key ${JSON.stringify(key)}`,
+        line: next.line,
+message: `expected ":" after the key ${JSON.stringify(key)}`,
       })
       entries.push({ key, value: errorNode('missing value') })
       continue

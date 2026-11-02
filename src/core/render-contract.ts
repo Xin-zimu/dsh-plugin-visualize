@@ -66,6 +66,15 @@ export interface Diagnostic {
   readonly message: string
   /** A concrete fix. */
   readonly fix?: string
+  /**
+   * 1-based line in the backend's own source, when the finding has one.
+   *
+   * Kept as a field rather than baked into {@link message}: the host decides how
+   * to present a location, and a message that embeds "line 3: " can never be
+   * compared against a backend that does not. Optional because a request-level
+   * finding (a size limit, an empty source) belongs to no line.
+   */
+  readonly line?: number
 }
 
 /** What a backend is given to render. */
