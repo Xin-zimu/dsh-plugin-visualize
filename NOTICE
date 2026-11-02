@@ -1,0 +1,32 @@
+dsh-unified-visualize
+Copyright (c) 2026 the dsh-unified-visualize contributors
+
+This product includes software developed by third parties. The original
+copyright notices and licence texts are reproduced below, and each upstream
+snapshot is kept verbatim under `upstream/`.
+
+--------------------------------------------------------------------------------
+dsh-visualize — https://github.com/Nagi-ovo/dsh-visualize
+Licence: BSD-3-Clause
+Pinned at cf6b3a3f5a3f02b83a380890a5b672a350715344.
+Contributes: the host half (tool registration, card store, sandboxed frame and
+CSP, fragment linter, lint gate, image embedding, same-turn self-repair, style
+system, settings page) and the browser half (card, streaming preview, turn-tail
+replay). Full text in LICENSE.dsh-visualize.
+
+--------------------------------------------------------------------------------
+dsh-intelligent-ui — https://github.com/my-dsh/deepseek-intelligent-ui
+Licence: MIT
+Pinned at 0b08749c9969cad34166566340f6c9464ea77b6c.
+Contributes: the openui-lang lexer and parser under src/backends/openui/,
+ported to TypeScript, and the component and function signature tables the
+skill text is generated from.
+
+--------------------------------------------------------------------------------
+open-intelligent-ui — https://github.com/thesysdev/open-intelligent-ui
+Licence: MIT
+Pinned at 16ef26475999e3a021a50b1607a03717c0721255.
+Contributes: capability design reference only. No application code is copied;
+its Next.js shell, API routes and React 19 runtime are deliberately left out.
+
+See PROVENANCE.md for the exact snapshots and what was excluded.

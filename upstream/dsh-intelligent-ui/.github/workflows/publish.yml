@@ -1,0 +1,149 @@
+# Release: publish the tagged version to npm, then list it in the plugin market index.
+#
+# Publishing authenticates with OIDC (npm trusted publishing), so this repository
+# holds no npm token. One-time setup on npmjs.com — the package's Settings →
+# Trusted Publisher → GitHub Actions:
+#
+#   Organization        my-dsh
+#   Repository          deepseek-intelligent-ui
+#   Workflow filename   publish.yml        (file name only, no path)
+#   Allowed action      npm publish
+#
+# Then release with `npm version patch && git push --follow-tags`. See
+# docs/RELEASING.md.
+#
+# The tagged tree is what gets published; the market index is committed on main,
+# which moves past every release. A failed run can therefore simply be re-run.
+#
+# Requires npm >= 11.5.1 on a GitHub-hosted runner, so the npm upgrade is pinned to
+# the major that was proven here instead of `@latest`. The `contents: write` below
+# is what lets the last step push the regenerated index back to main: a workflow's
+# `permissions` key overrides the repository's default workflow permissions, so no
+# repository setting has to change.
+name: Publish
+
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  # One release at a time. Releases are not per-tag independent: each one pushes a
+  # market-index commit to main, and two in flight would race that push.
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  # `id-token: write` is the only credential: npm verifies this workflow's identity
+  # instead of reading a stored token. `contents: write` pushes the index commit.
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The tagged tree is what gets published — never the tip of main.
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Update npm
+        # Trusted publishing needs npm >= 11.5.1. Pin the major so a new npm release
+        # cannot break a publish mid-release; bump this deliberately.
+        run: npm install -g npm@11
+
+      - name: The tag must match package.json and sit on the main line
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match the package.json version ${version}"
+            exit 1
+          fi
+          # The index is committed on main, so main moves past every release; the tag
+          # only has to be on the main line, and main is fetched for the index step.
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::${GITHUB_REF_NAME} is not an ancestor of main"
+            exit 1
+          fi
+
+      - name: Test
+        run: node --test
+
+      - name: client.js must match its sources
+        run: |
+          # The build is strict and reuses the committed stamp, so an unchanged tree
+          # rebuilds byte-identically and a diff can only mean a stale artifact.
+          node scripts/build-client.mjs
+          if ! git diff --exit-code -- client.js; then
+            echo "::error::client.js is stale — run node scripts/build-client.mjs and commit the result"
+            exit 1
+          fi
+
+      - name: The bundle must load and register its surface
+        # A syntactically valid client.js is not enough: probe-client executes the
+        # artifact and checks the slot registration plus the component/function sets.
+        run: node --check client.js && node scripts/probe-client.mjs
+
+      - name: Publish to npm
+        run: |
+          name="$(node -p "require('./package.json').name")"
+          version="$(node -p "require('./package.json').version")"
+          # A prerelease never moves the `latest` dist-tag.
+          case "$version" in
+            *-*) dist_tag=next ;;
+            *) dist_tag=latest ;;
+          esac
+          # A re-run of a release that failed after publishing must still reach the
+          # index step, and npm rejects a repeated version.
+          if npm view "${name}@${version}" version >/dev/null 2>&1; then
+            echo "${name}@${version} is already on npm; skipping the publish"
+          else
+            npm publish --tag "$dist_tag"
+            # The registry can take minutes to process a new version before the
+            # dist-tag read reflects it, so wait long enough to tell a real failure
+            # (a dist-tag the registry refused to move) from ordinary propagation lag.
+            published=""
+            for attempt in $(seq 1 30); do
+              published="$(npm view "${name}" "dist-tags.${dist_tag}" 2>/dev/null || true)"
+              if [ "$published" = "$version" ]; then break; fi
+              sleep 10
+            done
+            if [ "$published" != "$version" ]; then
+              echo "::error::published ${name}@${version} but dist-tag ${dist_tag} points at ${published:-nothing}"
+              exit 1
+            fi
+          fi
+
+      - name: List the release in the plugin market index
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          name="$(node -p "require('./package.json').name")"
+          # The index lives on main, which has moved past this tag, so the entry goes
+          # into main's copy while the release itself stays exactly what the tag holds.
+          # The updater is taken from the tag rather than from main, so a release is
+          # updated by the very tooling it tested and ships.
+          #
+          # main's package.json may already name the next release, so the entry's
+          # engines come from the tagged manifest instead.
+          git show "${GITHUB_REF_NAME}:package.json" > "$RUNNER_TEMP/tagged-package.json"
+          tagged_engines="$(node -e 'const manifest = require(process.argv[1]); process.stdout.write(JSON.stringify(manifest.engines ?? {}))' "$RUNNER_TEMP/tagged-package.json")"
+          git checkout -B market-index origin/main
+          git show "${GITHUB_REF_NAME}:scripts/update-market-index.mjs" > scripts/update-market-index.mjs
+          IUI_MARKET_ENGINES_JSON="$tagged_engines" node scripts/update-market-index.mjs "$version"
+          if git diff --quiet -- market/index.json; then
+            echo "market/index.json already lists ${name}@${version}"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add market/index.json
+          git commit -m "market: list ${name}@${version}"
+          git push origin HEAD:main
