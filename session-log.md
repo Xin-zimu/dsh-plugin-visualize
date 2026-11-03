@@ -82,9 +82,9 @@ Three lessons worth keeping:
 - **Scan after the last write, not before the first push.** A scan is only
   valid for the tree that existed when it ran.
 - **A redaction tool must not hard-code what it removes.** Two of the rewrite
-  rounds failed because `redact.mjs` contained `86139` as a literal; the
-  out-of-tree filter carries the literals, the in-repo tool reads them from
-  `REDACT_USER` / `REDACT_EMAIL`.
+  rounds failed because `redact.mjs` contained the Windows account name as a
+  literal; the out-of-tree filter carries the literals, the in-repo tool reads
+  them from `REDACT_USER` / `REDACT_EMAIL`.
 - **`git filter-branch` swallows a filter that crashes.** It reported success
   while a `EPERM` on the worktree `.git` gitlink aborted the script mid-run.
   Verify the result, never the exit status.
