@@ -10,13 +10,22 @@ import fs from 'node:fs'
 
 // Order matters: the absolute repo path first, so its own segments are
 // consumed before the generic home-directory rule runs.
+//
+// The username and machine id are deliberately NOT written here as literals:
+// a redaction tool that hard-codes the value it removes leaks it in the repo.
+// They are read from the environment when available, and the home-directory
+// rule below catches the common case without knowing them.
+const USER = process.env.REDACT_USER ?? null
+const EMAIL = process.env.REDACT_EMAIL ?? null
+
 const SUBS = [
   [/[A-Za-z]:(?:\\\\|\\|\/)+(?:Deepseek|work)(?:\\\\|\\|\/)+dsh-plugin-visualize/g,
     'D:/work/dsh-plugin-visualize'],
   [/[A-Za-z]:(?:\\\\|\\|\/)+Users(?:\\\\|\\|\/)+[^\\/\s'"]+/g, 'C:/Users/<user>'],
-  [/(?<![0-9])<user>(?![0-9])/g, '<user>'],
-  [/\b<email>\b/g, '<email>'],
 ]
+
+if (USER) SUBS.push([new RegExp(`(?<![0-9])${USER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![0-9])`, 'g'), '<user>'])
+if (EMAIL) SUBS.push([new RegExp(`\\b${EMAIL}\\b`, 'g'), '<email>'])
 
 export function redactString(s) {
   let out = s
@@ -39,8 +48,9 @@ for (const f of files) {
     continue
   }
   fs.writeFileSync(f, after, 'utf8')
-  const n = (before.match(/<user>|work/g) ?? []).length
+  // count how many of the rules actually fired, without naming their contents
+  const n = SUBS.reduce((acc, [rx]) => acc + (before.match(rx) ?? []).length, 0)
   console.log(`redacted ${f} (${n} path token(s))`)
   changed++
 }
-process.exit(changed === 0 ? 0 : 0)
+process.exit(0)
