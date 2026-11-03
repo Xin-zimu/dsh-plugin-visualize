@@ -23,7 +23,7 @@ The Text group is now complete: 10 of 10 render, and the inventory moves from
 | 3 | Layout, colour and contrast hold in both colour schemes | **PASS — after fixing three AA failures** |
 | 4 | The differential still reports 0 differences | **PASS** — 31/31 |
 | 5 | Browser evidence on an isolated profile, with the §9 hash check | **PASS** |
-| 6 | `tests/<batch>` added; the 15-failure baseline unchanged | **PASS** — 747 / 15, failure set identical |
+| 6 | `tests/<batch>` added; the 15-failure baseline unchanged | **PASS** — 747 / 15 at the verdict (749 after the two structural guards added at close), failure set identical |
 
 ## The security decision, made before the renderer existed
 

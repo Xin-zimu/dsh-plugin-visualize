@@ -254,13 +254,17 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | `src/client/OpenUICard.tsx` | **4A-2 / D21** — `--font-mono` bridged to `--dsw-font-markdown-code-font-family` | The frame vocabulary's `--font-mono` does not exist in the host. Measured first, so this is not D17/D18 a fourth time |
 | `src/client/OpenUICard.tsx` | **4A-2 / D22** — `LINK_LITERAL`, `--link`, `--muted-foreground-strong` | `Link` was 4.23:1 and the 11px supporting text 3.71:1 on white. Both now clear AA in both schemes |
 | `src/client/OpenUICard.tsx` | **4A-2** — `Label` renders; `Badge` carries colour by dot + tint | Tinted text at 11px is what upstream records as having failed contrast |
-| `tests/openui-text-4a2.spec.tsx` | **new, 62 tests** | The seven components, the 17 refused URL forms, the row-count regression, and the three-layer variable guard |
+| `tests/openui-text-4a2.spec.tsx` | **new, 64 tests** | The seven components, the 17 refused URL forms, and the three-layer variable guard. The `List` assertions were rewritten to check DOM **structure**, not text presence |
+| `tests/openui-dom-structure.ts` | **new (maintenance)** | `countOf` / `shapeOf` / `depthOf` / `describeShape` — the D20 lesson made reusable. `AGENTS.md` §6 makes structure the required assertion for a component claim |
 | `tests/openui-inventory.spec.tsx` | 12 → 19; 4A-2 batch row removed | Measured from `RENDERED_COMPONENTS`; the Text group now asserts *complete*, not *seven added* |
 | `tests/openui-layout-4a1.spec.tsx` | verified-token allowlist + 2 entries | The guard refused `--font-mono` and `--dsw-alias-label-secondary` until each had a measurement. That is the guard working |
 | `evidence/lib/cdp.mjs` | **D23** — `evaluate()` retries transient refusals | The documented policy was implemented in `step()` only, so one repaint could fail a run. `parity.mjs` still exits 0 |
-| `tsconfig.json`, `tsconfig.client.json` | new spec registered in both | D13 again |
+| `tsconfig.json`, `tsconfig.client.json` | new spec and the structure helper registered in both | D13 again |
 | `docs/reports/PHASE-4A-2-REPORT.md` | **new** | Batch verdict, ADR-008 summary, the three defects, and what is *not* verified |
 | `evidence/phase-4a-2/` | manifest, 4 PNGs, contrast/token/theme JSON, 14 probes | Every 4A-2 claim has a file |
+| `AGENTS.md` | **§2 rewritten** (tree ownership + pre-write check + worktrees); **§6 gained** the DOM-structure rule | Two owner decisions at 4A-2 close: a shared writable tree is a hazard, and a passing unit test is not a correct DOM |
+| `HANDOFF.md` | **downgraded to a navigation index** | It was carrying HEAD, test counts and workflow state — a second source of truth that goes stale and can be trusted over the real one |
+| `session-log.md` | §7 records the two changes above | AGENTS §8 |
 
 **No change under `src/backends/`.** Language semantics are untouched; the
 differential was re-run and still reports **31/31, 0 differences**
@@ -272,9 +276,10 @@ differential was re-run and still reports **31/31, 0 differences**
 | --- | --- | --- | --- |
 | Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-host.txt` |
 | Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-client.txt` |
-| Suite (4A-2) | `npx vitest run` | **747 / 15** (762) — failure set identical to 4A-1 after normalising timings | `evidence/phase-4a-2/test-4a2-final.txt` |
+| Suite (4A-2) | `npx vitest run` | **749 / 15** (764) — phase verdict was reached on 747; the 2 extra are the structural guards added at close | `evidence/phase-4a-2/test-4a2-maintenance.txt` |
 | Language differential (4A-2) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences** | `evidence/phase-4a-2/differential-4a2.txt` |
-| New 4A-2 spec | `npx vitest run tests/openui-text-4a2.spec.tsx` | **62 / 62 PASS** | same suite file |
+| New 4A-2 spec | `npx vitest run tests/openui-text-4a2.spec.tsx` | **64 / 64 PASS** | same suite file |
+| **D20 guard validated** | defect re-introduced on purpose, spec re-run, fix restored | **3 of the new structural tests failed on it**, incl. `listitem inside listitem`; then back to 64/64 | this log; no artefact kept, because keeping a deliberately broken build would be worse |
 | Inventory | `npx vitest run tests/openui-inventory.spec.tsx` | **19 / 48**, Text group complete | same suite file |
 | Harness parity | `node evidence/lib/parity.mjs` | exit 0; no capability lost, character typing still forbidden | `evidence/lib/parity-report.json` |
 | Browser 4A-2 | isolated profile, **no CSS overrides**, both schemes | **all six exit items PASS** | `evidence/phase-4a-2/MANIFEST.json` |
@@ -325,13 +330,46 @@ is self-contained: no `lib/`, `tmp/`, `node_modules/` or
 reproducible from a clean export.
 
 **4A-2 is closed (PASS).** Record: `docs/reports/PHASE-4A-2-REPORT.md`, manifest
-`evidence/phase-4a-2/MANIFEST.json`. Baseline to protect: **747 passed / 15
-failed / 762**, failure set identical to the 4A-1 baseline after normalising
+`evidence/phase-4a-2/MANIFEST.json`. Baseline to protect: **749 passed / 15
+failed / 764** — the phase verdict was reached on 747 / 762, and the two extra
+tests are the D20 structural guards added at close. The failure set is identical
+to the 4A-1 baseline after normalising
 timings; `tsc` clean both projects; differential **31/31**.
 
-**4A-3 is next**: `Input`, `TextArea`, `Select`, `SegmentedControl`, `Checkbox`,
-`RadioGroup`, `DatePicker`, `Timer`, `Form`, `IconButton`, `Pressable`. Scope and
-gates are in `STAGE.md` §Stage 4A. Two things specific to that batch:
+### Before 4A-3 starts: two maintainability changes, already made
+
+These are **not a new infra phase**. They are the two things the owner asked for
+at close, and both are done:
+
+1. **`HANDOFF.md` no longer carries dynamic state.** It is now a navigation index
+   only — where things are, and the three things that look like defects but are
+   not. It records no HEAD, no test count, no workflow state. State lives in
+   `STAGE.md` (what this stage may touch), `session-log.md` (what happened), and
+   `git status`/`git log` (what the tree is). One fact, one owner.
+2. **`AGENTS.md` §2 is now "one writable tree, one writing session"**, with a
+   pre-write check (HEAD, dirty files, files changing while you are not writing,
+   the server port) and git worktrees as the supported way to run parallel
+   agents. The worktree caveat is stated there too: it isolates files, not the
+   `bsk` daemon, the DSH server, the browser tab, or `tmp/`.
+
+### D20 is now a standing rule, not just a fixed defect
+
+`AGENTS.md` §6 gained **"A passing unit test is not a correct DOM"**, backed by a
+new `tests/openui-dom-structure.ts` (`countOf`, `shapeOf`, `depthOf`,
+`describeShape`). The `List` tests were rewritten to assert structure rather than
+the presence of strings, and the guard was **validated by re-introducing the
+defect**: 3 of the new structural tests failed on it, including
+`listitem inside listitem`, which no regex over raw markup can detect. The fix was
+then restored and the spec returned to green.
+
+That validation matters more than the tests: a regression guard that has never
+been seen to go red is a guess about what it protects.
+
+### 4A-3 is next
+
+`Input`, `TextArea`, `Select`, `SegmentedControl`, `Checkbox`, `RadioGroup`,
+`DatePicker`, `Timer`, `Form`, `IconButton`, `Pressable`. Scope and gates are in
+`STAGE.md` §Stage 4A. Two things specific to that batch:
 
 - **Every one of them binds `$state`.** This is where the P3 persistence and
   `@Set` path prove their generality, so "renders" is not the bar — a bound input
@@ -339,6 +377,10 @@ gates are in `STAGE.md` §Stage 4A. Two things specific to that batch:
 - **`IconButton` and `Pressable` are action carriers**, like `Button`. They must
   go through `write.runAction`, the same channel, or a second way for a control
   to reach state appears.
+
+**Scope note.** The toolchain and documentation system are mature enough. Prefer
+product capability and real-browser acceptance over more test-infrastructure
+work; `infra-1` is closed and 4A-3 is a feature batch, not an infra one.
 
 ### What 4A-2 learned the hard way, and 4A-3 should not re-learn
 

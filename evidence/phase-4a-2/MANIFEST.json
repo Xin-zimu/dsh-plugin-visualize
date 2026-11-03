@@ -60,7 +60,7 @@
       "item": 6,
       "criterion": "tests/<batch> added; the 15-failure baseline unchanged",
       "result": "PASS",
-      "evidence": "tests/openui-text-4a2.spec.tsx 62/62; test-4a2-final.txt 747 / 15 / 762, failure set identical to the 4A-1 baseline after normalising timing suffixes"
+      "evidence": "tests/openui-text-4a2.spec.tsx 64/64; test-4a2-maintenance.txt 749 / 15 / 764, failure set identical to the 4A-1 baseline after normalising timing suffixes. The verdict was reached on 747 / 762; the two extra tests are the D20 structural guards added at close, described under postAcceptanceMaintenance."
     }
   ],
   "decisions": {
@@ -190,5 +190,23 @@
     "noHostCssModified": true,
     "noSignatureTableChange": "no name was added to signatures.ts; all seven were already declared",
     "noBackendChange": "no file under src/backends/ was touched; the differential is still 31/31"
+  },
+  "postAcceptanceMaintenance": {
+    "when": "2026-11-04, after the phase verdict, at the owner's request",
+    "why": "Not a new infra phase. Two owner decisions taken at close, plus turning D20 into a standing constraint.",
+    "what": [
+      "tests/openui-dom-structure.ts added: countOf / shapeOf / depthOf / describeShape, so a structural claim about a component is cheap to assert",
+      "the List assertions in tests/openui-text-4a2.spec.tsx rewritten from text-presence to DOM structure; +2 tests (62 -> 64)",
+      "AGENTS.md §6 gained 'A passing unit test is not a correct DOM'; §2 rewritten as 'one writable tree, one writing session' with a pre-write check and git-worktree guidance",
+      "HANDOFF.md downgraded from a status snapshot to a navigation index — it no longer records HEAD, test counts or workflow state"
+    ],
+    "guardValidatedByReintroducingTheDefect": {
+      "method": "the raw-descriptor argument was removed from the listEntryRow call, restoring D20 exactly",
+      "result": "3 of the new structural tests failed — 'one item is one row' (2 != 1), 'nested rows' (1 nested listitem), 'one marker column per row' (2 != 1)",
+      "whyItMatters": "the third one, listitem-inside-listitem, cannot be detected by a regex over raw markup at all; it is only visible as DOM nesting",
+      "restored": "fix reapplied, spec back to 64/64, src/client/OpenUICard.tsx byte-identical to HEAD"
+    },
+    "suiteAfterMaintenance": "749 / 15 / 764 — 2 more passing than at the verdict, failure set unchanged",
+    "notKept": "the deliberately broken build was not committed; reproducing a defect is a validation step, not an artefact worth shipping"
   }
 }

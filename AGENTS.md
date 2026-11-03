@@ -18,11 +18,57 @@ At the start of every session, in this order:
 Do not infer the project's direction from the code alone. The code is one
 stage behind the plan at any moment.
 
-## 2. Check the tree before you edit
+## 2. One writable tree, one writing session
 
-Run `git status --short` first. If it is not clean and the change is not
-yours, stop and report it rather than building on top of it. Never commit
-someone else's half-finished work.
+**A writable working tree belongs to exactly one executing session at a time.**
+
+This is the rule, not a preference, and it has already been paid for once. In
+4A-2 a second session edited this same tree while a feature batch was in
+progress. It was caught only because a file write was refused for having changed
+since it was read — a coincidence, not a mechanism. The same collision could as
+easily have produced a commit containing another session's half-finished work, or
+a lost change nobody noticed.
+
+### The pre-write check
+
+Before the first edit of a session, establish all four:
+
+```powershell
+git log --oneline -2          # what am I building on?
+git status --short            # is anything uncommitted?
+# are files changing while I am not writing them?
+Get-ChildItem -Recurse -File . |
+  Where-Object { $_.FullName -notmatch 'node_modules|\\.git\\' -and
+                 $_.LastWriteTime -gt (Get-Date).AddMinutes(-15) } |
+  Sort-Object LastWriteTime -Descending | Select-Object -First 8
+# is anything holding the test server port?
+Get-NetTCPConnection -LocalPort 3093 -State Listen -ErrorAction SilentlyContinue
+```
+
+If the second command shows changes you cannot account for, **stop and report**.
+If the third shows files modified while you were not writing, another session is
+active — stop and report. "I will be careful" is not a substitute: the failure
+mode is a silent overwrite, not a visible conflict.
+
+### If parallel agents are genuinely needed
+
+Use **separate git worktrees**, never one shared directory:
+
+```powershell
+git worktree add ../dsh-plugin-agent-a -b agent-a/4a-3
+git worktree add ../dsh-plugin-agent-b -b agent-b/docs
+```
+
+Each agent diffs, tests and commits in its own tree; integration happens through
+an explicit merge, where a human can see what is being combined.
+
+A worktree isolates **files only**. It does not isolate the `bsk` daemon (one
+shared socket), the DSH server, an agent-window tab, or `tmp/`: two sessions
+racing for `:3093` is how a server dies with `exit 1` and an empty error log
+(§10, and the port check above). A build output is isolated by the worktree;
+a browser session is not.
+
+Do not use a worktree as permission to run two agents against one browser.
 
 ## 3. Frozen decisions
 
@@ -70,6 +116,38 @@ information; a hidden red test is a defect.
 The baseline is 15 pre-existing failures on Windows (CRLF and symlink
 assumptions). See `docs/testing/TEST_PLAN.md`. Do not "fix" them by making
 the assertions weaker without saying so in the session log.
+
+### A passing unit test is not a correct DOM
+
+`expect(html).toContain('Some text')` cannot tell one row from five. Stage 4A-2
+shipped a `List` that drew **two** `role="listitem"` elements for one item, and
+62 assertions passed while the live card was wrong, because every one of them
+asked *"is the expected text present?"* — and it was.
+
+When the claim is about a component, assert the **structure**:
+
+| Question | Helper in `tests/openui-dom-structure.ts` |
+| --- | --- |
+| How many were drawn? | `countOf(html, selector)` |
+| What are the direct children? | `shapeOf(html, selector)` |
+| How deep does it sit? | `depthOf(html, selector)` |
+
+```ts
+const html = draw('root = List([ListItem("T", "D", "check")])')
+expect(countOf(html, '[role="listitem"]')).toBe(1)
+expect(shapeOf(html, '[role="list"]')).toEqual(['div[role=listitem]'])
+expect(countOf(html, '[role="listitem"] [role="listitem"]')).toBe(0)
+```
+
+Presence assertions remain fine for a single value (`expect(html).toContain('42')`).
+The rule bites when the subject is a *component*: then the count, the nesting
+and the parent-child shape are part of what "renders correctly" means.
+
+**Prove a regression test can fail.** A guard that has never been seen to go red
+is a guess. Re-introduce the defect once, confirm the new test catches it, then
+restore the fix — the D20 guard was validated exactly that way (3 of 3 new
+structural tests failed on the reintroduced defect, including one that only DOM
+nesting could detect).
 
 ## 7. Keep the working tree clean
 

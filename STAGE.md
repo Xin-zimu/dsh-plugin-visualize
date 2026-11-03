@@ -224,7 +224,7 @@ seven that complete the Text group.
 | Light and dark both pass | PASS — dark entered through the host's own 外观 control |
 | Tool view and turn tail both display | PASS on the conversation surface |
 | Refresh and history replay | Not re-exercised: no 4A-2 component binds `$state` |
-| No new failures; TypeScript passes | PASS — 747 / 15, failure set identical |
+| No new failures; TypeScript passes | PASS — 747 / 15 at the verdict; 749 / 15 after the two structural guards added at close |
 | Build SHA-256 matches the test profile | PASS — client half, before the accepted run |
 | Evidence, matrix and report updated | PASS |
 

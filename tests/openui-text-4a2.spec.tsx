@@ -32,6 +32,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { OpenUICard, renderProgram } from '../src/client/OpenUICard.tsx'
 import { COMPONENTS } from '../src/backends/openui/signatures.ts'
+import { countOf, depthOf, describeShape, shapeOf } from './openui-dom-structure.ts'
 
 /** Markup for one program. */
 const draw = (source: string): string => {
@@ -260,11 +261,12 @@ describe('List', () => {
     expect(html).not.toContain('\u2022')
   })
 
-  it('is a role=list with role=listitem rows', () => {
+  it('is a role=list whose direct children are exactly the rows', () => {
+    // Structure, not presence: `role="list"` and N `role="listitem"` children.
+    // The weak version of this test checked that the strings appeared.
     const html = draw('root = List(["a", "b"])')
-    expect(has(html, 'role:list')).toBe(false) // role is an attribute, not a style
-    expect(html).toContain('role="list"')
-    expect((html.match(/role="listitem"/gu) ?? []).length).toBe(2)
+    expect(shapeOf(html, '[role="list"]')).toEqual(['div[role=listitem]', 'div[role=listitem]'])
+    expect(countOf(html, '[role="listitem"]')).toBe(2)
   })
 
   it('lets a nested ListItem supply its own marker and description', () => {
@@ -282,10 +284,34 @@ describe('List', () => {
     // row containing the check row. Fixed by letting List consult the raw
     // descriptor; this test is the regression guard.
     const html = draw('root = List([ListItem("Unique", "D", "check")])')
-    expect((html.match(/role="listitem"/gu) ?? []).length, 'one item is one row').toBe(1)
+    expect(countOf(html, '[role="listitem"]'), 'one item is one row').toBe(1)
+    expect(shapeOf(html, '[role="list"]'), describeShape(html, '[role="list"]')).toEqual(['div[role=listitem]'])
     expect((html.match(/Unique/gu) ?? []).length, 'the title is drawn once').toBe(1)
     expect(html).toContain('\u2713')
     expect(html, 'the list marker must not also be drawn').not.toContain('\u2022')
+  })
+
+  it('never nests a listitem inside a listitem', () => {
+    // The exact shape of D20: the outer row was a wrapper around the inner one.
+    // A regex on raw markup cannot see this, because nesting is a DOM property.
+    const programs = [
+      'root = List([ListItem("T", "D", "check")])',
+      'root = List([ListItem("A"), ListItem("B", "desc")])',
+      'root = List(["plain", ListItem("structured")])',
+    ]
+    for (const program of programs) {
+      const html = draw(program)
+      expect(countOf(html, '[role="listitem"] [role="listitem"]'), `nested rows in: ${program}`).toBe(0)
+    }
+  })
+
+  it('keeps the marker column inside its own row, as the first child', () => {
+    // The marker is `aria-hidden` and is the row's first child; a row that is
+    // wrapped in a second row breaks this without changing any text.
+    const html = draw('root = List([ListItem("T", "D", "check")])')
+    expect(shapeOf(html, '[role="listitem"]'), describeShape(html, '[role="listitem"]'))
+      .toEqual(['div', 'div'])
+    expect(countOf(html, '[role="listitem"] > div[aria-hidden="true"]'), 'one marker column per row').toBe(1)
   })
 
   it('draws N plain items as N rows', () => {
@@ -293,7 +319,7 @@ describe('List', () => {
     for (const count of [1, 2, 3, 5]) {
       const items = Array.from({ length: count }, (_, i) => `"i${i}"`).join(', ')
       const html = draw(`root = List([${items}])`)
-      expect((html.match(/role="listitem"/gu) ?? []).length, `${count} items`).toBe(count)
+      expect(countOf(html, '[role="listitem"]'), `${count} items`).toBe(count)
     }
   })
 
