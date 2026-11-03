@@ -30,9 +30,9 @@ for (const component of COMPONENTS) {
 }
 
 describe('component inventory', () => {
-  it('draws 19 of the 48 declared components after 4A-2', () => {
+  it('draws 30 of the 48 declared components after 4A-3', () => {
     expect(declared).toHaveLength(48)
-    expect(RENDERED_COMPONENTS).toHaveLength(19)
+    expect(RENDERED_COMPONENTS).toHaveLength(30)
   })
 
   it('has no renderer for a name the language does not declare', () => {
@@ -72,13 +72,24 @@ describe('component inventory', () => {
     expect(total).toBe(48)
   })
 
+  it('counts all eleven 4A-3 components as drawn', () => {
+    // The whole Inputs group apart from `Button` and `Slider`, which stage 3
+    // delivered. Before 4A-3 the group rendered 2 of 13; it now renders all 13,
+    // so this asserts the group is complete rather than merely that eleven names
+    // were added — the same distinction the 4A-2 check above makes.
+    for (const name of ['Input', 'TextArea', 'Select', 'SegmentedControl', 'Checkbox', 'RadioGroup', 'DatePicker', 'Timer', 'Form', 'IconButton', 'Pressable']) {
+      expect(rendered.has(name), `${name} should be rendered after 4A-3`).toBe(true)
+    }
+    expect(groups.get('Inputs')?.missing ?? [], 'the Inputs group should have nothing left').toEqual([])
+  })
+
   it('leaves the remaining catalogue in the batches STAGE.md assigns', () => {
     const missing = declared.filter(name => !rendered.has(name))
     // One row per batch, so a component cannot be quietly dropped from the plan.
-    // 4A-2 is absent because it is complete: an entry with no names would just
-    // assert that nothing is left, which the Text-group check above already does.
+    // 4A-1, 4A-2 and 4A-3 are absent because they are complete: an entry with no
+    // names would just assert that nothing is left, which the per-group checks
+    // above already do.
     const batches: Record<string, readonly string[]> = {
-      '4A-3': ['Input', 'TextArea', 'Select', 'SegmentedControl', 'Checkbox', 'RadioGroup', 'DatePicker', 'Timer', 'Form', 'IconButton', 'Pressable'],
       '4A-4': ['Table', 'Chart', 'Icon', 'Image'],
       '4A-5': ['Svg', 'G', 'Circle', 'Ellipse', 'Rect', 'Line', 'Path', 'Polyline', 'Polygon', 'SvgText', 'Flashcard', 'Celebration', 'Carousel', 'Popover'],
     }
@@ -113,6 +124,30 @@ describe('component inventory', () => {
       ListItem: 'root = Col([ListItem("title", "description")])',
       Quote: 'root = Col([Quote("quoted", "someone")])',
       Code: 'root = Col([Code("let x = 1", "ts")])',
+    }
+    for (const [name, program] of Object.entries(programs)) {
+      const { node, error } = renderProgram(program)
+      expect(error, `${name} failed to evaluate`).toBeUndefined()
+      expect(node, `${name} drew nothing`).not.toBeNull()
+    }
+  })
+
+  it('actually draws each of the eleven 4A-3 components, rather than listing it', () => {
+    // A name in the table whose renderer returns the renderer-gap notice would
+    // still count as "rendered" above, so the notice's marker is asserted absent
+    // as well as the node being present.
+    const programs: Record<string, string> = {
+      Input: '$v = "x"\nroot = Col([Input($v, "L")])',
+      TextArea: '$v = "x"\nroot = Col([TextArea($v, "L")])',
+      Select: '$v = "a"\nroot = Col([Select($v, ["a", "b"], "L")])',
+      SegmentedControl: '$v = "a"\nroot = Col([SegmentedControl($v, ["a", "b"])])',
+      Checkbox: '$v = true\nroot = Col([Checkbox($v, "L")])',
+      RadioGroup: '$v = 1\nroot = Col([RadioGroup($v, [{value: 1, label: "A"}])])',
+      DatePicker: '$v = "2026-11-04"\nroot = Col([DatePicker($v, "L")])',
+      Timer: '$v = 90\nroot = Col([Timer($v, "L")])',
+      Form: '$v = "x"\nroot = Col([Form([Input($v, "L")])])',
+      IconButton: '$v = 0\nroot = Col([IconButton("check", Action([@Set($v, 1)]), "L")])',
+      Pressable: '$v = 1\nroot = Col([Pressable([Text("t")], Action([@Set($v, 2)]), true)])',
     }
     for (const [name, program] of Object.entries(programs)) {
       const { node, error } = renderProgram(program)

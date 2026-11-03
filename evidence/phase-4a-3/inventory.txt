@@ -1,0 +1,28 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+stdout | tests/openui-inventory.spec.tsx > component inventory > reports the split by group, which must sum to 48
+Drawing (10): rendered —; missing Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText
+Inputs (13): rendered Button, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Slider, Checkbox, RadioGroup, DatePicker, Timer, Form; missing —
+Layout (9): rendered Col, Row, Box, Grid, Card, Divider, Spacer; missing Carousel, Popover
+Media and data (4): rendered —; missing Image, Icon, Table, Chart
+Play (2): rendered —; missing Flashcard, Celebration
+Text (10): rendered Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code; missing —
+=== 30 / 48 rendered ===
+
+ ✓ tests/openui-inventory.spec.tsx > component inventory > draws 30 of the 48 declared components after 4A-3 2ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > has no renderer for a name the language does not declare 1ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > counts the four 4A-1 components as drawn 0ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > counts all seven 4A-2 components as drawn 0ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > reports the split by group, which must sum to 48 8ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > counts all eleven 4A-3 components as drawn 0ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > leaves the remaining catalogue in the batches STAGE.md assigns 0ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > actually draws each of the four 4A-1 components, rather than listing it 3ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > actually draws each of the seven 4A-2 components, rather than listing it 2ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > actually draws each of the eleven 4A-3 components, rather than listing it 3ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  01:33:44
+   Duration  1.56s (transform 212ms, setup 0ms, import 527ms, tests 20ms, environment 732ms)
+

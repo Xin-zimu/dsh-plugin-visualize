@@ -1002,6 +1002,454 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
       createElement('span', { style: { minWidth: 24, textAlign: 'right' } }, text(current)),
     )
   },
+
+  // --- 4A-3: the rest of the Inputs group -----------------------------------
+  //
+  // Each renderer below follows the same shape, which is the loop the batch
+  // exists to prove: read the bound slot's current value, draw a control that
+  // shows it, and on interaction call `write(name, next)`. No renderer keeps its
+  // own copy of a bound value, so there is nothing that can drift out of sync
+  // with `$state`.
+
+  Input: (props, write, key) => {
+    const field = fieldOf(props[0])
+    const type = text(props[2], 'text')
+    const label = text(props[1], '')
+    const placeholder = text(props[3], '')
+    const emit = (raw: string): void => {
+      // A `number` input writes a number, not the string the DOM gave us: the
+      // program's own arithmetic (`$n + 1`) has to keep working, and a string
+      // would turn every later `@Set($n, $n + 1)` into concatenation.
+      const next = type === 'number'
+        ? (raw === '' ? '' : Number(raw))
+        : raw
+      if (field.binding !== undefined) write(field.binding.name, next as EvaluationValue)
+      // An unbound Input has nowhere to write; it renders what the program gave.
+    }
+    return createElement(
+      'label',
+      { key, style: FIELD_ROW_STYLE },
+      label === '' ? null : createElement('span', { style: FIELD_LABEL_STYLE }, label),
+      createElement('input', {
+        type: type === 'number' ? 'number' : 'text',
+        value: field.current === null || field.current === undefined ? '' : String(field.current),
+        placeholder: placeholder === '' ? undefined : placeholder,
+        disabled: field.binding === undefined,
+        'aria-label': label === '' ? (placeholder === '' ? 'Input' : placeholder) : label,
+        onChange: (event: { target: { value: string } }) => emit(event.target.value),
+        style: {
+          ...FIELD_STYLE,
+          ...field.binding === undefined ? { opacity: 0.7 } : {},
+        } satisfies CSSProperties,
+      }),
+    )
+  },
+
+  TextArea: (props, write, key) => {
+    const field = fieldOf(props[0])
+    const label = text(props[1], '')
+    const placeholder = text(props[2], '')
+    // Clamped: a program asking for 400 rows would push the card's own height
+    // past the viewport and the fold would never settle.
+    const rows = Math.min(24, Math.max(1, Math.round(num(arg(props[3], 4), 4))))
+    return createElement(
+      'label',
+      { key, style: FIELD_ROW_STYLE },
+      label === '' ? null : createElement('span', { style: FIELD_LABEL_STYLE }, label),
+      createElement('textarea', {
+        rows,
+        value: field.current === null || field.current === undefined ? '' : String(field.current),
+        placeholder: placeholder === '' ? undefined : placeholder,
+        disabled: field.binding === undefined,
+        'aria-label': label === '' ? (placeholder === '' ? 'Text' : placeholder) : label,
+        onChange: (event: { target: { value: string } }) => {
+          if (field.binding !== undefined) write(field.binding.name, event.target.value)
+        },
+        style: {
+          ...FIELD_STYLE,
+          resize: 'vertical',
+          fontFamily: 'var(--font-sans)',
+          lineHeight: 1.45,
+          ...field.binding === undefined ? { opacity: 0.7 } : {},
+        } satisfies CSSProperties,
+      }),
+    )
+  },
+
+  Select: (props, write, key, raw) => {
+    const field = fieldOf(props[0])
+    // From `raw`, not `props`: an option object is a plain object, and the
+    // walker has already turned it into `null` by the time it reaches `props`.
+    const options = optionList(raw?.[1])
+    const label = text(props[2], '')
+    const placeholder = text(props[3], '')
+    const found = options.find(option => sameValue(option.value, field.current))
+    // With a placeholder and no match, nothing is selected, which is what shows
+    // the placeholder. Without one, the first option is the display value — the
+    // program did not choose, but a bare `<select>` must show something.
+    const current = found !== undefined
+      ? String(found.value)
+      : (placeholder !== '' || options.length === 0 ? '' : String(options[0]!.value))
+    const items: ReactNode[] = []
+    if (placeholder !== '') {
+      items.push(createElement('option', { key: 'ph', value: '', disabled: true, hidden: true }, placeholder))
+    }
+    for (const [index, option] of options.entries()) {
+      items.push(createElement('option', { key: `opt${index}`, value: String(option.value) }, option.label))
+    }
+    return createElement(
+      'label',
+      { key, style: FIELD_ROW_STYLE },
+      label === '' ? null : createElement('span', { style: FIELD_LABEL_STYLE }, label),
+      createElement(
+        'select',
+        {
+          value: current,
+          disabled: field.binding === undefined,
+          'aria-label': label === '' ? (placeholder === '' ? 'Select' : placeholder) : label,
+          onChange: (event: { target: { value: string } }) => {
+            if (field.binding === undefined) return
+            // Write the option's ORIGINAL value, not the string the DOM gave
+            // back: an option declared as `{value: 1}` must write `1`, or the
+            // program's `$pick == 1` stops being true after one click.
+            const picked = options.find(option => sameValue(option.value, event.target.value))
+            write(field.binding.name, (picked === undefined ? event.target.value : picked.value) as EvaluationValue)
+          },
+          style: {
+            ...FIELD_STYLE,
+            cursor: field.binding === undefined ? 'default' : 'pointer',
+            ...field.binding === undefined ? { opacity: 0.7 } : {},
+          } satisfies CSSProperties,
+        },
+        items,
+      ),
+      found?.description === undefined
+        ? null
+        : createElement(
+          'span',
+          { style: { fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)', marginTop: 3 } },
+          found.description,
+        ),
+    )
+  },
+
+  SegmentedControl: (props, write, key, raw) => {
+    const field = fieldOf(props[0])
+    const options = optionList(raw?.[1])
+    const block = boolOf(props[2], false)
+    const items = options.map((option, index) => {
+      const active = sameValue(option.value, field.current)
+      return createElement(
+        'button',
+        {
+          key: `seg${index}`,
+          type: 'button',
+          role: 'radio',
+          'aria-checked': active,
+          title: option.description === undefined || option.description === '' ? undefined : option.description,
+          // A segment whose control is unbound has nothing to write to; it still
+          // draws, but pressing it would promise a change it cannot make.
+          disabled: field.binding === undefined,
+          onClick: field.binding === undefined || active
+            ? undefined
+            : () => write(field.binding!.name, option.value),
+          style: {
+            font: 'inherit',
+            fontSize: SIZES.sm,
+            flex: block ? '1 1 0' : '0 0 auto',
+            padding: '4px 12px',
+            cursor: field.binding === undefined ? 'default' : 'pointer',
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: active ? 'var(--primary)' : 'var(--border)',
+            borderRadius: 'calc(var(--radius) * 1.1)',
+            background: active ? 'var(--primary)' : 'transparent',
+            color: active ? 'var(--primary-foreground)' : 'var(--foreground)',
+            minWidth: 0,
+          } satisfies CSSProperties,
+        },
+        option.label,
+      )
+    })
+    return createElement(
+      'div',
+      {
+        key,
+        role: 'radiogroup',
+        'aria-label': 'Options',
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: 6,
+          width: block ? '100%' : undefined,
+          minWidth: 0,
+        } satisfies CSSProperties,
+      },
+      items,
+    )
+  },
+
+  Checkbox: (props, write, key) => {
+    const field = fieldOf(props[0])
+    const checked = boolOf(field.current, false)
+    const label = text(props[1], '')
+    const lineThrough = boolOf(props[2], false)
+    const id = `${key}-cb`
+    return createElement(
+      'label',
+      {
+        key,
+        htmlFor: id,
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 7,
+          fontSize: SIZES.sm,
+          cursor: field.binding === undefined ? 'default' : 'pointer',
+          color: 'var(--foreground)',
+          minWidth: 0,
+        } satisfies CSSProperties,
+      },
+      createElement('input', {
+        id,
+        type: 'checkbox',
+        checked,
+        disabled: field.binding === undefined,
+        'aria-label': label === '' ? 'Checkbox' : label,
+        onChange: (event: { target: { checked: boolean } }) => {
+          // A checkbox writes a BOOLEAN. Upstream's `iuiBField` does the same;
+          // a program that binds `$done` and then tests `@If($done, ...)`
+          // depends on it, and `"true"` is truthy for the wrong reason.
+          if (field.binding !== undefined) write(field.binding.name, event.target.checked)
+        },
+        style: { accentColor: 'var(--primary)', margin: 0, flex: '0 0 auto' } satisfies CSSProperties,
+      }),
+      createElement(
+        'span',
+        {
+          style: {
+            // `lineThrough` strikes the label only while checked — a to-do row
+            // that stays struck after unticking would read as done.
+            textDecoration: checked && lineThrough ? 'line-through' : undefined,
+            color: checked ? 'var(--muted-foreground-strong)' : 'var(--foreground)',
+            minWidth: 0,
+          } satisfies CSSProperties,
+        },
+        label,
+      ),
+    )
+  },
+
+  RadioGroup: (props, write, key, raw) => {
+    const field = fieldOf(props[0])
+    const options = optionList(raw?.[1])
+    const label = text(props[2], '')
+    const cards = ['cards', 'card'].includes(text(props[3], '').toLowerCase())
+    const groupName = `${key}-radio`
+    const items = options.map((option, index) => {
+      const active = sameValue(option.value, field.current)
+      return createElement(
+        'label',
+        {
+          key: `r${index}`,
+          style: {
+            display: 'flex',
+            alignItems: cards ? 'flex-start' : 'center',
+            gap: 7,
+            padding: cards ? '8px 10px' : 0,
+            cursor: field.binding === undefined ? 'default' : 'pointer',
+            borderWidth: cards ? 1 : 0,
+            borderStyle: 'solid',
+            borderColor: active ? 'var(--primary)' : 'var(--border)',
+            borderRadius: cards ? 'calc(var(--radius) * 1.2)' : 0,
+            background: cards ? (active ? 'color-mix(in oklab, var(--primary) 10%, transparent)' : 'transparent') : undefined,
+            minWidth: 0,
+          } satisfies CSSProperties,
+        },
+        createElement('input', {
+          type: 'radio',
+          name: groupName,
+          checked: active,
+          disabled: field.binding === undefined,
+          onChange: () => {
+            if (field.binding !== undefined) write(field.binding.name, option.value)
+          },
+          style: { accentColor: 'var(--primary)', margin: 0, marginTop: cards ? 2 : 0, flex: '0 0 auto' } satisfies CSSProperties,
+        }),
+        createElement(
+          'span',
+          { style: { display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 } },
+          createElement('span', { style: { fontSize: SIZES.sm, color: 'var(--foreground)' } }, option.label),
+          option.description === undefined || option.description === ''
+            ? null
+            : createElement(
+              'span',
+              { style: { fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)' } },
+              option.description,
+            ),
+        ),
+      )
+    })
+    return createElement(
+      'div',
+      { key, style: FIELD_ROW_STYLE },
+      label === '' ? null : createElement('span', { style: FIELD_LABEL_STYLE }, label),
+      createElement(
+        'div',
+        {
+          role: 'radiogroup',
+          'aria-label': label === '' ? 'Options' : label,
+          style: {
+            display: 'flex',
+            flexDirection: cards ? 'row' : 'column',
+            flexWrap: cards ? 'wrap' : 'nowrap',
+            gap: cards ? 6 : 5,
+            minWidth: 0,
+          } satisfies CSSProperties,
+        },
+        items,
+      ),
+    )
+  },
+
+  DatePicker: (props, write, key) => {
+    const field = fieldOf(props[0])
+    const label = text(props[1], '')
+    const min = props[2] === undefined || props[2] === null ? undefined : String(props[2])
+    const max = props[3] === undefined || props[3] === null ? undefined : String(props[3])
+    return createElement(
+      'label',
+      { key, style: FIELD_ROW_STYLE },
+      label === '' ? null : createElement('span', { style: FIELD_LABEL_STYLE }, label),
+      createElement('input', {
+        type: 'date',
+        value: field.current === null || field.current === undefined ? '' : String(field.current),
+        min,
+        max,
+        disabled: field.binding === undefined,
+        'aria-label': label === '' ? 'Date' : label,
+        onChange: (event: { target: { value: string } }) => {
+          if (field.binding !== undefined) write(field.binding.name, event.target.value)
+        },
+        style: {
+          ...FIELD_STYLE,
+          ...field.binding === undefined ? { opacity: 0.7 } : {},
+        } satisfies CSSProperties,
+      }),
+    )
+  },
+
+  Timer: (props, write, key) => {
+    const field = fieldOf(props[0])
+    const current = Math.max(0, Math.round(num(field.current, 0)))
+    return createElement(TimerControl, {
+      key,
+      remaining: current,
+      bindingName: field.binding?.name,
+      write,
+      label: text(props[1], ''),
+    })
+  },
+
+  Form: (props, _write, key) => createElement(
+    'form',
+    {
+      key,
+      // Never submits: this card is not a document, and a submit would navigate
+      // the host pane away from the conversation.
+      onSubmit: (event: { preventDefault: () => void }) => event.preventDefault(),
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        minWidth: 0,
+      } satisfies CSSProperties,
+    },
+    children(props[0]),
+  ),
+
+  IconButton: (props, write, key) => {
+    const icon = text(props[0], '')
+    const action = props[1]
+    const label = text(props[2], '')
+    const variant = text(props[3], 'ghost')
+    // `icon` names a glyph. There is no icon set in this renderer yet (`Icon` is
+    // 4A-4), so a named glyph is drawn as its own name in a bordered square —
+    // visibly a placeholder rather than an empty button that looks broken.
+    return createElement(
+      'button',
+      {
+        key,
+        type: 'button',
+        title: label === '' ? undefined : label,
+        'aria-label': label === '' ? (icon === '' ? 'button' : icon) : label,
+        ...action === undefined || action === null ? {} : {
+          onClick: () => write.runAction(action),
+        },
+        style: {
+          font: 'inherit',
+          fontSize: SIZES.sm,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minWidth: 28,
+          minHeight: 28,
+          padding: '3px 7px',
+          cursor: 'pointer',
+          borderRadius: 'calc(var(--radius) * 1.2)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          ...BUTTON_KINDS[variant] ?? BUTTON_KINDS.ghost,
+        } satisfies CSSProperties,
+      },
+      icon === '' ? (label === '' ? '·' : label) : icon,
+    )
+  },
+
+  Pressable: (props, write, key) => {
+    const action = props[1]
+    const selected = boolOf(props[2], false)
+    const padding = arg(props[3], 3)
+    const background = text(props[4], '')
+    const interactive = action !== undefined && action !== null
+    return createElement(
+      'div',
+      {
+        key,
+        ...interactive ? {
+          role: 'button',
+          tabIndex: 0,
+          'aria-pressed': selected,
+          onClick: () => write.runAction(action),
+          // A div with role=button is not keyboard-operable unless it says so.
+          // Enter and Space, because that is what a real button answers to.
+          onKeyDown: (event: { key: string; preventDefault: () => void }) => {
+            if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+              event.preventDefault()
+              write.runAction(action)
+            }
+          },
+        } : {},
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          padding: space(padding, 3),
+          borderRadius: 'calc(var(--radius) * 1.2)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: selected ? 'var(--primary)' : 'var(--border)',
+          background: background === ''
+            ? (selected ? 'color-mix(in oklab, var(--primary) 12%, transparent)' : 'transparent')
+            : (paintOf(background) ?? 'transparent'),
+          cursor: interactive ? 'pointer' : 'default',
+          minWidth: 0,
+        } satisfies CSSProperties,
+      },
+      children(props[0]),
+    )
+  },
 }
 
 /** What the parser and the walker hand the renderer. */
@@ -1028,6 +1476,316 @@ interface Binding {
 function isActionDescriptorName(name: string): boolean {
   const bare = name.replace(/^@/u, '')
   return SUPPORTED_STEPS.has(bare) || UNSUPPORTED_STEPS.has(bare)
+}
+
+// --- 4A-3: the Inputs group -------------------------------------------------
+//
+// Eleven components, and the thing they have in common is the thing that can go
+// wrong: every one of them is a *bidirectional* control. A Slider was the only
+// bound input before this batch, so the state loop had been proven exactly once.
+// These eleven reuse the same path — the card's `write` channel, the same
+// `cardStates` store, the same hydrate-and-merge on load — and that reuse is the
+// point of the batch. If a control here needed a second way to reach state, the
+// loop would not be general and the batch would have failed even if all eleven
+// drew something plausible.
+//
+// Two conventions are inherited from upstream (`upstream/dsh-intelligent-ui`,
+// src/client/components/inputs-data.js) rather than invented:
+//
+//  - **Each component has exactly ONE binding slot**, and it is always the first
+//    argument: `value` for the value controls, `checked` for `Checkbox`,
+//    `seconds` for `Timer`. That is upstream's `IUI_B_BINDING_ARG` table. An
+//    argument in any other position is a plain value, never written back.
+//  - **An unbound control still renders and still works locally.** Upstream's
+//    `iuiBField` keeps internal state when the first argument is not a `$var`;
+//    it simply cannot feed the program. Refusing to draw would make a legal
+//    program look broken, and silently writing nowhere would be worse — so an
+//    unbound `Input` is a controlled element over a local value, and an unbound
+//    `Checkbox` toggles itself.
+//
+// The one thing that is NOT inherited is the styling vocabulary: upstream ships
+// a stylesheet, this renderer draws inline against the frame variables bridged
+// on the card root, so every `var(--…)` below must be one of the names in
+// {@link HOST_TOKENS} or {@link COLOR_VARS} — otherwise it is D6/D7/D17/D18
+// again, a property that silently paints its fallback in the real host.
+
+/**
+ * The one argument a component writes back, per component.
+ *
+ * Upstream's `IUI_B_BINDING_ARG`, kept as a table rather than a per-renderer
+ * rule so the convention is stated once and can be asserted in a test.
+ */
+const BINDING_ARG: Readonly<Record<string, string>> = {
+  Input: 'value',
+  TextArea: 'value',
+  Select: 'value',
+  SegmentedControl: 'value',
+  Slider: 'value',
+  RadioGroup: 'value',
+  DatePicker: 'value',
+  Checkbox: 'checked',
+  Timer: 'seconds',
+}
+
+/** One normalised option, from either a bare string or an option object. */
+interface Option {
+  readonly value: EvaluationValue
+  readonly label: string
+  readonly description: string | undefined
+}
+
+/**
+ * Normalise an `options` argument.
+ *
+ * The language accepts a bare string or `{value, label, description}`. A bare
+ * string is its own value *and* its own label; an object with no `value` falls
+ * back to its label, and with neither falls back to its index — upstream's rule,
+ * and the reason a `Select` never has an unselectable row.
+ *
+ * Read from the **raw** argument list, not from the drawn one: `drawValue`
+ * turns a plain object into `null`, so by the time a renderer sees `props[1]`
+ * an option object has already been erased. `List` reads `raw` for the same
+ * reason (a `ListItem` is a descriptor, not a node).
+ * @param raw - the unevaluated argument.
+ * @returns the options, in order.
+ */
+function optionList(raw: unknown): Option[] {
+  const list = Array.isArray(raw) ? raw : (raw === undefined || raw === null ? [] : [raw])
+  return list.map((item, index) => {
+    if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+      const record = item as { value?: EvaluationValue; label?: unknown; description?: unknown }
+      const value = record.value !== undefined ? record.value : (record.label !== undefined ? record.label : index)
+      return {
+        value: value as EvaluationValue,
+        label: text(record.label ?? value, String(index)),
+        description: record.description === undefined || record.description === null
+          ? undefined
+          : text(record.description, ''),
+      }
+    }
+    return { value: item as EvaluationValue, label: text(item, String(index)), description: undefined }
+  })
+}
+
+/**
+ * Compare an option value with the current value the way the language does.
+ *
+ * `Select`/`RadioGroup`/`SegmentedControl` options and `$state` values travel as
+ * different JS types across a program (`1` vs `"1"` after a round-trip through a
+ * `<select>`), so identity alone would fail to mark the active row — the defect
+ * where a chosen option is stored but drawn as unchosen.
+ * @param a - one value.
+ * @param b - the other value.
+ * @returns true when they mean the same choice.
+ */
+function sameValue(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (a === undefined || a === null || b === undefined || b === null) return false
+  return String(a) === String(b)
+}
+
+/** Read a boolean argument, including the string forms the language allows. */
+function boolOf(value: unknown, fallback = false): boolean {
+  if (value === undefined || value === null || value === '') return fallback
+  if (typeof value === 'string') return value !== 'false' && value !== '0'
+  return Boolean(value)
+}
+
+/**
+ * The value an argument carries, whether or not it is bound.
+ *
+ * A bound argument arrives as the marker `bindingNode` produced, so reading it
+ * literally would give the renderer an object instead of the value.
+ * @param value - one component argument.
+ * @returns the current value, and the binding when there is one.
+ */
+function fieldOf(value: unknown): { readonly current: EvaluationValue; readonly binding: Binding | undefined } {
+  const binding = asBinding(value)
+  if (binding !== undefined) return { current: binding.value, binding }
+  return { current: value as EvaluationValue, binding: undefined }
+}
+
+/** Shared look of a text-like control: one box, one border, one focus colour. */
+const FIELD_STYLE: CSSProperties = {
+  font: 'inherit',
+  fontSize: SIZES.sm,
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '5px 9px',
+  borderRadius: 'calc(var(--radius) * 1.1)',
+  borderWidth: 1,
+  borderStyle: 'solid',
+  borderColor: 'var(--border)',
+  background: 'var(--card)',
+  color: 'var(--foreground)',
+  minWidth: 0,
+}
+
+/** The small caps-ish label above a field. */
+const FIELD_LABEL_STYLE: CSSProperties = {
+  fontSize: SIZES.xs,
+  color: 'var(--muted-foreground-strong)',
+  display: 'block',
+  marginBottom: 3,
+}
+
+/** A field as a column: label, control, optional hint. */
+const FIELD_ROW_STYLE: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  gap: 0,
+  minWidth: 0,
+}
+
+/** Format seconds as `mm:ss`, upstream's clock format. */
+function clock(total: unknown): string {
+  const seconds = Math.max(0, Math.round(num(total, 0)))
+  const mm = Math.floor(seconds / 60)
+  const ss = seconds % 60
+  return `${mm < 10 ? '0' : ''}${mm}:${ss < 10 ? '0' : ''}${ss}`
+}
+
+/**
+ * The timer's countdown, which is the one input in this batch that changes state
+ * without a gesture.
+ *
+ * It is a separate component so its `useState`/`useEffect` are instance-scoped:
+ * a hook called inside the parent renderer would be attributed to whatever row
+ * happened to draw it, and the row's hook order would then shift as the tree
+ * changes (upstream's `iuiBHookHost` exists for the same reason).
+ *
+ * The countdown does not keep its own copy of the remaining time. Every tick
+ * writes the bound variable through `write`, which re-evaluates the whole
+ * program — so a `Text(@Format($left, ...))` elsewhere on the card counts down
+ * with it, and a reload restores whatever it had reached. The only local state
+ * is whether it is running, which is a property of this control and not of the
+ * program.
+ * @param props - the bound value, its name, the write channel and the label.
+ * @returns the timer element.
+ */
+function TimerControl({
+  remaining,
+  bindingName,
+  write,
+  label,
+}: {
+  readonly remaining: number
+  readonly bindingName: string | undefined
+  readonly write: WriteChannel
+  readonly label: string
+}): ReactNode {
+  const [running, setRunning] = useState(false)
+  // The total the bar is measured against. Captured on the first paint and kept:
+  // reading it from `remaining` would make the bar jump back to full after the
+  // first tick, and reading it from the program is not possible from here.
+  const initial = useRef(Math.max(1, remaining))
+  if (remaining > initial.current) initial.current = Math.max(1, remaining)
+
+  // Refs, not dependencies: the interval must not be torn down and rebuilt on
+  // every tick, and `write` is a new function whenever the card re-renders.
+  const latest = useRef({ remaining, bindingName, write })
+  latest.current = { remaining, bindingName, write }
+
+  useEffect(() => {
+    if (!running) return undefined
+    const id = setInterval(() => {
+      const state = latest.current
+      if (state.bindingName === undefined) { setRunning(false); return }
+      const next = Math.max(0, Math.round(state.remaining) - 1)
+      state.write(state.bindingName, next)
+      if (next <= 0) setRunning(false)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [running])
+
+  const ratio = Math.max(0, Math.min(100, (remaining / Math.max(1, initial.current)) * 100))
+  const disabled = bindingName === undefined
+  const reset = (): void => {
+    setRunning(false)
+    if (bindingName !== undefined) write(bindingName, Math.max(0, Math.round(initial.current)))
+  }
+  const toggle = (): void => {
+    if (disabled) return
+    if (running) { setRunning(false); return }
+    // Starting from zero restarts from the captured total, not from zero —
+    // otherwise the one button that could restart a finished timer does nothing.
+    if (remaining <= 0) write(bindingName!, Math.max(0, Math.round(initial.current)))
+    setRunning(true)
+  }
+
+  const buttonStyle = (kind: CSSProperties): CSSProperties => ({
+    font: 'inherit',
+    fontSize: SIZES.sm,
+    padding: '4px 12px',
+    cursor: disabled ? 'default' : 'pointer',
+    borderRadius: 'calc(var(--radius) * 1.2)',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    ...kind,
+  })
+
+  return createElement(
+    'div',
+    { style: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 } satisfies CSSProperties },
+    createElement(
+      'div',
+      { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 } },
+      label === ''
+        ? null
+        : createElement('span', { style: { fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)' } }, label),
+      createElement(
+        'span',
+        {
+          role: 'timer',
+          // Tabular figures: a countdown that reflows its own width every second
+          // makes the whole card twitch.
+          style: {
+            fontSize: SIZES.lg,
+            fontVariantNumeric: 'tabular-nums',
+            color: 'var(--foreground)',
+            marginLeft: 'auto',
+          } satisfies CSSProperties,
+        },
+        clock(remaining),
+      ),
+    ),
+    createElement(
+      'div',
+      {
+        role: 'progressbar',
+        'aria-valuemin': 0,
+        'aria-valuemax': 100,
+        'aria-valuenow': Math.round(ratio),
+        'aria-valuetext': clock(remaining),
+        'aria-label': label === '' ? 'Timer' : label,
+        style: { height: 6, borderRadius: 999, background: 'var(--viz-grid)', overflow: 'hidden' } satisfies CSSProperties,
+      },
+      createElement('span', {
+        style: {
+          display: 'block',
+          height: '100%',
+          width: `${ratio}%`,
+          background: 'var(--primary)',
+          transition: 'width 0.9s linear',
+        } satisfies CSSProperties,
+      }),
+    ),
+    createElement(
+      'div',
+      { style: { display: 'flex', gap: 8 } },
+      createElement(
+        'button',
+        { type: 'button', onClick: toggle, disabled, style: buttonStyle(BUTTON_KINDS.secondary!) },
+        running ? 'Pause' : 'Start',
+      ),
+      createElement(
+        'button',
+        { type: 'button', onClick: reset, disabled, style: buttonStyle(BUTTON_KINDS.ghost!) },
+        'Reset',
+      ),
+    ),
+  )
 }
 
 /** Every component name this build can actually draw. */
