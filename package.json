@@ -21,7 +21,8 @@
     "assets",
     "cordis.patch.yml",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "LICENSE.dsh-visualize"
   ],
   "scripts": {
     "build": "tsdown",

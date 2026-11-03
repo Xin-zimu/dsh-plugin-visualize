@@ -33,9 +33,10 @@ component and whether the renderer draws it.
 
 ## Install
 
-Not published yet. From a checkout:
+Not on npm yet. From a checkout:
 
 ```sh
+git clone https://github.com/Xin-zimu/dsh-plugin-visualize
 dsh plugin --profile desktop add "$(pwd)"
 dsh --profile desktop --dump-config   # expect an id: dsh-visualize-unified row
 ```
@@ -49,7 +50,7 @@ Read, in order: `HANDOFF.md` → `AGENTS.md` → `session-log.md` → `STAGE.md`
 may be used to mean here.
 
 `HANDOFF.md` exists because two things a new session needs are not in the usual
-documents: the working tree currently carries accepted-but-uncommitted work (so
+documents: the working tree may carry accepted-but-uncommitted work (so
 `AGENTS.md` §2's "stop on a dirty tree" does **not** apply), and the browser
 harness's daemon, server and session are all session-bound processes that must be
 re-created before any measurement.
@@ -72,5 +73,10 @@ re-created before any measurement.
 
 ## Licence
 
-BSD-3-Clause. This is a fork; see `NOTICE` for the three upstream projects, and
-`upstream/` for their pinned sources.
+BSD-3-Clause; see `LICENSE`. This is a fork: `NOTICE` reproduces the three
+upstream licences in full and `upstream/` holds their pinned sources.
+
+The screenshots that used to sit under `evidence/` are not published — they were
+full-window captures, and a public repo is the wrong place for another session's
+desktop. The manifests, logs and measurements under `evidence/` are, and they
+are what the claims actually rest on.

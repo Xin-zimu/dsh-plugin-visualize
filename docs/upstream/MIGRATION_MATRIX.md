@@ -161,10 +161,11 @@ gets an `action.unsupported` refusal naming it, rather than a silent no-op.
 | Upstream capability | Fork location | How | Status |
 | --- | --- | --- | --- |
 | `src/lib/library.ts` (48 components) | `src/client/OpenUICard.tsx` `COMPONENTS` | rewritten — 19 of 48 drawn; the coverage table above is the authority | 19 ported / 29 pending |
-| `src/lib/functions/` (73 functions) | `src/backends/openui/functions.ts` | ported — stage 2 | verified (differential) |
+| `src/lib/functions/` | — | **dropped — reference only.** The fork's `functions.ts` is ported from `dsh-intelligent-ui`'s `src/lang/functions.js` (row above); comparing both snapshots found no implementation shared with this one | dropped |
 | `src/lib/components/map/` | — | pending — needs a network policy ADR first | pending |
 | `src/lib/components/media.tsx` (`SearchImage`) | — | pending — needs its own service | pending |
 | `src/lib/components/html-view.tsx` | — | pending — its sandbox+CSP pattern is the reference | pending |
 | `src/lib/components/chart.tsx` | — | replaced — HTML backend already has Chart.js | replaced |
 | `src/app/**` (Next.js shell, API routes) | — | dropped — not installable into DSH | dropped |
 | `src/generated/*.json` | — | dropped — our skill text is generated from our tables | dropped |
+| `docs/openui-chatgpt-comparison.{mp4,jpg}` | — | dropped — a ChatGPT comparison video is a third-party-mark asset its MIT licence cannot convey, and the plugin does not use it | dropped |

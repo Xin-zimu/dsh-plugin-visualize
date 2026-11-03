@@ -21,7 +21,51 @@ to the history. If you are an agent starting work, read this first.
 | --- | --- |
 | Stage | 4A-2 closed (PASS); the Text group is complete; 4A-3 is the next feature slice |
 | Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-1, 4A-2 PASS** (19 of 48 render), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are now **committed** (`5d2a3e9`) |
+| Status | **4A-1, 4A-2 PASS** (19 of 48 render), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
+
+## 2a. Published, and what publishing cost
+
+The repo is public at https://github.com/Xin-zimu/dsh-plugin-visualize.
+
+Getting there required rewriting history, because 8 of the 9 commits contained
+the owner's Windows username and the working tree carried 22 full-window
+screenshots. **Verified before the rewrite:** no credential, token, cookie or
+API key was ever present — that scan came back clean, and it is the only reason
+this was a privacy job rather than an incident.
+
+Removed, from every commit, not merely from `HEAD`:
+
+- 22 PNGs under `evidence/**/` — each was a **full-viewport** capture, so they
+  carried conversation text, the model's reasoning, the sidebar's project list
+  (12 unrelated private projects) and the account display name. Not redactable
+  in place; the fix is the deletion.
+- `upstream/open-intelligent-ui/docs/openui-chatgpt-comparison.{mp4,jpg}` — a
+  third-party-marked asset that Thesys's MIT grant cannot convey, and one the
+  plugin never used. Also removed 17 MB from a 21 MB payload.
+
+Redacted in place, every commit: `C:/Users/<user> → `C:/Users/<user> the
+absolute repo path → `D:/work/dsh-plugin-visualize`. No file under `src/` or
+`tests/` contained either literal, so nothing functional changed.
+
+Licence defects found by audit and fixed: there was **no root `LICENSE`** while
+`package.json` claimed BSD-3-Clause (GitHub would have shown the repo as
+unlicensed); `NOTICE` asserted that it reproduced the upstream licence texts but
+reproduced none of them and named no copyright holder for the two MIT
+upstreams; `package.json` `files[]` listed a `LICENSE` that did not exist and
+shipped `dsh-intelligent-ui`-derived code with no MIT text; `MIGRATION_MATRIX`
+credited `open-intelligent-ui` with porting `functions.ts`, which a
+implementation-level comparison shows came from `dsh-intelligent-ui`;
+`PROVENANCE.md` claimed the `upstream/*/.git` directories were kept, and they
+are not.
+
+**Evidence removed is not evidence lost:** what remains under `evidence/` is the
+assertion data — manifests, JSON measurements, probe scripts, test transcripts,
+the two `.log` files. Those are what the claims in this file rest on. The
+screenshots were illustration, and their removal is recorded here rather than
+papered over.
+
+Rehearsed on a throwaway clone before touching the real tree; the bundle is at
+`../dsh-plugin-visualize-BACKUP-20261104-010334.bundle`.
 
 ## 3. Current progress
 
@@ -277,6 +321,7 @@ differential was re-run and still reports **31/31, 0 differences**
 | Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-host.txt` |
 | Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-client.txt` |
 | Suite (4A-2) | `npx vitest run` | **749 / 15** (764) — phase verdict was reached on 747; the 2 extra are the structural guards added at close | `evidence/phase-4a-2/test-4a2-maintenance.txt` |
+| Suite (pre-publish, after the history rewrite) | `npx vitest run` | **749 / 15 / 764** — identical to 4A-2 after removing 22 screenshots and the vendored mp4; the rewrite touched no file under `src/` or `tests/` | `evidence/publish/test-before-publish.txt` |
 | Language differential (4A-2) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences** | `evidence/phase-4a-2/differential-4a2.txt` |
 | New 4A-2 spec | `npx vitest run tests/openui-text-4a2.spec.tsx` | **64 / 64 PASS** | same suite file |
 | **D20 guard validated** | defect re-introduced on purpose, spec re-run, fix restored | **3 of the new structural tests failed on it**, incl. `listitem inside listitem`; then back to 64/64 | this log; no artefact kept, because keeping a deliberately broken build would be worse |

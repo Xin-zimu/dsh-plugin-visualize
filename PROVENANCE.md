@@ -14,10 +14,14 @@ Licences: `dsh-visualize` BSD-3-Clause; `dsh-intelligent-ui` MIT;
 
 ## What was excluded
 
-`open-intelligent-ui` was moved here without its `.git` (17 MB),
-`node_modules` (640 MB) and `.next` (1.1 GB) — sources only. Its commit is
-recorded in `.upstream-commit` and `.upstream-commit.log` inside that
-directory, and in the table above.
+None of the three snapshots carries its `.git`, its `node_modules` or a build
+output. `open-intelligent-ui` additionally left behind `.next` (1.1 GB). They
+are sources only, which is why `git -C upstream/<name> log` does **not** work:
+the pinned commit in the table above is the record, plus
+`.upstream-commit` / `.upstream-commit.log` inside the open-intelligent-ui
+directory.
 
-The two `dsh-*` clones keep their `.git` (shallow, 3.3 MB and 1.8 MB total),
-so `git -C upstream/<name> log` still works for diffing against upstream.
+`open-intelligent-ui`'s `docs/openui-chatgpt-comparison.{mp4,jpg}` — a
+side-by-side against ChatGPT — was deliberately not carried over. Thesys's MIT
+grant covers its own code, not OpenAI's marks or product imagery in that video,
+and no part of this plugin uses it.
