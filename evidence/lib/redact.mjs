@@ -19,9 +19,12 @@ const USER = process.env.REDACT_USER ?? null
 const EMAIL = process.env.REDACT_EMAIL ?? null
 
 const SUBS = [
-  [/[A-Za-z]:(?:\\\\|\\|\/)+(?:Deepseek|work)(?:\\\\|\\|\/)+dsh-plugin-visualize/g,
+  // Any absolute path that ends at this checkout, whatever it is mounted under.
+  // Parent segments may contain spaces; the path may not cross a quote, a pipe
+  // or a line break, and the lookbehind keeps `https:` from reading as `s:`.
+  [/(?<![A-Za-z])[A-Za-z]:(?:\\\\|\\|\/)[^\r\n'"|<>]*?(?:\\\\|\\|\/)dsh-plugin-visualize(?![\w-])/g,
     'D:/work/dsh-plugin-visualize'],
-  [/[A-Za-z]:(?:\\\\|\\|\/)+Users(?:\\\\|\\|\/)+[^\\/\s'"]+/g, 'C:/Users/<user>'],
+  [/(?<![A-Za-z])[A-Za-z]:(?:\\\\|\\|\/)+Users(?:\\\\|\\|\/)+[^\\/\s'"]+/g, 'C:/Users/<user>'],
 ]
 
 if (USER) SUBS.push([new RegExp(`(?<![0-9])${USER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![0-9])`, 'g'), '<user>'])
