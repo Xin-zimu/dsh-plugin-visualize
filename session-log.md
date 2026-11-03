@@ -67,6 +67,37 @@ papered over.
 Rehearsed on a throwaway clone before touching the real tree; the bundle is at
 `../dsh-plugin-visualize-BACKUP-20261104-010334.bundle`.
 
+### 2a.1 One mistake, and one residual risk
+
+The first publish was too hasty: I saved the vitest transcript to
+`evidence/publish/test-before-publish.txt` **after** the pre-push scan had run,
+and the 15 known Windows failures print absolute temp paths in their stack
+traces. So a file containing the username went out in the first push. The
+post-push scan caught it within minutes; the history was rewritten again and
+force-pushed, and the in-repo tool `evidence/lib/redact.mjs` now exists so the
+next transcript is cleaned before it is committed rather than after.
+
+Three lessons worth keeping:
+
+- **Scan after the last write, not before the first push.** A scan is only
+  valid for the tree that existed when it ran.
+- **A redaction tool must not hard-code what it removes.** Two of the rewrite
+  rounds failed because `redact.mjs` contained `86139` as a literal; the
+  out-of-tree filter carries the literals, the in-repo tool reads them from
+  `REDACT_USER` / `REDACT_EMAIL`.
+- **`git filter-branch` swallows a filter that crashes.** It reported success
+  while a `EPERM` on the worktree `.git` gitlink aborted the script mid-run.
+  Verify the result, never the exit status.
+
+**Residual risk, stated plainly:** three pre-rewrite commits (`6b0c445`,
+`d10e927`, `58ab17a`) are no longer on any branch but are **still fetchable by
+SHA** from the GitHub API, and `58ab17a` still serves the transcript containing
+the username. Purging them requires deleting and re-creating the repository,
+which needs the `delete_repo` OAuth scope. The token in this session does not
+have it and approval prompts are disabled, so it could not be done here. The
+exposure is a Windows account name, not a credential; if that is unacceptable,
+run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
+
 ## 3. Current progress
 
 **Discussed** — `PLAN.md`, `STAGE.md`, `docs/decisions/`.
