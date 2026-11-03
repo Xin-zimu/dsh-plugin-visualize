@@ -73,6 +73,7 @@ exactly as it did before the fork. The tool's `backend` enum is generated from
 | Style, theme, chart defaults | `style*.ts` + frame CSS | A card must look like a card |
 | Replay | `TurnCards.tsx`, `fragment.ts` | One replay path or old sessions break |
 | Security envelope | `shell.ts` + ADR-004 | Two boundaries, but one owner of each |
+| Outbound URLs a card may activate | `safeHref` in `OpenUICard.tsx` + ADR-008 | One allowlist, in one function, with one caller path — a second place that turns a value into an `href` is a second policy |
 | Card identity and saved state | `card-state.ts` + `openui-state.ts` | One store, one eviction policy; per-backend record shapes (ADR-006) |
 
 ## One card, two surfaces

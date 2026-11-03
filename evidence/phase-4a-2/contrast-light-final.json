@@ -1,0 +1,41 @@
+{
+ "theme": "light",
+ "samples": [
+  {
+   "label": "Link",
+   "text": "a permitted https link",
+   "fontSize": "16px",
+   "ratio": 5.39
+  },
+  {
+   "label": "Badge",
+   "text": "info",
+   "fontSize": "11px",
+   "ratio": 18.9
+  },
+  {
+   "label": "Quote body",
+   "text": "The text components are ",
+   "fontSize": "16px",
+   "ratio": 18.9
+  },
+  {
+   "label": "Code body",
+   "text": "const seven = [Label, Ba",
+   "fontSize": "12px",
+   "ratio": 18.9
+  },
+  {
+   "label": "Copy button",
+   "text": "Copy",
+   "fontSize": "11px",
+   "ratio": 5.8
+  },
+  {
+   "label": "List marker",
+   "text": "1.",
+   "fontSize": "16px",
+   "ratio": 5.8
+  }
+ ]
+}

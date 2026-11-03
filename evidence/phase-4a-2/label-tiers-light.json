@@ -1,0 +1,30 @@
+{
+ "theme": "light",
+ "cardBackdrop": "rgb(255,255,255)",
+ "tiers": {
+  "--dsw-alias-label-secondary": {
+   "resolves": true,
+   "raw": "#61666b",
+   "rgb": "rgb(97,102,107)",
+   "onCard": 5.8
+  },
+  "--dsw-alias-label-tertiary": {
+   "resolves": true,
+   "raw": "#81858c",
+   "rgb": "rgb(129,133,140)",
+   "onCard": 3.71
+  },
+  "--dsw-alias-label-caption": {
+   "resolves": true,
+   "raw": "#adb2b8",
+   "rgb": "rgb(173,178,184)",
+   "onCard": 2.13
+  },
+  "--dsw-alias-label-primary": {
+   "resolves": true,
+   "raw": "#0f1115",
+   "rgb": "rgb(15,17,21)",
+   "onCard": 18.9
+  }
+ }
+}

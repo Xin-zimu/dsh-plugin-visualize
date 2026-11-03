@@ -1,0 +1,9 @@
+{
+ "at": "2026-11-03T16:22:48.138Z",
+ "what": "theme",
+ "facts": {
+  "verdict": "BLOCKED",
+  "reason": "theme: asked for dark through the host control and the host did not switch (dark=false)"
+ },
+ "detail": []
+}

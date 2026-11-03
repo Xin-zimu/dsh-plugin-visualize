@@ -370,6 +370,14 @@ describe('CSS variable resolution — the D6/D7 guard', () => {
     //
     // Source: evidence/phase-4a-1/host-tokens.json, a scan of all 509 custom
     // properties the live DSH host declares.
+    //
+    // `--dsw-font-markdown-code-font-family` was added in 4A-2 for `Code`'s mono
+    // stack, and it was measured the same way rather than guessed: the live page
+    // was asked which mono candidates resolve, and the frame vocabulary's
+    // `--font-mono` was among the ones that do NOT exist in the host. Record:
+    // evidence/phase-4a-2/host-mono-tokens.json. This list is deliberately a
+    // written-down set — adding a name to it is the moment a measurement has to
+    // exist, which is what stops D17/D18 recurring.
     const VERIFIED_HOST_TOKENS = new Set([
       '--dsw-alias-label-primary',
       '--dsw-alias-label-tertiary',
@@ -384,6 +392,11 @@ describe('CSS variable resolution — the D6/D7 guard', () => {
       '--dsw-static-red-500',
       '--dsw-radius-sm',
       '--dsw-font-family',
+      '--dsw-font-markdown-code-font-family',
+      // Added in 4A-2 for small supporting text. Measured on the live page at
+      // 5.8:1 on white and 12.11:1 on the dark surface;
+      // evidence/phase-4a-2/label-tiers-light.json.
+      '--dsw-alias-label-secondary',
     ])
 
     const html = renderToStaticMarkup(createElement(OpenUICard as never, {

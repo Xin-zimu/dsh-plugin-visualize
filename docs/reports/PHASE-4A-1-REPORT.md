@@ -26,7 +26,7 @@ value, and the result still *looks* like a layout.
 | 4 | Light and dark both pass | **PASS** — dark entered via the host's own control |
 | 5 | Tool view and turn tail both display | **PASS** — 1 fold + 1 tail |
 | 6 | Refresh and history replay pass | **PASS** for refresh; **A9 NOT VERIFIED** |
-| 7 | No new failures; TypeScript passes | **PASS** — 675 / 15, identical failure set |
+| 7 | No new failures; TypeScript passes | **PASS** — 683 / 15, identical failure set |
 | 8 | Build SHA-256 matches the test profile | **PASS** — both halves |
 | 9 | Evidence, matrix and report updated | **PASS** |
 

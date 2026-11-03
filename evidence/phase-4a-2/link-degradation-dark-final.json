@@ -1,0 +1,16 @@
+{
+ "theme": "dark",
+ "refusedLabelVisible": true,
+ "permittedLabelVisible": true,
+ "refusedCarrierTags": [
+  "DIV",
+  "SPAN"
+ ],
+ "refusedHasAnchor": false,
+ "permittedHasAnchor": true,
+ "javascriptInDom": false,
+ "anchorCount": 1,
+ "hrefs": [
+  "https://example.com/docs"
+ ]
+}

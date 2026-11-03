@@ -163,7 +163,7 @@ async function gateEnvironment() {
   if (SESSION !== '') {
     try {
       const tabs = JSON.parse(execFileSync('bsk', ['tab', 'list', '--session', SESSION, '--json'], {
-        encoding: 'utf8', maxBuffer: 1 << 26, env: { ...process.env, BSK_AUTO_START: '0' }, timeout: 15000,
+        encoding: 'utf8', maxBuffer: 1 << 26, env: { ...process.env, BSK_AUTO_START: '0' }, timeout: 30000,
       }))
       const agent = (tabs.tabs ?? []).find(tab => tab.scope === 'agent')
       facts.agentTab = agent === undefined ? null : { url: agent.url, title: agent.title }
@@ -172,7 +172,12 @@ async function gateEnvironment() {
         gaps.push(`the agent tab is still ${agent.url} — it must be navigated to the DSH app before measuring`)
       }
     } catch (error) {
-      gaps.push(`could not list the session's tabs: ${String(error.message).split('\n')[0]}`)
+      // Do not fold this into a generic "could not list tabs": the two causes
+      // need different fixes. A timeout means another client is holding the
+      // session (very likely when two agents share one), and retrying or
+      // using a private session is the answer. Anything else is a real fault.
+      const detail = String(error.message).split('\n').filter(Boolean).slice(-3).join(' | ')
+      gaps.push(`could not list the session's tabs (bsk tab list failed: ${detail.slice(0, 200)}) — if this is a timeout, another client is holding session ${SESSION}; use your own session`)
     }
   }
 

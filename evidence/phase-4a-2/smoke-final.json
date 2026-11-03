@@ -1,0 +1,54 @@
+{
+ "at": "2026-11-03T16:20:38.743Z",
+ "what": "smoke",
+ "facts": {
+  "verdict": "SMOKE PASS",
+  "gates": [
+   {
+    "gate": "G0",
+    "name": "environment",
+    "daemonVersion": "0.4.1",
+    "protocolVersion": "1.8",
+    "agentTab": {
+     "url": "http://127.0.0.1:3093/",
+     "title": "Reply with exactly PING — DeepSeek Harness"
+    },
+    "buildSha256": "2B7B238FDA607E19C0140632798DF446E766F5D334FE0BE0BDB83F28119982F6",
+    "installedSha256": "2B7B238FDA607E19C0140632798DF446E766F5D334FE0BE0BDB83F28119982F6",
+    "page": {
+     "title": "Reply with exactly PING — DeepSeek Harness",
+     "url": "http://127.0.0.1:3093/",
+     "hasComposer": true,
+     "cards": 12,
+     "unreadableLog": false,
+     "excerpt": "Reply with exactly PING\n对话\n轨迹\n加载更早\nReply with exactly: PING\n11月3日 01:51\n已完成\n已完成，用时 1秒\n\nPING\n\n用量 8.3K tok\n11月3日 01:51\nUse visualize with backend \"openui\", title "
+    },
+    "draftEditorCrashes": 0,
+    "gaps": []
+   },
+   {
+    "gate": "G1",
+    "name": "input",
+    "sent": 31,
+    "received": 31
+   },
+   {
+    "gate": "G2",
+    "name": "submit",
+    "marker": "SMOKE-mw0w9ag7",
+    "composerLength": 0,
+    "echoed": true
+   },
+   {
+    "gate": "G3",
+    "name": "render",
+    "paragraphs": 24,
+    "settled": true
+   }
+  ],
+  "stamp": "evidence/.smoke-stamp.json"
+ },
+ "detail": [
+  "console entries: 0, draft-editor crashes: 0"
+ ]
+}

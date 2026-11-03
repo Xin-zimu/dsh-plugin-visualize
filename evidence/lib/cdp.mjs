@@ -114,20 +114,64 @@ async function authority() {
 }
 
 /**
+ * True for a refusal that is a property of a *live* page, not of the product.
+ *
+ * `observation_changed` means the strict observation moved between `cooperate
+ * sync` and the dispatch. On a live conversation — a streaming turn, a
+ * re-rendering card — that happens constantly and is not a defect. The
+ * documented response is a fresh sync and one more attempt; the wrong response
+ * is to report it, because a real permission error and a moving page would then
+ * be indistinguishable.
+ * @param text - the failure text.
+ * @returns whether to retry.
+ */
+function isTransientRefusal(text) {
+  return /observation_changed|strict observation changed|content changed|covered|control_context_invalid/u.test(text)
+}
+
+/**
  * Evaluate an expression in the page.
  *
  * Prefer returning a small object: this output lands in a terminal, then in an
  * evidence file, then in a transcript. Returning the whole accessibility tree
  * or a full DOM dump is the single easiest way to waste a context window.
  *
+ * Transient observations are retried here as well as in `step()`. This was a
+ * real gap: the documented policy is that a moving page is never a product
+ * failure, but only `step()` implemented it, so a plain `evaluate` against a
+ * live conversation failed the whole run on a page that had merely repainted.
+ *
  * @param expression - the expression; may end in `JSON.stringify(...)`.
+ * @param attempts - how many transient refusals to tolerate.
  * @returns the parsed value.
  */
-export async function evaluate(expression) {
-  const args = ['evaluate', '--session', SESSION, ...await authority()]
-  const parsed = JSON.parse(raw([...args, '--json', expression]))
-  if (parsed.ok !== true) throw new Error(`evaluate rejected: ${JSON.stringify(parsed.error)}`)
-  return typeof parsed.value === 'string' ? JSON.parse(parsed.value) : parsed.value
+export async function evaluate(expression, attempts = 4) {
+  let last
+  for (let i = 0; i < attempts; i += 1) {
+    const args = ['evaluate', '--session', SESSION, ...await authority()]
+    let parsed
+    try {
+      parsed = JSON.parse(raw([...args, '--json', expression]))
+    } catch (error) {
+      if (isTransientRefusal(String(error.message)) && i + 1 < attempts) {
+        last = error
+        await SLEEP(300)
+        continue
+      }
+      throw error
+    }
+    if (parsed.ok !== true) {
+      const text = JSON.stringify(parsed.error)
+      if (isTransientRefusal(text) && i + 1 < attempts) {
+        last = new Error(`evaluate rejected: ${text}`)
+        await SLEEP(300)
+        continue
+      }
+      throw new Error(`evaluate rejected: ${text}`)
+    }
+    return typeof parsed.value === 'string' ? JSON.parse(parsed.value) : parsed.value
+  }
+  throw last ?? new Error('evaluate failed')
 }
 
 /** Evaluate and return the raw string, for markup rather than JSON. */

@@ -1,0 +1,194 @@
+{
+  "phase": "4A-2",
+  "title": "Text group — Label, Badge, Link, List, ListItem, Quote, Code",
+  "capturedAt": "2026-11-04T00:30+08:00",
+  "status": "COMPLETE — all seven render in both colour schemes on an isolated profile",
+  "verdict": "PASS on all six exit criteria",
+  "scope": {
+    "components": ["Label", "Badge", "Link", "List", "ListItem", "Quote", "Code"],
+    "inventoryBefore": "12 / 48",
+    "inventoryAfter": "19 / 48",
+    "textGroup": "complete — rendered 10 of 10, missing none",
+    "measuredFrom": "tests/openui-inventory.spec.tsx reading RENDERED_COMPONENTS, not a hand-kept list"
+  },
+  "environment": {
+    "profile": "p3web — isolated DSH_HOME at tmp/dsh-p3 on :3093; production desktop untouched",
+    "server": "DSH_HOME=tmp/dsh-p3; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1",
+    "browserSession": "ggbi (the session id changes on every start)",
+    "daemon": "bsk 0.4.1, protocol 1.8, version_skew false",
+    "theme": "driven through the host's own Settings -> 通用设置 -> 外观 control in both directions; data-ds-dark-theme was never set directly"
+  },
+  "bundleHashCheck": {
+    "rule": "AGENTS.md §9",
+    "build": "2B7B238FDA607E19C0140632798DF446E766F5D334FE0BE0BDB83F28119982F6",
+    "installed": "2B7B238FDA607E19C0140632798DF446E766F5D334FE0BE0BDB83F28119982F6",
+    "verdict": "MATCH on the client half before the accepted measurement",
+    "note": "The check earned its place twice this phase. The first run measured against 0C72613C… (the 4A-1 bundle) because pnpm had hard-linked the old copy; `pnpm install` reports 'Already up to date' for a `file:` dependency until the profile's node_modules entry is removed. Every measurement below was taken after a matching hash."
+  },
+  "exitCriteria": [
+    {
+      "item": 1,
+      "criterion": "Every component in the batch renders from a real program",
+      "result": "PASS",
+      "evidence": "card-light-final.json / card-dark-final.json: 3 badges, 1 blockquote, 1 pre, 1 copy button, 4 list rows, 1 anchor — all seven components in one card written by the model"
+    },
+    {
+      "item": 2,
+      "criterion": "Bound inputs write $state and survive a reload (4A-3 onward)",
+      "result": "N/A this batch",
+      "evidence": "no 4A-2 component binds $state; Code's copy confirmation is deliberately local UI state"
+    },
+    {
+      "item": 3,
+      "criterion": "Layout, colour and contrast hold in both colour schemes",
+      "result": "PASS after fixing three AA failures",
+      "evidence": "contrast-light-final.json, contrast-dark-final.json"
+    },
+    {
+      "item": 4,
+      "criterion": "The differential still reports 0 differences",
+      "result": "PASS",
+      "evidence": "differential-4a2.txt — cases: 31 | matched: 31 | differing: 0"
+    },
+    {
+      "item": 5,
+      "criterion": "Browser evidence on an isolated profile, with the §9 hash check",
+      "result": "PASS",
+      "evidence": "this manifest; smoke-final.json; card-{light,dark}-final.png"
+    },
+    {
+      "item": 6,
+      "criterion": "tests/<batch> added; the 15-failure baseline unchanged",
+      "result": "PASS",
+      "evidence": "tests/openui-text-4a2.spec.tsx 62/62; test-4a2-final.txt 747 / 15 / 762, failure set identical to the 4A-1 baseline after normalising timing suffixes"
+    }
+  ],
+  "decisions": {
+    "ADR-008": "The Link protocol policy. A positive, closed allowlist: an absolute http: or https: URL, parsed with `new URL` rather than pattern-matched. Everything else — javascript:, vbscript:, data:, file:, blob:, protocol-relative //host/x, relative paths, fragments, mailto:, tel: — degrades to plain text with no href, no target and no handler.",
+    "divergenceFromUpstream": "Deliberate and recorded. Upstream's predicate is /^(https?:\\/\\/|mailto:|tel:|\\/|#)/i, which ALLOWS protocol-relative //evil.example.com/x, mailto:, tel:, root-relative paths and fragments. The fork is strictly stricter: every target it refuses is also refused by upstream except those five. Verified against both predicates, not read off the source.",
+    "noHostTokenForLinkColour": "No single host token clears AA in both schemes. --primary is 4.23:1 on white; the static brand steps are 3.39-3.53:1 on the dark surface. Declared as LINK_LITERAL (a light-dark pair drawn from the host's brand scale) rather than a var() bridge that would silently fail in one scheme — the same reasoning as SERIES_4_LITERAL."
+  },
+  "defectsFound": [
+    {
+      "id": "D20",
+      "title": "A nested ListItem drew two rows for one item",
+      "foundBy": "reading the live page, not a test — the screenshot appeared to show both a bullet and a check before 'Nested title'",
+      "detail": "List([ListItem(...)]) produced TWO role=\"listitem\" elements: the walker drew the ListItem into a complete row, and List then wrapped that row in a second one. The live card showed 5 rows for a 4-item program, markers ['1.','2.','3.','•','✓'], with the bullet row containing the check row.",
+      "howConfirmed": "tests/diag-list-rows.spec.tsx (throwaway) printed row counts per item shape: 'one ListItem, check rows=2'. After the fix: rows=1.",
+      "fix": "Renderer signature gained the raw argument list; List consults the raw descriptor to decide whether an entry IS a ListItem, rather than inspecting the node it already drew into.",
+      "regression": "tests/openui-text-4a2.spec.tsx — 'draws a nested ListItem as exactly one row' and 'draws N plain items as N rows'",
+      "verifiedAfterFix": "live browser: listRows 4, markers ['1.','2.','3.','✓'] in both schemes"
+    },
+    {
+      "id": "D21",
+      "title": "--font-mono does not exist in the host",
+      "foundBy": "measuring the candidate tokens before writing the renderer, prompted by D17/D18",
+      "detail": "The frame vocabulary declares --font-mono (src/frame-css.ts:47) but the host document does not. Bridging to it would have been D17/D18 a fourth time: a var() that resolves to nothing still paints a fallback.",
+      "evidence": "host-mono-tokens.json — --font-mono and --dsw-font-mono both absent; --dsw-font-markdown-code-font-family resolves to a real mono stack",
+      "fix": "--font-mono is bridged to --dsw-font-markdown-code-font-family, measured to resolve on the live page",
+      "guard": "the 4A-1 verified-token allowlist rejected the new name until it was added with this measurement behind it"
+    },
+    {
+      "id": "D22",
+      "title": "Three 4A-2 colours failed AA in the light scheme",
+      "foundBy": "measuring contrast against the effective backdrop instead of eyeballing the screenshot",
+      "detail": "Link 4.23:1 (--primary is a surface fill, not a text colour), copy button 3.71:1 and list marker 3.71:1 (both inherited --muted-foreground, which bridges to the host's tertiary tier).",
+      "fix": "Link moved to its own --link literal (5.39:1 light / 5.42:1 dark); the small supporting text moved to a new --muted-foreground-strong bridging the host's secondary tier (5.8:1 light / 12.11:1 dark)",
+      "notChanged": "--muted-foreground itself is left alone. It is the 4A-1 tier used by Caption, which is browser-verified; this batch does not get to silently restyle it.",
+      "evidence": "contrast-light-final.json, contrast-dark-final.json, label-tiers-light.json, link-colour-light.json, link-colour-dark.json"
+    },
+    {
+      "id": "D23",
+      "title": "evaluate() did not retry transient observation refusals",
+      "foundBy": "a real run failed with 'strict observation changed before this action'",
+      "detail": "The documented policy is that a moving page is never a product failure, but only step() implemented it. A plain evaluate() against a live conversation failed the whole run on a page that had merely repainted.",
+      "fix": "evaluate() retries observation_changed / content changed / covered / control_context_invalid, and re-throws anything else immediately",
+      "guard": "node evidence/lib/parity.mjs still exits 0; no capability lost, per-character typing still forbidden"
+    }
+  ],
+  "measurements": {
+    "light": {
+      "cardWidth": 369,
+      "listRows": 4,
+      "markers": ["1.", "2.", "3.", "✓"],
+      "anchors": 1,
+      "unresolvedVariables": 0,
+      "danglingHostTokens": 0,
+      "unrenderedNotices": 0,
+      "contrast": {
+        "link": 5.39,
+        "badge11px": 18.9,
+        "quoteBody": 18.9,
+        "codeBody12px": 18.9,
+        "copyButton11px": 5.8,
+        "listMarker": 5.8
+      }
+    },
+    "dark": {
+      "cardWidth": 908,
+      "listRows": 4,
+      "markers": ["1.", "2.", "3.", "✓"],
+      "anchors": 1,
+      "unresolvedVariables": 0,
+      "danglingHostTokens": 0,
+      "unrenderedNotices": 0,
+      "hostVariablesDeclared": 473,
+      "contrast": {
+        "link": 5.42,
+        "badge11px": 17.45,
+        "quoteBody": 17.45,
+        "codeBody12px": 13.34,
+        "copyButton11px": 9.25,
+        "listMarker": 12.11
+      }
+    },
+    "monoFontFamily": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas, \"Liberation Mono\", Menlo, Courier, \"PingFang SC\", \"Microsoft YaHei\"",
+    "linkPolicyInLiveHost": {
+      "permitted": "https://example.com/docs -> <a href target=_blank rel='noreferrer noopener'>",
+      "refused": "javascript:alert(1) -> plain <span>, label visible, javascriptInDom false, exactly 1 anchor in the card"
+    }
+  },
+  "costAccounting": {
+    "note": "The five metrics infra-1 asked 4A-2 to record, so the comparison is data rather than the 'about 1/5' estimate.",
+    "scriptCount": {
+      "total": 12,
+      "named": [
+        "probe-host-mono.mjs", "navigate-agent-tab.mjs", "probe-card-4a2.mjs", "probe-link-degradation.mjs",
+        "probe-contrast-4a2.mjs", "probe-label-tiers.mjs", "probe-link-colour.mjs", "read-page.mjs",
+        "close-settings.mjs", "switch-theme.mjs", "diagnose-theme.mjs", "probe-all-cards.mjs",
+        "probe-markers.mjs", "probe-program-source.mjs"
+      ],
+      "comparison": "4A-1 wrote 41 scripts for one batch; 4A-2 wrote 14 small named ones, and the four generic measurements (card, theme, tokens, smoke) were probe.mjs modes, not new files"
+    },
+    "bskToolCalls": {
+      "approximate": "~60",
+      "perPrompt": 2,
+      "comparison": "4A-1 spent ~1760 subprocess calls on one prompt alone"
+    },
+    "wallTime": {
+      "totalMinutes": "~50 including the environment recovery",
+      "environmentRecovery": "~12 minutes of it was the wedged agent tab after repeated server restarts, not product work"
+    },
+    "failedRetries": {
+      "count": 6,
+      "causes": [
+        "pnpm 'Already up to date' left the stale bundle installed — caught by the §9 hash check before any measurement",
+        "evaluate() observation_changed (D23) — fixed in the harness",
+        "theme probe reported BLOCKED twice while a Settings dialog was open — a genuine block, correctly not filed as a product failure",
+        "a hanging smoke run after a server restart — killed and diagnosed, per AGENTS.md §10"
+      ]
+    },
+    "outputTokensPolicy": "probe.mjs summaries stayed small; the 473-variable table and per-element detail went to --out files, never to stdout"
+  },
+  "notClaimed": {
+    "A9": "Cross-generation history replay remains NOT VERIFIED from 4A-1. Nothing in this batch ran it or changed that finding.",
+    "A05_A06_A09_stage3": "Still unit-tested only, never browser-verified. Unchanged by this batch.",
+    "reload": "Persistence was not re-exercised here because no 4A-2 component binds $state. The stored card did survive the server restarts and re-render identically, which is observed but is not the same test as A8 and is not claimed as one.",
+    "tailSurface": "The card was measured on the conversation surface. The folded tool-view copy was not separately measured this batch."
+  },
+  "prohibitedAndObserved": {
+    "noHostCssModified": true,
+    "noSignatureTableChange": "no name was added to signatures.ts; all seven were already declared",
+    "noBackendChange": "no file under src/backends/ was touched; the differential is still 31/31"
+  }
+}

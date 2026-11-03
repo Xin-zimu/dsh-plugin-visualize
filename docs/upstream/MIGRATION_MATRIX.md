@@ -76,10 +76,10 @@ shape of the problem. Recording them keeps "kept from upstream" honest.
 | Action dispatch | `src/client/openui-actions.ts` (new) | Upstream runs actions from `30-render.js:599-647` against a mutable store. The fork's dispatcher is pure — it returns a patch that the card applies through its one state channel — so a Button and a Slider cannot diverge in validation or persistence. `@Set` and `Action([...])` keep upstream's semantics, including its pre-click snapshot contract. |
 | `@Reset(...)` arguments | `src/client/openui-actions.ts` | **Divergence reproduced, not introduced.** Upstream's executor calls `store.reset()` with no argument (`20-store.js:112-118`), so `@Reset($a, $b)` resets everything and its bindings are never read. The fork does the same and emits an `action.reset-ignores-args` note so the gap is recorded; selecting variables by argument would be a semantic change needing its own decision. |
 
-## Component coverage — 12 of 48 render
+## Component coverage — 19 of 48 render
 
 The language parses and evaluates all 48 (`src/backends/openui/signatures.ts`);
-the renderer draws 12. Measured, not remembered: `tests/openui-inventory.spec.tsx`
+the renderer draws 19. Measured, not remembered: `tests/openui-inventory.spec.tsx`
 imports the renderer's own `RENDERED_COMPONENTS` and the language's table and
 prints the split. A name may only appear in the *rendered* column if it is in
 `COMPONENTS` — the probe asserts that no renderer name is phantom.
@@ -91,13 +91,13 @@ renderer's table as a hand-written literal and still reported 8 / 48 after the
 | Group | Total | Rendered | Missing (stage 4A batch) |
 | --- | --- | --- | --- |
 | Layout | 9 | Col, Row, Box, Grid, Card, Divider, Spacer | Carousel, Popover (4A-5) |
-| Text | 10 | Title, Text, Caption | Label, Badge, Link, List, ListItem, Quote, Code (**4A-2**) |
+| Text | 10 | Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code | **— complete** |
 | Inputs | 13 | Button, Slider | Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form, IconButton, Pressable (**4A-3**) |
 | Drawing | 10 | — | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText (**4A-5**) |
 | Media and data | 4 | — | Table, Chart, Icon, Image (**4A-4**) |
 | Play | 2 | — | Flashcard, Celebration (4A-5) |
 
-**Status: 12/48 `ported`; 36 pending.** Each batch moves its own rows to
+**Status: 19/48 `ported`; 29 pending.** Each batch moves its own rows to
 `verified` only when its exit criteria are met, browser evidence included — the
 same rule as every other row in this file.
 
@@ -115,6 +115,31 @@ D17/D18 in the 4A-1 manifest: `--dsw-static-purple-500` and
 `--dsh-font-family-text-default` do not exist in the DSH host. Both had
 fallbacks, so the card looked correct while resolving to nothing — the D6/D7
 defect class. Fixed and re-verified in both themes.
+
+### 4A-2 rows (browser-verified)
+
+The Text group. Only `Link` is a meaningful divergence; the rest are close
+adaptations of upstream's renderers.
+
+| Upstream | Fork location | How | Status |
+| --- | --- | --- | --- |
+| `Label` (`layout-text.js:843-849`) | `src/client/OpenUICard.tsx` | **adapted** — 12px medium weight, `overflow-wrap: anywhere`; upstream's `.iui-lt-label` class becomes inline styles | verified (`evidence/phase-4a-2/`) |
+| `Badge` (`:851-876`) | same | **rewritten** — upstream paints the text in the series colour and adds a dot; the fork keeps the text foreground and carries colour by dot + 16% tint, because upsteam's own comment records that tinted 11px text failed contrast | verified; AA in both schemes |
+| `Link` (`:878-887`, `iuiLtAnchor`) | same | **rewritten — security boundary, ADR-008.** Upstream's predicate `/^(https?:\/\/|mailto:|tel:|\/|#)/i` is replaced by parsing with `new URL` and requiring `http:`/`https:` | verified; refusal cases measured in the live host |
+| `List` (`:889-941`) | same | **adapted** — marker vocabulary, item shapes and the truncation notice follow upstream; the 500-row cap becomes a stated 200-row cap with a visible notice. **Defect D20 fixed here:** the row must consult the raw descriptor, or a nested `ListItem` renders two rows | verified |
+| `ListItem` (`:943-958`) | same | **adapted** — title/description/marker/children order preserved | verified |
+| `Quote` (`:960-972`) | same | **adapted** — `<blockquote>` with a 2px brand side rule and an optional cite line | verified |
+| `Code` (`:974-980`, `IuiLtCodeView`) | same | **adapted** — language label, copy button and `<pre><code>`; the clipboard call is local and best-effort, not the refused `@CopyToClipboard` action | verified |
+
+Two upstream capabilities are **deliberately refused** by `Link`, recorded in
+ADR-008 rather than dropped silently: protocol-relative `//host/x`, `mailto:`,
+`tel:`, root-relative paths and fragments. The fork's allowlist is a strict
+subset of upstream's, so this narrows the fork's surface rather than widening it.
+
+A third bridged token was found wrong before it shipped, not after: the frame
+vocabulary's `--font-mono` **does not exist in the host**. `Code` is the first
+component to need a mono stack, so the candidates were measured first and the
+bridge went to `--dsw-font-markdown-code-font-family` (D21).
 
 ### External actions — recognised, refused, not implemented
 
@@ -135,7 +160,7 @@ gets an `action.unsupported` refusal naming it, rather than a silent no-op.
 
 | Upstream capability | Fork location | How | Status |
 | --- | --- | --- | --- |
-| `src/lib/library.ts` (48 components) | `src/client/OpenUICard.tsx` `COMPONENTS` | rewritten — 12 of 48 drawn; the coverage table above is the authority | 12 ported / 36 pending |
+| `src/lib/library.ts` (48 components) | `src/client/OpenUICard.tsx` `COMPONENTS` | rewritten — 19 of 48 drawn; the coverage table above is the authority | 19 ported / 29 pending |
 | `src/lib/functions/` (73 functions) | `src/backends/openui/functions.ts` | ported — stage 2 | verified (differential) |
 | `src/lib/components/map/` | — | pending — needs a network policy ADR first | pending |
 | `src/lib/components/media.tsx` (`SearchImage`) | — | pending — needs its own service | pending |

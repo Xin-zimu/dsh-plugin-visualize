@@ -19,9 +19,9 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | 4A-1 closed (PASS); test infrastructure refactor (infra-1) complete; 4A-2 is the next feature slice |
+| Stage | 4A-2 closed (PASS); the Text group is complete; 4A-3 is the next feature slice |
 | Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-1 PASS** (12 of 48 render) and **infra-1 COMPLETE** — both 2026-11-03. 4A-2 not started |
+| Status | **4A-1, 4A-2 PASS** (19 of 48 render), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are now **committed** (`5d2a3e9`) |
 
 ## 3. Current progress
 
@@ -246,17 +246,40 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | `docs/decisions/ADR-007-STAGE-3-INPUTS-EXIT-CRITERION.md` | **new** | Records the stage-3 scope adjustment the owner asked for |
 | `docs/reports/PHASE-4A-1-REPORT.md` | **new** | Batch verdict, the three defects, and A9 recorded as not verified |
 | `evidence/phase-4a-1/` | probes, manifests, 2 PNGs, baseline | Every 4A-1 claim has a file |
+| **all of the above** | **committed as `5d2a3e9`** | Three accepted phases sat uncommitted on top of `9b46cec` for a session. One commit rather than three because stage 3 and 4A-1 both rewrite `OpenUICard.tsx`; a split would produce intermediate commits that fail `tsc` |
+| `docs/decisions/ADR-008-LINK-PROTOCOL-POLICY.md` | **new (4A-2)** | `Link` is the first component whose output a reader can activate, in the host origin. A positive allowlist of absolute `http:`/`https:`, parsed with `new URL`, decided before the renderer was written |
+| `src/client/OpenUICard.tsx` | **4A-2** — seven renderers: `Label`, `Badge`, `Link`, `List`, `ListItem`, `Quote`, `Code` | The Text group is complete; inventory 12 → 19 of 48 |
+| `src/client/OpenUICard.tsx` | **4A-2** — `safeHref`, `markerNode`, `listRow`, `listEntryRow`, `CodeBlock` | The seven share one URL policy, one marker vocabulary and one row builder, so they cannot drift apart |
+| `src/client/OpenUICard.tsx` | **4A-2 / D20** — `Renderer` gains the raw argument list; `List` reads the descriptor | A nested `ListItem` drew **two** rows: the walker drew a complete row and `List` wrapped it in a second one. Found by reading the live page, not by a test |
+| `src/client/OpenUICard.tsx` | **4A-2 / D21** — `--font-mono` bridged to `--dsw-font-markdown-code-font-family` | The frame vocabulary's `--font-mono` does not exist in the host. Measured first, so this is not D17/D18 a fourth time |
+| `src/client/OpenUICard.tsx` | **4A-2 / D22** — `LINK_LITERAL`, `--link`, `--muted-foreground-strong` | `Link` was 4.23:1 and the 11px supporting text 3.71:1 on white. Both now clear AA in both schemes |
+| `src/client/OpenUICard.tsx` | **4A-2** — `Label` renders; `Badge` carries colour by dot + tint | Tinted text at 11px is what upstream records as having failed contrast |
+| `tests/openui-text-4a2.spec.tsx` | **new, 62 tests** | The seven components, the 17 refused URL forms, the row-count regression, and the three-layer variable guard |
+| `tests/openui-inventory.spec.tsx` | 12 → 19; 4A-2 batch row removed | Measured from `RENDERED_COMPONENTS`; the Text group now asserts *complete*, not *seven added* |
+| `tests/openui-layout-4a1.spec.tsx` | verified-token allowlist + 2 entries | The guard refused `--font-mono` and `--dsw-alias-label-secondary` until each had a measurement. That is the guard working |
+| `evidence/lib/cdp.mjs` | **D23** — `evaluate()` retries transient refusals | The documented policy was implemented in `step()` only, so one repaint could fail a run. `parity.mjs` still exits 0 |
+| `tsconfig.json`, `tsconfig.client.json` | new spec registered in both | D13 again |
+| `docs/reports/PHASE-4A-2-REPORT.md` | **new** | Batch verdict, ADR-008 summary, the three defects, and what is *not* verified |
+| `evidence/phase-4a-2/` | manifest, 4 PNGs, contrast/token/theme JSON, 14 probes | Every 4A-2 claim has a file |
 
 **No change under `src/backends/`.** Language semantics are untouched; the
 differential was re-run and still reports **31/31, 0 differences**
-(`evidence/phase-4a-1/differential-4a1.txt`).
+(`evidence/phase-4a-2/differential-4a2.txt`).
 
 ## 5. Test results
 
 | Test | Command | Result | Evidence |
 | --- | --- | --- | --- |
-| Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-1/tsc-host.txt` |
-| Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-1/tsc-client.txt` |
+| Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-host.txt` |
+| Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-client.txt` |
+| Suite (4A-2) | `npx vitest run` | **747 / 15** (762) — failure set identical to 4A-1 after normalising timings | `evidence/phase-4a-2/test-4a2-final.txt` |
+| Language differential (4A-2) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences** | `evidence/phase-4a-2/differential-4a2.txt` |
+| New 4A-2 spec | `npx vitest run tests/openui-text-4a2.spec.tsx` | **62 / 62 PASS** | same suite file |
+| Inventory | `npx vitest run tests/openui-inventory.spec.tsx` | **19 / 48**, Text group complete | same suite file |
+| Harness parity | `node evidence/lib/parity.mjs` | exit 0; no capability lost, character typing still forbidden | `evidence/lib/parity-report.json` |
+| Browser 4A-2 | isolated profile, **no CSS overrides**, both schemes | **all six exit items PASS** | `evidence/phase-4a-2/MANIFEST.json` |
+| Bundle hash (§9) | `Get-FileHash` build vs installed | **MATCH** before the accepted run | `MANIFEST.json` |
+| Baseline (pre-commit) | `npx vitest run` | 683 / 15 (698) — matches the committed claim | `evidence/phase-4a-1/test-4a1-final.txt` |
 | Suite | `npx vitest run` | **683 / 15** (698) | `evidence/phase-4a-1/test-4a1-final.txt` |
 | Baseline parity | normalised FAIL-set diff vs baseline | **IDENTICAL** (15 vs 15, diff empty) | same file |
 | New spec | `npx vitest run tests/openui-layout-4a1.spec.tsx` | **40 / 40 PASS** | `evidence/phase-4a-1/test-4a1-final.txt` |
@@ -283,36 +306,55 @@ differential was re-run and still reports **31/31, 0 differences**
 | `@OpenUrl`/`@CopyToClipboard`/`@ToAssistant` refused | A card cannot open, copy or message | Deliberate; each needs a security review (4B) |
 | Two bridged tokens do not exist in the host | `--viz-series-4` and `--font-sans` resolved to nothing and silently used fallbacks | **Fixed in 4A-1 and re-verified in both themes** (D17, D18) |
 | A declared-but-undrawn component drew nothing | A renderer gap looked like an intentionally empty card | **Fixed in 4A-1** — an explicit notice, pinned by tests (A7) |
-| 12 of 48 components render | The language knows all 48; the renderer draws 12 | **4A-1 closed**; 36 assigned to 4A-2…4A-5 |
-| Cross-generation replay unverified | A9 cannot be run on the profile's older session | Log written by a newer harness; recorded, not counted |
+| 12 of 48 components render | The language knows all 48; the renderer draws 12 | **Superseded — 19 of 48 after 4A-2**; 29 assigned to 4A-3…4A-5 |
+| Cross-generation replay unverified | A9 cannot be run on the profile's older session | Log written by a newer harness; recorded, not counted. **Unchanged by 4A-2** |
 | 15 Windows test failures | Noise that could hide a regression | Accepted; `docs/testing/TEST_PLAN.md` |
+| Small supporting text was 3.71:1 on white | 11px meta text (`Copy`, markers, citations) was below AA | **Fixed in 4A-2** — `--muted-foreground-strong` on the host's secondary tier, 5.8:1 / 12.11:1 (D22) |
+| `--muted-foreground` is still 3.71:1 on white | `Caption` and `color: "muted"` inherit it | **Deliberately not changed.** `Caption` is a browser-verified 4A-1 component; restyling it needs its own decision, not a side effect of 4A-2 |
+| `Link` colour has no host token that passes AA in both schemes | A `var()` bridge would fail in one scheme | Recorded in ADR-008; declared as a measured `light-dark()` pair (`LINK_LITERAL`) |
+| Protocol-relative URLs allowed upstream, refused here | A recorded divergence, not a drift | ADR-008; the fork's allowlist is a strict subset of upstream's |
+| `Mailto:`/`tel:` links degrade to text | A card cannot start an email or a call | Deliberate in ADR-008; nothing in the catalogue needs them, and they invoke OS handlers |
 
 ## 7. Next step
 
-**⚠ READ THIS FIRST — the working tree is dirty, and it is not someone else's
-work.** Roughly three dozen uncommitted changes accumulate three accepted
-phases: stage 3, 4A-1, and infra-1. `HEAD` is still `9b46cec`, the stage-2 commit
-from 2026-11-02.
+**The working tree was dirty and is now committed.** The three accepted phases
+(stage 3, 4A-1, infra-1) sat on top of `9b46cec` for a session and were committed
+as **`5d2a3e9`** at the start of this one. A separate audit confirmed the commit
+is self-contained: no `lib/`, `tmp/`, `node_modules/` or
+`evidence/.smoke-stamp.json`, no file under `src/backends/`, and its baseline is
+reproducible from a clean export.
 
-`AGENTS.md` §2 says a dirty tree means stop and report. Here the correct action is
-**not** to stop — it is to establish that the changes are the accepted work
-described in this log, then commit them **before** starting 4A-2. A new session
-otherwise spends its first minutes deciding whether the tree is safe to build on,
-and the honest answer without this paragraph would be "unknown".
+**4A-2 is closed (PASS).** Record: `docs/reports/PHASE-4A-2-REPORT.md`, manifest
+`evidence/phase-4a-2/MANIFEST.json`. Baseline to protect: **747 passed / 15
+failed / 762**, failure set identical to the 4A-1 baseline after normalising
+timings; `tsc` clean both projects; differential **31/31**.
 
-Nothing here is half-finished: every claim in §3 is verified with evidence under
-`evidence/`. Record `9b46cec` as the last release point and commit as one entry
-(or three, one per phase) — but do not commit `lib/`, `tmp/`, or
-`evidence/.smoke-stamp.json` (§7, and see `.gitignore`).
+**4A-3 is next**: `Input`, `TextArea`, `Select`, `SegmentedControl`, `Checkbox`,
+`RadioGroup`, `DatePicker`, `Timer`, `Form`, `IconButton`, `Pressable`. Scope and
+gates are in `STAGE.md` §Stage 4A. Two things specific to that batch:
 
-**4A-1 is closed (PASS).** Record: `docs/reports/PHASE-4A-1-REPORT.md`. Baseline
-to protect: **683 passed / 15 failed / 698**, failure set byte-identical to the
-upstream baseline, `tsc` clean both projects, differential **31/31**, bundle
-hash `0C72613C…` on both halves.
+- **Every one of them binds `$state`.** This is where the P3 persistence and
+  `@Set` path prove their generality, so "renders" is not the bar — a bound input
+  must write `$state` and survive a reload, which is exit criterion 2.
+- **`IconButton` and `Pressable` are action carriers**, like `Button`. They must
+  go through `write.runAction`, the same channel, or a second way for a control
+  to reach state appears.
 
-**infra-1 is complete.** Record: `evidence/infra-1/MANIFEST.json`, manual in
-`docs/testing/BROWSER_HARNESS.md`. The harness is verified against a live DSH
-session, not merely written.
+### What 4A-2 learned the hard way, and 4A-3 should not re-learn
+
+1. **Assert counts, not presence.** `List([ListItem(...)])` drew two rows for one
+   item and every unit test passed, because the tests only checked that the
+   expected strings were somewhere in the markup. Assert how many things were
+   drawn (D20).
+2. **Measure a token before using it.** `--font-mono` looks obviously real — it
+   is declared in `src/frame-css.ts` — and the host has never published it. The
+   frame vocabulary is not the host vocabulary (D21).
+3. **A colour is not a metaphor.** `--primary` is a *surface fill*; as 16px text
+   it is 4.23:1. Contrast has to be measured against the effective backdrop, and
+   11px text is the case that fails first (D22).
+4. **A dialog dims the page.** Driving the host's Settings control leaves the
+   Settings dialog open, which greys the card in a screenshot. Close it before
+   capturing, or compare computed styles rather than pixels.
 
 ### Operational state that does not survive the session
 
@@ -322,11 +364,19 @@ re-create them; nothing in the repo can.
 | Thing | How it was started | Evidence of life |
 | --- | --- | --- |
 | `bsk` daemon | `$env:BSK_AUTO_START='0'; bsk daemon start --foreground --session-idle 4h --daemon-idle 8h` as a background job | `bsk status --json` → daemon 0.4.1, protocol 1.8, `version_skew: false` |
-| Isolated DSH server on :3093 | `$env:DSH_HOME=(Resolve-Path 'tmp/dsh-p3').Path; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1` | URL printed to `tmp/dsh-p3/web9.out.log` |
-| Agent-window session | `bsk session start --browser 0b5a787d --name … --json` | session id was `rkct` this time; **it changes every start** |
-| Agent tab navigated | `bsk navigate --session <sid> "<the :3093 URL>"` | otherwise the tab stays `about:blank` and G0 blocks |
+| Isolated DSH server on :3093 | `$env:DSH_HOME=(Resolve-Path 'tmp/dsh-p3').Path; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1` | URL printed to `tmp/dsh-p3/web<n>.out.log` — **read the newest one; the number increments and the token changes every start** |
+| Agent-window session | `bsk session start --browser 0b5a787d --name … --json` | session id was `ggbi` this time; **it changes every start** |
+| Agent tab navigated | `bsk navigate --session <sid> --tab-id <tab> -- "<url>"` | otherwise the tab stays `about:blank` and G0 blocks |
 
-Two traps, both hit in this session and both now checked by G0:
+**A stale bundle is the first thing to check, and `pnpm install` lies about it.**
+For a `file:` dependency pnpm reports "Already up to date" and keeps the
+hard-linked old copy in the profile, so a build that happened after the install
+is not what the browser runs. To refresh it, remove the profile's
+`node_modules/@dsh-unified/visualize` directory and `pnpm install` again, then
+confirm with `Get-FileHash` on both halves. This cost a full measurement cycle
+this session; the §9 check is what caught it.
+
+Five traps, all hit across this session and the last:
 
 - **The daemon needs a persistent foreground task.** `bsk status` from a normal
   one-shot shell fails with `cannot start an independent Windows daemon`. Start it
@@ -334,28 +384,19 @@ Two traps, both hit in this session and both now checked by G0:
 - **A fresh agent window opens on `about:blank`**, and evaluating against it
   *hangs* rather than failing. Navigate first. `probe.mjs --what=smoke` reports
   this in 0.3 s instead of hanging, which is the whole reason G0 exists.
+- **Only one process may hold :3093.** Before starting a server, check
+  `Get-NetTCPConnection -State Listen | ? LocalPort -eq 3093`; if it is held,
+  reuse that server and read its token from the newest `web<n>.out.log`. dsh does
+  not report a bind failure where you would look for it — the symptom reads as
+  "the server crashed".
+- **Repeated server restarts can wedge the agent tab.** The symptom is
+  `A page frame is not responding`, and then every call hangs. `bsk status` stays
+  healthy, which is how you know it is the tab and not the daemon. A fresh
+  agent-window session clears it; there is no need to restart the daemon.
+- **`bsk navigate` takes the URL positionally.** `--url` is rejected and `--tab-id`
+  is required when the session has more than one tab.
 
-**4A-2 is next**: `Label`, `Badge`, `Link`, `List`, `ListItem`, `Quote`, `Code` —
-the text group. Scope and gates are in `STAGE.md` §Stage 4A. In particular:
-
-- `src/client/` only; no language semantics; the differential must stay 31/31.
-- `signatures.ts` is the contract: a component may not be added to the table
-  before its renderer exists.
-- Both colour schemes and a reload, on an isolated profile, **after** the
-  `AGENTS.md` §9 bundle hash matches.
-- **Start with the gates, not with a card.** `node evidence/lib/probe.mjs
-  --what=smoke` — four gates, 0.3 s to a blocked environment, 11.6 s to a passing
-  one. `AGENTS.md` §10; manual in `docs/testing/BROWSER_HARNESS.md`. Exit 2 means
-  the environment blocked the run and may never be filed as a product failure.
-- **Measure with `--what=card` and `--what=tokens`.** Both already run the
-  three-layer variable check (referenced → declared on the root → host token
-  resolves), which is what caught D6, D7, D17 and D18. A
-  `getComputedStyle().color` spot check catches none of them.
-- `Link` is the first component that can render a URL, so **protocol policy lands
-  in 4A-2**: http/https only, with `javascript:`/`data:`/`file:` and
-  protocol-relative targets degrading to plain text, matching upstream.
-
-Four things carried forward:
+Six things carried forward:
 
 1. **The HTML cross-view hazard** is pinned by three regression tests and
    deliberately unfixed. Fixing it changes shipped behaviour and needs its own
@@ -368,12 +409,74 @@ Four things carried forward:
 4. **A coverage number must be measured from the code, not copied.** The
    inventory said "8 of 48" for three sessions and was still saying it after the
    renderers existed, because it mirrored the table by hand (D19).
+5. **A unit test that checks for the presence of text is not a rendering test.**
+   4A-2 shipped a `List` that drew two rows for one item while 62 assertions
+   passed, because they asked "is the title in the markup?" rather than "how many
+   rows were drawn?" (D20). Count what was rendered.
+6. **A bridged `var()` must name a token someone has *seen resolve*.** The
+   measured allowlist in `tests/openui-layout-4a1.spec.tsx` is what turns that
+   from advice into a failing test; it refused two new names in 4A-2 until each
+   had a measurement behind it (D21, D22).
 
 ---
 
 ## History
 
-### Session 12 — 2026-11-03
+### Session 13 — 2026-11-03/04
+
+**Committed the backlog, then closed 4A-2.** The session opened on a dirty tree:
+three accepted phases sat uncommitted on top of `9b46cec`. They were verified
+against a clean export by an independent audit — 683 / 15 / 698, `tsc` clean,
+differential 31/31, `src/backends/` untouched — and committed as `5d2a3e9` before
+any feature work. One commit rather than three, because stage 3 and 4A-1 both
+rewrite `OpenUICard.tsx` and a split would leave intermediate commits that fail
+`tsc`.
+
+Two documentation defects the audit found were fixed rather than carried:
+`PHASE-4A-1-REPORT.md` quoted 675 / 15 (a mid-phase run) where the final figure
+is 683 / 15, and `session-log.md` gave a line count for `openui-state.ts` that
+did not match the file.
+
+**The batch itself: seven text components, and one security decision.** `Link` is
+the first component whose output a reader can activate, and the card is mounted
+in the host origin, so a `javascript:` href would execute there. ADR-008 was
+written *before* the renderer: a positive allowlist of absolute `http:`/`https:`
+URLs, **parsed with `new URL` rather than pattern-matched**, everything else
+degrading to visible plain text. Upstream's regex admits protocol-relative
+`//host/x`, `mailto:`, `tel:`, `/path` and `#anchor`; the fork refuses all five,
+so its allowlist is a strict subset — stricter, and recorded rather than quiet.
+
+**Three defects, none found by a unit test.**
+
+D20 is the one worth remembering. A screenshot seemed to show a bullet *and* a
+check before one nested item. Rather than trust the picture, the DOM was read: the
+card had **five** `role="listitem"` elements for a four-item program. The walker
+drew a nested `ListItem` into a complete row, then `List` wrapped it in a second
+one. All 62 assertions passed while the live card was wrong, because they asked
+whether the expected text appeared rather than how many rows were drawn. Fixed by
+handing the raw descriptor to the renderer; the spec now asserts row counts.
+
+D21 was caught before it shipped, which is the point: `--font-mono` is declared
+in `src/frame-css.ts` and does **not** exist in the host document. Bridging to it
+would have been D17/D18 a fourth time. Measuring the candidates first took one
+probe and produced a real token (`--dsw-font-markdown-code-font-family`).
+
+D22: three colours failed AA in the light scheme — `Link` at 4.23:1 because
+`--primary` is a surface fill, and the 11px supporting text at 3.71:1 because it
+inherited the tertiary tier. Both now clear AA in both schemes. `Caption`'s tier
+was deliberately left alone: it is a browser-verified 4A-1 component and a later
+batch does not get to restyle it silently.
+
+**A harness gap, fixed rather than worked around.** `evaluate()` did not retry
+the transient `observation_changed` that `step()` already retried, so one repaint
+could fail an entire run. That is the documented policy implemented in only one
+of two places. `parity.mjs` still exits 0.
+
+**Cost, recorded as infra-1 asked:** 14 small named scripts against 4A-1's 41; 2
+subprocess calls per prompt against ~1 760; 6 failed retries, each with a stated
+cause. The harness did not make the verification smaller — three defects still
+had to be found by measuring — it made the failures cheaper to attribute.
+
 
 **infra-1: the browser harness, done as its own task before 4A-2.** The owner's
 framing was the right one — the problem was never "too many tests", it was that a

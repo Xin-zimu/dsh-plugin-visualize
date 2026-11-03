@@ -1,0 +1,283 @@
+{
+ "at": "2026-11-03T16:20:43.452Z",
+ "theme": "light",
+ "program": "root = Col([Label(\"A 4A-2 acceptance card\"), Row([Badge(\"info\", \"info\"), Badge(\"success\", \"success\"), Badge(\"plain\")]), Link(\"a permitted https link\", \"https://example.com/docs\"), Link(\"a refused javascript link\", \"javascript:alert(1)\"), List([\"first item\", \"second item\", \"third item\"], \"number\"), List([ListItem(\"Nested title\", \"Nested description\", \"check\")]), Quote(\"The text components are the last of the Text group.\", \"4A-2\"), Code(\"const seven = [Label, Badge, Link, List, ListItem, Quote, Code]\", \"ts\")])",
+ "cardsBefore": 12,
+ "cardsAfter": 14,
+ "measured": {
+  "found": true,
+  "copies": 14,
+  "theme": "light",
+  "cardWidth": 369,
+  "headline": "A2 text",
+  "unresolved": [],
+  "danglingHostTokens": [],
+  "unrendered": [],
+  "anchors": [
+   {
+    "href": "https://example.com/docs",
+    "target": "_blank",
+    "rel": "noreferrer noopener",
+    "text": "a permitted https link",
+    "color": "rgb(72, 104, 178)",
+    "decoration": "none"
+   }
+  ],
+  "badges": [
+   {
+    "text": "info",
+    "w": 46,
+    "h": 21,
+    "background": "oklab(0.589542 -0.0217781 -0.177995 / 0.16)",
+    "fontSize": "11px"
+   },
+   {
+    "text": "",
+    "w": 6,
+    "h": 6,
+    "background": "rgb(65, 118, 230)",
+    "fontSize": "11px"
+   },
+   {
+    "text": "success",
+    "w": 63,
+    "h": 21,
+    "background": "oklab(0.722741 -0.165537 0.0972287 / 0.16)",
+    "fontSize": "11px"
+   },
+   {
+    "text": "",
+    "w": 6,
+    "h": 6,
+    "background": "rgb(34, 197, 94)",
+    "fontSize": "11px"
+   },
+   {
+    "text": "plain",
+    "w": 41,
+    "h": 21,
+    "background": "rgba(0, 0, 0, 0.04)",
+    "fontSize": "11px"
+   }
+  ],
+  "blockquote": [
+   {
+    "text": "The text components are the last of the ",
+    "w": 369,
+    "h": 71,
+    "borderLeft": "2px rgb(65, 118, 230)"
+   }
+  ],
+  "pre": [
+   {
+    "w": 367,
+    "h": 43,
+    "fontFamily": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas, \"Liberation Mono\", Menlo, Courier, \"PingFang SC\", \"Microsoft YaHei\"",
+    "whiteSpace": "pre"
+   }
+  ],
+  "buttons": [
+   {
+    "text": "Copy",
+    "w": 42,
+    "h": 20
+   }
+  ],
+  "markers": [
+   "1.",
+   "2.",
+   "3.",
+   "✓"
+  ],
+  "counts": {
+   "nodes": 39,
+   "listitems": 4
+  },
+  "variables": [
+   {
+    "name": "--border-subtle",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#0000000a"
+   },
+   {
+    "name": "--card",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#fff"
+   },
+   {
+    "name": "--dsw-alias-bg-layer-2",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#fff"
+   },
+   {
+    "name": "--dsw-alias-border-l1",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#0000000a"
+   },
+   {
+    "name": "--dsw-alias-border-l2",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#0000001a"
+   },
+   {
+    "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#4176e6"
+   },
+   {
+    "name": "--dsw-alias-label-primary",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#0f1115"
+   },
+   {
+    "name": "--dsw-alias-label-primary-foreground",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#fff"
+   },
+   {
+    "name": "--dsw-alias-label-secondary",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#61666b"
+   },
+   {
+    "name": "--dsw-alias-label-tertiary",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#81858c"
+   },
+   {
+    "name": "--dsw-font-family",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi"
+   },
+   {
+    "name": "--dsw-font-markdown-code-font-family",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas"
+   },
+   {
+    "name": "--dsw-radius-sm",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "8px"
+   },
+   {
+    "name": "--dsw-static-amber-500",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#f59e0b"
+   },
+   {
+    "name": "--dsw-static-deepseek-500",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#4176e6"
+   },
+   {
+    "name": "--dsw-static-green-500",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#22c55e"
+   },
+   {
+    "name": "--dsw-static-red-500",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#ef4444"
+   },
+   {
+    "name": "--font-mono",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas"
+   },
+   {
+    "name": "--font-sans",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi"
+   },
+   {
+    "name": "--foreground",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#0f1115"
+   },
+   {
+    "name": "--link",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "light-dark(rgb(72 104 178), rgb(86 134 254))"
+   },
+   {
+    "name": "--muted-foreground-strong",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#61666b"
+   },
+   {
+    "name": "--primary",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#4176e6"
+   },
+   {
+    "name": "--radius",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "8px"
+   },
+   {
+    "name": "--viz-grid",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#0000000a"
+   },
+   {
+    "name": "--viz-series-3",
+    "declaredOnRoot": true,
+    "hostToken": null,
+    "hostResolves": null,
+    "value": "#22c55e"
+   }
+  ]
+ },
+ "monoFontFamily": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas, \"Liberation Mono\", Menlo, Courier, \"PingFang SC\", \"Microsoft YaHei\"",
+ "verdict": "CARD MEASURED"
+}

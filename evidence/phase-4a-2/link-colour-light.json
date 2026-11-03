@@ -1,0 +1,57 @@
+{
+ "theme": "light",
+ "backdrop": "rgb(255,255,255)",
+ "candidates": {
+  "--dsw-alias-brand-primary-new-colorprimary-new-color": {
+   "resolves": true,
+   "raw": "#4176e6",
+   "rgb": "rgb(65,118,230)",
+   "ratio": 4.23
+  },
+  "--dsw-alias-brand-primary": {
+   "resolves": true,
+   "raw": "#0f1115",
+   "rgb": "rgb(15,17,21)",
+   "ratio": 18.9
+  },
+  "--dsw-alias-label-link": {
+   "resolves": false
+  },
+  "--dsw-alias-label-primary": {
+   "resolves": true,
+   "raw": "#0f1115",
+   "rgb": "rgb(15,17,21)",
+   "ratio": 18.9
+  },
+  "--dsw-alias-label-secondary": {
+   "resolves": true,
+   "raw": "#61666b",
+   "rgb": "rgb(97,102,107)",
+   "ratio": 5.8
+  },
+  "--dsw-font-markdown-link-font-color": {
+   "resolves": false
+  },
+  "--dsw-alias-state-info-primary": {
+   "resolves": false
+  },
+  "--dsw-static-deepseek-600": {
+   "resolves": true,
+   "raw": "#4868b2",
+   "rgb": "rgb(72,104,178)",
+   "ratio": 5.39
+  },
+  "--dsw-static-deepseek-700": {
+   "resolves": false
+  },
+  "--dsw-static-blue-600": {
+   "resolves": true,
+   "raw": "#2563eb",
+   "rgb": "rgb(37,99,235)",
+   "ratio": 5.17
+  },
+  "--dsw-static-blue-700": {
+   "resolves": false
+  }
+ }
+}

@@ -18,7 +18,7 @@
  * reproduces the card without calling the model again.
  */
 
-import { createElement, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createElement, isValidElement, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { openuiMetaFrom } from '../fragment.ts'
 import type { OpenUIMeta } from '../fragment.ts'
 import { parseProgram } from '../backends/openui/parse.ts'
@@ -41,8 +41,19 @@ import {
  *
  * `write` carries a `$variable` change back to the card's state, which is what
  * closes the loop: input -> state -> re-evaluate -> new tree.
+ *
+ * `raw` is the argument list *before* the walker turned it into nodes. Almost no
+ * component needs it, but `List` does: the language lets a list item be a
+ * `ListItem` descriptor, and whether an entry names that component is a property
+ * of the descriptor, not of the node it drew into. Without the raw list, `List`
+ * can only see an already-built row and would wrap it in a second one.
  */
-type Renderer = (props: readonly unknown[], write: WriteChannel, key: string) => ReactNode
+type Renderer = (
+  props: readonly unknown[],
+  write: WriteChannel,
+  key: string,
+  raw?: readonly EvaluationValue[],
+) => ReactNode
 
 /**
  * Writes bound variables and triggers re-evaluation.
@@ -322,6 +333,22 @@ const HOST_TOKENS: Readonly<Record<string, readonly [string, string]>> = {
   // which is below AA for text. Tertiary is the tier the host itself uses for
   // small meta text (timestamps, key hints) and measures 3.71:1.
   '--muted-foreground': ['--dsw-alias-label-tertiary', 'light-dark(rgb(26 28 31 / 55%), rgb(240 242 245 / 55%))'],
+  // The AA-safe supporting tier, added in 4A-2 after measuring it.
+  //
+  // `--muted-foreground` is the host's *tertiary* tier, and on white it measures
+  // 3.71:1 — below AA (4.5:1) for text. 4A-1 chose tertiary over caption (2.13:1)
+  // as an improvement and recorded the result; that choice is left alone here,
+  // because Caption is a browser-verified 4A-1 component and this batch does not
+  // get to silently restyle it.
+  //
+  // But 4A-2 adds a lot of small supporting text — the code language label, the
+  // copy button, the list marker column, the quote citation and list
+  // descriptions — and upstream used the *secondary* tier for exactly those roles
+  // (layout-text.css: `.iui-lt-code__copy`, `.iui-lt-li__marker`,
+  // `.iui-lt-quote__cite`, `.iui-lt-li__desc`). Secondary measures **5.8:1 on
+  // white** and 12.11:1 on the dark surface, so it clears AA in both schemes.
+  // Measured, not assumed: evidence/phase-4a-2/label-tiers-light.json.
+  '--muted-foreground-strong': ['--dsw-alias-label-secondary', 'light-dark(rgb(26 28 31 / 68%), rgb(240 242 245 / 70%))'],
   '--border': ['--dsw-alias-border-l2', 'light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 12%))'],
   // The hairline tier. The host publishes both `border-l1` and `border-l2`; the
   // language's `border: "l1"` names the fainter of the two, so it gets its own
@@ -329,6 +356,21 @@ const HOST_TOKENS: Readonly<Record<string, readonly [string, string]>> = {
   '--border-subtle': ['--dsw-alias-border-l1', 'light-dark(rgb(0 0 0 / 8%), rgb(255 255 255 / 10%))'],
   '--card': ['--dsw-alias-bg-layer-2', 'light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 6%))'],
   '--primary': ['--dsw-alias-brand-primary-new-colorprimary-new-color', 'light-dark(rgb(65 118 230), rgb(110 150 240))'],
+  // The link colour, which is NOT `--primary`.
+  //
+  // `--primary` is the host's brand *surface* fill: it is designed to carry a
+  // paired foreground (see `--primary-foreground`), not to be read as text. Used
+  // for a 16px link it measures 4.23:1 on white — below AA's 4.5:1 — and 5.42:1
+  // on the dark surface. Measured in both schemes:
+  // evidence/phase-4a-2/link-colour-light.json and -dark.json.
+  //
+  // No single host token clears AA in *both* schemes: the brand token is too
+  // light on white, and every static brand step (`--dsw-static-deepseek-600`,
+  // `--dsw-static-blue-600`) is a fixed value that measures 3.39–3.53:1 on the
+  // dark surface. So `--link` is declared directly as LINK_LITERAL below, for the
+  // same reason as SERIES_4_LITERAL: a `var()` bridge here would *look* like it
+  // read a host colour and silently return a failing contrast in one scheme,
+  // which is D17/D18 again.
   // The text that pairs with the brand fill. The host's *-inverted token is NOT
   // it: in dark mode that one resolves to #353638, which measures 3.59:1 on the
   // brand blue and fails AA. --dsw-alias-label-primary-foreground is the token
@@ -362,6 +404,17 @@ const HOST_TOKENS: Readonly<Record<string, readonly [string, string]>> = {
   // latter. Verified against all 509 custom properties the live host declares —
   // see evidence/phase-4a-1/host-tokens.json.
   '--font-sans': ['--dsw-font-family', 'system-ui, -apple-system, \'Segoe UI\', \'PingFang SC\', \'Microsoft YaHei\', sans-serif'],
+  // `Code` is the first component here that needs a mono stack. The frame
+  // vocabulary's `--font-mono` does NOT exist in the host document, so bridging
+  // to it would be D6/D7/D17/D18 a fourth time — a `var()` resolving to nothing
+  // that still paints a plausible fallback. `--dsw-font-markdown-code-font-family`
+  // is the host's own token for inline code, and it was measured to resolve to a
+  // real mono stack on the live page, not assumed from its name. Evidence:
+  // evidence/phase-4a-2/host-mono-tokens.json. The other two candidates that also
+  // resolved (`--ds-font-family-code`, `--dsw-font-markdown-code-block-font-family`)
+  // are the same stack; the inline-code one is chosen because `Code` renders a
+  // block of what is visually the host's code text.
+  '--font-mono': ['--dsw-font-markdown-code-font-family', 'ui-monospace, \'SF Mono\', Menlo, Consolas, monospace'],
 }
 
 /**
@@ -376,6 +429,21 @@ const HOST_TOKENS: Readonly<Record<string, readonly [string, string]>> = {
 const SERIES_4_LITERAL = 'light-dark(rgb(147 89 185), rgb(183 145 226))'
 
 /**
+ * The link colour, the second variable with no single host token behind it.
+ *
+ * `Link` is 16px text, so AA asks 4.5:1. The host's brand token clears that in
+ * dark (5.42:1) and misses it on white (4.23:1); its static brand steps clear it
+ * on white (5.39:1) and miss it on dark (3.39:1). No published token passes both,
+ * so this is an explicit pair rather than a `var()` that would silently fail in
+ * one scheme — see the note in {@link HOST_TOKENS}. Both values are drawn from
+ * the host's own brand scale, one step deeper in light.
+ *
+ * Measured: evidence/phase-4a-2/link-colour-light.json (4.23 vs 5.39) and
+ * evidence/phase-4a-2/link-colour-dark.json (5.42 vs 3.39).
+ */
+const LINK_LITERAL = 'light-dark(rgb(72 104 178), rgb(86 134 254))'
+
+/**
  * Declare the bridged variables on an element.
  * @returns a style object carrying the custom properties, ready to spread.
  */
@@ -388,6 +456,9 @@ function hostTokenStyle(): CSSProperties {
   // A `var()` here would resolve to nothing and paint the fallback, which looks
   // identical but hides that the host supplies no value at all.
   style['--viz-series-4'] = SERIES_4_LITERAL
+  // Same reasoning as above: no host token clears AA in both schemes, so the
+  // value is declared rather than borrowed from one that would fail in one.
+  style['--link'] = LINK_LITERAL
   return style as CSSProperties
 }
 
@@ -443,6 +514,42 @@ const BUTTON_KINDS: Readonly<Record<string, CSSProperties>> = {
   ghost: { background: 'transparent', color: 'var(--foreground)', borderColor: 'transparent' },
   outline: { background: 'transparent', color: 'var(--foreground)', borderColor: 'var(--border)' },
   danger: { background: 'var(--viz-series-5)', color: 'var(--primary-foreground)', borderColor: 'var(--viz-series-5)' },
+}
+
+/**
+ * The only URL an activated `Link` may carry, or undefined.
+ *
+ * `Link` is the first component in this catalogue whose output the reader can
+ * activate, and the card is mounted in the **host document** rather than inside
+ * the HTML backend's sandboxed frame — so a `javascript:` href here would run in
+ * the DSH host's own origin. The policy is ADR-008 and it is a positive,
+ * closed list: an absolute `http:` or `https:` URL, and nothing else.
+ *
+ * The URL is **parsed**, not pattern-matched. A regex tests the shape of the
+ * string while the browser tests what it will actually do, and where the two
+ * disagree the disagreement resolves in the attacker's favour. Anything that
+ * fails to parse, or parses to another scheme, degrades the component to plain
+ * text — including `mailto:`, `tel:`, protocol-relative `//host/x`, relative
+ * paths and fragments, all of which upstream's looser predicate admits.
+ *
+ * @param value - the raw `url` argument.
+ * @returns the absolute http(s) URL, or undefined when it must not be a link.
+ */
+function safeHref(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const raw = value.trim()
+  if (raw === '') return undefined
+  let parsed: URL
+  try {
+    parsed = new URL(raw)
+  } catch {
+    // A relative path, a fragment, or junk: not an absolute URL at all.
+    return undefined
+  }
+  // `new URL` lowercases the scheme, so this comparison is case-insensitive
+  // without a regex — `JavaScript:` and `java\nscript:` both land here as a
+  // scheme that is not http(s).
+  return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? raw : undefined
 }
 
 /**
@@ -645,6 +752,180 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     },
     text(props[0]),
   ),
+  // Argument order throughout the seven below is the signature table's, read
+  // from `signatures.ts` rather than guessed: Label(text), Badge(text, color),
+  // Link(text, url), List(items, marker, timeline),
+  // ListItem(title, description, marker, children), Quote(text, cite),
+  // Code(code, language).
+  Label: (props, _write, key) => createElement(
+    'div',
+    {
+      key,
+      style: {
+        fontSize: SIZES.sm,
+        fontWeight: 500,
+        lineHeight: 1.4,
+        color: 'var(--foreground)',
+        overflowWrap: 'anywhere',
+      } satisfies CSSProperties,
+    },
+    text(props[0]),
+  ),
+  Badge: (props, _write, key) => {
+    // Colour is carried by a dot plus a tinted fill, never by the text alone.
+    // Upstream learned this the hard way: painting a text token as its own
+    // background made the label invisible, and tinted text at 11px failed
+    // contrast. Readable text first, colour second.
+    const series = typeof props[1] === 'string' ? COLOR_VARS[props[1]] : undefined
+    return createElement(
+      'span',
+      {
+        key,
+        style: {
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          maxWidth: '100%',
+          padding: '1px 8px',
+          fontSize: SIZES.xs,
+          fontWeight: 500,
+          lineHeight: 1.7,
+          color: 'var(--foreground)',
+          background: series === undefined
+            ? 'var(--viz-grid)'
+            : `color-mix(in oklab, ${series} 16%, transparent)`,
+          borderRadius: 9999,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          verticalAlign: 'baseline',
+        } satisfies CSSProperties,
+      },
+      series === undefined ? null : createElement('span', {
+        key: 'dot',
+        'aria-hidden': 'true',
+        style: {
+          flex: 'none',
+          width: 6,
+          height: 6,
+          borderRadius: 9999,
+          background: series,
+        } satisfies CSSProperties,
+      }),
+      text(props[0]),
+    )
+  },
+  Link: (props, _write, key) => {
+    const label = text(props[0])
+    const href = safeHref(props[1])
+    // ADR-008: a target that is not an absolute http(s) URL degrades to the text
+    // it would otherwise have shown. No href, no target, no handler — the
+    // component is still drawn, so a reader sees the label and the policy is
+    // visible rather than silent.
+    if (href === undefined) {
+      return createElement(
+        'span',
+        {
+          key,
+          style: { color: 'inherit', overflowWrap: 'anywhere' } satisfies CSSProperties,
+        },
+        label,
+      )
+    }
+    return createElement(
+      'a',
+      {
+        key,
+        href,
+        target: '_blank',
+        // noreferrer as well as noopener: the opened page must not receive the
+        // card's URL as a referrer, and must not be able to reach back through
+        // `window.opener`.
+        rel: 'noreferrer noopener',
+        style: {
+          color: 'var(--link)',
+          textDecoration: 'none',
+          overflowWrap: 'anywhere',
+        } satisfies CSSProperties,
+      },
+      label,
+    )
+  },
+  List: (props, _write, key, raw) => {
+    const rawItems = Array.isArray(raw?.[0]) ? raw[0] : raw?.[0] === undefined || raw?.[0] === null ? [] : [raw[0]]
+    const drawnItems = props[0]
+    const items = Array.isArray(drawnItems) ? drawnItems : drawnItems === undefined || drawnItems === null ? [] : [drawnItems]
+    const timeline = props[2] === true
+    const marker = props[1] === undefined || props[1] === null ? 'bullet' : props[1]
+    const shown = items.slice(0, MAX_LIST_ROWS)
+    const rows = shown.map((item, index) =>
+      // The *raw* descriptor decides whether this entry is a `ListItem`. A drawn
+      // `ListItem` is already a complete row, so passing the node here made the
+      // list wrap it in a second `role="listitem"` — the live card showed five
+      // rows for four items, with the bullet row containing the check row.
+      listEntryRow(item, rawItems[index], index, shown.length, marker, timeline))
+    const list = createElement(
+      'div',
+      {
+        key,
+        role: 'list',
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: timeline ? 0 : 6,
+          minWidth: 0,
+        } satisfies CSSProperties,
+      },
+      rows,
+    )
+    if (items.length <= MAX_LIST_ROWS) return list
+    // Say what was dropped. A list that silently ends early cannot be told apart
+    // from one that was meant to be that length.
+    return createElement(
+      'div',
+      { key, style: { display: 'flex', flexDirection: 'column', gap: 6, width: '100%', minWidth: 0 } satisfies CSSProperties },
+      list,
+      createElement('div', {
+        key: 'truncated',
+        role: 'note',
+        style: { fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)' } satisfies CSSProperties,
+      }, `Showing ${MAX_LIST_ROWS} of ${items.length} items`),
+    )
+  },
+  ListItem: (props, _write, key) => listRow(
+    // title, description, marker, children.
+    { title: text(props[0]), description: text(props[1]), children: children(props[3]) },
+    markerNode(props[2], 0, false),
+    false,
+    false,
+    key,
+  ),
+  Quote: (props, _write, key) => {
+    const cite = props[1]
+    return createElement(
+      'blockquote',
+      {
+        key,
+        style: {
+          margin: 0,
+          padding: '4px 0 4px 12px',
+          borderLeftWidth: 2,
+          borderLeftStyle: 'solid',
+          borderLeftColor: 'var(--primary)',
+          color: 'var(--foreground)',
+          overflowWrap: 'anywhere',
+        } satisfies CSSProperties,
+      },
+      createElement('div', { key: 'body' }, text(props[0])),
+      cite === undefined || cite === null || cite === ''
+        ? null
+        : createElement('div', {
+          key: 'cite',
+          style: { marginTop: 4, fontSize: SIZES.sm, color: 'var(--muted-foreground-strong)' } satisfies CSSProperties,
+        }, text(cite)),
+    )
+  },
+  Code: (props, _write, key) => CodeView(props, key),
   Button: (props, write, key) => {
     const variant = text(props[2], 'primary')
     // The action arrives already evaluated: a value tree, never source text.
@@ -867,7 +1148,10 @@ function drawValue(
   }
   const args = (descriptor.args ?? []).map((arg, index) =>
     drawValue(arg, write, depth + 1, `${path}/${descriptor.name}${index}`))
-  return renderer(args, write, `o${path}:${descriptor.name}`)
+  // The raw argument list travels beside the drawn nodes. Only `List` reads it,
+  // and only to ask whether an entry *is* a `ListItem` — a question the rendered
+  // node cannot answer, because a `ListItem` is itself a complete row.
+  return renderer(args, write, `o${path}:${descriptor.name}`, descriptor.args)
 }
 
 /**
@@ -892,6 +1176,360 @@ function asBinding(value: unknown): Binding | undefined {
   if (value === null || typeof value !== 'object') return undefined
   const marked = (value as { __openuiBinding?: Binding }).__openuiBinding
   return marked === undefined ? undefined : marked
+}
+
+/**
+ * The marker column of a list row, or null for none.
+ *
+ * Marker words are upstream's, resolved once here so `List` and `ListItem`
+ * cannot disagree about what `"dash"` means. An unrecognised word is drawn as
+ * custom text rather than dropped: the language allows a custom marker, and
+ * silently showing nothing would look like `marker: "none"`.
+ * @param marker - the raw marker argument.
+ * @param index - row index, for `number`.
+ * @param timeline - whether this row is on a timeline.
+ * @returns the marker node, or null.
+ */
+function markerNode(marker: unknown, index: number, timeline: boolean): ReactNode {
+  const name = typeof marker === 'string' ? marker.trim() : marker === true ? 'bullet' : ''
+  // `none` and absent both mean "no marker column at all". Timeline rows keep a
+  // column regardless, because the spine is drawn in it.
+  if (!timeline && (name === '' || name === 'none' || name === 'false')) return null
+  const numbered = name === 'number' || name === 'ordered' || name === 'decimal'
+  const checked = name === 'check' || name === 'checkmark' || name === 'done'
+  const base: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    flex: '0 0 auto',
+    minWidth: 16,
+    lineHeight: 1.5,
+    color: 'var(--muted-foreground-strong)',
+    fontVariantNumeric: 'tabular-nums',
+  }
+  if (timeline) {
+    // A dot on the spine; numbered and check markers label it instead.
+    const labelled = numbered || checked
+    return createElement('div', {
+      key: 'marker',
+      'aria-hidden': 'true',
+      style: {
+        ...base,
+        position: 'relative',
+        width: 16,
+      },
+    }, createElement('span', {
+      style: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: labelled ? 16 : 8,
+        height: labelled ? 16 : 8,
+        marginTop: labelled ? 1 : 5,
+        borderRadius: '9999px',
+        background: 'var(--primary)',
+        fontSize: '0.625rem',
+        fontWeight: 600,
+        color: 'var(--primary-foreground)',
+      },
+    }, numbered ? String(index + 1) : checked ? '\u2713' : ''))
+  }
+  const style: CSSProperties = numbered ? { ...base, justifyContent: 'flex-end' } : base
+  const content = numbered ? `${index + 1}.` : name === 'bullet' || name === 'dot'
+    ? '\u2022'
+    : name === 'dash' ? '\u2013' : checked ? '\u2713' : name
+  return createElement(
+    'div',
+    {
+      key: 'marker',
+      'aria-hidden': 'true',
+      style: checked ? { ...style, color: 'var(--viz-series-3)' } : style,
+    },
+    content,
+  )
+}
+
+/**
+ * One list row: an optional marker column and a content column.
+ *
+ * `ListItem` renders through this too, so a row nested in a `List` and a
+ * free-standing one cannot drift apart.
+ * @param parts - title, description and children.
+ * @param marker - the marker node, or null.
+ * @param timeline - whether this row is on a timeline.
+ * @param last - whether it is the final row, which ends the spine.
+ * @param key - React key.
+ * @returns the row.
+ */
+function listRow(
+  parts: { readonly title?: ReactNode; readonly description?: ReactNode; readonly children?: ReactNode },
+  marker: ReactNode,
+  timeline: boolean,
+  last: boolean,
+  key: string,
+): ReactNode {
+  const body: ReactNode[] = []
+  if (parts.title !== null && parts.title !== undefined && parts.title !== '') {
+    body.push(createElement('div', { key: 'title', style: { color: 'var(--foreground)', overflowWrap: 'anywhere' } }, parts.title))
+  }
+  if (parts.description !== null && parts.description !== undefined && parts.description !== '') {
+    body.push(createElement('div', {
+      key: 'description',
+      style: { fontSize: SIZES.sm, lineHeight: 1.45, color: 'var(--muted-foreground-strong)', overflowWrap: 'anywhere' },
+    }, parts.description))
+  }
+  if (parts.children !== null && parts.children !== undefined && parts.children !== '') {
+    body.push(createElement('div', { key: 'body', style: { color: 'var(--foreground)', minWidth: 0 } }, parts.children))
+  }
+  return createElement(
+    'div',
+    {
+      key,
+      role: 'listitem',
+      style: {
+        display: 'flex',
+        gap: 8,
+        alignItems: 'flex-start',
+        minWidth: 0,
+        ...timeline ? { position: 'relative', paddingBottom: last ? 0 : 12 } : {},
+      } satisfies CSSProperties,
+    },
+    marker,
+    createElement('div', {
+      key: 'content',
+      style: { display: 'flex', flexDirection: 'column', gap: 2, flex: '1 1 auto', minWidth: 0 } satisfies CSSProperties,
+    }, body),
+    // The spine joins this row's dot to the next one. Drawn as a sibling of the
+    // content so it cannot affect the content column's width.
+    timeline && !last
+      ? createElement('div', {
+        key: 'spine',
+        'aria-hidden': 'true',
+        style: {
+          position: 'absolute',
+          top: 22,
+          bottom: -2,
+          left: 8,
+          width: 1,
+          background: 'var(--border)',
+        } satisfies CSSProperties,
+      })
+      : null,
+  )
+}
+
+/**
+ * Read one list entry, which the language allows to be a `ListItem`
+ * descriptor, a bare string, or an already-drawn node.
+ *
+ * A non-descriptor is treated as a title, matching upstream: `List(["a",
+ * "b"])` is a legal bulleted list of two plain items.
+ *
+ * The `raw` argument is the entry *before* the walker drew it, and it is what
+ * tells this function whether the entry is a `ListItem`. That distinction cannot
+ * be recovered from the node: `ListItem` renders a complete row, so treating its
+ * output as content would nest one row inside another and produce two
+ * `role="listitem"` elements for one item. The live card showed exactly that —
+ * five rows for four items, with the bullet row containing the check row.
+ *
+ * @param item - one evaluated (already drawn) entry.
+ * @param raw - the same entry as a descriptor, when it has one.
+ * @param index - its position, for React keys and numbering.
+ * @param total - the number of entries, to know the last row.
+ * @param fallbackMarker - the list's own marker, used when the entry omits one.
+ * @param timeline - whether the list is a timeline.
+ * @returns the row.
+ */
+function listEntryRow(
+  item: EvaluationValue,
+  raw: EvaluationValue | undefined,
+  index: number,
+  total: number,
+  fallbackMarker: unknown,
+  timeline: boolean,
+): ReactNode {
+  const key = `li${index}`
+  const descriptor = raw !== null && typeof raw === 'object' && !Array.isArray(raw)
+    ? raw as { kind?: string; name?: string; args?: readonly EvaluationValue[] }
+    : undefined
+  // A `ListItem` inside a List supplies its own marker, title, description and
+  // children: title, description, marker, children.
+  if (descriptor?.kind === 'element' && descriptor.name === 'ListItem') {
+    const args = descriptor.args ?? []
+    const marker = args[2] === undefined || args[2] === null ? fallbackMarker : args[2]
+    // The children argument arrived already drawn, as the element at index 3 of
+    // the *drawn* entry. Reading it from there keeps `drawValue` the only place
+    // that turns values into nodes.
+    const drawnArgs = item !== null && typeof item === 'object' && !Array.isArray(item)
+      ? (item as { args?: readonly EvaluationValue[] }).args
+      : undefined
+    return listRow(
+      { title: text(args[0]), description: text(args[1]), children: children(drawnArgs?.[3]) },
+      markerNode(marker, index, timeline),
+      timeline,
+      index === total - 1,
+      key,
+    )
+  }
+  if (isValidElement(item)) {
+    // Already-rendered node: an `@Each` body or a component the walker drew
+    // before this row saw it. It is content, not a row of its own.
+    return listRow({ children: item }, markerNode(fallbackMarker, index, timeline), timeline, index === total - 1, key)
+  }
+  return listRow(
+    { title: typeof item === 'string' ? item : text(item) },
+    markerNode(fallbackMarker, index, timeline),
+    timeline,
+    index === total - 1,
+    key,
+  )
+}
+
+/**
+ * The most rows one `List` will draw.
+ *
+ * A single dispatch must not emit an unbounded number of DOM nodes. Upstream
+ * caps the same way and charges the excess against the row's output budget;
+ * here the cap is stated, and the truncation is reported in the card rather than
+ * silently dropping the tail — a list that quietly ends early is indistinguishable
+ * from one that was meant to be that length.
+ */
+const MAX_LIST_ROWS = 200
+
+/**
+ * Format code text for the `Code` block.
+ *
+ * The language hands over an already-evaluated string; there is no syntax
+ * highlighting, deliberately — highlighting is an interpretation of the text and
+ * this renderer's contract with the model is that what it wrote is what is drawn.
+ * @param value - the raw `code` argument.
+ * @returns the code text.
+ */
+function codeText(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (Array.isArray(value)) return value.map(item => codeText(item)).join('\n')
+  return ''
+}
+
+/**
+ * A `Code` block with a copy button.
+ *
+ * The clipboard call is deliberately local rather than routed through the
+ * dispatcher: `@CopyToClipboard` is still in `UNSUPPORTED_STEPS` (stage 4B), and
+ * that is an *action* the program can take. A copy button is a user gesture on a
+ * visible control, which is a different and much narrower capability. It is
+ * best-effort and swallows a refusal — a denied permission must not throw into
+ * the card. ADR-008's scope note makes the same distinction for `Link` vs
+ * `@OpenUrl`.
+ * @param props - component arguments.
+ * @param key - React key.
+ * @returns the block.
+ */
+function CodeView(props: readonly unknown[], key: string): ReactNode {
+  const body = codeText(props[0])
+  const language = text(props[1], '')
+  return createElement(CodeBlock, { body, language, key })
+}
+
+/**
+ * The stateful half of {@link CodeView}, kept as its own component because the
+ * "copied" confirmation is local UI state and must not reach `$state`.
+ */
+function CodeBlock({ body, language }: { readonly body: string; readonly language: string }): ReactNode {
+  const [copied, setCopied] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => {
+    if (timer.current !== undefined) clearTimeout(timer.current)
+  }, [])
+  const copy = (): void => {
+    const clipboard = typeof navigator === 'undefined' ? undefined : navigator.clipboard
+    // Best-effort: a refused permission is not an error the card may throw.
+    if (clipboard !== undefined && typeof clipboard.writeText === 'function') {
+      void clipboard.writeText(body).catch(() => undefined)
+    }
+    setCopied(true)
+    if (timer.current !== undefined) clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      timer.current = undefined
+      setCopied(false)
+    }, 1600)
+  }
+  return createElement(
+    'div',
+    {
+      style: {
+        minWidth: 0,
+        maxWidth: '100%',
+        background: 'var(--card)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'var(--border-subtle)',
+        borderRadius: 'calc(var(--radius) * 1)',
+        overflow: 'hidden',
+      } satisfies CSSProperties,
+    },
+    createElement(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          minHeight: 26,
+          padding: '2px 6px 2px 10px',
+          borderBottomWidth: 1,
+          borderBottomStyle: 'solid',
+          borderBottomColor: 'var(--border-subtle)',
+        } satisfies CSSProperties,
+      },
+      createElement('span', {
+        style: {
+          fontSize: SIZES.xs,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          color: 'var(--muted-foreground-strong)',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        } satisfies CSSProperties,
+      }, language),
+      createElement('button', {
+        type: 'button',
+        onClick: copy,
+        'aria-label': copied ? 'Copied' : 'Copy code',
+        style: {
+          flex: '0 0 auto',
+          font: 'inherit',
+          padding: '2px 8px',
+          fontSize: SIZES.xs,
+          color: 'var(--muted-foreground-strong)',
+          background: 'transparent',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'var(--border-subtle)',
+          borderRadius: 6,
+          cursor: 'pointer',
+        } satisfies CSSProperties,
+      }, copied ? 'Copied' : 'Copy'),
+    ),
+    createElement('pre', {
+      style: {
+        margin: 0,
+        padding: '10px 12px',
+        maxHeight: 360,
+        overflow: 'auto',
+        fontSize: SIZES.sm,
+        lineHeight: 1.55,
+      } satisfies CSSProperties,
+    }, createElement('code', {
+      style: {
+        fontFamily: 'var(--font-mono)',
+        whiteSpace: 'pre',
+        color: 'var(--foreground)',
+      } satisfies CSSProperties,
+    }, body)),
+  )
 }
 
 /**

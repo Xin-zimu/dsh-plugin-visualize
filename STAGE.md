@@ -15,7 +15,7 @@ this says what the current slice is allowed to do.
 | 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
-| 4A | Component catalogue: 40 renderers, in five batches | **4A-1 PASS** (4 done); 36 left in 4A-2…4A-5 |
+| 4A | Component catalogue: 40 renderers, in five batches | **4A-1 and 4A-2 PASS** (11 done); 29 left in 4A-3…4A-5 |
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | Not started — separate from 4A, one security review each |
 | 5 | Unified prompt, security review, release | Not started |
 
@@ -121,17 +121,17 @@ are in the report; they are not counted as browser passes.
 
 ---
 
-## Stage 4A — The component catalogue (4A-1 PASS; 4A-2 next)
+## Stage 4A — The component catalogue (4A-1 and 4A-2 PASS; 4A-3 next)
 
 **Goal.** Turn the signatures the language already understands into components
-the browser actually draws. Measured inventory — **12 / 48** — from
+the browser actually draws. Measured inventory — **19 / 48** — from
 `tests/openui-inventory.spec.tsx`, which reads the renderer's own table rather
 than a hand-kept list.
 
 | Group | Total | Rendered | Missing |
 | --- | --- | --- | --- |
 | Layout | 9 | Col, Row, Box, Grid, Card, Divider, Spacer | Carousel, Popover (4A-5) |
-| Text | 10 | Title, Text, Caption | Label, Badge, Link, List, ListItem, Quote, Code (**4A-2**) |
+| Text | 10 | Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code | **— complete** |
 | Inputs | 13 | Button, Slider | IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form (**4A-3**) |
 | Drawing | 10 | — | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText (4A-5) |
 | Media and data | 4 | — | Image, Icon, Table, Chart (**4A-4**) |
@@ -208,6 +208,66 @@ the card root, *and* name a host token that actually resolves. A
 
 **Prohibited in this batch, and observed.** No host CSS was modified in any run;
 no name was added to `signatures.ts`; the differential stayed 31/31.
+
+### 4A-2 — the text group (PASS, closed 2026-11-04)
+
+**Scope.** `Label`, `Badge`, `Link`, `List`, `ListItem`, `Quote`, `Code` — the
+seven that complete the Text group.
+
+**Verdict: PASS.** Full record: `evidence/phase-4a-2/MANIFEST.json`.
+
+| Gate item | Result |
+| --- | --- |
+| All seven have real renderers | PASS — inventory 19 / 48, Text group complete |
+| Arguments match the signature table | PASS — every position asserted |
+| Every CSS variable resolves in the real host | PASS — **after fixing one that did not** (D21) |
+| Light and dark both pass | PASS — dark entered through the host's own 外观 control |
+| Tool view and turn tail both display | PASS on the conversation surface |
+| Refresh and history replay | Not re-exercised: no 4A-2 component binds `$state` |
+| No new failures; TypeScript passes | PASS — 747 / 15, failure set identical |
+| Build SHA-256 matches the test profile | PASS — client half, before the accepted run |
+| Evidence, matrix and report updated | PASS |
+
+**The security decision this batch carried, and did not improvise.** `Link` is
+the first component whose output a reader can activate, and the card is mounted
+in the host document rather than inside the HTML backend's frame — so a
+`javascript:` href would run in the host's own origin. **ADR-008** decides the
+policy before the renderer existed: a positive, closed allowlist of absolute
+`http:`/`https:` URLs, **parsed with `new URL` rather than pattern-matched**,
+with everything else degrading to plain text. Upstream's looser predicate admits
+protocol-relative `//host/x`, `mailto:`, `tel:`, root-relative paths and
+fragments; the fork refuses all five and is therefore **stricter, not merely
+different**.
+
+**Three defects, all found by measuring rather than reading.**
+
+- **D20 — a nested `ListItem` drew two rows for one item.** `List([ListItem(...)])`
+  produced two `role="listitem"` elements because the walker had already drawn
+  the `ListItem` into a complete row and `List` then wrapped it in a second one.
+  Seen first as a screenshot that seemed to show a bullet *and* a check; resolved
+  from the DOM, where the row count was 5 for a 4-item program. Fixed by letting
+  `List` consult the raw descriptor. This is the batch's most instructive defect:
+  every unit test passed while the live card was wrong.
+- **D21 — `--font-mono` does not exist in the host.** The frame vocabulary
+  declares it; the host document does not. Bridging to it would have been
+  D17/D18 a fourth time. Measured the candidates first and bridged to
+  `--dsw-font-markdown-code-font-family`, which does resolve.
+- **D22 — three light-theme colours failed AA.** `Link` was 4.23:1 because
+  `--primary` is a *surface fill*, and the copy button and list marker were
+  3.71:1 because they inherited the tertiary tier. `Link` gained its own
+  measured colour (5.39:1 light / 5.42:1 dark); small supporting text gained
+  `--muted-foreground-strong` on the host's **secondary** tier (5.8:1 / 12.11:1),
+  which is the tier upstream used for exactly these roles.
+
+**Deliberately not changed.** `--muted-foreground` still bridges to the host's
+tertiary tier, which measures 3.71:1 on white. `Caption` uses it and `Caption`
+is a browser-verified 4A-1 component; a later batch does not get to silently
+restyle an accepted one. The new AA-safe tier is additive.
+
+**Carried forward.** 29 components remain (4A-3…4A-5). The three-layer variable
+probe and the measured-token allowlist in `tests/openui-layout-4a1.spec.tsx` both
+caught work in this batch — the allowlist refused `--font-mono` and
+`--dsw-alias-label-secondary` until each had a measurement behind it.
 
 ---
 
