@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ✓ tests/card-state.spec.ts (11 tests) 9ms
+ ✓ tests/frame-state.spec.tsx (14 tests) 297ms
+
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
+   Start at  23:16:36
+   Duration  28.58s (transform 1.10s, setup 0ms, import 1.90s, tests 306ms, environment 50.20s)
+

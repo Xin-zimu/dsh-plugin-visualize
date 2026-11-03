@@ -88,8 +88,15 @@ export function apply(ctx: ClientContext): void {
   // The second keyed toolview, so a card written before the fork by
   // dsh-intelligent-ui replays through this plugin instead of the generic row.
   // New cards reach it through the `visualize` view's own dispatch.
+  // The session id is injected for the same reason the `visualize` view takes
+  // it: a card's saved state is keyed by session + path (ADR-006), so without
+  // it a replayed program card would draw but keep nothing.
   ctx.slots.inject('tool.call.toolview', () => ctx.slots.register(
-    { name: 'tool.call.toolview', key: 'intelligent_ui' },
+    {
+      name: 'tool.call.toolview',
+      key: 'intelligent_ui',
+      inject: (sessionId: unknown) => sessionInjection(undefined, sessionId),
+    },
     OpenUIToolView,
   ))
   // The dock reads the argument stream from Turn data the stream Definition

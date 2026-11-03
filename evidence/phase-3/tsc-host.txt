@@ -1,0 +1,5 @@
+src/client/card-state.ts(273,17): error TS2304: Cannot find name 'window'.
+src/client/card-state.ts(273,54): error TS2304: Cannot find name 'window'.
+src/client/card-state.ts(288,12): error TS2304: Cannot find name 'window'.
+src/client/card-state.ts(290,3): error TS2304: Cannot find name 'addEventListener'.
+src/client/card-state.ts(291,3): error TS2584: Cannot find name 'document'. Do you need to change your target library? Try changing the 'lib' compiler option to include 'dom'.

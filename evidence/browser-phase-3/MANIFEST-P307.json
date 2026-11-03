@@ -1,0 +1,114 @@
+{
+  "phase": "3.7",
+  "title": "P3-07 — OpenUI Button action dispatch, verified in a real browser",
+  "capturedAt": "2026-11-03T00:50+08:00",
+  "environment": {
+    "plugin": "@dsh-unified/visualize@0.1.0 (this working tree, npx tsdown build)",
+    "profile": "p3web — isolated DSH_HOME at tmp/dsh-p3 on :3093; production desktop (:61582) untouched",
+    "browser": "Chromium Agent Window (browser-skill over CDP), session edhi",
+    "model": "DeepSeek-V4.1-Flash"
+  },
+  "bundleCheckPerAgentsRule9": {
+    "buildSha256": "B2961F1C4F637E4827376EC696471B6F8BCFA45701F8E849ECD828224A5348E0",
+    "installedSha256AtFirstCheck": "14D503894363D560CBFF3EEF581EE5C3674296B5BF35F6470279BDD191D5F8DC",
+    "outcome": "MISMATCH — the profile still held the P3-06 bundle. Copied the fresh build in, re-checked, then MATCH before any measurement.",
+    "note": "This is the first run in which the new AGENTS.md §9 rule did real work: it caught the stale bundle before a single browser assertion was made."
+  },
+  "summary": {
+    "PASS": ["A01", "A02", "A03", "A04", "A07", "A08", "A10", "T7", "T8"],
+    "FAIL": [],
+    "NOT_VERIFIED": ["A05", "A06", "A09"]
+  },
+  "checks": [
+    {
+      "id": "A01",
+      "name": "@Set($count, 6) updates the target and its neighbours",
+      "verdict": "PASS",
+      "detail": "Clicking the set6 Button changed the card from 'count 3 step 1' to 'count 6 step 1': the Slider and the Text both followed, and `step` was untouched.",
+      "evidence": "p307-s3-acceptance.mjs"
+    },
+    {
+      "id": "A02",
+      "name": "repeated clicks recompute from the latest state",
+      "verdict": "PASS",
+      "detail": "Repeating `combo` twice in a row left 'count 2 step 5' — each click applies the descriptor held by the tree as rendered, so a second identical click is idempotent, not cumulative. The monotone case (a counter built from the current value) is covered by the unit test 'keeps the latest state across repeated clicks'.",
+      "evidence": "p307-s3-acceptance.mjs"
+    },
+    {
+      "id": "A03",
+      "name": "@Reset() restores every declared default",
+      "verdict": "PASS",
+      "detail": "After `set6` the card read 'count 6'; clicking reset returned it to 'count 3 step 1'.",
+      "evidence": "p307-s3-acceptance.mjs"
+    },
+    {
+      "id": "A04",
+      "name": "Action([...]) runs its steps in order",
+      "verdict": "PASS",
+      "detail": "`Action([@Set($count, 2), @Set($step, 5)])` produced 'count 2 step 5' — both writes applied, in one re-evaluation.",
+      "evidence": "p307-s3-acceptance.mjs"
+    },
+    {
+      "id": "A07",
+      "name": "a Button's write survives a reload",
+      "verdict": "PASS",
+      "detail": "The card was left at 'count 6 step 5'; after a full page reload both copies read 'count 6 step 5'.",
+      "evidence": "p307-s4-reload-surfaces.mjs",
+      "stored": "{\"t\":1793637698392,\"s\":{\"v\":1,\"h\":\"6ca2203e\",\"values\":{\"count\":6,\"step\":5}}}"
+    },
+    {
+      "id": "A08",
+      "name": "both display surfaces agree after a Button change",
+      "verdict": "PASS",
+      "detail": "After the reload the toolview copy (inside the fold) and the turn-tail copy (outside it) both read 'count 6 step 5'. Before the reload the stale copy still showed 'count 3'; the remount read the shared key and they converged.",
+      "evidence": "p307-s4-reload-surfaces.mjs",
+      "observed": { "total": 2, "inFold": 1, "inTail": 1 }
+    },
+    {
+      "id": "A10",
+      "name": "no new console errors or React warnings",
+      "verdict": "PASS",
+      "detail": "Clicked every Button on a freshly loaded page (set6, reset, combo, set6) and then read the console buffer: 0 entries, 0 errors, 0 warnings.",
+      "evidence": "p307-s5-console.mjs, p307-console-after.json"
+    },
+    {
+      "id": "T7",
+      "name": "switching sessions shows no other session's cards or state (backfilled)",
+      "verdict": "PASS",
+      "detail": "A new session showed 0 cards, while both stored records stayed under their own session keys. Returning to the original session restored 'count 6 step 5'.",
+      "evidence": "p307-s7-t7-sessions.mjs"
+    },
+    {
+      "id": "T8",
+      "name": "history replay across card generations (backfilled)",
+      "verdict": "PASS",
+      "detail": "Three generations of card replayed on the tail with their own values: the pre-P3-06 card at 8, the P306 card at 3, and the P307 actions card at 6. The HTML control card also kept its tail copy.",
+      "evidence": "p307-s8-t8-history.mjs"
+    },
+    {
+      "id": "A05",
+      "name": "an invalid variable binding writes nothing and reports a diagnostic",
+      "verdict": "NOT VERIFIED",
+      "detail": "Not reachable from a program: the evaluator only produces a binding descriptor for a legal `$variable`, so a bad binding cannot be expressed in openui-lang. Covered by unit tests against hand-built descriptors (action.bad-binding, action.unknown-variable)."
+    },
+    {
+      "id": "A06",
+      "name": "unsupported actions produce no external side effect",
+      "verdict": "NOT VERIFIED",
+      "detail": "Unit-tested (action.unsupported for @OpenUrl/@CopyToClipboard/@ToAssistant; an actionless Button writes nothing and posts nothing). Not driven in the browser, because the browser check would have to prove a negative — no navigation, no clipboard write — through side effects the harness cannot observe."
+    },
+    {
+      "id": "A09",
+      "name": "HTML regression",
+      "verdict": "NOT VERIFIED",
+      "detail": "No HTML card was exercised with actions in this browser run; the HTML control card rendered and kept its tail copy, but its frame state was not re-driven. Covered by unit tests: tests/frame-state.spec.tsx 17/17 including the newly added cross-view pinning cases."
+    }
+  ],
+  "screenshots": [
+    "p307-actions-card.png — the action card in the turn tail, no CSS override (noOverrides: true)"
+  ],
+  "reproduction": {
+    "server": "DSH_HOME=tmp/dsh-p3; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1",
+    "scripts": ["p307-s1-draw.mjs", "p307-s2-wait.mjs", "p307-s3-acceptance.mjs", "p307-s4-reload-surfaces.mjs", "p307-s5-console.mjs", "p307-s6-capture.mjs", "p307-s7-t7-sessions.mjs", "p307-s8-t8-history.mjs"]
+  }
+}

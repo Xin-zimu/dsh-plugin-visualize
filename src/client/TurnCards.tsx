@@ -11,6 +11,12 @@
  * The cards come from a state-only Conversation Definition that collects each
  * successful `visualize` result's persisted meta per turn; nothing here reads
  * the session log directly or imports host runtime code.
+ *
+ * Both backends land here through the one descriptor reader
+ * (`visualizationFrom`), and the view dispatches on the discriminant exactly as
+ * the toolview does. Recognising only HTML descriptors would leave an OpenUI
+ * card visible solely inside the fold, which is where a model's answer is least
+ * legible: the card is the output, not the process.
  */
 
 import type { CSSProperties } from 'react'
@@ -20,8 +26,10 @@ import type {
 import type { HostObservable, InjectFace, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: pulls the `conversation.chat.turnTail` SlotMap declaration.
 import type {} from '@deepseek-ai/dsh-client-ui-chat/client'
-import { visualizeMetaFrom, type VisualizeMeta } from '../fragment.ts'
+import { visualizationFrom, type VisualizationDescriptor } from '../fragment.ts'
 import { Frame, type VisualizePromptInjected } from './VisualizeCard.tsx'
+import { liveStyle } from './style.ts'
+import { OpenUICard, stateKeyFor } from './OpenUICard.tsx'
 import { cardStateKey } from './card-state.ts'
 
 /** Definition kind and Turn data key; namespaced by package to stay unique. */
@@ -31,7 +39,8 @@ export const TURN_CARDS_KEY = 'dsh-visualize'
 export interface TurnCard {
   readonly callId: string
   readonly seq: number
-  readonly meta: VisualizeMeta
+  /** Either backend's descriptor; the view dispatches on its discriminant. */
+  readonly meta: VisualizationDescriptor
 }
 
 /** Per-turn value published on the Turn Location. */
@@ -86,20 +95,21 @@ interface PtcDispatchData {
 const enclosingTurns = new Map<string, number>()
 
 /**
- * Accept a successful root `visualize` result. The persisted meta names its
- * own kind, so no call-to-name bookkeeping is needed.
+ * Accept a successful root card result. The persisted meta names its own kind,
+ * so one reader covers both backends: `visualizationFrom` is the descriptor
+ * dispatcher every other surface already uses.
  * @param data - `tool/result` payload.
  * @returns the card descriptor, or undefined when unrelated or failed.
  */
-function resultMeta(data: ToolResultData): VisualizeMeta | undefined {
-  return data.message.isError === true ? undefined : visualizeMetaFrom(data.meta)
+function resultMeta(data: ToolResultData): VisualizationDescriptor | undefined {
+  return data.message.isError === true ? undefined : visualizationFrom(data.meta)
 }
 
 /** One settled card found in an event, with the call that produced it. */
 interface SettledCard {
   readonly turn: number
   readonly callId: string
-  readonly meta: VisualizeMeta
+  readonly meta: VisualizationDescriptor
 }
 
 /**
@@ -124,7 +134,7 @@ function settledCard(event: { readonly type: string; readonly data?: unknown }):
   if (event.type === 'tool/ptc-dispatch') {
     const data = event.data as PtcDispatchData
     if (data.isError === true) return undefined
-    const meta = visualizeMetaFrom(data.meta)
+    const meta = visualizationFrom(data.meta)
     if (meta === undefined) return undefined
     const turn = enclosingTurns.get(String(data.rootCallId)) ?? enclosingTurns.get(String(data.parentCallId))
     return turn === undefined ? undefined : { turn, callId: String(data.subCallId), meta }
@@ -226,6 +236,45 @@ const listStyle: CSSProperties = {
 }
 
 /**
+ * One turn-tail card, drawn by the renderer its own descriptor names.
+ *
+ * The dispatch is on the discriminant, exactly as the toolview does it: an
+ * HTML descriptor goes to the sandboxed frame, an OpenUI descriptor to the
+ * component renderer. Both derive their saved-state key through the same
+ * helpers, so the same card read here and in the toolview is the same state —
+ * one card, one key, whichever surface mounted it.
+ * @param props - the card, the session it renders in, and the prompt sink.
+ * @returns the card, or null when its descriptor is not one this build draws.
+ */
+function TurnTailCard({ card, session, prompt }: {
+  readonly card: TurnCard
+  readonly session: string | undefined
+  readonly prompt: VisualizePromptInjected['visualizePrompt']
+}) {
+  if (card.meta.kind === 'intelligent_ui') {
+    return (
+      <OpenUICard
+        key={card.callId}
+        meta={{ ...card.meta, style: card.meta.style ?? liveStyle() }}
+        stateKey={stateKeyFor(card.meta, session, card.callId)}
+      />
+    )
+  }
+  // A distinct height token: the toolview frame for the same call may be
+  // mounted too (an opened fold) and reports under the bare call id. Both
+  // share the card's saved state.
+  return (
+    <Frame
+      key={card.callId}
+      meta={card.meta}
+      callId={`turn-tail:${card.callId}`}
+      prompt={prompt}
+      stateKey={cardStateKey(session, card.meta.path, card.callId)}
+    />
+  )
+}
+
+/**
  * Turn-tail entry. A list turn tail mounts it on every turn, so it declines
  * turns without cards itself, and it stays empty whenever the host is not
  * folding — the toolview card is then already in view.
@@ -239,15 +288,11 @@ export function TurnCards({ turn, seq, useVisualizeFolds, visualizePrompt, visua
   return (
     <div style={listStyle}>
       {cards.map(card => (
-        // A distinct height token: the toolview frame for the same call may be
-        // mounted too (an opened fold) and reports under the bare call id. Both
-        // share the card's saved state.
-        <Frame
+        <TurnTailCard
           key={card.callId}
-          meta={card.meta}
-          callId={`turn-tail:${card.callId}`}
+          card={card}
+          session={visualizeSession}
           prompt={visualizePrompt}
-          stateKey={cardStateKey(visualizeSession, card.meta.path, card.callId)}
         />
       ))}
     </div>

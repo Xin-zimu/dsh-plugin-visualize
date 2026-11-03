@@ -1,0 +1,273 @@
+{
+ "at": "2026-11-03T15:27:40.982Z",
+ "what": "card",
+ "facts": {
+  "stamp": {
+   "at": "2026-11-03T15:27:40.706Z",
+   "session": "rkct",
+   "buildSha256": "0C72613C112FB3F0D40073F771CDB36F9573F6C9BDD5F00346AE4D2842702507",
+   "installedSha256": "0C72613C112FB3F0D40073F771CDB36F9573F6C9BDD5F00346AE4D2842702507"
+  },
+  "ageMs": 89,
+  "verdict": "CARD MEASURED",
+  "found": true,
+  "copies": 2,
+  "theme": "light",
+  "cardWidth": 680,
+  "unresolved": [],
+  "danglingHostTokens": [],
+  "counts": {
+   "boxes": 4,
+   "grids": 4,
+   "dividers": 1,
+   "spacers": 1,
+   "emptyGrids": 1,
+   "unrendered": 0
+  },
+  "unrendered": [],
+  "detail": {
+   "boxes": [
+    {
+     "text": "Box nestingleftrig",
+     "w": 680,
+     "h": 73,
+     "background": "oklab(0.589542 -0.0217781 -0.177995 / 0.14)",
+     "borderWidth": "0.666667px",
+     "borderStyle": "solid",
+     "padding": "12px",
+     "flex": "0 1 auto"
+    },
+    {
+     "text": "fixed 240",
+     "w": 240,
+     "h": 35,
+     "background": "oklab(0.722741 -0.165537 0.0972287 / 0.14)",
+     "borderWidth": "0px",
+     "borderStyle": "none",
+     "padding": "8px",
+     "flex": "0 1 auto"
+    },
+    {
+     "text": "elastic",
+     "w": 680,
+     "h": 35,
+     "background": "oklab(0.768595 0.0561344 0.154817 / 0.14)",
+     "borderWidth": "0px",
+     "borderStyle": "none",
+     "padding": "8px",
+     "flex": "1 1 0%"
+    },
+    {
+     "text": "cell one",
+     "w": 334,
+     "h": 47,
+     "background": "oklab(0.636841 0.187884 0.0889429 / 0.14)",
+     "borderWidth": "0.666667px",
+     "borderStyle": "solid",
+     "padding": "8px",
+     "flex": "0 1 auto"
+    }
+   ],
+   "grids": [
+    {
+     "w": 680,
+     "h": 47,
+     "tracks": 2,
+     "template": "334px 334px",
+     "gap": "12px",
+     "items": 2
+    },
+    {
+     "w": 680,
+     "h": 19,
+     "tracks": 3,
+     "template": "221.333px 221.333px 221.333px",
+     "gap": "8px",
+     "items": 3
+    },
+    {
+     "w": 680,
+     "h": 19,
+     "tracks": 3,
+     "template": "221.333px 221.333px 221.333px",
+     "gap": "8px",
+     "items": 3
+    },
+    {
+     "w": 680,
+     "h": 0,
+     "tracks": 2,
+     "template": "336px 336px",
+     "gap": "8px",
+     "items": 0
+    }
+   ],
+   "dividers": [
+    {
+     "w": 680,
+     "h": 1,
+     "background": "rgba(0, 0, 0, 0.1)",
+     "opacity": "1"
+    }
+   ],
+   "spacers": [
+    {
+     "w": 595,
+     "h": 19,
+     "flex": "1 1 0px",
+     "measuredGapPx": 611
+    }
+   ],
+   "variables": [
+    {
+     "name": "--border",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#0000001a"
+    },
+    {
+     "name": "--dsw-alias-bg-layer-2",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#fff"
+    },
+    {
+     "name": "--dsw-alias-border-l1",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#0000000a"
+    },
+    {
+     "name": "--dsw-alias-border-l2",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#0000001a"
+    },
+    {
+     "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#4176e6"
+    },
+    {
+     "name": "--dsw-alias-label-primary",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#0f1115"
+    },
+    {
+     "name": "--dsw-alias-label-primary-foreground",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#fff"
+    },
+    {
+     "name": "--dsw-alias-label-tertiary",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#81858c"
+    },
+    {
+     "name": "--dsw-font-family",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\""
+    },
+    {
+     "name": "--dsw-radius-sm",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "8px"
+    },
+    {
+     "name": "--dsw-static-amber-500",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#f59e0b"
+    },
+    {
+     "name": "--dsw-static-deepseek-500",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#4176e6"
+    },
+    {
+     "name": "--dsw-static-green-500",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#22c55e"
+    },
+    {
+     "name": "--dsw-static-red-500",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#ef4444"
+    },
+    {
+     "name": "--font-sans",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\""
+    },
+    {
+     "name": "--foreground",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#0f1115"
+    },
+    {
+     "name": "--muted-foreground",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#81858c"
+    },
+    {
+     "name": "--primary",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#4176e6"
+    },
+    {
+     "name": "--viz-series-2",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#f59e0b"
+    },
+    {
+     "name": "--viz-series-3",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#22c55e"
+    },
+    {
+     "name": "--viz-series-5",
+     "declaredOnRoot": true,
+     "hostToken": null,
+     "hostResolves": null,
+     "value": "#ef4444"
+    }
+   ]
+  }
+ },
+ "detail": []
+}

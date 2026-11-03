@@ -11,7 +11,7 @@
 
 import { act, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { apply } from '../src/client/index.tsx'
 import { configFormsFolds, foldingSource, settingsScopeFolds } from '../src/client/folding.ts'
 import {
@@ -19,7 +19,9 @@ import {
   type TurnCard,
 } from '../src/client/TurnCards.tsx'
 import { STREAM_KEY } from '../src/client/StreamingPreview.tsx'
-import type { VisualizeMeta } from '../src/fragment.ts'
+import { cardStateKey, cardStates, resetCardStates, STORAGE_PREFIX, type StateStorage } from '../src/client/card-state.ts'
+import { openuiStateKey } from '../src/client/openui-state.ts'
+import type { OpenUIMeta, VisualizeMeta } from '../src/fragment.ts'
 
 /** A well-formed persisted descriptor. */
 function meta(path: string, title = path): VisualizeMeta {
@@ -222,6 +224,216 @@ describe('turn cards view', () => {
   it('stays empty when the toolview card is already in view', () => {
     expect(render(false, cards)).toEqual([])
     expect(render(true, [])).toEqual([])
+  })
+})
+
+/**
+ * P3-06 — the turn tail must draw a card of either backend, through the one
+ * descriptor reader, and must reach the same saved state the toolview does.
+ */
+describe('turn tail draws both backends (P3-06)', () => {
+  /** A well-formed persisted program card. */
+  function program(path: string, title = path, programSource = '$count = 3\nroot = Text("x")'): OpenUIMeta {
+    return { kind: 'intelligent_ui', program: programSource, title, mode: 'inline', path, style: 'whale' }
+  }
+
+  /**
+   * Mount the entry and report what it drew.
+   * @param folds - host folding state.
+   * @param cards - the turn's cards.
+   * @param session - the card's session id.
+   * @returns the drawn surfaces.
+   */
+  function mount(folds: boolean, cards: readonly TurnCard[], session = 's1') {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    const Entry = TurnCards as unknown as ComponentType<Record<string, unknown>>
+    const draw = (nextCards: readonly TurnCard[]) => act(() => {
+      root.render(
+        <Entry
+          turn={turnWith(nextCards)}
+          seq={10}
+          visualizeSession={session}
+          useVisualizeFolds={<S,>(pick: (value: boolean) => S) => pick(folds)}
+        />,
+      )
+    })
+    draw(cards)
+    return {
+      host,
+      draw,
+      unmount: () => { act(() => root.unmount()); host.remove() },
+      iframes: () => [...host.querySelectorAll('iframe')].map(f => f.title),
+      programs: () => [...host.querySelectorAll('[data-openui-card]')],
+    }
+  }
+
+  it('draws a program card while the host folds (requirement 1)', () => {
+    const view = mount(true, [{ callId: 'p1', seq: 3, meta: program('viz/p.openui.html', 'Prog') }])
+    expect(view.iframes()).toEqual([])
+    expect(view.programs()).toHaveLength(1)
+    expect(view.host.textContent).toContain('Prog')
+    view.unmount()
+  })
+
+  it('keeps HTML cards working alongside program cards (requirement 4)', () => {
+    const view = mount(true, [
+      { callId: 'h1', seq: 2, meta: meta('viz/a.html', 'Arch') },
+      { callId: 'p1', seq: 3, meta: program('viz/p.openui.html', 'Prog') },
+    ])
+    expect(view.iframes()).toEqual(['Arch'])
+    expect(view.programs()).toHaveLength(1)
+    expect(view.programs()[0]?.textContent).toContain('Prog')
+    view.unmount()
+  })
+
+  it('stays empty when the host does not fold, for either backend (requirement 2)', () => {
+    const both = [
+      { callId: 'h1', seq: 2, meta: meta('viz/a.html', 'Arch') },
+      { callId: 'p1', seq: 3, meta: program('viz/p.openui.html', 'Prog') },
+    ]
+    const view = mount(false, both)
+    expect(view.iframes()).toEqual([])
+    expect(view.programs()).toHaveLength(0)
+    view.unmount()
+  })
+
+  it('collects a program result from tool/result and from a nested dispatch (requirement 4)', () => {
+    resetEnclosingTurns()
+    const def = turnCardsDefinition
+    expect(def.match(result(3, 'p1', program('viz/p.openui.html')))).toEqual({ id: '1', role: 'update' })
+    def.match({ type: 'tool/call', seq: 2, data: { turn: 1, callId: 'root-9', name: 'run_code' } } as never)
+    const nested = {
+      type: 'tool/ptc-dispatch', seq: 3,
+      data: {
+        rootCallId: 'root-9', parentCallId: 'root-9', subCallId: 'root-9:ptc:1',
+        name: 'visualize', arguments: '{}', isError: false, content: [], meta: program('viz/nested.openui.html'),
+      },
+    } as never
+    expect(def.match(nested)).toEqual({ id: '1', role: 'update' })
+  })
+
+  it('still declines a failed or unrecognised result (requirement 4)', () => {
+    const def = turnCardsDefinition
+    expect(def.match(result(3, 'p1', program('viz/p.openui.html'), true))).toBeNull()
+    expect(def.match(result(3, 'p2', { kind: 'other' }))).toBeNull()
+    expect(def.match(result(3, 'p3', { kind: 'intelligent_ui', program: '' }))).toBeNull()
+  })
+})
+
+/**
+ * Requirement 3 — the same card reads the same state from either surface.
+ *
+ * This is the case the audit warned about: the HTML toolview and turn tail share
+ * one key and write whole maps, so a stale view can overwrite a newer one. For
+ * OpenUI the risk is sharper, because a *mount* now writes too: hydrating a card
+ * with defaults and immediately persisting them would reset a value the reader
+ * had already set. So the negative case here is explicit — viewing a card must
+ * never turn a stored 6 back into the program's 3.
+ */
+describe('one card, one state, either surface (requirement 3)', () => {
+  const PROGRAM = [
+    '$count = 3',
+    'root = Col([Slider($count, 1, 10, 1, "count"), Text("count " + @Format($count, "number"))])',
+  ].join('\n')
+
+  let storage: Map<string, string>
+
+  beforeEach(() => {
+    storage = new Map()
+    const fake: StateStorage = {
+      get length() { return storage.size },
+      key: i => [...storage.keys()][i] ?? null,
+      getItem: k => storage.get(k) ?? null,
+      setItem: (k, v) => { storage.set(k, v) },
+      removeItem: k => { storage.delete(k) },
+    }
+    resetCardStates(() => fake, { delayMs: 0 })
+  })
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  const META: OpenUIMeta = {
+    kind: 'intelligent_ui', program: PROGRAM, title: 'P', mode: 'inline', path: 'viz/shared.openui.html', style: 'whale',
+  }
+
+  /** Seed the stored state the way a previous page left it. */
+  function seed(count: number) {
+    const key = cardStateKey('s1', META.path, 'call-1')
+    storage.set(
+      `${STORAGE_PREFIX}${openuiStateKey(key)}`,
+      JSON.stringify({ t: 1, s: { v: 1, h: 'seeded', values: { count } } }),
+    )
+  }
+
+  /** Render the turn tail for one program card. */
+  function tail(session = 's1') {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const root = createRoot(host)
+    const Entry = TurnCards as unknown as ComponentType<Record<string, unknown>>
+    act(() => {
+      root.render(
+        <Entry
+          turn={turnWith([{ callId: 'call-1', seq: 3, meta: META }])}
+          seq={10}
+          visualizeSession={session}
+          useVisualizeFolds={<S,>(pick: (value: boolean) => S) => pick(true)}
+        />,
+      )
+    })
+    return {
+      host,
+      unmount: () => { act(() => root.unmount()); host.remove() },
+      slider: () => host.querySelector('input[type=range]') as HTMLInputElement | null,
+    }
+  }
+
+  it('mounting the turn tail does not overwrite a stored value with the default', () => {
+    seed(6)
+    const view = tail()
+    expect(view.host.textContent).toContain('count 6')
+    expect(view.slider()?.value).toBe('6')
+    cardStates.flush()
+    // The stored 6 is still 6: a mount hydrates and writes, but writes what it read.
+    const raw = JSON.parse(storage.get(`${STORAGE_PREFIX}${openuiStateKey(cardStateKey('s1', META.path, 'call-1'))}`)!)
+    expect((raw.s as { values: Record<string, unknown> }).values['count']).toBe(6)
+    view.unmount()
+  })
+
+  it('an interaction in the turn tail is what the toolview would see', () => {
+    seed(6)
+    const view = tail()
+    const slider = view.slider()!
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set
+    act(() => {
+      setter?.call(slider, '9')
+      slider.dispatchEvent(new Event('input', { bubbles: true }))
+      slider.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    expect(view.host.textContent).toContain('count 9')
+    cardStates.flush()
+    // Re-reading the same key returns the value the reader just set.
+    const stored = cardStates.read(openuiStateKey(cardStateKey('s1', META.path, 'call-1'))) as { values?: Record<string, unknown> } | undefined
+    expect(stored?.values?.['count']).toBe(9)
+    view.unmount()
+  })
+
+  it('keeps two sessions apart on the turn tail', () => {
+    seed(6)
+    const view = tail('s2')
+    // s2 has no record, so the program default applies and nothing is inherited.
+    expect(view.host.textContent).toContain('count 3')
+    cardStates.flush()
+    const s2Key = `${STORAGE_PREFIX}${openuiStateKey(cardStateKey('s2', META.path, 'call-1'))}`
+    const written = storage.get(s2Key)
+    if (written !== undefined) {
+      expect((JSON.parse(written).s as { values: Record<string, unknown> }).values['count']).not.toBe(6)
+    }
+    view.unmount()
   })
 })
 

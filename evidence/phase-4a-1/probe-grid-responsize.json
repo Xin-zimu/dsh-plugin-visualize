@@ -1,0 +1,97 @@
+{
+ "found": true,
+ "samples": [
+  {
+   "cardWidth": 680,
+   "grids": [
+    {
+     "items": 2,
+     "template": "334px 334px",
+     "tracks": 2,
+     "w": 680
+    },
+    {
+     "items": 3,
+     "template": "221.333px 221.333px 221.333px",
+     "tracks": 3,
+     "w": 680
+    },
+    {
+     "items": 3,
+     "template": "221.333px 221.333px 221.333px",
+     "tracks": 3,
+     "w": 680
+    }
+   ]
+  },
+  {
+   "cardWidth": 560,
+   "grids": [
+    {
+     "items": 2,
+     "template": "274px 274px",
+     "tracks": 2,
+     "w": 560
+    },
+    {
+     "items": 3,
+     "template": "181.333px 181.333px 181.333px",
+     "tracks": 3,
+     "w": 560
+    },
+    {
+     "items": 3,
+     "template": "181.333px 181.333px 181.333px",
+     "tracks": 3,
+     "w": 560
+    }
+   ]
+  },
+  {
+   "cardWidth": 440,
+   "grids": [
+    {
+     "items": 2,
+     "template": "214px 214px",
+     "tracks": 2,
+     "w": 440
+    },
+    {
+     "items": 3,
+     "template": "216px 216px",
+     "tracks": 2,
+     "w": 440
+    },
+    {
+     "items": 3,
+     "template": "141.333px 141.333px 141.333px",
+     "tracks": 3,
+     "w": 440
+    }
+   ]
+  },
+  {
+   "cardWidth": 320,
+   "grids": [
+    {
+     "items": 2,
+     "template": "154px 154px",
+     "tracks": 2,
+     "w": 320
+    },
+    {
+     "items": 3,
+     "template": "320px",
+     "tracks": 1,
+     "w": 320
+    },
+    {
+     "items": 3,
+     "template": "101.333px 101.333px 101.333px",
+     "tracks": 3,
+     "w": 320
+    }
+   ]
+  }
+ ]
+}

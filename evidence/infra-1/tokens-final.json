@@ -1,0 +1,3313 @@
+{
+ "at": "2026-11-03T15:27:41.243Z",
+ "what": "tokens",
+ "facts": {
+  "stamp": {
+   "at": "2026-11-03T15:27:40.706Z",
+   "session": "rkct",
+   "buildSha256": "0C72613C112FB3F0D40073F771CDB36F9573F6C9BDD5F00346AE4D2842702507",
+   "installedSha256": "0C72613C112FB3F0D40073F771CDB36F9573F6C9BDD5F00346AE4D2842702507"
+  },
+  "ageMs": 363,
+  "verdict": "TOKENS RESOLVE",
+  "theme": "light",
+  "total": 470,
+  "dangling": [],
+  "indirect": [],
+  "detail": {
+   "tokens": [
+    {
+     "name": "--border",
+     "value": "#0000001a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-inset-shadow-alpha",
+     "value": "100%",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-100",
+     "value": "#dbeafe",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xl-24-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-head-font-size",
+     "value": "min(calc(14px - 1px), max(13px, calc(14px - 2px)))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-ghost-active-border",
+     "value": "#979da6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--card",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-idle-primary",
+     "value": "#d4d4d4",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-italic-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-750",
+     "value": "#43454a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-inverted",
+     "value": "#0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-focus-ring-width",
+     "value": "2px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small",
+     "value": "12px/20px -apple-system, BlinkMacSystemFont, \"Sego",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--primary-foreground",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-layer-1",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-onboarding-checkbox-border",
+     "value": "color-mix(in srgb, #0f1115 20%, transparent)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-150",
+     "value": "#e9ecf2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-500",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-scrollbar-thumb-hover",
+     "value": "#d4d4d4",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-m-18-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-info-fill",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-outline-style",
+     "value": "solid",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-conversation-viewport-height",
+     "value": "651px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-700",
+     "value": "#61666b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-elevation-stroke-color",
+     "value": "#00000029",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-inset-ring-shadow",
+     "value": "0 0 #0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-850",
+     "value": "#2c2c2e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-small-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-600",
+     "value": "#2563eb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-700-delete",
+     "value": "#2f4c8f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-file-diff-added-gutter",
+     "value": "#edf7ed",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h1-font-size",
+     "value": "calc(21px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-11",
+     "value": "11px/14px -apple-system, BlinkMacSystemFont, \"Sego",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-200",
+     "value": "#e1e5ee",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-error-secondary",
+     "value": "#f25a5a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--viz-series-5",
+     "value": "#ef4444",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-12-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-16",
+     "value": "16px/24px -apple-system, BlinkMacSystemFont, \"Sego",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h4",
+     "value": "600 14px / calc(24px + calc(14px - 14px)) -apple-s",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-boot-bg",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-50",
+     "value": "#fafafa",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h1-font-weight",
+     "value": "700",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h3-font-weight",
+     "value": "700",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-inset-shadow",
+     "value": "0 0 #0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--ds-ease-in-out",
+     "value": "cubic-bezier(.4, 0, .2, 1)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-13-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-settings-card-stroke",
+     "value": "#00000029",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-600",
+     "value": "#4868b2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-sidebar-fill",
+     "value": "#f9fafb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-shadow-alpha",
+     "value": "100%",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-gradient-onboarding-blue-stops",
+     "value": "#3964fe 18.75%, #398efe 51.78%, #6dccff 86.252%, #",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--viz-series-2",
+     "value": "#f59e0b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-l-20-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-line-height",
+     "value": "calc(22px + calc(min(calc(14px - 1px), max(13px, c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-small",
+     "value": "11px/16px \"SF Mono\", \"JetBrains Mono\", \"Fira Code\"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-conversation-column-width",
+     "value": "978px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-300",
+     "value": "#b7c8fe",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-selector",
+     "value": "#f5f6f7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-16-font-size",
+     "value": "16px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-scrollbar-track-margin",
+     "value": "0px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-450",
+     "value": "#4d93f8",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-250",
+     "value": "#dcdcdc",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-radius-lg",
+     "value": "16px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--viz-series-4",
+     "value": "light-dark(rgb(147 89 185), rgb(183 145 226))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-composer-side-clearance",
+     "value": "16px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-bubble",
+     "value": "#edf3fe",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-scrollbar-width",
+     "value": "5px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-settings-card-fill",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-caption",
+     "value": "#adb2b8",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-turn-trigger-bg",
+     "value": "#f9fafb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-font-weight",
+     "value": "600",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-strong-16-line-height",
+     "value": "24px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-layer-3",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h4-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-chat-flow-gap",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-50",
+     "value": "#edf3fe",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h3-line-height",
+     "value": "calc(26px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-file-diff-deleted-gutter",
+     "value": "#fdece9",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h2",
+     "value": "700 calc(19px + calc(14px - 14px)) / calc(28px + c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-success-primary",
+     "value": "#22c55e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-code-block-banner",
+     "value": "#f9fafb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-secondary",
+     "value": "#61666b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xl-24-font-size",
+     "value": "24px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-14-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-composer-dock-inset",
+     "value": "8px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-content-font-delta-secondary",
+     "value": "calc(min(calc(14px - 1px), max(13px, calc(14px - 2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong",
+     "value": "600 14px / calc(24px + calc(14px - 14px)) -apple-s",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-elevated-fill",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-floating-fill",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-menu",
+     "value": "#f8f9fa94",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-elevation-prominent",
+     "value": "0 0 0 .5px #00000029, 0 3px 8px 0 #0000000a, 0 0 2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-function",
+     "value": "#6741d9",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-50p",
+     "value": "#eaf3ff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-950",
+     "value": "#172554",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-450",
+     "value": "#5686fe",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-shadow-lv3",
+     "value": "0 0 1px 0 #0003, 0 0 4px 0 #00000005, 0 12px 32px ",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-base",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-italic-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-italic-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-strong-11-line-height",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-mask-photo",
+     "value": "#000000e0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-m-18-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-scrollbar-bg-l2",
+     "value": "#e5e5e5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-input-major",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-contrast-fill",
+     "value": "#61666b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-l1",
+     "value": "#0000000a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-italic-font-weight",
+     "value": "600",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-l2",
+     "value": "#0000001a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-document-preview",
+     "value": "#61666b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-strong-11-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-strong-16-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-italic-font-style",
+     "value": "italic",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-warn-tertiary",
+     "value": "#fef5e7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-shadow-lv2",
+     "value": "0 4px 12px 0 #00000005, 0 2px 8px 0 #0000000a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-switch-thumb",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-primary-bluish",
+     "value": "#0e3074",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-font-size",
+     "value": "11px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-75",
+     "value": "#e5f0ff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-italic",
+     "value": "italic 14px / calc(24px + calc(14px - 14px)) -appl",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-amber-500",
+     "value": "#f59e0b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-line-height",
+     "value": "19px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-primary",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-interactive-bg-hover-accent",
+     "value": "#26314824",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-shimmer",
+     "value": "color-mix(in srgb, #000 30%, transparent)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h1",
+     "value": "700 calc(21px + calc(14px - 14px)) / calc(30px + c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-translate-z",
+     "value": "0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-brand-primary-invert",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-strong-11-font-size",
+     "value": "11px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-75",
+     "value": "#f1f3f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-mask-blur",
+     "value": "none",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-head-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-menu-backdrop-filter",
+     "value": "blur(40px) saturate(150%)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-primary-dimmed",
+     "value": "#151517",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-mask-1",
+     "value": "#0000003d",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-italic-font-style",
+     "value": "italic",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-900",
+     "value": "#1b1b1c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-link",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-strong-14-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-strong-16-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-00",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-12-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-tool-bar-fill-invisible",
+     "value": "#1f1f1f5c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-primary-foreground",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-translate-y",
+     "value": "0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-elevation-stroke",
+     "value": "0 0 0 .5px #00000029",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-14-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-italic-line-height",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-900",
+     "value": "#0e3074",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h3",
+     "value": "700 calc(18px + calc(14px - 14px)) / calc(26px + c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-strong-11-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-l4",
+     "value": "#00000029",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-11-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-16-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-chat-content-width",
+     "value": "clamp(680px, calc(978px * .64), 920px)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-small-line-height",
+     "value": "16px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-code-block",
+     "value": "#f9fafb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-16-line-height",
+     "value": "24px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-italic-font-style",
+     "value": "italic",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-skeleton",
+     "value": "#0000000a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base",
+     "value": "14px / calc(24px + calc(14px - 14px)) -apple-syste",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-business-primary",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-400-a12",
+     "value": "#f25a5a1f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-tooltip-key-bg",
+     "value": "color-mix(in srgb, #2c2c2e, white 18%)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h1-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-mask-2",
+     "value": "#0000001f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-strong-13-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-900",
+     "value": "#570c0c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-border-style",
+     "value": "solid",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-14-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-small-font-size",
+     "value": "11px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-strong-12-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-strong-13-line-height",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-translate-x",
+     "value": "0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-interactive-bg-active",
+     "value": "#2631481a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-brand-primary",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-info-hover",
+     "value": "#7aaaff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-string",
+     "value": "#2f9e44",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-12-line-height",
+     "value": "18px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-green-900",
+     "value": "#233c2c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-interactive-bg-hover",
+     "value": "#2631480f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-italic-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-menu-surface-fill",
+     "value": "#f8f9fa94",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-elevation-panel",
+     "value": "0 0 0 .5px #00000029, 0 3px 8px 0 #00000008, 0 0 1",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-strong-16",
+     "value": "500 16px/24px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-interactive-bg-hover-danger",
+     "value": "#ec13130d",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-turn-trigger-bg-hover",
+     "value": "#2631480f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-strong-13-font-size",
+     "value": "13px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-12",
+     "value": "12px/18px -apple-system, BlinkMacSystemFont, \"Sego",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-italic-line-height",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-950",
+     "value": "#151517",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-line-height",
+     "value": "calc(24px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong",
+     "value": "600 12px/20px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-login-input",
+     "value": "#f9fafb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-l-20-line-height",
+     "value": "28px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-200",
+     "value": "#e5e5e5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-success-secondary",
+     "value": "#4ed17e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-code-segment-selected",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-head-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-space-y-reverse",
+     "value": "0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-11-line-height",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-strong-16-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-strong-14-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-floating-hover",
+     "value": "#f1f3f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--primary",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-head-line-height",
+     "value": "calc(22px + calc(min(calc(14px - 1px), max(13px, c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-sidebar-nav-item-active-accent",
+     "value": "#e4edfd",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-tool-bar-fill",
+     "value": "#54555780",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-sidebar-nav-item-active",
+     "value": "#ebeef2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xl-24-font-weight",
+     "value": "600",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h3-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-400",
+     "value": "#7aaaff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-11-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-warn-secondary",
+     "value": "#f7ad31",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-ring-shadow",
+     "value": "0 0 #0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-font-family",
+     "value": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-onboarding-card-fill",
+     "value": "color-mix(in srgb, #fff 80%, transparent)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-875",
+     "value": "#232324",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-line-height",
+     "value": "calc(24px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xl-24",
+     "value": "600 24px/32px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-content-font-size",
+     "value": "14px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-strong-14",
+     "value": "500 14px/22px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-drop-shadow-alpha",
+     "value": "100%",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-400",
+     "value": "#adb2b8",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-font-family",
+     "value": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-elevation-soft",
+     "value": "0 0 0 .5px #00000029, 0 4px 16px 0 #00000008, 0 0 ",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h4-font-weight",
+     "value": "600",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-file-diff-deleted-marker",
+     "value": "#ba2723",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-500",
+     "value": "#979da6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-primary-hover",
+     "value": "#43454a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-linear-gradient-think",
+     "value": "linear-gradient(180deg, #fff 20.19%, #fff0 100%)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-l-20-font-size",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-success-tertiary",
+     "value": "#e6faed",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-inverted2",
+     "value": "#0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-deep-diving-shimmer",
+     "value": "color-mix(in srgb, #4176e6 30%, #172554)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-italic-line-height",
+     "value": "calc(24px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-italic-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-green-500-a12",
+     "value": "#22c55e1f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-amber-900",
+     "value": "#27241f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-900",
+     "value": "#283142",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-green-400",
+     "value": "#4ed17e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-amber-600",
+     "value": "#dd8629",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-tooltip-bg",
+     "value": "#2c2c2e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-keyword",
+     "value": "#d6336c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-300",
+     "value": "#93c5fd",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-l-20-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-strong-12-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-600",
+     "value": "#81858c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-warn-primary",
+     "value": "#f59e0b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-italic",
+     "value": "italic 12px/20px -apple-system, BlinkMacSystemFont",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-600-a08",
+     "value": "#ec131314",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-italic-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-italic-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-font-weight",
+     "value": "600",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-strong-12-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-m-18-line-height",
+     "value": "28px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-strong-11",
+     "value": "500 11px/14px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h2-line-height",
+     "value": "calc(28px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-13-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-primary-fill",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-300",
+     "value": "#d4d4d4",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-strong-14-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h4-line-height",
+     "value": "calc(24px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-strong-italic",
+     "value": "italic 600 14px / calc(24px + calc(14px - 14px)) -",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-radius-panel",
+     "value": "28px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-italic",
+     "value": "italic 600 12px/20px -apple-system, BlinkMacSystem",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-ring-offset-color",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-550",
+     "value": "#65676b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-onboarding-accent",
+     "value": "#3964fe",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-divide-x-reverse",
+     "value": "0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-inline-code",
+     "value": "#fafafa",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--viz-series-3",
+     "value": "#22c55e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-100",
+     "value": "#e4edfd",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-1000",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-font-size",
+     "value": "min(calc(14px - 1px), max(13px, calc(14px - 2px)))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-14-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-radius-xl",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--font-sans",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-menu-group-header-fill",
+     "value": "#f8f9faf0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-900",
+     "value": "#0f0f0f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-toast-label",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--radius",
+     "value": "8px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-m-18-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-green-500",
+     "value": "#22c55e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table",
+     "value": "min(calc(14px - 1px), max(13px, calc(14px - 2px)))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h2-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-italic-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-document-selection",
+     "value": "color-mix(in srgb, #3b82f6 40%, transparent)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-radius-xs",
+     "value": "4px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--viz-grid",
+     "value": "#0000000a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-ring-offset-width",
+     "value": "0px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xl-24-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-850",
+     "value": "#212123",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-interactive-bg-hover-solid",
+     "value": "#f1f3f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-1000",
+     "value": "#000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-amber-100",
+     "value": "#fef5e7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-green-100",
+     "value": "#e6faed",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-13",
+     "value": "13px/20px -apple-system, BlinkMacSystemFont, \"Sego",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-800",
+     "value": "#34415b",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-100",
+     "value": "#ebeef2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h4-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-content-font-delta",
+     "value": "calc(14px - 14px)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-150",
+     "value": "#ededed",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-file-diff-added-marker",
+     "value": "#01a241",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-tool-bar-hover",
+     "value": "#54555799",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-menu-icon",
+     "value": "#353638",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h2-font-weight",
+     "value": "700",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-400",
+     "value": "#f25a5a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-tip",
+     "value": "#f5f6f7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--ds-transition-duration",
+     "value": ".2s",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-italic-font-size",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-code-diff-added",
+     "value": "#22c55e14",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-business-tertiary",
+     "value": "#e4edfd",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-300",
+     "value": "#cfd3d6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-radius-md",
+     "value": "12px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-radius-sm",
+     "value": "8px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-ring-offset-shadow",
+     "value": "0 0 #0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-file-diff-deleted-bg",
+     "value": "#fce6e2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-bubble-highlight",
+     "value": "#d3e2ff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-content-font-size-secondary",
+     "value": "min(calc(14px - 1px), max(13px, calc(14px - 2px)))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-16-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-13-font-size",
+     "value": "13px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-scrollbar-thumb",
+     "value": "#e5e5e5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h3-font-size",
+     "value": "calc(18px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-italic-font-style",
+     "value": "italic",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-11-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-14",
+     "value": "14px/22px -apple-system, BlinkMacSystemFont, \"Sego",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-primary-inverted",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-foreground",
+     "value": "",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-toast-bg",
+     "value": "#353638",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h1-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-head-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-shadow-lv1",
+     "value": "0 2px 4px 0 #0000000d",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-800",
+     "value": "#353638",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-layer-2",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-gradient-onboarding-violet-stops",
+     "value": "#2a2fb6 33.102%, #8b76f6 50.954%, #c5c0ff 85.326%,",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-warn-label",
+     "value": "#dd8629",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-shadow-lv1-blur",
+     "value": "0 4px 12px 0 #00000005",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-mask-3",
+     "value": "#0000007a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--viz-series-1",
+     "value": "#4176e6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-tertiary",
+     "value": "#81858c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-l2-darkmode-thin",
+     "value": "#0000001a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-scrollbar-thumb-border",
+     "value": "0px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--ds-transition-duration-fast",
+     "value": ".1s",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-primary-dimmed",
+     "value": "#ebeef2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-italic-line-height",
+     "value": "calc(24px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-13-line-height",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-composer-height",
+     "value": "128px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-module-platform",
+     "value": "#f5f6f7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-parameter",
+     "value": "#e8590c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-tag",
+     "value": "#f1f3f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-scrollbar-bg-l1",
+     "value": "#e5e5e5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-onboarding-border-angle",
+     "value": "90deg",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-400",
+     "value": "#60a5fa",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h2-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-ghost-active-hover",
+     "value": "#e9ecf2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-dimmed",
+     "value": "#e1e5ee",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-multi-select",
+     "value": "#f5f6f7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-italic-font-weight",
+     "value": "600",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-placeholder",
+     "value": "#f5f6f7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-gradient-onboarding-cyan-stops",
+     "value": "#0293b4 21.154%, #2dc8eb 50.954%, #aff0ff 85.326%,",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--border-subtle",
+     "value": "#0000000a",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-file-diff-added-bg",
+     "value": "#e6f4e7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h3-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-scrollbar-hover-l1",
+     "value": "#d4d4d4",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block",
+     "value": "11px/19px \"SF Mono\", \"JetBrains Mono\", \"Fira Code\"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-50",
+     "value": "#fef2f2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-400",
+     "value": "#a2a4a6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-constant",
+     "value": "#1c7ed6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-specific-sidebar-nav-item-hover",
+     "value": "#f1f3f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-base-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-amber-400",
+     "value": "#f7ad31",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-strong-16-font-size",
+     "value": "16px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-citation",
+     "value": "#ebeef2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--ds-transition-duration-slow",
+     "value": ".3s",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-14-line-height",
+     "value": "22px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-corner-shape",
+     "value": "superellipse(1.5)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-100",
+     "value": "#f5f5f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-comment",
+     "value": "#868e96",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-50",
+     "value": "#f9fafb",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h1-line-height",
+     "value": "calc(30px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-strong-13",
+     "value": "500 13px/20px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-strong-12",
+     "value": "500 12px/18px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-document-preview",
+     "value": "#ebeef2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-11-font-size",
+     "value": "11px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code",
+     "value": "12px/19px \"SF Mono\", \"JetBrains Mono\", \"Fira Code\"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-500",
+     "value": "#3b82f6",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-strong-12-line-height",
+     "value": "18px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-table-head",
+     "value": "500 min(calc(14px - 1px), max(13px, calc(14px - 2p",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--ds-font-family-code",
+     "value": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-600",
+     "value": "#545557",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-linear-think-select",
+     "value": "linear-gradient(180deg, #f5f6f7 20.19%, #f5f6f700 ",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-onboarding-secondary-fill",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-50",
+     "value": "#eff6ff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--muted-foreground",
+     "value": "#81858c",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-600",
+     "value": "#ec1313",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-500",
+     "value": "#7f8287",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-divide-y-reverse",
+     "value": "0",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-mask-drop",
+     "value": "#ffffffb3",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-strong-14-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-state-error-primary",
+     "value": "#ec1313",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-strong-line-height",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-small-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-l-20-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-string-expression",
+     "value": "#2b8a3e",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-m-18",
+     "value": "500 16px/28px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--tw-shadow",
+     "value": "0 0 #0000",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-strong-13-font-weight",
+     "value": "500",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-bluish-60",
+     "value": "#f5f6f7",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-12-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xl-24-line-height",
+     "value": "32px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-500",
+     "value": "#ef4444",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-bg-overlay",
+     "value": "#e9ecf2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-13-font-weight",
+     "value": "400",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-italic-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-code-diff-deleted",
+     "value": "#ec131314",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-00",
+     "value": "#fff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-border-l3",
+     "value": "#0000001f",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-scrollbar-hover-l2",
+     "value": "#d4d4d4",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-link",
+     "value": "#1971c2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxxs-strong-11-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-family-brand",
+     "value": "\"Montserrat\", -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-s-strong-14-line-height",
+     "value": "22px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-red-100",
+     "value": "#fee2e2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-l-20",
+     "value": "500 20px/28px -apple-system, BlinkMacSystemFont, \"",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-background",
+     "value": "",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-base-16-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-label-deep-diving",
+     "value": "color-mix(in srgb, #4176e6 70%, #172554)",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--shiki-token-punctuation",
+     "value": "#495057",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsh-composer-card-max-width",
+     "value": "calc(clamp(680px, calc(978px * .64), 920px) + 32px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-small-line-height",
+     "value": "20px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-button-ghost-active-fill",
+     "value": "#ebeef2",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xs-strong-13-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-m-18-font-size",
+     "value": "16px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h4-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-deepseek-200",
+     "value": "#d3e2ff",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-blue-800",
+     "value": "#1e40af",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-green-500-a08",
+     "value": "#22c55e14",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-brand-text",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-alias-markdown-code-segment-unselected",
+     "value": "#f1f3f5",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-strong-12-font-style",
+     "value": "normal",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-xxs-12-font-family",
+     "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"Pi",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--foreground",
+     "value": "#0f1115",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-h2-font-size",
+     "value": "calc(19px + calc(14px - 14px))",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-small-font-family",
+     "value": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", Consolas",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-800",
+     "value": "#292929",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-font-markdown-code-block-line-height",
+     "value": "19px",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    },
+    {
+     "name": "--dsw-static-neutral-700",
+     "value": "#3c3c3d",
+     "hostToken": null,
+     "hostResolves": null,
+     "indirect": false
+    }
+   ]
+  }
+ },
+ "detail": []
+}

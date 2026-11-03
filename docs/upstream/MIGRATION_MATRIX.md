@@ -72,13 +72,71 @@ shape of the problem. Recording them keeps "kept from upstream" honest.
 | --- | --- | --- |
 | `HOST_TOKENS` bridge | `src/client/OpenUICard.tsx` | The OpenUI card is mounted **in the host document**, not inside a frame. `src/frame-css.ts` declares `--foreground`, `--primary` etc. inside the HTML backend's iframe `srcdoc`; those names do not exist in the host. DSH publishes only `--dsw-alias-*` / `--dsw-static-*`. Using the frame vocabulary on a host-mounted card silently resolves every variable to nothing. |
 | `theme.ts` token list as the authority | `src/client/theme.ts` → `OpenUICard.tsx` | One file decides which host token means "foreground"; both renderers read it, so the two backends cannot drift apart again (D6 was exactly that drift). |
+| OpenUI `$state` persistence | `src/client/openui-state.ts` (new), `src/client/OpenUICard.tsx` | Upstream dsh-intelligent-ui keeps `$state` in React only, so a reload re-evaluates from defaults. The fork persists it through the host's existing card-state store under a `:openui` key (ADR-006). Upstream has no equivalent, and no code was carried over: the record shape, hash and merge rules are original. |
+| Action dispatch | `src/client/openui-actions.ts` (new) | Upstream runs actions from `30-render.js:599-647` against a mutable store. The fork's dispatcher is pure — it returns a patch that the card applies through its one state channel — so a Button and a Slider cannot diverge in validation or persistence. `@Set` and `Action([...])` keep upstream's semantics, including its pre-click snapshot contract. |
+| `@Reset(...)` arguments | `src/client/openui-actions.ts` | **Divergence reproduced, not introduced.** Upstream's executor calls `store.reset()` with no argument (`20-store.js:112-118`), so `@Reset($a, $b)` resets everything and its bindings are never read. The fork does the same and emits an `action.reset-ignores-args` note so the gap is recorded; selecting variables by argument would be a semantic change needing its own decision. |
+
+## Component coverage — 12 of 48 render
+
+The language parses and evaluates all 48 (`src/backends/openui/signatures.ts`);
+the renderer draws 12. Measured, not remembered: `tests/openui-inventory.spec.tsx`
+imports the renderer's own `RENDERED_COMPONENTS` and the language's table and
+prints the split. A name may only appear in the *rendered* column if it is in
+`COMPONENTS` — the probe asserts that no renderer name is phantom.
+
+(The previous probe, `evidence/phase-3/component-inventory.mjs`, mirrored the
+renderer's table as a hand-written literal and still reported 8 / 48 after the
+4A-1 renderers existed. It is superseded; see D19 in the 4A-1 manifest.)
+
+| Group | Total | Rendered | Missing (stage 4A batch) |
+| --- | --- | --- | --- |
+| Layout | 9 | Col, Row, Box, Grid, Card, Divider, Spacer | Carousel, Popover (4A-5) |
+| Text | 10 | Title, Text, Caption | Label, Badge, Link, List, ListItem, Quote, Code (**4A-2**) |
+| Inputs | 13 | Button, Slider | Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form, IconButton, Pressable (**4A-3**) |
+| Drawing | 10 | — | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText (**4A-5**) |
+| Media and data | 4 | — | Table, Chart, Icon, Image (**4A-4**) |
+| Play | 2 | — | Flashcard, Celebration (4A-5) |
+
+**Status: 12/48 `ported`; 36 pending.** Each batch moves its own rows to
+`verified` only when its exit criteria are met, browser evidence included — the
+same rule as every other row in this file.
+
+### 4A-1 rows (browser-verified)
+
+| Upstream | Fork location | How | Status |
+| --- | --- | --- | --- |
+| `Box` (`layout-text.js:687-712`) | `src/client/OpenUICard.tsx` | **rewritten** — longhand border resolution so a shorthand cannot erase it, `box-sizing: border-box`, radius clips content only when set, semantic `background` painted as a 14% tint of its series | verified (`evidence/phase-4a-1/`, A1, A2) |
+| `Grid` (`:714-737`) | same | **rewritten** — the three track branches (count / explicit CSS / `auto-fit`) keep upstream's intent; the `min(100%, …)` floor is added so a wide `minChildWidth` cannot overflow a narrow card | verified (A3, A4) |
+| `Divider` (`:773-779`) | same | **adapted** — same role/aria contract, painted from the bridged `--border` rather than a frame-only class | verified (A5) |
+| `Spacer` (`:781-787`) | same | **adapted** — `flex: 1 1 0` with a 4px floor, as upstream | verified (A6) |
+
+Two bridged host tokens were **wrong** on first browser run and are recorded as
+D17/D18 in the 4A-1 manifest: `--dsw-static-purple-500` and
+`--dsh-font-family-text-default` do not exist in the DSH host. Both had
+fallbacks, so the card looked correct while resolving to nothing — the D6/D7
+defect class. Fixed and re-verified in both themes.
+
+### External actions — recognised, refused, not implemented
+
+`ACTION_STEPS` declares six steps; three execute. The other three are listed in
+`UNSUPPORTED_STEPS` (`src/client/openui-actions.ts`) so a program that uses one
+gets an `action.unsupported` refusal naming it, rather than a silent no-op.
+
+| Action | Upstream behaviour (`30-render.js`) | Fork status | Gate |
+| --- | --- | --- | --- |
+| `@Set` | `store.set(binding.name, value(args[1]))` (`:609-616`) | **implemented**, reproduced | — |
+| `@Reset` | `store.reset()`, arguments ignored (`:618-620`) | **implemented**, divergence recorded | — |
+| `Action([...])` | runs each step in order (`:639-642`) | **implemented**, reproduced | — |
+| `@OpenUrl` | protocol-checked `window.open` (`:622-629`) | **refused** | protocol allowlist; needs its own ADR (4B) |
+| `@CopyToClipboard` | `navigator.clipboard.writeText` + legacy fallback (`:631-634`, `:649-…`) | **refused** | real-gesture-only, permission refusal reported (4B) |
+| `@ToAssistant` | `toAssistant(utilRawText(...))` (`:635-638`) | **refused** | fill the composer, never auto-submit (4B) |
 
 ## open-intelligent-ui (`16ef264`)
 
 | Upstream capability | Fork location | How | Status |
 | --- | --- | --- | --- |
-| `src/lib/library.ts` (48 components) | reference | rewritten — see `docs/specifications/COMPONENT_CATALOG.md` | pending |
-| `src/lib/functions/` (73 functions) | reference | ported — stage 2 | pending |
+| `src/lib/library.ts` (48 components) | `src/client/OpenUICard.tsx` `COMPONENTS` | rewritten — 12 of 48 drawn; the coverage table above is the authority | 12 ported / 36 pending |
+| `src/lib/functions/` (73 functions) | `src/backends/openui/functions.ts` | ported — stage 2 | verified (differential) |
 | `src/lib/components/map/` | — | pending — needs a network policy ADR first | pending |
 | `src/lib/components/media.tsx` (`SearchImage`) | — | pending — needs its own service | pending |
 | `src/lib/components/html-view.tsx` | — | pending — its sandbox+CSP pattern is the reference | pending |

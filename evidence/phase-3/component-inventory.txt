@@ -1,0 +1,24 @@
+
+Drawing (10)
+  missing  : Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText
+
+Inputs (13)
+  rendered : Button, Slider
+  missing  : IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form
+
+Layout (9)
+  rendered : Col, Row, Card
+  missing  : Box, Grid, Carousel, Popover, Divider, Spacer
+
+Media and data (4)
+  missing  : Image, Icon, Table, Chart
+
+Play (2)
+  missing  : Flashcard, Celebration
+
+Text (10)
+  rendered : Title, Text, Caption
+  missing  : Label, Badge, Link, List, ListItem, Quote, Code
+
+=== 8 / 48 rendered; 40 missing ===
+renderer names not in the signature table: none

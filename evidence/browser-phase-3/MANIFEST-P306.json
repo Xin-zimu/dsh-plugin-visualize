@@ -1,0 +1,106 @@
+{
+  "phase": "3.6",
+  "title": "P3-06 — OpenUI cards in folded conversation turn tails, verified in a real browser",
+  "capturedAt": "2026-11-03T00:20+08:00",
+  "environment": {
+    "plugin": "@dsh-unified/visualize@0.1.0 (this working tree, npx tsdown build)",
+    "profile": "p3web — isolated DSH_HOME at tmp/dsh-p3 on :3093; production desktop (:61582) untouched",
+    "browser": "Chromium Agent Window (browser-skill over CDP), session lnzp",
+    "model": "DeepSeek-V4.1-Flash",
+    "os": "Windows 10.0.26100"
+  },
+  "method": {
+    "noCssOverrides": "No display property was set by any script in this run. The page's own computed styles decide every verdict; `noOverrides` in the acceptance step asserts no capture marker is present.",
+    "visibilityRule": "A card counts as visible only when it has a non-zero box inside the viewport AND no ancestor reports `content-visibility` other than `visible`. The host uses `content-visibility: hidden` on fold containers, so this rule distinguishes 'in the tail' from 'inside the collapsed process' without touching the host.",
+    "whyThisMattered": "The previous phase's screenshots forced `content-visibility: visible` on host containers to photograph a card that was laid out but never painted. This phase does not need that, because the card is genuinely outside the fold."
+  },
+  "summary": {
+    "PASS": ["T1", "T2", "T3", "T4", "T5", "T6"],
+    "FAIL": [],
+    "NOT_VERIFIED": ["T7", "T8"]
+  },
+  "checks": [
+    {
+      "id": "T1",
+      "name": "a freshly drawn OpenUI card is visible without expanding the fold",
+      "verdict": "PASS",
+      "detail": "Turn tail mounted its own copy of each program card: surfaces split 3 inside folds / 3 outside. Before P3-06 the OpenUI turns produced no tail copy at all.",
+      "evidence": "p306-s11-per-turn.mjs, p306-s12-record.mjs"
+    },
+    {
+      "id": "T2",
+      "name": "the persisted value survives the reload and is visible folded",
+      "verdict": "PASS",
+      "detail": "Dragged the TAIL copy 6 -> 8; after a full reload the tail card still showed 'count 8' with slider value 8, and the record was {v:1,h:18bcb949,values:{count:8}}.",
+      "evidence": "p306-s13-interact-reload.mjs, p306-s14-after-reload.mjs",
+      "observed": { "cards": 4, "tailCards": 2, "tailValues": ["8", "3"] }
+    },
+    {
+      "id": "T3",
+      "name": "expanding the fold does not duplicate a card in the tail",
+      "verdict": "PASS",
+      "detail": "After expanding, the total stayed 4 and the split stayed 2 in the fold / 2 in the tail. The toolview copy is the call's record inside the fold; the tail keeps exactly one copy. This is the policy the HTML backend already had.",
+      "evidence": "p306-s15-expand.mjs",
+      "observed": { "total": 4, "inFold": 2, "inTail": 2 }
+    },
+    {
+      "id": "T4",
+      "name": "an interaction in the tail card drives its siblings and persists",
+      "verdict": "PASS",
+      "detail": "Setting the tail card's Slider to 8 changed its Text to 'count 8' and wrote the record; the same key is read by the toolview copy.",
+      "evidence": "p306-s13-interact-reload.mjs"
+    },
+    {
+      "id": "T5",
+      "name": "the HTML backend's turn-tail behaviour is unchanged",
+      "verdict": "PASS",
+      "detail": "The HTML control card produced two surfaces: one inside the fold, one outside it in the tail — the same shape it had before this change, now measured explicitly.",
+      "evidence": "p306-s9-html-control.mjs, p306-s10-where.mjs"
+    },
+    {
+      "id": "T6",
+      "name": "no host CSS was modified to make any of this visible",
+      "verdict": "PASS",
+      "detail": "The acceptance step asserts no capture marker remains in the DOM and that all folds report aria-expanded=false while two tail cards are visible.",
+      "evidence": "p306-s17-acceptance-shot.mjs",
+      "observed": { "foldState": ["false", "false", "false"], "visible": 2, "noOverrides": true }
+    },
+    {
+      "id": "T7",
+      "name": "session switching shows no other session's cards or state",
+      "verdict": "NOT VERIFIED",
+      "detail": "Unit-tested (tests/turn-cards.spec.tsx 'keeps two sessions apart on the turn tail'), not driven live: the browser run stayed in one session."
+    },
+    {
+      "id": "T8",
+      "name": "a legacy pre-fork dsh-intelligent-ui card replays on the turn tail",
+      "verdict": "NOT VERIFIED",
+      "detail": "The reader path is unit-tested (a program-shaped descriptor is accepted by `visualizationFrom` and rejected by the old `visualizeMetaFrom`), but no genuine pre-fork card exists in an isolated session to replay."
+    }
+  ],
+  "defectFoundDuringVerification": {
+    "what": "The isolated profile served a STALE build for the first round of P3-06 measurements.",
+    "why": "`dsh plugin add file:...` copies lib/ at install time. The P3-06 build happened after that install, so the profile kept the pre-fix bundle and the turn tail correctly showed nothing for OpenUI.",
+    "howDetected": "The installed lib/client.js hash differed from the worktree build, and a grep found 4 matches for the new symbols in the installed copy against 7 in the worktree build.",
+    "resolution": "Copied the fresh lib/ into the profile, restarted, and re-ran every measurement. All results above are from the corrected build.",
+    "lesson": "A 'fails in browser but passes in tests' reading must be checked against what the browser actually loaded before it is reported as a code defect."
+  },
+  "screenshots": [
+    "p306-tail-visible.png — two OpenUI cards visible in tails while turns are folded",
+    "p306-openui-tail-8.png — the reloaded card at 8 in the tail",
+    "p306-folded-tail-acceptance.png — default collapsed fold with the card below the answer",
+    "p306-after-reload.png — post-reload transcript (HTML control turn in view)"
+  ],
+  "reproduction": {
+    "server": "DSH_HOME=tmp/dsh-p3; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1",
+    "scripts": [
+      "p306-s1-reach.mjs",
+      "p306-s11-per-turn.mjs",
+      "p306-s12-record.mjs",
+      "p306-s13-interact-reload.mjs",
+      "p306-s14-after-reload.mjs",
+      "p306-s15-expand.mjs",
+      "p306-s17-acceptance-shot.mjs"
+    ]
+  }
+}

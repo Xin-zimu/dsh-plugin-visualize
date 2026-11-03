@@ -1,0 +1,24 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+stdout | tests/openui-inventory.spec.tsx > component inventory > reports the split by group, which must sum to 48
+Drawing (10): rendered —; missing Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText
+Inputs (13): rendered Button, Slider; missing IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form
+Layout (9): rendered Col, Row, Box, Grid, Card, Divider, Spacer; missing Carousel, Popover
+Media and data (4): rendered —; missing Image, Icon, Table, Chart
+Play (2): rendered —; missing Flashcard, Celebration
+Text (10): rendered Title, Text, Caption; missing Label, Badge, Link, List, ListItem, Quote, Code
+=== 12 / 48 rendered ===
+
+ ✓ tests/openui-inventory.spec.tsx > component inventory > draws 12 of the 48 declared components after 4A-1 2ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > has no renderer for a name the language does not declare 1ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > counts the four 4A-1 components as drawn 0ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > reports the split by group, which must sum to 48 11ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > leaves the remaining catalogue in the batches STAGE.md assigns 0ms
+ ✓ tests/openui-inventory.spec.tsx > component inventory > actually draws each of the four, rather than listing it 3ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  01:49:26
+   Duration  1.56s (transform 191ms, setup 0ms, import 613ms, tests 18ms, environment 690ms)
+

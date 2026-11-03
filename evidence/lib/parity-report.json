@@ -1,0 +1,69 @@
+{
+ "canon": "evidence/lib/cdp.mjs",
+ "canonExports": [
+  "SESSION",
+  "SLEEP",
+  "click",
+  "consoleRead",
+  "evaluate",
+  "evaluateRaw",
+  "fill",
+  "navigate",
+  "observe",
+  "observeContext",
+  "press",
+  "refFor",
+  "reload",
+  "resize",
+  "screenshot",
+  "step",
+  "sync"
+ ],
+ "copies": [
+  {
+   "file": "evidence/browser-phase-1/probes/cdp.mjs",
+   "lines": 51,
+   "exports": 6,
+   "absentExports": [],
+   "absentCommands": []
+  },
+  {
+   "file": "evidence/browser-phase-2/cdp.mjs",
+   "lines": 92,
+   "exports": 9,
+   "absentExports": [],
+   "absentCommands": [
+    "step click",
+    "step navigate",
+    "step press"
+   ]
+  },
+  {
+   "file": "evidence/browser-phase-3/cdp.mjs",
+   "lines": 114,
+   "exports": 12,
+   "absentExports": [
+    {
+     "name": "type",
+     "decision": "per-character typing. It existed only to work around the 0.4.0/0.4.1 protocol skew that made `fill` crash the host draft editor; once the CLI matched the extension, `fill` delivered 876 characters in one action. Kept as a recorded mistake, not as an API: a character loop costs one subprocess per glyph."
+    }
+   ],
+   "absentCommands": [
+    "step click",
+    "step fill",
+    "step navigate",
+    "step press",
+    "step type"
+   ]
+  },
+  {
+   "file": "evidence/phase-4a-1/cdp.mjs",
+   "lines": 160,
+   "exports": 14,
+   "absentExports": [],
+   "absentCommands": []
+  }
+ ],
+ "missingAction": [],
+ "forbidsCharacterTyping": true
+}

@@ -1,0 +1,197 @@
+{
+  "phase": "4A-1",
+  "title": "Box, Divider, Spacer, Grid — layout primitives, verified in a real browser",
+  "capturedAt": "2026-11-03T02:05+08:00",
+  "environment": {
+    "plugin": "@dsh-unified/visualize@0.1.0 (this working tree, npx tsdown build)",
+    "profile": "p3web — isolated DSH_HOME at tmp/dsh-p3 on :3093; production desktop (:61582) untouched",
+    "browser": "Edge 156 / browser-skill 0.4.1 CLI + 0.4.1 extension (protocol 1.8)",
+    "host": "dsh 0.2.0-rc.2",
+    "model": "DeepSeek-V4.1-Flash",
+    "card": "drawn by the model through the visualize tool; no DOM injected by the harness"
+  },
+  "bundleCheckPerAgentsRule9": {
+    "clientBuildSha256": "0C72613C112FB3F0D40073F771CDB36F9573F6C9BDD5F00346AE4D2842702507",
+    "clientInstalledSha256": "0C72613C112FB3F0D40073F771CDB36F9573F6C9BDD5F00346AE4D2842702507",
+    "indexBuildSha256": "2748303BC9FD0CCAAB188AEA6A33584207F0F88A20F1F2C711080A2504EA3131",
+    "indexInstalledSha256": "2748303BC9FD0CCAAB188AEA6A33584207F0F88A20F1F2C711080A2504EA3131",
+    "outcome": "MATCH on both halves, re-verified after the final rebuild and again before the closing measurements."
+  },
+  "summary": {
+    "PASS": ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"],
+    "FAIL": [],
+    "NOT_VERIFIED": ["A9"],
+    "gate": "9 items — 8 verified, 1 recorded as not verified with its reason"
+  },
+  "exitGate": [
+    {
+      "item": "Box, Divider, Spacer, Grid all have a real renderer",
+      "verdict": "PASS",
+      "detail": "All four draw; the inventory (tests/openui-inventory.spec.tsx) reads RENDERED_COMPONENTS from the renderer itself, not a hand-kept list: 12 / 48."
+    },
+    {
+      "item": "Component arguments match the signature table",
+      "verdict": "PASS",
+      "detail": "Argument order was read from signatures.ts (Box: children, direction, gap, padding, background, radius, border, width, height, flex, align, justify, wrap; Grid: children, columns, minChildWidth, gap) and every position is asserted in tests/openui-layout-4a1.spec.tsx."
+    },
+    {
+      "item": "Every component CSS variable resolves in the real DSH host",
+      "verdict": "PASS — after fixing two defects it found",
+      "detail": "The probe checks three layers: the variable is referenced, it is declared on the card root, and the host token it names resolves on document.body. First run: 0 of 24 unresolved in light, but 2 in dark — see defects D17/D18. After the fix both themes report 0 unresolved (probe-light-fixed.json, probe-dark-final.json)."
+    },
+    {
+      "item": "Light and dark both pass",
+      "verdict": "PASS",
+      "detail": "Dark was entered through the host's own Settings → 通用设置 → 外观 → 深色 control (a1-s22-switch.mjs: data-ds-dark-theme false→true, color-scheme light→dark) and the measurements were taken under it. No host CSS was modified at any point."
+    },
+    {
+      "item": "Tool View and Turn Tail both display",
+      "verdict": "PASS",
+      "detail": "2 copies of the card, 1 inside the fold and 1 on the tail, at 362px and 367px respectively — see replay.txt."
+    },
+    {
+      "item": "Refresh and history replay pass",
+      "verdict": "PASS",
+      "detail": "After a full reload both copies return with identical layout: same grid tracks, 1px divider, Spacer flex 1 1 0px. The model was not called again."
+    },
+    {
+      "item": "No new failures; TypeScript passes",
+      "verdict": "PASS",
+      "detail": "675 passed / 15 failed / 690, and the 15-item failure set is identical to the baseline (evidence/phase-4a-1/test-4a1.txt vs test-baseline.txt). tsc host and client both exit 0."
+    },
+    {
+      "item": "Build SHA-256 matches the test profile",
+      "verdict": "PASS",
+      "detail": "Both halves match; see bundleCheckPerAgentsRule9. A mismatch was caught and fixed at the start of the run, which is why the rule exists."
+    },
+    {
+      "item": "Test evidence, migration matrix and stage report updated",
+      "verdict": "PASS",
+      "detail": "evidence/phase-4a-1/, docs/upstream/MIGRATION_MATRIX.md, docs/specifications/COMPONENT_CATALOG.md, STAGE.md, docs/reports/PHASE-4A-1-REPORT.md."
+    }
+  ],
+  "checks": [
+    {
+      "id": "A1",
+      "name": "Box nesting: Box containing Row, Col and Text",
+      "verdict": "PASS",
+      "detail": "The first Box holds a Title and a Row of two Texts; the first Grid cell holds a Box with a Text and a Col with a Text + Caption. All three container kinds render inside a Box.",
+      "evidence": "probe-light.json / probe-dark-final.json"
+    },
+    {
+      "id": "A2",
+      "name": "Box sizing: fixed width and elastic width",
+      "verdict": "PASS",
+      "detail": "width 240 measured 240px in a 680px card; flex 1 measured 680px in the same card and 367px after the card narrowed. Neither collapsed nor overflowed.",
+      "evidence": "probe-light.json"
+    },
+    {
+      "id": "A3",
+      "name": "Grid responsiveness: columns drop as the card narrows",
+      "verdict": "PASS",
+      "detail": "MinChildWidth 180 grid: 3 columns at 680px and 560px, 2 at 440px, 1 at 320px. The explicit 3-column grid held 3 tracks at every width, so the change is the auto-fit rule and not a global effect.",
+      "evidence": "probe-grid-responsize.json",
+      "note": "An earlier attempt resized the window instead of the card and produced 527px at every step; that run is kept as a1-s27-responsive.mjs but its result is NOT used."
+    },
+    {
+      "id": "A4",
+      "name": "Grid nesting: cells hold complex components",
+      "verdict": "PASS",
+      "detail": "The 2-column grid held a Box (bg danger, radius sm, border 1px solid) and a Col with two children; both measured 334px wide at a 680px card, with the 12px gap.",
+      "evidence": "probe-light.json"
+    },
+    {
+      "id": "A5",
+      "name": "Divider visible in both themes",
+      "verdict": "PASS",
+      "detail": "1px tall, full card width, painting rgba(0,0,0,0.1) in light and rgba(255,255,255,0.12) in dark; opacity 1, visibility visible in both.",
+      "evidence": "probe-light.json, probe-dark-final.json, a1-light-card.png, a1-dark-card.png"
+    },
+    {
+      "id": "A6",
+      "name": "Spacer: measured distance between its two neighbours",
+      "verdict": "PASS",
+      "detail": "The Spacer took 589px of a 680px row (flex 1 1 0px), leaving 'before' and 'after' 605px apart; after the card narrowed it took 298px. Without the Spacer the two Texts would sit 8px apart (the row gap).",
+      "evidence": "probe-light.json, probe-dark-final.json"
+    },
+    {
+      "id": "A7",
+      "name": "Empty content vs missing renderer",
+      "verdict": "PASS",
+      "detail": "The empty Grid draws as a real grid (display:grid, template 336px 336px, 0 children) and carries no unrendered notice. A declared-but-undrawn component instead renders a visible 'X is not drawn by this build' notice with data-openui-unrendered — pinned by tests so the two cannot become confusable.",
+      "evidence": "probe-light.json (emptyGrids: 1, unrendered: []), tests/openui-layout-4a1.spec.tsx"
+    },
+    {
+      "id": "A8",
+      "name": "Both surfaces and replay after refresh",
+      "verdict": "PASS",
+      "detail": "1 copy inside the fold, 1 on the tail, before and after a full reload, with identical geometry across the reload.",
+      "evidence": "replay.txt"
+    },
+    {
+      "id": "A9",
+      "name": "History replay across several sessions and older card generations",
+      "verdict": "NOT VERIFIED",
+      "detail": "The isolated profile's original session log cannot be loaded by this host build at all: it contains event type 'job/registered' written by a newer harness, and dsh 0.2.0-rc.2 refuses to interpret it ('历史加载失败'). That session was therefore unavailable for a multi-generation replay. The single-session reload replay (A8) passed; a cross-generation replay needs a session this build can read.",
+      "reason": "environment — older session log written by a newer harness"
+    }
+  ],
+  "defectsFound": [
+    {
+      "id": "D17",
+      "defect": "`--dsw-static-purple-500` does not exist in the host",
+      "impact": "`--viz-series-4` resolved to nothing in the real browser and silently painted its fallback; every unit test passed because the fallback is a plausible purple.",
+      "found": "the three-layer CSS-variable probe, in dark theme",
+      "fix": "The slot has no host token at all, so it is now declared directly as a literal pair (light-dark) with a comment saying why, instead of naming a token that does not exist."
+    },
+    {
+      "id": "D18",
+      "defect": "`--dsh-font-family-text-default` does not exist in the host",
+      "impact": "`--font-sans` resolved to nothing and fell back to the literal stack; identical-looking text, wrong mechanism.",
+      "found": "the same probe",
+      "fix": "Reads `--dsw-font-family`, which the host does publish and which resolves to the same system stack. Verified against all 509 custom properties the live host declares (host-tokens.json)."
+    },
+    {
+      "id": "D19",
+      "defect": "The component inventory mirrored the renderer's table as a hand-written literal",
+      "impact": "The probe reported 8 / 48 after the renderers existed — it was a copy of an old answer, not a measurement.",
+      "found": "while regenerating the inventory for this batch",
+      "fix": "The renderer now exports RENDERED_COMPONENTS, and tests/openui-inventory.spec.tsx asserts against the real table (12 / 48)."
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "a1-light-card.png",
+      "theme": "light",
+      "how": "host Settings → 通用设置 → 外观 → 浅色 (verified: data-ds-dark-theme false, color-scheme light)"
+    },
+    {
+      "file": "a1-dark-card.png",
+      "theme": "dark",
+      "how": "data-ds-dark-theme set directly, because the click on 深色 was intermittently blocked by the browser-skill extension overlay. Dark-theme MEASUREMENTS (probe-dark.json, probe-dark-final.json) were taken under the host-switched theme via a1-s22-switch.mjs, not under this forced attribute. The image is a faithful dark render; the switch itself is recorded separately so the two are not conflated."
+    }
+  ],
+  "environmentBlockersRecorded": [
+    {
+      "blocker": "The batch's first session could not be driven by automation",
+      "detail": "The host's own conversation pane failed on that session with 'TypeError: text.replace is not a function' in DraftEditorRuntime.setDraft and then could not load the log at all ('job/registered' unknown to this harness). Prompts returned HTTP 200 with nothing painted. This is a host/session defect, not a 4A-1 regression: the same flow worked in a fresh session in the same profile and same build.",
+      "resolution": "Measurements were taken in a fresh session; the older one is recorded as unreadable rather than as a 4A-1 failure."
+    },
+    {
+      "blocker": "browser-skill CLI 0.4.0 against extension 0.4.1",
+      "detail": "protocol skew; the CLI reported version_skew true and every fill crashed the host editor. Updated the CLI to 0.4.1 and restarted the daemon; skew false afterwards.",
+      "resolution": "fixed before any measurement was recorded"
+    }
+  ],
+  "reproduction": {
+    "server": "DSH_HOME=tmp/dsh-p3; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1",
+    "scripts": [
+      "a1-s6-draw.mjs (navigate + compose the request)",
+      "a1-s16-send.mjs / a1-s17-enter.mjs (submit; Enter is the working path)",
+      "a1-probe.mjs (the acceptance measurement)",
+      "a1-s28-gridwidth.mjs (responsive grid at four card widths)",
+      "a1-s29-replay.mjs (surfaces + reload replay)",
+      "a1-s22-switch.mjs (host theme switch)"
+    ]
+  }
+}

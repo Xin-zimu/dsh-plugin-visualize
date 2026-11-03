@@ -1,0 +1,92 @@
+{
+  "phase": "3",
+  "title": "OpenUI $state persistence, verified in a real browser",
+  "capturedAt": "2026-11-02T23:52+08:00",
+  "environment": {
+    "dsh": "booted from the installed runtime, profile p3web",
+    "plugin": "@dsh-unified/visualize@0.1.0 (this working tree, npx tsdown build)",
+    "gitHead": "9b46cec + uncommitted stage-3 changes",
+    "profile": "p3web — isolated DSH_HOME at tmp/dsh-p3; production desktop (:61582) untouched",
+    "url": "http://127.0.0.1:3093/",
+    "browser": "Chromium Agent Window (browser-skill over CDP), session acbm",
+    "model": "DeepSeek-V4.1-Flash",
+    "os": "Windows 10.0.26100",
+    "isolationCheck": "The production profile installs the published @nagi-ovo/dsh-visualize@^0.1.7, not this tree; the isolated profile installs file:D:/work/dsh-plugin-visualize and names @dsh-unified/visualize as its only visualisation bundle."
+  },
+  "summary": {
+    "PASS": ["S04", "P301", "P302", "P303", "P304"],
+    "FAIL": [],
+    "NOT_VERIFIED": ["P305", "P306"]
+  },
+  "checks": [
+    {
+      "id": "S04",
+      "name": "replay after reload — the case stage 2 marked PARTIAL",
+      "verdict": "PASS",
+      "detail": "The model drew an OpenUI card with Slider($count, 1, 10, 1, \"count\") and Text(\"count \" + @Format($count, \"number\")). Dragging the Slider 3 -> 6 changed the sibling to \"count 6\". After reload the card came back with value 6 and text \"count 6\", not the program default 3.",
+      "evidence": "s4-acceptance.mjs output; p3-card-value-6.png",
+      "before": { "value": "3", "text": "P3 persistencecount3count 3", "records": [] },
+      "afterDrag": { "value": "6", "text": "P3 persistencecount6count 6" },
+      "afterReload": { "value": "6", "text": "P3 persistencecount6count 6" }
+    },
+    {
+      "id": "P301",
+      "name": "the record is written under the :openui key with the A′ payload",
+      "verdict": "PASS",
+      "detail": "One localStorage entry, key ending \":openui\", payload {t, s:{v:1, h:\"18bcb949\", values:{count:6}}}. No HTML-shaped entry was created for this card.",
+      "observed": "dsh-visualize:state:session-82ee260c-…|…p3-persistence-461c4c27.whale.html:openui -> {\"t\":1793634317341,\"s\":{\"v\":1,\"h\":\"18bcb949\",\"values\":{\"count\":6}}}"
+    },
+    {
+      "id": "P302",
+      "name": "the value survives repeated reloads, not just one",
+      "verdict": "PASS",
+      "detail": "Reloaded the page twice more and reopened the session once; the Slider still read 6 and the stored t stayed at the first write (1793634317341), so nothing rewrote or churned the record.",
+      "detail2": "The second reload landed on the session list; after reopening the session the card restored to 6 again."
+    },
+    {
+      "id": "P303",
+      "name": "the hash is stable across reloads",
+      "verdict": "PASS",
+      "detail": "h stayed \"18bcb949\" across all three loads, so a reload does not look like a schema change and does not migrate the state."
+    },
+    {
+      "id": "P304",
+      "name": "the session id reaches the openui card",
+      "verdict": "PASS",
+      "detail": "The stored key begins with the real session id (session-82ee260c-9ed6-44b5-9909-b9adf7599c3c), which is only possible because the intelligent_ui toolview received it (P3-04). Before that change the same card would have persisted nothing."
+    },
+    {
+      "id": "P305",
+      "name": "cross-card and cross-session isolation, in the browser",
+      "verdict": "NOT VERIFIED",
+      "detail": "Covered by unit tests (tests/openui-state.spec.tsx cases 6 and 7) but not driven in the browser: only one card was drawn, because a second model call was not made."
+    },
+    {
+      "id": "P306",
+      "name": "corrupt localStorage falls back safely, in the browser",
+      "verdict": "NOT VERIFIED",
+      "detail": "Covered by unit tests (case 15, and the throwing-storage case 9) but not exercised on a live page."
+    }
+  ],
+  "captureNotes": {
+    "whyTheCardIsNotInEveryScreenshot": "The host folds a finished turn with an ancestor carrying `content-visibility: hidden`. A subtree that is laid out but skipped for painting also drops out of the accessibility tree, so getBoundingClientRect returned 675x79 while the card appeared in neither the a11y snapshot nor a viewport capture.",
+    "whatWasDone": "For the final capture (s16) `content-visibility` was forced to visible on the two host fold containers, then reverted (s17). The persisted record was unchanged by the override: t and h are identical before and after.",
+    "pluginOrHost": "Host behaviour. No plugin code was changed, disabled or special-cased to produce the image, and the measurement in S04/P301 does not depend on the override at all."
+  },
+  "notVerifiedOverall": [
+    "Button action steps remain inert: only Slider writes state, so a Button-driven state change is stubbed by the unit tests but not exercisable in the UI yet.",
+    "The HTML backend's own card state in this build was not re-driven in the browser; it is covered by the existing 25 unit tests, which pass unchanged."
+  ],
+  "reproduction": {
+    "server": "DSH_HOME=tmp/dsh-p3; dsh --profile p3web --no-open --port 3093 --host 127.0.0.1",
+    "scripts": [
+      "s1-reach-composer.mjs <tokenised url>",
+      "s2-ask-for-card.mjs",
+      "s3-wait-card.mjs",
+      "s4-acceptance.mjs",
+      "s12-reopen-and-paint.mjs",
+      "s16-force-paint.mjs",
+      "s17-revert.mjs"
+    ]
+  }
+}

@@ -47,7 +47,7 @@ import {
   openuiMetaFrom, openuiMetaFromArgs, visualizeMetaFrom, visualizeMetaFromArgs,
   type OpenUIMeta, type VisualizeMeta,
 } from '../fragment.ts'
-import { OpenUICard } from './OpenUICard.tsx'
+import { OpenUICard, stateKeyFor } from './OpenUICard.tsx'
 import { buildFrameDoc, HEIGHT_MESSAGE_TYPE, type FrameVariant } from '../shell.ts'
 import { PROMPT_INTERVAL_MS, readerIsInFrame, readPromptMessage, type PromptSink } from './prompt-bridge.ts'
 import { buildWindowDoc, FRAME_SANDBOX } from '../window-doc.ts'
@@ -596,7 +596,12 @@ export function VisualizeCard({ callId, block, visualizePrompt, visualizeSession
   const program = openuiMetaFrom(block.meta)
     ?? (visualizeMetaFrom(block.meta) === undefined ? openuiMetaFromArgs(argsRaw) : undefined)
   if (program !== undefined) {
-    return <OpenUICard meta={{ ...program, style: program.style ?? liveStyle() }} />
+    return (
+      <OpenUICard
+        meta={{ ...program, style: program.style ?? liveStyle() }}
+        stateKey={stateKeyFor(program, visualizeSession, callId)}
+      />
+    )
   }
   const persisted = visualizeMetaFrom(block.meta)
   if (persisted !== undefined) noteSettledStyle(persisted.style, argsRaw)

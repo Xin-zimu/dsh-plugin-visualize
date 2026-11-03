@@ -139,8 +139,11 @@ describe('host token bridge', () => {
     for (const name of ['--foreground', '--muted-foreground', '--border', '--primary', '--primary-foreground', '--radius']) {
       expect(decoded).toContain(`${name}:var(--dsw-`)
     }
-    // --font-sans is the one bridged name whose host token is a --dsh-* token.
-    expect(decoded).toContain('--font-sans:var(--dsh-font-family-text-default')
+    // --font-sans is a --dsw-* token, not a --dsh-* one. This assertion used to
+    // name `--dsh-font-family-text-default`, which the host has never published:
+    // the 4A-1 browser run found it resolving to nothing (D18), and the fix is
+    // `--dsw-font-family`. Pinned to the measured token so it cannot drift back.
+    expect(decoded).toContain('--font-sans:var(--dsw-font-family')
   })
 
   it('keeps the semantic colour names on their own series', () => {

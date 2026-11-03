@@ -15,17 +15,20 @@ one theme and one replay path.
 
 ## Status
 
-**Version 0.1.0, unreleased. Stage 1 of 5.**
+**Version 0.1.0, unreleased. Stage 4A-1 of 5.**
 
 | Works today | Not yet |
 | --- | --- |
-| One `visualize` tool, both backends registered | An openui card does not render in the browser yet |
-| HTML cards, unchanged from upstream | No evaluator: programs are validated, not run |
-| Contract, registry, router, envelope | 8 of 48 components, 17 of 73 functions |
+| One `visualize` tool, both backends registered | 12 of 48 components render |
+| HTML cards, unchanged from upstream | 36 components (4A-2 … 4A-5) |
+| OpenUI programs are evaluated and drawn as host components | `@OpenUrl` / `@CopyToClipboard` / `@ToAssistant` (refused by name, 4B) |
+| `$state` persists across a reload; Button actions change it | Cross-generation history replay (blocked on a host-compatible log) |
+| Layout primitives `Box`, `Grid`, `Divider`, `Spacer` — verified in both themes | `Popover` (the only component that overlays the host document, 4A-5) |
 | Legacy calls and legacy cards still work | Maps, image search, maths, embeds |
 
 Read `session-log.md` for the dated truth. It is the only file that says what
-is actually true right now.
+is actually true right now. `docs/specifications/COMPONENT_CATALOG.md` lists every
+component and whether the renderer draws it.
 
 ## Install
 
@@ -40,18 +43,26 @@ Restart DSH, then ask for something worth looking at.
 
 ## For agents
 
-Read, in order: `AGENTS.md` → `session-log.md` → `STAGE.md` → `PLAN.md`.
-`AGENTS.md` is binding: it defines what "implemented" and "verified" may be
-used to mean here.
+Read, in order: `HANDOFF.md` → `AGENTS.md` → `session-log.md` → `STAGE.md` →
+`PLAN.md`. `AGENTS.md` is binding: it defines what "implemented" and "verified"
+may be used to mean here.
+
+`HANDOFF.md` exists because two things a new session needs are not in the usual
+documents: the working tree currently carries accepted-but-uncommitted work (so
+`AGENTS.md` §2's "stop on a dirty tree" does **not** apply), and the browser
+harness's daemon, server and session are all session-bound processes that must be
+re-created before any measurement.
 
 ## Where everything is
 
 | Question | File |
 | --- | --- |
+| What do I need before my first command? | `HANDOFF.md` |
 | What is this project for? | `PLAN.md` |
 | What are we doing right now? | `STAGE.md` |
 | Where did the last session stop? | `session-log.md` |
 | How do I work in this repo? | `AGENTS.md` |
+| How do I verify in a browser? | `docs/testing/BROWSER_HARNESS.md` |
 | How are the layers organised? | `docs/architecture/SYSTEM_ARCHITECTURE.md` |
 | Where did this code come from? | `docs/upstream/UPSTREAM_BASELINE.md`, `MIGRATION_MATRIX.md` |
 | Why is it built this way? | `docs/decisions/ADR-00*.md` |

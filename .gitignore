@@ -26,3 +26,7 @@ upstream/*/.next/
 # Next.js writes this on first build; it is generated, not source, and the
 # upstream snapshot is 18 MB of source without it.
 upstream/open-intelligent-ui/next-env.d.ts
+
+# Browser-harness runtime state (see docs/testing/BROWSER_HARNESS.md).
+# The stamp records when the last smoke pass ran; it is machine-local.
+evidence/.smoke-stamp.json

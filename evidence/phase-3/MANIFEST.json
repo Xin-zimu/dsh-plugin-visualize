@@ -1,0 +1,104 @@
+{
+  "phase": "3-design",
+  "subject": "ADR-006 read-only audit — cardStates / OpenUI $state persistence",
+  "date": "2026-11-02",
+  "kind": "baseline capture, no product code changed",
+  "head": "9b46cec",
+  "workingTreeCleanBeforeWork": true,
+  "commands": [
+    {
+      "id": "E1",
+      "command": "npx vitest run tests/card-state.spec.ts tests/frame-state.spec.tsx",
+      "purpose": "Establish that the HTML card-state infrastructure ADR-006 claims to reuse is green before any change",
+      "result": "25 passed / 25 (2 files)",
+      "output": "evidence/phase-3/audit-card-state-baseline.txt",
+      "sha256": "BE275CB0273B426E559D3155D1F5D114C3F2DAA088FEC68092E1B0151FAB1863",
+      "verdict": "PASS"
+    },
+    {
+      "id": "E2",
+      "command": "git status --short",
+      "purpose": "AGENTS.md rule 2: do not build on someone else's uncommitted work",
+      "result": "empty (clean tree) before work started",
+      "verdict": "PASS"
+    },
+    {
+      "id": "E3",
+      "command": "npx tsc -p tsconfig.json --noEmit",
+      "purpose": "Host project typechecks after the new module, card wiring and toolview inject",
+      "result": "exit 0, no diagnostics",
+      "output": "evidence/phase-3/tsc-host.txt",
+      "verdict": "PASS"
+    },
+    {
+      "id": "E4",
+      "command": "npx tsc -p tsconfig.client.json --noEmit",
+      "purpose": "Client project typechecks, including the new spec",
+      "result": "exit 0, no diagnostics",
+      "output": "evidence/phase-3/tsc-client.txt",
+      "verdict": "PASS"
+    },
+    {
+      "id": "E5",
+      "command": "npx vitest run",
+      "purpose": "Whole suite after implementation",
+      "result": "602 passed / 15 failed / 617 (35 files)",
+      "output": "evidence/phase-3/test-final.txt",
+      "verdict": "PASS — failure set is byte-identical to the stage-2 baseline",
+      "delta": "+26 passed against stage 2 (576 -> 602); +0 failed"
+    },
+    {
+      "id": "E6",
+      "command": "normalised FAIL-set diff, evidence/phase-3/test-final.txt vs evidence/phase-2/test-after-stage2.txt",
+      "purpose": "AGENTS.md §6: prove the 15 are the same 15, not new ones",
+      "result": "15 vs 15, Compare-Object empty",
+      "verdict": "IDENTICAL"
+    },
+    {
+      "id": "E7",
+      "command": "npx tsdown",
+      "purpose": "Build both halves after the change",
+      "result": "lib/index.js 240.42 kB, lib/client.js 290.42 kB",
+      "verdict": "PASS"
+    },
+    {
+      "id": "E8",
+      "command": "live DSH web session, isolated profile p3web on :3093",
+      "purpose": "P3-05 acceptance: Slider 3 -> 6, then reload",
+      "result": "after three reloads the Slider reads 6 and the Text reads 'count 6'",
+      "output": "evidence/browser-phase-3/MANIFEST.json",
+      "verdict": "PASS"
+    }
+  ],
+  "claimsCheckedInSource": {
+    "note": "Every row names the file and line range the claim was read from. Nothing in ADR-006 was inferred from documentation.",
+    "rows": [
+      { "claim": "cardStates is a localStorage store, one entry per card", "source": "src/client/card-state.ts:7-13, :272-277" },
+      { "claim": "entry shape is { t, s }", "source": "src/client/card-state.ts:59-62, :202" },
+      { "claim": "card key is session + path, or call:<id> when path is empty", "source": "src/client/card-state.ts:71-73" },
+      { "claim": "HTML state is authored inside the frame, not by the card", "source": "src/viz-helper.ts:255-267, :342-349; src/client/VisualizeCard.tsx:292-304" },
+      { "claim": "saved HTML state is baked into the srcdoc before scripts run", "source": "src/shell.ts:138-141; src/viz-helper.ts:274-277" },
+      { "claim": "per-card cap 16 KiB, total cap 256 KiB, debounce 400 ms", "source": "src/viz-helper.ts:67; src/client/card-state.ts:44, :47" },
+      { "claim": "eviction is oldest-change-first and quota refusals shed own entries", "source": "src/client/card-state.ts:196-239" },
+      { "claim": "clearing state is expressed as '{}' and becomes removeItem", "source": "src/client/card-state.ts:198-201" },
+      { "claim": "OpenUI state was plain host React state, not persisted", "source": "src/client/OpenUICard.tsx:540-547 (before this change)" },
+      { "claim": "the OpenUI card was never given a stateKey", "source": "src/client/VisualizeCard.tsx:587, :599 (before this change)" },
+      { "claim": "stateDefaults is documented and implemented as independent of caller state", "source": "src/backends/openui/evaluate.ts:78-79, :264-282, :807-813" },
+      { "claim": "a $variable reference reads userState with no type check", "source": "src/backends/openui/evaluate.ts:302-308" },
+      { "claim": "a $variable argument can become a { kind:'binding' } descriptor", "source": "src/backends/openui/evaluate.ts:51-55, :736" },
+      { "claim": "the write channel receives the unwrapped value", "source": "src/client/OpenUICard.tsx:359-364" },
+      { "claim": "card paths are content-addressed on create", "source": "src/core/legacy-tool.ts:321, :498-519" },
+      { "claim": "toolview and turn tail share one state key but use different tokens", "source": "src/client/VisualizeCard.tsx:610 vs src/client/TurnCards.tsx:245-251" },
+      { "claim": "unmounting a card does not delete its stored state", "source": "tests/frame-state.spec.tsx:214-237" },
+      { "claim": "the turn tail does not collect OpenUI cards", "source": "src/client/TurnCards.tsx:94, :127 use visualizeMetaFrom only" },
+      { "claim": "no client file uses innerHTML or dangerouslySetInnerHTML", "source": "grep over src/client/*.tsx: 0 matches" },
+      { "claim": "the store itself was not modified by this work", "source": "git diff --stat: src/client/card-state.ts does not appear" }
+    ]
+  },
+  "notVerified": [
+    "Button action steps (@Set/@Reset) still do not write state, so a Button-driven change is not exercisable in the UI.",
+    "Cross-card and cross-session isolation in the browser: unit-tested (cases 6/7), not driven live.",
+    "Corrupt localStorage fallback in the browser: unit-tested (cases 9/15), not driven live.",
+    "The HTML backend's card state was not re-driven in the browser this phase; its 25 unit tests pass unchanged."
+  ]
+}

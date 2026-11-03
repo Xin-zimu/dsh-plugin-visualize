@@ -91,7 +91,85 @@ A change is not finished until the documents it invalidates are updated.
 | Released a version | `CHANGELOG.md` |
 | New component or function shipped | `docs/specifications/` catalog |
 
-## 9. When you are unsure
+## 9. Browser evidence must prove what the browser loaded
+
+Before starting any DSH browser integration test, compare the SHA-256 of the
+client bundle the test profile has **installed** with the SHA-256 of the current
+build output. If they differ, the browser is not running this tree, and no
+product code may be judged FAIL on that run.
+
+```powershell
+Get-FileHash tmp/dsh-p3/profiles/p3web/node_modules/@dsh-unified/visualize/lib/client.js -Algorithm SHA256
+Get-FileHash lib/client.js -Algorithm SHA256
+```
+
+Why this is a rule and not a tip: `dsh plugin add file:...` copies `lib/` at
+install time. A build that happens *after* the install leaves the profile on the
+old bundle, and the browser then behaves exactly as an unfixed build would. That
+happened in P3-06: a correct turn-tail fix looked like a total failure, and the
+"defect" was the environment. The trap is that the wrong conclusion is the
+believable one — a browser test failing after a fix reads as a real defect.
+
+If a bundle mismatch is found, fix the install and re-run; if a genuine mismatch
+cannot be fixed, record the run as **NOT VERIFIED** with the two hashes, never
+as FAIL against the code.
+
+## 10. Diagnose the environment before you test the product
+
+This is the rule the stage-4A-1 refactor exists to encode. It is not about
+spending fewer tokens; that is a symptom. The rule is:
+
+> **Diagnose the environment, then verify the interaction, then verify the
+> product. If a precondition does not hold, stop and say so — repeated trial and
+> error is not fault localisation.**
+
+A browser run must begin with the gates, not with a card:
+
+```powershell
+node evidence/lib/probe.mjs --what=smoke
+```
+
+Four gates, in order, stopping at the first failure: **G0** environment (version
+skew, bundle hash, an unreadable session log, a dead agent tab), **G1** input
+(`fill` delivers a whole value in one action), **G2** submit (`Enter` submits),
+**G3** render (the turn actually paints). Only then:
+
+```powershell
+node evidence/lib/probe.mjs --what=card  --title="<card title>"
+node evidence/lib/probe.mjs --what=theme --want=dark
+node evidence/lib/probe.mjs --what=tokens
+```
+
+**Exit code 2 means the environment blocked the run and is never a product
+failure.** It may not be added to a FAIL column, a failure count, or a stage
+verdict. Exit code 1 is a product failure and is the only one that may be.
+
+The manual is `docs/testing/BROWSER_HARNESS.md`. Three consequences that are easy
+to get wrong:
+
+1. **A hanging call is a defect in the harness, not a fact about the product.**
+   Every `bsk` subprocess is time-bounded. If something hangs, fix the bound —
+   do not background it and keep working. A 20-second check that became a
+   three-minute job is what this paragraph is for.
+2. **Bulk input, never per character.** `fill` sets a whole value in one action;
+   `press('Enter')` submits. A character loop costs one subprocess per glyph and
+   was written once in 4A-1 to route around a protocol skew that should have been
+   diagnosed and fixed. `evidence/lib/parity.mjs` fails if it comes back.
+3. **Read the page before probing it.** If a card does not appear, read
+   `document.body.innerText` and the console buffer first. In 4A-1 the host was
+   publishing `历史加载失败` in a visible banner, and ten scripts were spent trying
+   to make a card appear before anyone read it.
+
+Also binding on test *cost*, for the same reason: run the **single spec** you
+touched while iterating, and the **full suite once** before writing numbers down.
+A full suite re-run mid-edit buys nothing and costs a full transcript of output.
+
+Keep the authoritative helper in `evidence/lib/cdp.mjs`; the older phase copies
+stay as historical record and must not be edited. After changing the helper, run
+`node evidence/lib/parity.mjs` — a capability that disappears must be a recorded
+decision, not an accident (§4).
+
+## 11. When you are unsure
 
 Write the uncertainty down in `session-log.md` under "open questions" and
 ask. Do not guess an architecture, do not invent a component name, and do not

@@ -236,3 +236,107 @@ describe('card state relay', () => {
     expect((running.document.getElementById('r') as HTMLInputElement).value).toBe('7')
   })
 })
+
+/**
+ * The HTML backend's cross-view write hazard, pinned as it is today.
+ *
+ * The toolview and the turn tail can both be mounted for one card. They share a
+ * state key but each frame holds its own copy of the saved map and posts the
+ * whole map on every change, so whichever posts last wins — including when that
+ * view's map is the older one.
+ *
+ * ADR-006 decided this would **not** be changed in stage 3: the OpenUI path got
+ * a read-modify-write merge, and applying one to the HTML write path would alter
+ * shipped behaviour. These tests exist so the risk is recorded and visible rather
+ * than assumed absent. If a future change fixes it, these assertions fail and
+ * the decision gets revisited deliberately.
+ */
+describe('HTML cross-view writes are last-writer-wins (known, not fixed)', () => {
+  const card = (path: string): VisualizeMeta => ({
+    kind: 'visualize', fragment: '<input id="r" type="range" data-viz-keep>', title: 'Card', mode: 'inline', path, style: 'whale',
+  })
+  const A = card('/s/x-1.whale.html')
+  let storage: Map<string, string>
+
+  beforeAll(() => {
+    window.matchMedia ??= (() => ({ matches: false, addEventListener() {}, removeEventListener() {} })) as never
+    ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+  })
+  beforeEach(() => {
+    storage = new Map()
+    resetCardStates(() => ({
+      get length() { return storage.size },
+      key: i => [...storage.keys()][i] ?? null,
+      getItem: k => storage.get(k) ?? null,
+      setItem: (k, v) => { storage.set(k, v) },
+      removeItem: k => { storage.delete(k) },
+    }), { delayMs: 0 })
+  })
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  /** Mount two views of ONE card, as an opened fold produces. */
+  function mountBothViews() {
+    const root = document.createElement('div')
+    document.body.append(root)
+    const reactRoot = createRoot(root)
+    const key = cardStateKey('s1', A.path, 'call-a')
+    act(() => {
+      reactRoot.render(
+        <>
+          <Frame key="toolview" meta={{ ...A }} callId="call-a" stateKey={key} />
+          <Frame key="turn-tail" meta={{ ...A }} callId="turn-tail:call-a" stateKey={key} />
+        </>,
+      )
+    })
+    return {
+      frames: [...root.querySelectorAll('iframe')],
+      key,
+      unmount: () => { act(() => reactRoot.unmount()); root.remove() },
+    }
+  }
+
+  function post(source: MessageEventSource | null, token: string, state: unknown) {
+    act(() => {
+      window.dispatchEvent(new MessageEvent('message', { data: { type: STATE_MESSAGE_TYPE, token, state }, source }))
+    })
+  }
+
+  it('keeps one key for both views', () => {
+    const both = mountBothViews()
+    expect(both.frames).toHaveLength(2)
+    // Both mount from the same card, so both are keyed identically.
+    expect(cardStateKey('s1', A.path, 'call-a')).toBe(cardStateKey('s1', A.path, 'call-a'))
+    both.unmount()
+  })
+
+  it('shows the hazard: a stale view overwrites a newer value', () => {
+    const both = mountBothViews()
+    const [toolview, tail] = both.frames
+
+    // The toolview reports a change first.
+    post(toolview!.contentWindow, 'call-a', { 'keep:r': '8' })
+    expect(cardStates.read(both.key)).toEqual({ 'keep:r': '8' })
+
+    // The turn tail, which never saw that change, posts its own whole map next
+    // — the value from before. The store takes it, because a post is a snapshot
+    // of a whole map and nothing reconciles the two views.
+    post(tail!.contentWindow, 'turn-tail:call-a', { 'keep:r': '3' })
+    expect(cardStates.read(both.key)).toEqual({ 'keep:r': '3' })
+
+    both.unmount()
+  })
+
+  it('does not let one view write the other’s key', () => {
+    // The narrower hazard this pins: a frame may only ever write the card it is
+    // mounted for, whatever token it holds.
+    const both = mountBothViews()
+    const [toolview] = both.frames
+    post(toolview!.contentWindow, 'call-a', { 'keep:r': '5' })
+    expect(cardStates.read(both.key)).toEqual({ 'keep:r': '5' })
+    // The other card in the session is untouched.
+    expect(cardStates.read(cardStateKey('s1', '/s/other-1.whale.html', 'call-z'))).toBeUndefined()
+    both.unmount()
+  })
+})

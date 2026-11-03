@@ -1,0 +1,7 @@
+Grid   errors=[] sizeBytes=22
+Table  errors=[] sizeBytes=23
+Chart  errors=[] sizeBytes=23
+Map    errors=["VZO002"] sizeBytes=21
+
+--- a name that is genuinely absent from the table ---
+Nope   errors= [{"code":"VZO002","message":"line 1: unknown component \"Nope\""}]

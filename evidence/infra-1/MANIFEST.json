@@ -1,0 +1,131 @@
+{
+  "phase": "infra-1",
+  "title": "Test infrastructure refactor — four gates, one helper, one probe",
+  "capturedAt": "2026-11-03T23:35+08:00",
+  "status": "COMPLETE — toolchain verified against a live DSH session",
+  "motivation": {
+    "measuredIn": "4A-1",
+    "problem": "Not 'too many tests'. A dead host was treated as a product defect and debugged by trial and error for most of the phase.",
+    "evidence": {
+      "scriptsWritten": 41,
+      "scriptsThatProducedAcceptedEvidence": 6,
+      "cdpCopiesInTree": 4,
+      "rootCauses": [
+        "host refused to load its own session log (event type 'job/registered' written by a newer harness)",
+        "browser-skill CLI 0.4.0 against extension 0.4.1 — protocol skew made every fill crash the host draft editor"
+      ],
+      "timeToStateThoseRootCauses": "most of the phase",
+      "perCharacterTyping": {
+        "subprocessCalls": 1760,
+        "wallTimeSeconds": 420,
+        "charactersDelivered": 876,
+        "actualFix": "fill + press('Enter') = 2 calls, after the CLI was updated to match the extension"
+      }
+    }
+  },
+  "deliverables": [
+    {
+      "file": "evidence/lib/cdp.mjs",
+      "what": "the single authoritative helper",
+      "capabilities": ["evaluate", "evaluateRaw", "fill", "press", "click", "step", "navigate", "reload", "screenshot", "resize", "consoleRead", "observe", "refFor", "observeContext", "sync"],
+      "protocols": "reads both 1.7 and 1.8 shapes of cooperate sync",
+      "hardening": [
+        "every bsk subprocess is time-bounded (BSK_CALL_TIMEOUT_MS, default 20000)",
+        "transient refusals (observation_changed, content changed, covered) are retried; anything else surfaces immediately"
+      ],
+      "deliberateOmissions": {
+        "type": "per-character typing — recorded as a mistake, asserted absent by parity.mjs"
+      }
+    },
+    {
+      "file": "evidence/lib/probe.mjs",
+      "what": "parameterized probe: gates first, measurement second",
+      "modes": ["smoke", "card", "theme", "tokens"],
+      "gates": [
+        { "id": "G0", "name": "environment", "checks": ["daemon reachable", "no CLI/extension version skew", "active session", "agent tab is not about:blank", "bundle hash == installed hash", "page can load its session log", "no host draft-editor crash in console"] },
+        { "id": "G1", "name": "input", "asserts": "fill delivers all 31 characters including non-ASCII in one action" },
+        { "id": "G2", "name": "submit", "asserts": "Enter submits — composer clears AND the marker appears in the conversation" },
+        { "id": "G3", "name": "render", "asserts": ">= 2 paragraphs painted and the turn settles" }
+      ],
+      "gateOrderingRationale": "cheapest first, because evaluating against an about:blank tab HANGS instead of failing — tab list needs no cooperation context, so that case is answered without touching the page",
+      "exitCodes": { "0": "pass", "1": "product failure (only this may be filed as FAIL)", "2": "environment blocked (never a product failure)", "3": "usage error" },
+      "blockingPropagation": {
+        "productMeasurementsRequireFreshSmoke": true,
+        "stampFile": "evidence/.smoke-stamp.json",
+        "ttlMinutes": 45,
+        "sessionMustMatch": true,
+        "forceFlag": "bypasses for diagnosis, prints a warning, marks result forced:true"
+      }
+    },
+    {
+      "file": "evidence/lib/parity.mjs",
+      "what": "static check that the canonical helper covers every historical copy",
+      "failsOn": ["an exported name the canonical helper lacks (unless recorded in DROPPED)", "a missing core capability", "the return of the per-character typing loop"]
+    },
+    {
+      "file": "docs/testing/BROWSER_HARNESS.md",
+      "what": "the manual — gates, usage, exit-code semantics, cost accounting"
+    },
+    {
+      "file": "AGENTS.md §10",
+      "what": "the binding rule: diagnose environment -> verify interaction -> verify product",
+      "alsoBinds": ["single spec while iterating, full suite once before recording numbers", "bulk input, never per character", "read the page before probing it"]
+    },
+    {
+      "file": "evidence/*/HISTORICAL.md (4 files)",
+      "what": "marks the old cdp copies as history — the copies themselves are unedited"
+    }
+  ],
+  "verification": {
+    "g0FailsFastOnBlankTab": {
+      "verdict": "PASS",
+      "elapsedSeconds": 0.3,
+      "message": "G0 environment: the agent tab is still about:blank — it must be navigated to the DSH app before measuring",
+      "exitCode": 2,
+      "note": "before the fix this case hung; the same run had to be backgrounded and killed"
+    },
+    "fullSmoke": {
+      "verdict": "SMOKE PASS",
+      "elapsedSeconds": 11.6,
+      "gates": ["G0 pass", "G1 31/31 characters", "G2 submitted and echoed", "G3 rendered"],
+      "incidental": "G0 also reported the 2 existing 4A-1 cards and 0 draft-editor crashes"
+    },
+    "blockingWorks": {
+      "verdict": "PASS",
+      "cases": [
+        { "case": "no smoke stamp", "exit": 2, "message": "no smoke pass recorded — run --what=smoke before any product measurement" },
+        { "case": "stamp from another session", "exit": 2, "message": "the smoke pass was for session rkct, not wrongsid" },
+        { "case": "unknown --what", "exit": 3 }
+      ]
+    },
+    "parity": {
+      "verdict": "PASS (exit 0)",
+      "report": "evidence/lib/parity-report.json",
+      "result": "every historical copy's exports are covered; the single absence is `type`, recorded as a mistake",
+      "forbidsCharacterTyping": true
+    },
+    "productMeasurementsReuseExistingEvidence": {
+      "card": "found the 4A-1 card (2 copies, 680px, 0 unresolved variables, 0 dangling host tokens) — 0.2s",
+      "tokens": "read the card root's variables against the host — 0.2s",
+      "theme": "dark via the host's own Settings -> 通用设置 -> 外观 control; after = {dark:true, scheme:dark}, matching the 4A-1 record; restored to light afterwards — 12.3s"
+    }
+  },
+  "costBaselineFor4A2Comparison": {
+    "note": "Recorded as measured facts about THIS refactor, not as a claimed multiplier. 4A-2 must record the same metrics so the comparison is data.",
+    "metricsToRecordInEachPhase": ["script count", "bsk tool calls", "output tokens", "wall time seconds", "failed retries"],
+    "thisRefactor": {
+      "scriptsAdded": 3,
+      "cdpCopies": { "authoritative": 1, "historical": 4 },
+      "timeToDetectDeadEnvironment": "0.3s",
+      "timeForPassingSmoke": "11.6s",
+      "subprocessCallsForOnePrompt": 2,
+      "failedRetries": 1,
+      "failedRetryCause": "observation_changed on the first step call, fixed by adding transient retry to step()"
+    }
+  },
+  "untouched": {
+    "phase4a1Verdicts": "NOT redefined. 8 of 9 gate items pass; A9 remains NOT VERIFIED because the profile's older session is unreadable by this host build. The refactor changed tooling, not findings.",
+    "phase4a1Evidence": "not deleted, not rewritten. The old cdp copies stay exactly as those runs executed them.",
+    "sessionLog": "4A-1 numbers (683 / 15, differential 31/31) unchanged."
+  }
+}
