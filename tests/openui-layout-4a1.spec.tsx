@@ -269,14 +269,18 @@ describe('Spacer', () => {
 
 describe('a declared component with no renderer says so', () => {
   it('draws a notice instead of an empty card', () => {
-    const html = draw('root = Col([Table([])])')
-    expect(html).toContain('data-openui-unrendered="Table"')
-    expect(html).toContain('Table is not drawn by this build')
+    // `Carousel` is 4A-5's and has no renderer, which is what makes it a valid
+    // example here. 4A-1 wrote this test against `Table`; 4A-4 drew that one, so
+    // the fixture moved rather than the test being deleted — the property under
+    // test is "a declared name with no renderer says so", not "Table is missing".
+    const html = draw('root = Col([Carousel([])])')
+    expect(html).toContain('data-openui-unrendered="Carousel"')
+    expect(html).toContain('Carousel is not drawn by this build')
   })
 
   it('distinguishes that from a legal empty container', () => {
     const empty = draw('root = Col([Grid([])])')
-    const missing = draw('root = Col([Table([])])')
+    const missing = draw('root = Col([Carousel([])])')
     expect(empty).not.toContain('not drawn by this build')
     expect(missing).toContain('not drawn by this build')
   })
@@ -290,8 +294,8 @@ describe('a declared component with no renderer says so', () => {
   })
 
   it('keeps the notice out of the way inside a nested container', () => {
-    const html = draw('root = Box([Grid([Chart([])], 2)], "col")')
-    expect(html).toContain('data-openui-unrendered="Chart"')
+    const html = draw('root = Box([Grid([Popover([])], 2)], "col")')
+    expect(html).toContain('data-openui-unrendered="Popover"')
     expect(has(html, 'display:grid')).toBe(true)
   })
 })

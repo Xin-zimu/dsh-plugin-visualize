@@ -32,7 +32,7 @@ for (const component of COMPONENTS) {
 describe('component inventory', () => {
   it('draws 30 of the 48 declared components after 4A-3', () => {
     expect(declared).toHaveLength(48)
-    expect(RENDERED_COMPONENTS).toHaveLength(30)
+    expect(RENDERED_COMPONENTS).toHaveLength(34)
   })
 
   it('has no renderer for a name the language does not declare', () => {
@@ -86,11 +86,10 @@ describe('component inventory', () => {
   it('leaves the remaining catalogue in the batches STAGE.md assigns', () => {
     const missing = declared.filter(name => !rendered.has(name))
     // One row per batch, so a component cannot be quietly dropped from the plan.
-    // 4A-1, 4A-2 and 4A-3 are absent because they are complete: an entry with no
-    // names would just assert that nothing is left, which the per-group checks
+    // 4A-1, 4A-2, 4A-3 and 4A-4 are absent because they are complete: an entry with
+    // no names would just assert that nothing is left, which the per-group checks
     // above already do.
     const batches: Record<string, readonly string[]> = {
-      '4A-4': ['Table', 'Chart', 'Icon', 'Image'],
       '4A-5': ['Svg', 'G', 'Circle', 'Ellipse', 'Rect', 'Line', 'Path', 'Polyline', 'Polygon', 'SvgText', 'Flashcard', 'Celebration', 'Carousel', 'Popover'],
     }
     const planned = Object.values(batches).flat()

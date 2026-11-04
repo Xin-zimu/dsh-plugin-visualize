@@ -21,8 +21,8 @@ is measured, not inferred: `evidence/phase-3/unrendered-component-check.txt`.
 | Program | `validate` errors | What the reader sees |
 | --- | --- | --- |
 | `root = Col([Grid([])])` | none | a drawn, empty grid |
-| `root = Col([Table([])])` | none | a "Table is not drawn by this build" notice |
-| `root = Col([Chart([])])` | none | a "Chart is not drawn by this build" notice |
+| `root = Col([Carousel([])])` | none | a "Carousel is not drawn by this build" notice |
+| `root = Col([Popover([])])` | none | a "Popover is not drawn by this build" notice |
 | `root = Col([Map([])])` | `VZO002 unknown component "Map"` | the call is rejected |
 
 The safety net covers names the **language** does not know (`Map` is
@@ -44,7 +44,7 @@ was *meant* to be empty. The two are now different by construction:
 | Case | What is drawn |
 | --- | --- |
 | Legal empty container, e.g. `Grid([])` | the container itself, e.g. `display:grid` with zero children |
-| Declared component with no renderer, e.g. `Table([])` | a muted notice: `Table is not drawn by this build`, carrying `data-openui-unrendered="Table"` |
+| Declared component with no renderer, e.g. `Carousel([])` | a muted notice: `Carousel is not drawn by this build`, carrying `data-openui-unrendered="Carousel"`` |
 | Name the language does not declare, e.g. `Map` | nothing; the host rejects the program at validation (`VZO002`) |
 
 The notice is not a substitute for the renderer — it is a diagnostic that stops a
@@ -82,6 +82,10 @@ renderer gap from looking like an intentional blank.
 | `DatePicker` | Inputs | `value, label?, min?, max?` | Writes `YYYY-MM-DD` |
 | `Timer` | Inputs | `seconds, label?` | The only control that writes on a clock: one interval writes the bound seconds every second, so a sibling `Text` counts down with it and a reload resumes where it stopped. `role="timer"` and `role="progressbar"` |
 | `Form` | Inputs | `children` | Groups fields. Never submits — a submit would navigate the host pane away from the conversation |
+| `Table` | Media and data | `columns, rows` | One `<tr>` per row and exactly one `<td>` per **column**, so a short row is padded rather than shifting later cells. Header survives an empty body, which then says `no rows`. No columns draws a stated refusal, not an empty table |
+| `Chart` | Media and data | `type, data, x?, series?, format?, currency?, stacked?, height?` | **ADR-010.** Row objects in, countable inline SVG out: one `data-chart-mark` element per datum. `type`: bar \| line \| area \| pie \| donut \| scatter, unknown falls back to bar. Invalid data draws a stated refusal; a non-finite value is a counted **gap**, never a coerced zero. A legend appears only with more than one series |
+| `Icon` | Media and data | `name, size?, color?` | No icon set ships in this build, so a narrow glyph renders its own name in a bordered box — visibly a glyph, never an empty square. `size`: sm \| md \| lg \| xl. `role="img"` with the name as its accessible label |
+| `Image` | Media and data | `src, alt, aspectRatio?, radius?, fit?` | **ADR-009.** A real `<img>` **only** for an absolute `http:`/`https:` URL, parsed with `new URL`. `data:`, `blob:`, `file:`, `javascript:`, protocol-relative and relative sources render the alt text plus the reason, and produce **no `<img>` element at all**. Adds `loading=lazy`, `decoding=async`, `referrerPolicy=no-referrer`; a failed load degrades to the same visible refusal |
 
 ## Not yet available — validated but not drawn
 
@@ -91,7 +95,7 @@ shows a "not drawn by this build" notice. The batch column is the stage-4A plan
 
 | Batch | Components |
 | --- | --- |
-| 4A-4 | `Table`, `Chart`, `Icon`, `Image` |
+| ~~4A-4~~ | `Table`, `Chart`, `Icon`, `Image` — **complete**, 34 / 48 |
 | 4A-5 | `Svg`, `G`, `Circle`, `Ellipse`, `Rect`, `Line`, `Path`, `Polyline`, `Polygon`, `SvgText`, `Flashcard`, `Celebration`, `Carousel`, `Popover` |
 
 The authoritative list is measured, not typed: `tests/openui-inventory.spec.tsx`.

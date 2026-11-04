@@ -1,0 +1,86 @@
+{
+ "at": "2026-11-04T15:14:48.736Z",
+ "probe": "4A-4 C1",
+ "stamp": {
+  "at": "2026-11-04T15:13:28.898Z",
+  "session": "ehxx",
+  "buildSha256": "62AD5817E9DD4F2F63DE660C33AE4276CE27A5B22EACD20EB5334C64938611DA",
+  "installedSha256": "62AD5817E9DD4F2F63DE660C33AE4276CE27A5B22EACD20EB5334C64938611DA"
+ },
+ "prompt": "Use the visualize tool with backend openui, title A4 media and data. One statement per line, no explanation. Write exactly one root = statement drawing a Col with these children in this order: a Table with columns [Name, Qty] and three rows: [Widget, 3], [Gadget, 7], [Doohickey, 1]; a Chart of type bar over data [{month: \"Jan\", sales: 12}, {month: \"Feb\", sales: 30}, {month: \"Mar\", sales: 18}] with x month and series [sales]; a second Chart of type line over data [{month: \"Jan\", a: 5, b: 9}, {month: \"Feb\", a: 8, b: 4}] with x month and series [a, b]; a Row containing Icon(\"map-pin\"), Icon(\"star\", \"lg\"), Icon(\"heart\", \"xl\", \"danger\"); an Image with src https://example.com/photo.png and alt A remote photo; an Image with src javascript:alert(1) and alt A refused image. Then reply with the single word DRAWN. Do not explain and do not change the content.",
+ "submit": {
+  "clicked": true
+ },
+ "cardsBefore": 26,
+ "cardsAfter": 28,
+ "measured": {
+  "cards": 28,
+  "unrendered": [],
+  "table": {
+   "tables": 1,
+   "heads": 2,
+   "bodyRows": 3,
+   "cells": 6
+  },
+  "chart": {
+   "count": 2,
+   "kind": "bar",
+   "svgs": 2,
+   "marks": {
+    "bar": 3,
+    "line": 2
+   },
+   "legend": [
+    "a",
+    "b"
+   ],
+   "charts": [
+    "bar",
+    "line"
+   ],
+   "axisText": [
+    "0",
+    "7.5",
+    "15",
+    "22.5",
+    "30",
+    "Jan",
+    "Feb",
+    "Mar",
+    "0",
+    "2.25",
+    "4.5",
+    "6.75",
+    "9",
+    "Jan",
+    "Feb"
+   ]
+  },
+  "icon": {
+   "count": 3,
+   "names": [
+    "map-pin",
+    "star",
+    "heart"
+   ],
+   "labels": [
+    "map-pin",
+    "star",
+    "heart"
+   ]
+  },
+  "image": {
+   "imgs": 1,
+   "imgsrc": [
+    "https://example.com/photo.png"
+   ],
+   "refused": 1,
+   "loaded": 1,
+   "allImageNodes": 2,
+   "text": "A4 media and data\nName\tQty\nWidget\t3\nGadget\t7\nDoohickey\t1\n0\n7.5\n15\n22.5\n30\nJan\nFeb\nMar\n0\n2.25\n4.5\n6.75\n9\nJan\nFeb\na\nb\nma\nst\nhe\nA refused image\njavascript: is not an allowed scheme (http or https only)"
+  },
+  "notices": []
+ },
+ "problems": [],
+ "verdict": "PASS"
+}

@@ -1,0 +1,198 @@
+{
+  "phase": "4A-4",
+  "title": "Media and data — Table, Chart, Icon, Image",
+  "capturedAt": "2026-11-04T23:15+08:00",
+  "status": "ACCEPTED — all four components rendered in a real DSH host, both schemes measured, security policy exercised",
+  "verdict": "ACCEPTED. All six exit-gate items have evidence on this machine. The batch's distinguishing risk was not rendering but two security questions, both decided in ADRs before the renderers existed: ADR-009 (an Image may load only an absolute http/https URL) and ADR-010 (a Chart is a structured row contract rendered as countable SVG, never a Chart.js clone).",
+  "scope": {
+    "components": [
+      "Table",
+      "Chart",
+      "Icon",
+      "Image"
+    ],
+    "inventoryBefore": "30 / 48",
+    "inventoryAfter": "34 / 48",
+    "mediaGroup": "complete — 4 of 4",
+    "measuredFrom": "tests/openui-inventory.spec.tsx reading RENDERED_COMPONENTS"
+  },
+  "decisions": [
+    {
+      "id": "ADR-009",
+      "title": "The Image component's source policy",
+      "summary": "An Image renders a real <img> only for an absolute http: or https: URL, parsed with new URL and never pattern-matched. data:, blob:, file:, javascript:, protocol-relative and relative sources render the alt text in a bordered placeholder naming the reason. Workspace paths are deliberately unsupported here: the node-side reader in src/images.ts needs an execute step and a sandboxed frame that this backend does not have, because the OpenUI card is mounted in the host document."
+    },
+    {
+      "id": "ADR-010",
+      "title": "The Chart parameter contract",
+      "summary": "data is an array of row objects, x names the category key and series the value keys. Invalid data draws a stated refusal rather than a blank or a coerced zero; a non-finite value is a gap and is counted in a notice. SVG rather than Canvas so every bar and slice is countable in a test and in the host DOM. No options object, no animation, no tooltips — recorded as out of scope so a later batch adds them as a decision."
+    }
+  ],
+  "environment": {
+    "platform": "Windows 11 x64, real DSH host, isolated Edge profile, bsk 0.4.1",
+    "node": "v24.22.1",
+    "pnpm": "11.28.0",
+    "headBefore": "02ddc65 (4A-3 accepted, merged to main)",
+    "dshServer": "isolated server on 127.0.0.1:3093 with DSH_HOME=tmp/dsh-p3, profile p3web",
+    "browser": "Microsoft Edge 156.0.4314.58, bsk extension 0.4.1, version_skew false"
+  },
+  "hashGate": {
+    "rule": "AGENTS.md §9 — the bundle the browser ran must be the bundle this tree built",
+    "buildClientSha256": "62AD5817E9DD4F2F63DE660C33AE4276CE27A5B22EACD20EB5334C64938611DA",
+    "installedBeforeFix": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22 (the 4A-3 bundle)",
+    "staleBundleFound": true,
+    "fix": "removed the profile's node_modules/@dsh-unified/visualize and reinstalled before any measurement",
+    "installedAfterFix": "62AD5817E9DD4F2F63DE660C33AE4276CE27A5B22EACD20EB5334C64938611DA",
+    "result": "MATCH before measurement; G0 re-checks it on every smoke run",
+    "note": "Second consecutive batch where §9 caught an N-1 bundle that pnpm described as up to date. The rule is not a formality."
+  },
+  "commands": [
+    {
+      "command": "pnpm run typecheck",
+      "result": "PASS, exit 0, both projects",
+      "evidence": "tsc ok"
+    },
+    {
+      "command": "pnpm run test",
+      "result": "PASS on the batch — 821 passed / 15 failed / 836; the 15 are the documented baseline, set compared name by name",
+      "evidence": "tmp/test-4a4.txt"
+    },
+    {
+      "command": "pnpm run build",
+      "result": "PASS — lib/client.js rebuilt, new hash 62AD5817…",
+      "evidence": "build ok"
+    },
+    {
+      "command": "node --experimental-strip-types evidence/phase-2/differential.mjs",
+      "result": "PASS — 31/31, 0 differing, differential.json byte-identical",
+      "evidence": "-"
+    },
+    {
+      "command": "pnpm vitest run tests/openui-inventory.spec.tsx",
+      "result": "34 / 48 rendered; Media and data 4 / 4",
+      "evidence": "inventory output"
+    },
+    {
+      "command": "pnpm vitest run tests/openui-media-4a4.spec.tsx",
+      "result": "21 / 21 PASS",
+      "evidence": "-"
+    },
+    {
+      "command": "pnpm vitest run tests/openui-validate-gate.spec.ts",
+      "result": "6 / 6 PASS — the O1 gate",
+      "evidence": "-"
+    },
+    {
+      "command": "node evidence/lib/probe.mjs --what=smoke",
+      "result": "SMOKE PASS — G0 (both hashes equal), G1, G2, G3",
+      "evidence": "G0 fields"
+    }
+  ],
+  "exitCriteria": [
+    {
+      "item": 1,
+      "criterion": "Every component in the batch renders from a real program",
+      "result": "PASS (browser)",
+      "evidence": "C1-four-components.json — Table 1 table / 2 headers / 3 body rows / 6 cells; 2 charts with 3 bars and 2 line paths; 3 icons with correct accessible names; 1 <img>. Screenshot: screenshot-four-components.png"
+    },
+    {
+      "item": 2,
+      "criterion": "Bound inputs write $state and survive a reload",
+      "result": "N/A for this batch",
+      "evidence": "None of Table, Chart, Icon or Image is an input; none binds $state. The loop was proven in 4A-3 (V5) and is unchanged."
+    },
+    {
+      "item": 3,
+      "criterion": "Layout, colour and contrast hold in both colour schemes",
+      "result": "PASS (browser)",
+      "evidence": "V3-themes.json — 25 text samples per scheme covering chart axis labels, chart legend, table head and table cells: min contrast 5.8:1 light and 12.11:1 dark, both above AA 4.5:1. Both schemes entered through the host's own Settings → 通用设置 → 外观 control."
+    },
+    {
+      "item": 4,
+      "criterion": "The differential still reports 0 differences",
+      "result": "PASS",
+      "evidence": "31/31, 0 differing, output byte-identical"
+    },
+    {
+      "item": 5,
+      "criterion": "Browser evidence on an isolated profile, with the §9 hash check",
+      "result": "PASS",
+      "evidence": "Isolated host on :3093 driven through bsk 0.4.1; both SHA-256 halves matched 62AD5817… before measuring. A stale 4A-3 bundle was found first and fixed."
+    },
+    {
+      "item": 6,
+      "criterion": "tests/<batch> added; the 15-failure baseline unchanged",
+      "result": "PASS",
+      "evidence": "tests/openui-media-4a4.spec.tsx added, 21/21. Windows run 821/15/836 and the failing SET is identical to evidence/publish/test-before-publish.txt — compared name by name, zero added, zero removed."
+    }
+  ],
+  "notVerified": [],
+  "browserRuns": [
+    {
+      "id": "C1",
+      "claim": "All four components render from one real program in the host",
+      "result": "PASS",
+      "evidence": "C1-four-components.json, screenshot-four-components.png",
+      "probe": "evidence/phase-4a-4/probe-c1-four.mjs",
+      "measured": "Table: 1 <table>, 2 <th>, 3 <tbody tr>, 6 <tbody td>. Charts: 2 [data-openui-chart], 3 bar marks for 3 data points, 2 line paths for 2 series, legend naming a and b, category axis carrying Jan/Feb. Icons: 3, each with its own aria-label (map-pin, star, heart). Image: exactly 1 <img>, its src the https URL and nothing else; the javascript: source produced a refusal notice and zero image elements."
+    },
+    {
+      "id": "V3",
+      "claim": "Layout, colour and contrast hold in both colour schemes",
+      "result": "PASS",
+      "evidence": "V3-themes.json",
+      "probe": "evidence/phase-4a-4/probe-v3-themes.mjs",
+      "measured": "25 text samples per scheme. Min contrast 5.8:1 light / 12.11:1 dark. Chart axis labels are the new small-text class this batch introduces, and they are the D22 risk measured rather than assumed."
+    },
+    {
+      "id": "V4",
+      "claim": "The bundle the browser ran is the bundle this tree built (§9)",
+      "result": "PASS",
+      "evidence": "G0 in the smoke run; hashGate above"
+    }
+  ],
+  "securityEvidence": [
+    {
+      "claim": "A refused scheme produces no <img> element at all, in the host document",
+      "unit": "tests/openui-media-4a4.spec.tsx — javascript:, data:, file:, blob:, //host/x, relative, rooted and empty all assert countOf(html, 'img') === 0",
+      "browser": "C1-four-components.json — measured.image.imgs === 1, and every src starts with https:",
+      "whyItMatters": "The OpenUI card is mounted in the host document, not the HTML backend's sandboxed iframe, so a javascript: src would be a host-origin question.",
+      "mutation": "M1: making allowedImageUrl accept every scheme turned two tests red (the refused-scheme test and the reason test), then restored."
+    },
+    {
+      "claim": "The refusal names the reason and does not echo the hostile payload",
+      "browser": "The refusal reads 'javascript: is not an allowed scheme (http or https only)' — the scheme is named, the alert(1) payload is not re-inserted into the DOM"
+    }
+  ],
+  "mutationChecks": {
+    "purpose": "a guard that has never been seen to go red is a guess about what it protects",
+    "M1": "allowedImageUrl accepts every scheme -> 'produces NO <img> element for any refused scheme' and 'names the reason' both fail",
+    "M2": "chartSeries coerces an unreadable value to 0 -> 'refuses when no numeric series can be found' and 'treats a non-finite value as a gap' both fail",
+    "M3": "Table draws only the cells that exist -> 'pads a short row rather than shifting the cells' fails",
+    "O1": "validate gate replaced with a stub returning no errors -> 'rejects Action([...])' and 'rejects an unknown @-function' both fail",
+    "note": "All four mutations were restored and the suites re-run green."
+  },
+  "observations": [
+    {
+      "id": "O1",
+      "summary": "The unit spec bypassed the backend's name check — CLOSED in this batch",
+      "detail": "recorded in 4A-3 as a test-fidelity gap. tests/openui-validate-gate.spec.ts now runs fixtures through openuiBackend().validate(), the same entry the tool path uses, so a fixture the host would refuse fails in the suite. It asserts both directions: the documented bare @Set form is accepted, and Action([...]) is rejected with VZO002 — the shape the live host refuses.",
+      "status": "Fixed. Proven to go red by replacing the error list with a stub."
+    }
+  ],
+  "defects": [
+    {
+      "id": "D26",
+      "summary": "Table used 'raw' without declaring it, and the new spec was missing both the jsdom pragma and its tsconfig registration",
+      "detail": "The renderer signature had to grow a fourth parameter; the spec needed // @vitest-environment jsdom to reach document, and then had to be excluded from the node project and included in the client project like every other .tsx spec. Typecheck caught all three.",
+      "status": "Fixed. Recorded because the tsconfig pair is a step a new batch will have to repeat."
+    }
+  ],
+  "openQuestions": [
+    {
+      "topic": "A remote Image URL is still fetched by the reader's browser",
+      "detail": "ADR-009 closes the scheme set but cannot prevent a request to an attacker-chosen https host. That is inherent to an <img> in a host document.",
+      "whyRecorded": "so a later move to node-side resolution is a decision that cites ADR-009 and adds the isPublicAddress check images.ts already has, rather than a silent regression"
+    }
+  ]
+}

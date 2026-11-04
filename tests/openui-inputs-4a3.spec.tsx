@@ -226,7 +226,8 @@ describe('4A-3 renders every component in the batch', () => {
   it('draws 30 of the 48 declared components', () => {
     // 19 before this batch, +11 here. Counted from the renderer's own table, so
     // this cannot drift away from what is actually drawn.
-    expect(RENDERED_COMPONENTS).toHaveLength(30)
+    // 30 at the end of 4A-3; 34 since 4A-4 added Table, Chart, Icon and Image.
+    expect(RENDERED_COMPONENTS).toHaveLength(34)
   })
 })
 

@@ -19,9 +19,9 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | 4A-3 **ACCEPTED 2026-11-04** — the Inputs group is complete (30 of 48 render) and all eleven have now been seen in a real DSH host |
+| Stage | 4A-4 **ACCEPTED 2026-11-04** — Table, Chart, Icon and Image render in a real DSH host (34 of 48); 4A-5 remains |
 | Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-3 ACCEPTED** (30 of 48 render) — the unit half is green (809 / 809 on Linux) **and the browser half is now done**: V1–V5 plus a card drawing all eleven components, measured in a real DSH host with the §9 hash gate passing first. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
+| Status | **4A-4 ACCEPTED** (34 of 48 render). 4A-3 was accepted earlier the same day after its browser run (V1–V5, all eleven input components). 4A-4 added Table, Chart, Icon and Image, with two ADRs deciding the security shape before the code: ADR-009 (Image source allowlist) and ADR-010 (Chart row contract). Both batches have browser evidence with the §9 hash gate passing first. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
 
 ## 2a. Published, and what publishing cost
 
@@ -355,6 +355,12 @@ differential was re-run and still reports **31/31, 0 differences**
 | Language differential (4A-3) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences**; output byte-identical | `evidence/phase-4a-3/differential-4a3.txt` |
 | Inventory (4A-3) | `pnpm vitest run tests/openui-inventory.spec.tsx` | **30 / 48**, Inputs group complete | `evidence/phase-4a-3/inventory-linux.txt` |
 | Mutation checks (4A-3) | two defects re-introduced on purpose, spec re-run, source restored | **both new guards went red** (Timer cleanup; meta size 205772 > 4096) | `evidence/phase-4a-3/mutation-check.txt` |
+| Suite (4A-4, Windows) | `pnpm run test` | **821 / 15 / 836** — the failing **set** compared name-by-name with the baseline: **zero added, zero removed**; new spec 21/21 | `evidence/phase-4a-4/MANIFEST.json` |
+| Browser 4A-4 — four components | isolated profile, host DOM counted by structure | **PASS** — Table 1/2/3/6; 2 charts (3 bar marks, 2 line paths, legend a+b); 3 icons; **exactly 1 `<img>`** and a `javascript:` src produced none | `evidence/phase-4a-4/C1-four-components.json`, `screenshot-four-components.png` |
+| Browser 4A-4 — V3 themes | host's own 外观 control, both directions | **PASS** — 25 text samples per scheme over chart axis, legend, table head and cells; min contrast **5.8:1 light / 12.11:1 dark** | `evidence/phase-4a-4/V3-themes.json` |
+| Browser 4A-4 — §9 hash gate | `Get-FileHash` before any measurement | **MATCH** `62AD5817…` — after finding a stale 4A-3 bundle (`4D071A86…`); **second consecutive batch §9 caught it** | `evidence/phase-4a-4/MANIFEST.json` → `hashGate` |
+| 4A-4 mutation checks | four defects re-introduced, restored after | **all four went red**: Image scheme (2), chart gap coercion (2), table padding (1), validate-gate stub (2) | `MANIFEST.json` → `mutationChecks` |
+| O1 validate gate | `pnpm vitest run tests/openui-validate-gate.spec.ts` | **6 / 6 PASS** — fixtures now run through `openuiBackend().validate()` | — |
 | Browser 4A-3 — eleven components | isolated profile, host DOM counted by structure | **PASS** — all eleven counted; `data-openui-unrendered` empty | `evidence/phase-4a-3/C1-eleven-components.json`, `screenshot-eleven-components.png` |
 | Browser 4A-3 — V1 IME | genuine `Input.imeSetComposition` over CDP | **PASS** — 5 `input` events with `isComposing=true`; pre-edit `startn→startni→startnih→startnihao` intact; caret 5→6→7→8→10; focus held; commit 你好 reached `$state` | `evidence/phase-4a-3/V1-ime-composition.json` |
 | Browser 4A-3 — V2 Timer focus | real key events across 8 ticks | **PASS** — timer 01:00 → 00:53; six characters all landed in order; focus and node identity held; caret 1→6 | `evidence/phase-4a-3/V2-timer-focus.json` |
@@ -415,9 +421,23 @@ differential was re-run and still reports **31/31, 0 differences**
 
 ## 7. Next step
 
-**4A-3 is accepted. Next is 4A-4** (`Table`, `Chart`, `Icon`, `Image`), which is
-also where `IconButton`'s placeholder glyph gets a real `Icon` to draw. Two
-things from this run belong to it:
+**4A-4 is accepted. Next is 4A-5** — the fourteen that remain: the ten SVG
+drawing primitives plus `Flashcard`, `Celebration`, `Carousel` and `Popover`.
+Three things carry forward:
+
+1. **`Popover` is the only remaining component that overlays the host document.**
+   It needs its own containment check, in the shape ADR-009 took: decide the
+   boundary in an ADR before the renderer exists.
+2. **Countable marks.** `Chart` gives every drawn element a `data-chart-mark`
+   attribute, so a test (and the browser probe) can assert *how many* were drawn.
+   The SVG primitives should do the same — the D20 lesson, applied before the
+   defect this time.
+3. **`IconButton`'s placeholder glyph** still draws its own `icon` name. `Icon`
+   now exists but draws its name too, so there is nothing to gain by wiring them
+   together until a real icon set lands. Recorded so it is not mistaken for an
+   oversight.
+
+Two things from the 4A-3 run still apply:
 
 1. **Carry the documented action form into the fixtures.** The 4A-3 unit spec
    calls `renderProgram` directly, which skips the backend's name check, so it
@@ -577,6 +597,74 @@ Six things carried forward:
 
 ## History
 
+### Session 16 — 2026-11-04 (4A-3 merged, 4A-4 built and accepted)
+
+**The 4A-3 acceptance branch was merged, fast-forward only.** `main` went
+`74ca8f7` → `02ddc65` with five commits preserved, none squashed. Before merging
+I ran the final diff audit and it found two leaks the repository already had rules
+against: a live DSH session token in the V1/V2 evidence JSON, and the local
+username in the Windows transcript. `evidence/lib/probe.mjs` has redacted
+`token=…` since long before this batch, and `evidence/lib/redact.mjs` exists
+precisely for transcripts like that one. Both were fixed with those existing
+tools rather than new ones, the probes now record the redacted form so the leak
+cannot return on a re-run, and the fix was its own commit (`02ddc65`) so the
+accepted evidence commit stays readable. The username appears in **zero** tracked
+files on `main` — a previous session purged it — so this would have reintroduced
+it.
+
+**O1 was closed first, because the owner asked for it and it is cheap.**
+`tests/openui-validate-gate.spec.ts` runs fixtures through
+`openuiBackend().validate()`, the same entry the tool path uses, and asserts both
+directions: the documented bare `@Set` form is accepted, and `Action([...])` is
+rejected with `VZO002` exactly as the live host rejects it. Proven able to fail
+by stubbing the error list to empty — two tests went red, then green again.
+
+**4A-4 decided its two security questions before writing a renderer.** This is
+the part of the batch that mattered, and both decisions came from an existing
+precedent rather than an improvised rule:
+
+- **ADR-009 (`Image`).** `src/images.ts` was the obvious thing to reuse and
+  cannot be: it resolves images node-side at execute time for a **sandboxed
+  iframe**, while the OpenUI card mounts in the **host document** and its
+  renderer is a pure function with no execute step. So the policy is ADR-008's
+  shape — positive closed allowlist, `new URL` rather than a regex, refusal
+  rendered as visible text. The ADR states plainly what it does *not* protect
+  against: a remote `https:` host still receives a request from the reader's
+  machine, and that is inherent to an `<img>`.
+- **ADR-010 (`Chart`).** Not a Chart.js clone, because an options object would
+  put arbitrary JavaScript configuration inside a language whose security
+  argument is that it is closed. Rows in, countable SVG out; invalid data draws
+  a stated refusal; a non-finite value is a **gap counted in a notice**, never a
+  coerced zero. Animation and tooltips are recorded as out of scope so a later
+  batch adds them as a decision.
+
+**The browser run was largely uneventful, which is the point of the harness.**
+`§9` caught a stale bundle for the **second consecutive batch** — the profile
+held the 4A-3 build while the tree had moved to `62AD5817…` — and it was fixed
+before a single measurement. C1 then counted structure in the host DOM: Table
+1/2/3/6, two charts with 3 bar marks and 2 line paths plus a legend, three icons,
+and **exactly one `<img>`**, with the `javascript:` source producing a refusal
+notice and zero image elements. V3 measured 25 text samples per scheme across
+chart axis, legend and table cells — the new 11px class that D22 was about — at
+5.8:1 light and 12.11:1 dark.
+
+**Four mutations, all restored.** Image accepting every scheme (2 red), a chart
+coercing gaps to zero (2 red), Table not padding a short row (1 red), and the
+validate gate stubbed (2 red). A guard that has not been seen to fail is a guess.
+
+**Three self-inflicted probe errors, none in the product** — the same lesson as
+last session, recorded because it keeps recurring: a `\.join` with a literal
+newline, an escaped quote inside a single-quoted page expression, and a
+`getComputedStyle().color` assertion that assumed `rgb()` when the value was
+perfectly resolved in another notation. Each looked like a defect until the DOM
+or the file was read.
+
+**Numbers.** Typecheck clean; **821 / 15 / 836** on Windows with the failing
+**set** identical name by name to the baseline (**zero added, zero removed**);
+build PASS; differential **31/31** byte-identical; inventory **34 / 48** with
+Media and data complete. The new spec is 21/21, the validate gate 6/6.
+
+**4A-4 is ACCEPTED.** 14 components remain, all in 4A-5.
 ### Session 15 — 2026-11-04 (4A-3 browser acceptance)
 
 **The handoff ZIP was v3, not v1 — checked before touching anything.** The

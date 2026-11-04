@@ -1450,6 +1450,128 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
       children(props[0]),
     )
   },
+
+  // --- 4A-4: media and data -----------------------------------------------
+  //
+  // These four do not bind `$state`: none of them is an input, so none takes a
+  // write channel. They are still pure functions of the descriptor, which is the
+  // property the whole component table rests on.
+
+  Icon: (props, _write, key) => {
+    const name = text(props[0], '')
+    const size = SIZE_OF_ICON[text(props[1], 'md')] ?? SIZE_OF_ICON.md!
+    const paint = color(props[2]) ?? 'currentColor'
+    // No icon set ships in this build (ADR-010 keeps the dependency tree closed,
+    // and the same reasoning applies here). A named glyph is drawn as its own
+    // name, which is honest and readable, rather than as an empty box that looks
+    // like a rendering failure. Upgrading this to a real set is a substitution,
+    // not a rewrite: the geometry and the contract stay.
+    return createElement(
+      'span',
+      {
+        key,
+        role: 'img',
+        'aria-label': name === '' ? 'icon' : name,
+        'data-openui-icon': name,
+        style: {
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minWidth: size,
+          minHeight: size,
+          fontSize: `calc(${size} * 0.5)`,
+          lineHeight: 1,
+          color: paint,
+          fontVariantNumeric: 'tabular-nums',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'var(--border)',
+          borderRadius: 'calc(var(--radius) * 0.6)',
+          padding: 1,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+        } satisfies CSSProperties,
+      },
+      name === '' ? '?' : name.slice(0, 2),
+    )
+  },
+
+  Image: (props, _write, key) => {
+    const src = text(props[0], '')
+    const alt = text(props[1], '')
+    const ratio = arg(props[2])
+    const radius = arg(props[3])
+    const fit = text(props[4], 'cover')
+    const allowed = allowedImageUrl(src)
+    const box: CSSProperties = {
+      maxWidth: '100%',
+      width: '100%',
+      borderRadius: radius === undefined ? 'calc(var(--radius) * 1.2)' : space(radius, 0) + 'px',
+      ...ratio === undefined ? {} : { aspectRatio: String(arg(ratio)) },
+      overflow: 'hidden',
+      display: 'block',
+    }
+    if (allowed === undefined) {
+      // ADR-009: a refused src is never rendered as an <img>. The alt text and
+      // the reason are shown instead, so the reader is told why rather than
+      // shown a broken-image glyph.
+      return createElement(ImageNotice, { key, alt, reason: imageRefusal(src), style: box })
+    }
+    return createElement(ImageFrame, { key, src: allowed, alt, fit, style: box })
+  },
+
+  Table: (props, _write, key, raw) => {
+    // From `raw`, not `props`: a cell may be a component descriptor, and the
+    // walker has already drawn it into a node by the time it reaches `props`.
+    const columns = textList(raw?.[0] ?? props[0])
+    const rows = rowList(raw?.[1] ?? props[1])
+    if (columns.length === 0) return notice(key, 'Table has no columns')
+    if (rows.length === 0) {
+      // An empty table draws its header and says it is empty. A table with no
+      // header at all is indistinguishable from a component that failed.
+      return createElement(
+        'table',
+        { key, style: TABLE_STYLE, 'data-openui-table': 'empty' },
+        createElement(TableHead, { columns }),
+        createElement('tbody', null,
+          createElement('tr', null,
+            createElement('td', {
+              colSpan: columns.length,
+              style: { ...TABLE_CELL_STYLE, color: 'var(--muted-foreground)', fontStyle: 'italic' },
+            }, 'no rows'),
+          ),
+        ),
+      )
+    }
+    return createElement(
+      'table',
+      { key, style: TABLE_STYLE, 'data-openui-table': `${rows.length}x${columns.length}` },
+      createElement(TableHead, { columns }),
+      createElement('tbody', null, rows.map((cells, rowIndex) => createElement(
+        'tr',
+        { key: `r${rowIndex}`, style: rowIndex % 2 === 1 ? TABLE_ROW_ALT : undefined },
+        columns.map((column, columnIndex) => createElement(
+          'td',
+          { key: `c${columnIndex}`, style: TABLE_CELL_STYLE },
+          cellNode(cells[columnIndex]),
+        )),
+      ))),
+    )
+  },
+
+  Chart: (props, _write, key, raw) => {
+    const type = text(props[0], 'bar')
+    const rows = rowObjects(raw?.[1] ?? props[1])
+    const xName = typeof props[2] === 'string' && props[2] !== '' ? props[2] : undefined
+    const seriesNames = textList(raw?.[3] ?? props[3])
+    const format = text(props[4], 'number')
+    const currency = text(props[5], '')
+    const stacked = boolOf(props[6], false)
+    const height = num(arg(props[7], 180), 180)
+    return createElement(ChartView, {
+      key, type, rows, xName, seriesNames, format, currency, stacked, height,
+    })
+  },
 }
 
 /** What the parser and the walker hand the renderer. */
@@ -1785,6 +1907,599 @@ function TimerControl({
         'Reset',
       ),
     ),
+  )
+}
+
+
+// --- 4A-4 helpers: media and data -----------------------------------------
+
+/** Icon box sizes, so `size` stays a name rather than an arbitrary number. */
+const SIZE_OF_ICON: Readonly<Record<string, string>> = {
+  sm: '1rem',
+  md: '1.25rem',
+  lg: '1.75rem',
+  xl: '2.5rem',
+}
+
+/**
+ * The URL an `Image` may load, or `undefined` when the scheme is refused.
+ *
+ * ADR-009: the allowlist is positive and closed, and the URL is *parsed* rather
+ * than pattern-matched — a regex tests the shape of the string while the browser
+ * tests what it will do, and the two disagree exactly where it matters
+ * (`java\nscript:`, ` JavaScript:`). ADR-008 made the same call for `Link`.
+ * @param src - the `src` argument as written.
+ * @returns the parsed href, or undefined when it must not be loaded.
+ */
+function allowedImageUrl(src: string): string | undefined {
+  if (src === '') return undefined
+  let parsed: URL
+  try {
+    parsed = new URL(src)
+  } catch {
+    return undefined
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return undefined
+  return parsed.href
+}
+
+/**
+ * Why an `Image` src was refused, in words a reader can act on.
+ * @param src - the refused `src`.
+ * @returns one short sentence.
+ */
+function imageRefusal(src: string): string {
+  if (src === '') return 'no src given'
+  try {
+    const parsed = new URL(src)
+    return `${parsed.protocol} is not an allowed scheme (http or https only)`
+  } catch {
+    return 'not an absolute http or https URL'
+  }
+}
+
+/** Read a list of strings from a raw argument, dropping non-strings. */
+function textList(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  return raw.map(item => (typeof item === 'string' ? item : '')).filter(item => item !== '')
+}
+
+/**
+ * Read `rows` for a `Table`: one array of cell descriptors per row.
+ *
+ * A row that is not an array is skipped rather than rendered as a single
+ * mystery cell; the count of what was actually drawn is what the tests assert.
+ */
+function rowList(raw: unknown): unknown[][] {
+  if (!Array.isArray(raw)) return []
+  return raw
+    .filter((row): row is unknown[] => Array.isArray(row))
+    .map(row => [...row])
+}
+
+/**
+ * Read `data` for a `Chart`: plain row objects, as ADR-010 specifies.
+ *
+ * The language turns an object argument into a descriptor before it reaches
+ * `props`, so this reads from `raw`. A non-object row is dropped, because a
+ * chart drawn from a mystery value would be a lie about the data.
+ */
+function rowObjects(raw: unknown): Record<string, unknown>[] {
+  if (!Array.isArray(raw)) return []
+  const out: Record<string, unknown>[] = []
+  for (const row of raw) {
+    if (row === null || typeof row !== 'object' || Array.isArray(row)) continue
+    out.push(row as Record<string, unknown>)
+  }
+  return out
+}
+
+/** A cell may already be a rendered node, or a plain scalar. */
+function cellNode(value: unknown): ReactNode {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (Array.isArray(value)) return value as ReactNode[]
+  return value as ReactNode
+}
+
+/** A quiet, stated refusal — the shape 4A-1 established for an undrawable part. */
+function notice(key: string, message: string): ReactNode {
+  return createElement('div', {
+    key,
+    role: 'status',
+    'data-openui-notice': message,
+    style: NOTICE_STYLE,
+  }, message)
+}
+
+const TABLE_STYLE: CSSProperties = {
+  width: '100%',
+  borderCollapse: 'collapse',
+  fontSize: SIZES.sm,
+  color: 'var(--foreground)',
+  display: 'table',
+  tableLayout: 'auto',
+}
+
+const TABLE_CELL_STYLE: CSSProperties = {
+  textAlign: 'left',
+  padding: '6px 10px',
+  borderBottomWidth: 1,
+  borderBottomStyle: 'solid',
+  borderBottomColor: 'var(--border)',
+  // Long data truncates rather than pushing the card wider than the pane.
+  maxWidth: 320,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  verticalAlign: 'top',
+}
+
+const TABLE_ROW_ALT: CSSProperties = {
+  background: 'var(--viz-grid)',
+}
+
+/** The header row of a `Table`. */
+function TableHead({ columns }: { readonly columns: readonly string[] }): ReactNode {
+  return createElement('thead', null, createElement('tr', null, columns.map((column, index) => createElement(
+    'th',
+    {
+      key: `h${index}`,
+      scope: 'col',
+      style: {
+        ...TABLE_CELL_STYLE,
+        fontWeight: 600,
+        color: 'var(--foreground)',
+        borderBottomColor: 'var(--border)',
+      } satisfies CSSProperties,
+    },
+    column,
+  ))))
+}
+
+/** An image that could not be used, saying why instead of showing a broken icon. */
+function ImageNotice({
+  alt, reason, style,
+}: { readonly alt: string; readonly reason: string; readonly style: CSSProperties }): ReactNode {
+  return createElement(
+    'div',
+    {
+      role: 'img',
+      'aria-label': alt === '' ? 'image' : alt,
+      'data-openui-image': 'refused',
+      style: {
+        ...style,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 2,
+        minHeight: 64,
+        padding: 10,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: 'var(--border)',
+        background: 'var(--viz-grid)',
+        color: 'var(--muted-foreground-strong)',
+        fontSize: SIZES.xs,
+        textAlign: 'center',
+      } satisfies CSSProperties,
+    },
+    createElement('span', { style: { fontWeight: 500 } }, alt === '' ? 'image' : alt),
+    createElement('span', null, reason),
+  )
+}
+
+/**
+ * An allowed image, with the loading contract ADR-009 sets out.
+ *
+ * `loading=lazy` and `decoding=async` keep a card with many images from blocking
+ * the conversation paint; `referrerPolicy=no-referrer` stops the host leaking the
+ * console URL to a third-party host. A failed load degrades to the same visible
+ * refusal a rejected scheme gets, because a broken-image glyph explains nothing.
+ */
+function ImageFrame({
+  src, alt, fit, style,
+}: { readonly src: string; readonly alt: string; readonly fit: string; readonly style: CSSProperties }): ReactNode {
+  const [failed, setFailed] = useState(false)
+  if (failed) {
+    return createElement(ImageNotice, { alt, reason: 'the image could not be loaded', style })
+  }
+  return createElement('img', {
+    src,
+    alt: alt === '' ? 'image' : alt,
+    loading: 'lazy',
+    decoding: 'async',
+    referrerPolicy: 'no-referrer',
+    'data-openui-image': 'loaded',
+    onError: () => setFailed(true),
+    style: {
+      ...style,
+      objectFit: fit === 'contain' ? 'contain' : 'cover',
+    } satisfies CSSProperties,
+  })
+}
+
+
+/** Series colours, in the order a chart assigns them. */
+const SERIES_VARS: readonly string[] = [
+  'var(--viz-series-1)',
+  'var(--viz-series-2)',
+  'var(--viz-series-3)',
+  'var(--viz-series-4)',
+  'var(--viz-series-5)',
+]
+
+/** One resolved series: its name, its colour, and its numeric points. */
+interface ChartSeries {
+  readonly name: string
+  readonly color: string
+  readonly values: readonly (number | null)[]
+}
+
+/**
+ * Read the series out of the rows, following ADR-010.
+ *
+ * `seriesNames` wins when given; otherwise every key that holds at least one
+ * finite number becomes a series, in first-seen order. A value that is not a
+ * finite number becomes a `null` gap rather than a zero: coerce it and the chart
+ * claims a reading that does not exist.
+ */
+function chartSeries(
+  rows: readonly Record<string, unknown>[],
+  xName: string | undefined,
+  seriesNames: readonly string[],
+): ChartSeries[] {
+  let names = [...seriesNames]
+  if (names.length === 0) {
+    const seen: string[] = []
+    for (const row of rows) {
+      for (const [key, value] of Object.entries(row)) {
+        if (key === xName) continue
+        if (seen.includes(key)) continue
+        if (typeof value === 'number' && Number.isFinite(value)) seen.push(key)
+      }
+    }
+    names = seen
+  }
+  return names.map((name, index) => ({
+    name,
+    color: SERIES_VARS[index % SERIES_VARS.length]!,
+    values: rows.map(row => {
+      const value = row[name]
+      return typeof value === 'number' && Number.isFinite(value) ? value : null
+    }),
+  }))
+}
+
+/** Format one number for a label or an axis tick. */
+function formatValue(value: number, format: string, currency: string): string {
+  if (format === 'percent') return `${Math.round(value * 100) / 100}%`
+  if (format === 'currency') return `${currency === '' ? '$' : currency}${Math.round(value * 100) / 100}`
+  if (Math.abs(value) >= 1000) return value.toLocaleString()
+  return String(Math.round(value * 100) / 100)
+}
+
+/**
+ * Draw a chart from row objects, as inline SVG.
+ *
+ * ADR-010 decides the shape and, just as importantly, what happens when the data
+ * cannot be drawn: a stated refusal is rendered as visible text, never an empty
+ * box. SVG rather than Canvas for a reason the project needs — every bar, point
+ * and slice is a countable element, so a test asserts *how many* were drawn
+ * instead of that a shape exists (`AGENTS.md` §6, the D20 lesson).
+ */
+function ChartView({
+  type, rows, xName, seriesNames, format, currency, stacked, height,
+}: {
+  readonly type: string
+  readonly rows: readonly Record<string, unknown>[]
+  readonly xName: string | undefined
+  readonly seriesNames: readonly string[]
+  readonly format: string
+  readonly currency: string
+  readonly stacked: boolean
+  readonly height: number
+}): ReactNode {
+  // ADR-010: an unknown type falls back to bar, like every other enum here.
+  const kind = CHART_TYPES.has(type) ? type : 'bar'
+
+  if (rows.length === 0) return notice('chart', 'Chart has no data')
+
+  const series = chartSeries(rows, xName, seriesNames)
+  if (series.length === 0) return notice('chart', 'Chart found no numeric series')
+
+  const empty = series.filter(item => item.values.every(value => value === null))
+  if (empty.length === series.length) {
+    return notice('chart', `Chart series ${series.map(item => `\"${item.name}\"`).join(', ')} has no numeric values`)
+  }
+
+  // A pie or donut is one series by definition; saying so is more useful than
+  // silently drawing one ring and dropping the rest.
+  const radial = kind === 'pie' || kind === 'donut'
+  if (radial && series.length > 1) {
+    return notice('chart', `Chart type ${kind} takes one series; ${series.length} were given`)
+  }
+
+  const categories = rows.map((row, index) => {
+    if (xName === undefined) return String(index + 1)
+    const value = row[xName]
+    return value === undefined || value === null ? String(index + 1) : String(value)
+  })
+
+  // Gaps are drawn as gaps and counted in a notice, so a reader can tell a
+  // missing reading from a zero.
+  const gapCount = series.reduce(
+    (total, item) => total + item.values.filter(value => value === null).length, 0,
+  )
+  const gapNote = gapCount === 0
+    ? null
+    : createElement('div', {
+      role: 'status',
+      'data-openui-notice': 'gaps',
+      style: { ...NOTICE_STYLE, marginTop: 6 },
+    }, `${gapCount} value${gapCount === 1 ? '' : 's'} could not be read as a number and ${gapCount === 1 ? 'is' : 'are'} shown as a gap`)
+
+  const chart = radial
+    ? createElement(RadialChart, { kind, categories, series: series[0]!, format, currency, height })
+    : createElement(AxisChart, { kind, categories, series, format, currency, stacked, height })
+
+  return createElement(
+    'div',
+    {
+      role: 'group',
+      'aria-label': `Chart, ${kind}, ${series.length} series`,
+      'data-openui-chart': kind,
+      style: { display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%' } satisfies CSSProperties,
+    },
+    chart,
+    createElement(ChartLegend, { series, radial: series.length === 1 && radial }),
+    gapNote,
+  )
+}
+
+const CHART_TYPES: ReadonlySet<string> = new Set(['bar', 'line', 'area', 'pie', 'donut', 'scatter'])
+
+
+const CHART_PAD = { top: 10, right: 10, bottom: 22, left: 40 }
+
+/** A bar / line / area / scatter chart on two axes. */
+function AxisChart({
+  kind, categories, series, format, currency, stacked, height,
+}: {
+  readonly kind: string
+  readonly categories: readonly string[]
+  readonly series: readonly ChartSeries[]
+  readonly format: string
+  readonly currency: string
+  readonly stacked: boolean
+  readonly height: number
+}): ReactNode {
+  const W = 640
+  const H = Math.max(80, Math.min(520, Math.round(height)))
+  const plotW = W - CHART_PAD.left - CHART_PAD.right
+  const plotH = H - CHART_PAD.top - CHART_PAD.bottom
+
+  // Stacking sums per category; otherwise the extent is over every value.
+  const perCategory = categories.map((_, index) => stacked
+    ? series.reduce((sum, item) => sum + (item.values[index] ?? 0), 0)
+    : 0)
+  const flat = series.flatMap(item => item.values.filter((value): value is number => value !== null))
+  const candidates = stacked ? [...flat, ...perCategory] : flat
+  const max = candidates.length === 0 ? 1 : Math.max(...candidates, 0)
+  const min = Math.min(...(candidates.length === 0 ? [0] : candidates), 0)
+  const span = max - min === 0 ? 1 : max - min
+
+  const yOf = (value: number): number => CHART_PAD.top + plotH - ((value - min) / span) * plotH
+  const bandW = plotW / Math.max(1, categories.length)
+  const xOf = (index: number): number => CHART_PAD.left + bandW * (index + 0.5)
+
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map(part => min + span * part)
+
+  const grid = ticks.map((tick, index) => createElement('g', { key: `g${index}` },
+    createElement('line', {
+      x1: CHART_PAD.left, x2: W - CHART_PAD.right,
+      y1: yOf(tick), y2: yOf(tick),
+      stroke: 'var(--border)',
+      strokeWidth: 1,
+      shapeRendering: 'crispEdges',
+    }),
+    createElement('text', {
+      x: CHART_PAD.left - 6, y: yOf(tick) + 3,
+      textAnchor: 'end',
+      fontSize: 10,
+      fill: 'var(--muted-foreground-strong)',
+    }, formatValue(tick, format, currency)),
+  ))
+
+  const axisLabels = categories.map((category, index) => createElement('text', {
+    key: `x${index}`,
+    x: xOf(index), y: H - 6,
+    textAnchor: 'middle',
+    fontSize: 10,
+    fill: 'var(--muted-foreground-strong)',
+  }, category.length > 8 ? `${category.slice(0, 7)}…` : category))
+
+  const marks: ReactNode[] = []
+  series.forEach((item, seriesIndex) => {
+    if (kind === 'bar') {
+      const barW = stacked
+        ? bandW * 0.6
+        : (bandW * 0.7) / Math.max(1, series.length)
+      item.values.forEach((value, index) => {
+        if (value === null) return
+        const base = stacked
+          ? series.slice(0, seriesIndex).reduce((sum, previous) => sum + (previous.values[index] ?? 0), 0)
+          : 0
+        const top = yOf(base + value)
+        const bottom = yOf(base)
+        marks.push(createElement('rect', {
+          key: `b${seriesIndex}-${index}`,
+          'data-chart-mark': 'bar',
+          x: stacked ? xOf(index) - barW / 2 : xOf(index) - (bandW * 0.7) / 2 + seriesIndex * barW,
+          y: Math.min(top, bottom),
+          width: barW,
+          height: Math.max(1, Math.abs(bottom - top)),
+          fill: item.color,
+          rx: 2,
+        }))
+      })
+      return
+    }
+    if (kind === 'scatter') {
+      item.values.forEach((value, index) => {
+        if (value === null) return
+        marks.push(createElement('circle', {
+          key: `s${seriesIndex}-${index}`,
+          'data-chart-mark': 'point',
+          cx: xOf(index), cy: yOf(value), r: 3.5,
+          fill: item.color,
+        }))
+      })
+      return
+    }
+    // line and area share the path; area adds a filled region underneath.
+    const points = item.values
+      .map((value, index) => (value === null ? undefined : { x: xOf(index), y: yOf(value) }))
+      .filter((point): point is { x: number; y: number } => point !== undefined)
+    if (points.length === 0) return
+    const path = points.map((point, index) => `${index === 0 ? 'M' : 'L'}${point.x},${point.y}`).join(' ')
+    if (kind === 'area') {
+      const base = yOf(min)
+      marks.push(createElement('path', {
+        key: `a${seriesIndex}`,
+        'data-chart-mark': 'area',
+        d: `${path} L${points[points.length - 1]!.x},${base} L${points[0]!.x},${base} Z`,
+        fill: item.color,
+        opacity: 0.18,
+      }))
+    }
+    marks.push(createElement('path', {
+      key: `l${seriesIndex}`,
+      'data-chart-mark': 'line',
+      d: path,
+      fill: 'none',
+      stroke: item.color,
+      strokeWidth: 2,
+      strokeLinejoin: 'round',
+      strokeLinecap: 'round',
+    }))
+    // A single point would otherwise draw nothing visible on a line chart.
+    if (points.length === 1) {
+      marks.push(createElement('circle', {
+        key: `p${seriesIndex}`,
+        'data-chart-mark': 'point',
+        cx: points[0]!.x, cy: points[0]!.y, r: 3.5,
+        fill: item.color,
+      }))
+    }
+  })
+
+  return createElement(
+    'svg',
+    {
+      role: 'img',
+      'aria-label': `${kind} chart, ${categories.length} categories`,
+      viewBox: `0 0 ${W} ${H}`,
+      width: '100%',
+      height: H,
+      preserveAspectRatio: 'xMidYMid meet',
+      style: { display: 'block', maxWidth: '100%', overflow: 'visible' } satisfies CSSProperties,
+    },
+    grid,
+    axisLabels,
+    marks,
+  )
+}
+
+/** A pie or donut: one series, one slice per category. */
+function RadialChart({
+  kind, categories, series, format, currency, height,
+}: {
+  readonly kind: string
+  readonly categories: readonly string[]
+  readonly series: ChartSeries
+  readonly format: string
+  readonly currency: string
+  readonly height: number
+}): ReactNode {
+  const size = Math.max(100, Math.min(320, Math.round(height)))
+  const center = size / 2
+  const radius = center - 4
+  const inner = kind === 'donut' ? radius * 0.58 : 0
+  const values = series.values.map(value => (value === null || value < 0 ? 0 : value))
+  const total = values.reduce((sum, value) => sum + value, 0)
+
+  if (total <= 0) return notice('chart', 'Chart has nothing to divide into slices')
+
+  let angle = -Math.PI / 2
+  const slices = values.map((value, index) => {
+    const sweep = (value / total) * Math.PI * 2
+    const start = angle
+    const end = angle + sweep
+    angle = end
+    const point = (at: number, r: number): string => `${center + Math.cos(at) * r},${center + Math.sin(at) * r}`
+    // A full circle cannot be drawn as one arc: start and end coincide.
+    const d = sweep >= Math.PI * 2 - 0.0001
+      ? `M${center},${center - radius} A${radius},${radius} 0 1 1 ${center},${center + radius} A${radius},${radius} 0 1 1 ${center},${center - radius} Z`
+      : [
+        `M${point(start, radius)}`,
+        `A${radius},${radius} 0 ${sweep > Math.PI ? 1 : 0} 1 ${point(end, radius)}`,
+        inner > 0 ? `L${point(end, inner)}` : `L${center},${center}`,
+        inner > 0
+          ? `A${inner},${inner} 0 ${sweep > Math.PI ? 1 : 0} 0 ${point(start, inner)}`
+          : '',
+        'Z',
+      ].filter(part => part !== '').join(' ')
+    return createElement('path', {
+      key: `slice${index}`,
+      'data-chart-mark': 'slice',
+      'data-chart-slice': categories[index] ?? String(index + 1),
+      d,
+      fill: SERIES_VARS[index % SERIES_VARS.length]!,
+      stroke: 'var(--background)',
+      strokeWidth: 1,
+    })
+  })
+
+  return createElement(
+    'svg',
+    {
+      role: 'img',
+      'aria-label': `${kind} chart, ${categories.length} slices`,
+      viewBox: `0 0 ${size} ${size}`,
+      width: size,
+      height: size,
+      style: { display: 'block', maxWidth: '100%' } satisfies CSSProperties,
+    },
+    slices,
+  )
+}
+
+/** The legend, drawn from series names so a reader can map colour to label. */
+function ChartLegend({
+  series, radial,
+}: { readonly series: readonly ChartSeries[]; readonly radial: boolean }): ReactNode {
+  if (radial) return null
+  if (series.length <= 1) return null
+  return createElement(
+    'div',
+    {
+      style: {
+        display: 'flex', flexWrap: 'wrap', gap: 10,
+        marginTop: 6, fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)',
+      } satisfies CSSProperties,
+    },
+    series.map((item, index) => createElement(
+      'span',
+      { key: `lg${index}`, 'data-chart-legend': item.name, style: { display: 'inline-flex', alignItems: 'center', gap: 4 } },
+      createElement('span', {
+        'aria-hidden': 'true',
+        style: { width: 8, height: 8, borderRadius: 2, background: item.color, display: 'inline-block' },
+      }),
+      item.name,
+    )),
   )
 }
 

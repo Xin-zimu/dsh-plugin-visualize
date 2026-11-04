@@ -15,7 +15,7 @@ this says what the current slice is allowed to do.
 | 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
-| 4A | Component catalogue: 40 renderers, in five batches | **4A-1, 4A-2, 4A-3 PASS** (30 done); 18 left in 4A-4…4A-5 |
+| 4A | Component catalogue: 40 renderers, in five batches | **4A-1, 4A-2, 4A-3, 4A-4 PASS** (34 done); 14 left in 4A-5 |
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | Not started — separate from 4A, one security review each |
 | 5 | Unified prompt, security review, release | Not started |
 
@@ -121,10 +121,10 @@ are in the report; they are not counted as browser passes.
 
 ---
 
-## Stage 4A — The component catalogue (4A-1, 4A-2, 4A-3 PASS)
+## Stage 4A — The component catalogue (4A-1…4A-4 PASS)
 
 **Goal.** Turn the signatures the language already understands into components
-the browser actually draws. Measured inventory — **30 / 48** — from
+the browser actually draws. Measured inventory — **34 / 48** — from
 `tests/openui-inventory.spec.tsx`, which reads the renderer's own table rather
 than a hand-kept list.
 
@@ -134,7 +134,7 @@ than a hand-kept list.
 | Text | 10 | Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code | **— complete** |
 | Inputs | 13 | Button, Slider, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form | **— complete** |
 | Drawing | 10 | — | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText (4A-5) |
-| Media and data | 4 | — | Image, Icon, Table, Chart (**4A-4**) |
+| Media and data | 4 | Table, Chart, Icon, Image | **— complete** |
 | Play | 2 | — | Flashcard, Celebration (4A-5) |
 
 **In scope.** `src/client/` only, plus each batch's tests.
@@ -344,6 +344,62 @@ cleanup goes.
 
 ---
 
+### 4A-4 — media and data (PASS, closed 2026-11-04)
+
+**Scope.** `Table`, `Chart`, `Icon`, `Image` — the four that complete the Media
+and data group, 4 / 4.
+
+**Verdict: PASS.** Record: `docs/reports/PHASE-4A-4-REPORT.md`; manifest
+`evidence/phase-4a-4/MANIFEST.json`.
+
+| Gate item | Result |
+| --- | --- |
+| All four have real renderers | PASS — inventory 34 / 48, Media and data complete, and all four counted by structure in the host DOM |
+| Arguments match the signature table | PASS |
+| Bound inputs write `$state` and survive a reload | N/A — none of these four is an input. The loop is unchanged since 4A-3 (V5) |
+| Layout, colour and contrast in both schemes | PASS — 25 text samples per scheme over chart axis, legend, table head and cells; min contrast 5.8:1 light / 12.11:1 dark |
+| Differential still 0 differences | PASS — 31/31, `differential.json` byte-identical |
+| Browser evidence on an isolated profile, with the §9 hash check | PASS — isolated host on :3093 + bsk 0.4.1; both halves matched `62AD5817…` before measuring |
+| `tests/<batch>` added; failure baseline unchanged | PASS — `tests/openui-media-4a4.spec.tsx` 21/21; Windows 821/15/836 with the failing **set** identical name by name |
+
+**The batch's real risk was security, not rendering, and it was decided before
+the code.** Two ADRs exist because two components take an argument from the model
+that the host acts on:
+
+- **ADR-009 — `Image` source policy.** A real `<img>` only for an absolute
+  `http:`/`https:` URL, parsed with `new URL` and never pattern-matched. `data:`,
+  `blob:`, `file:`, `javascript:`, protocol-relative and relative sources render
+  the alt text in a bordered placeholder naming the reason. This matters more
+  here than it did for `Link`: the OpenUI card is mounted in the **host
+  document**, not the HTML backend's sandboxed iframe, so a hostile `src` is a
+  host-origin question.
+- **ADR-010 — `Chart` contract.** Row objects in, countable SVG out. Not a
+  Chart.js clone, no options object, no animation or tooltips (recorded as out of
+  scope so a later batch adds them as a decision rather than a drift). Invalid
+  data draws a **stated refusal**; a non-finite value is a **gap counted in a
+  notice**, never a coerced zero. A chart that plots `NaN` as `0` is lying about
+  the data.
+
+**`Icon` draws its own name, and says so.** No icon set ships in this build,
+which keeps the dependency tree closed for the same reason ADR-010 keeps the
+chart contract small. A named glyph renders as its name inside a bordered box —
+honest and readable — rather than as an empty square that reads as a rendering
+failure. Swapping in a real set later is a substitution, not a rewrite.
+
+**O1 is closed.** 4A-3 recorded that the unit spec bypassed the backend's name
+check. `tests/openui-validate-gate.spec.ts` now runs fixtures through
+`openuiBackend().validate()`, the same entry the tool path uses, and asserts
+both directions: the documented bare `@Set` form is accepted, and `Action([...])`
+is rejected with `VZO002`, which is what the live host does.
+
+**Four mutations were used to prove the guards can fail**, and all four were
+restored: `Image` accepting every scheme (2 tests red), a chart coercing gaps to
+zero (2 red), `Table` not padding a short row (1 red), and the validate gate
+stubbed to return no errors (2 red).
+
+**Carried forward.** 14 components remain, all in 4A-5.
+
+---
 ## Stage 4B — External actions (separate, later)
 
 Three actions are refused by name today (`UNSUPPORTED_STEPS`), which is why

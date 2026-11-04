@@ -1,0 +1,466 @@
+{
+ "at": "2026-11-04T15:16:13.955Z",
+ "probe": "4A-4 V3",
+ "stamp": {
+  "at": "2026-11-04T15:13:28.898Z",
+  "session": "ehxx",
+  "buildSha256": "62AD5817E9DD4F2F63DE660C33AE4276CE27A5B22EACD20EB5334C64938611DA",
+  "installedSha256": "62AD5817E9DD4F2F63DE660C33AE4276CE27A5B22EACD20EB5334C64938611DA"
+ },
+ "switches": {
+  "light": {
+   "switched": true,
+   "after": {
+    "dark": false
+   }
+  },
+  "dark": {
+   "switched": true,
+   "after": {
+    "dark": true
+   }
+  }
+ },
+ "measured": {
+  "light": {
+   "found": true,
+   "theme": "light",
+   "samples": [
+    {
+     "what": "chart-axis",
+     "text": "0",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "7.5",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "15",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "22.5",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "30",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Jan",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Feb",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Mar",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "0",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "2.25",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "4.5",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "6.75",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "9",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Jan",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Feb",
+     "size": 10,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "chart-legend",
+     "text": "a",
+     "size": 11,
+     "ratio": 5.8,
+     "need": 4.5
+    },
+    {
+     "what": "chart-legend",
+     "text": "b",
+     "size": 11,
+     "ratio": 5.8,
+     "need": 4.5
+    },
+    {
+     "what": "table-head",
+     "text": "Name",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-head",
+     "text": "Qty",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "Widget",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "3",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "Gadget",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "7",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "Doohickey",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "1",
+     "size": 12,
+     "ratio": 18.9,
+     "need": 4.5
+    }
+   ],
+   "icons": [
+    {
+     "name": "map-pin",
+     "color": "rgb(15, 17, 21)",
+     "bg": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1
+     }
+    },
+    {
+     "name": "star",
+     "color": "rgb(15, 17, 21)",
+     "bg": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1
+     }
+    },
+    {
+     "name": "heart",
+     "color": "rgb(239, 68, 68)",
+     "bg": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1
+     }
+    }
+   ],
+   "counts": {
+    "table": 1,
+    "charts": 2,
+    "icons": 3,
+    "images": 0
+   }
+  },
+  "dark": {
+   "found": true,
+   "theme": "dark",
+   "samples": [
+    {
+     "what": "chart-axis",
+     "text": "0",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "7.5",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "15",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "22.5",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "30",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Jan",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Feb",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Mar",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "0",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "2.25",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "4.5",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "6.75",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "9",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Jan",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-axis",
+     "text": "Feb",
+     "size": 10,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "chart-legend",
+     "text": "a",
+     "size": 11,
+     "ratio": 12.11,
+     "need": 4.5
+    },
+    {
+     "what": "chart-legend",
+     "text": "b",
+     "size": 11,
+     "ratio": 12.11,
+     "need": 4.5
+    },
+    {
+     "what": "table-head",
+     "text": "Name",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-head",
+     "text": "Qty",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "Widget",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "3",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "Gadget",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "7",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "Doohickey",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    },
+    {
+     "what": "table-cell",
+     "text": "1",
+     "size": 12,
+     "ratio": 17.45,
+     "need": 4.5
+    }
+   ],
+   "icons": [
+    {
+     "name": "map-pin",
+     "color": "rgb(249, 250, 251)",
+     "bg": {
+      "r": 21,
+      "g": 21,
+      "b": 23,
+      "a": 1
+     }
+    },
+    {
+     "name": "star",
+     "color": "rgb(249, 250, 251)",
+     "bg": {
+      "r": 21,
+      "g": 21,
+      "b": 23,
+      "a": 1
+     }
+    },
+    {
+     "name": "heart",
+     "color": "rgb(239, 68, 68)",
+     "bg": {
+      "r": 21,
+      "g": 21,
+      "b": 23,
+      "a": 1
+     }
+    }
+   ],
+   "counts": {
+    "table": 1,
+    "charts": 2,
+    "icons": 3,
+    "images": 0
+   }
+  }
+ },
+ "problems": [],
+ "verdict": "PASS"
+}
