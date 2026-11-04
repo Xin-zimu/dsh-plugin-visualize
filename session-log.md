@@ -660,6 +660,16 @@ A full recovery bundle was written to `D:\Deepseek WorkSpace\.pre-cleanup-backup
 **before** the rewrite, outside the repository, so a botched history edit would
 have been recoverable.
 
+**That backup then became a copy of the leak, and had to be destroyed.** A
+`git bundle --all` written before the rewrite carries every commit that existed
+then, including `b73bd6a` with the token in it. Left in place it would have been
+the one file on disk still holding the credential — outside the repository, so no
+repo scan would ever have found it. The pre-cleanup bundle was deleted and
+replaced with `post-cleanup.bundle` (the rewritten history, verified free of the
+token by cloning it and walking every commit). The scratch extraction of the
+handoff ZIP was removed for the same reason: not because it was dirty, but
+because a second copy of history is a second place to keep a secret.
+
 ## What remains, and what was deliberately not done
 
 - **The published username reference stays.** It is in two published commits,
