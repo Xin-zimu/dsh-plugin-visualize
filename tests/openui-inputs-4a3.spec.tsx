@@ -44,7 +44,7 @@
 
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { OpenUICard, RENDERED_COMPONENTS, renderProgram, stateKeyFor } from '../src/client/OpenUICard.tsx'
@@ -179,6 +179,18 @@ function reload(): void {
   // testing its own timing rather than the persistence rule.
   cardStates.flush()
   resetCardStates(() => storage, { delayMs: 0 })
+}
+
+/** The Timer's Start/Pause button, by the label it is currently showing. */
+function startButton(card: ReturnType<typeof mount>, label = 'Start'): HTMLButtonElement {
+  const found = card.all('button').find(button => button.textContent === label)
+  if (found === undefined) throw new Error(`the timer is not showing a ${label} button`)
+  return found as HTMLButtonElement
+}
+
+/** Advance the fake clock by one Timer tick, inside `act` so React commits. */
+function tick(ms = 1000): void {
+  act(() => { vi.advanceTimersByTime(ms) })
 }
 
 // --- 1. coverage ------------------------------------------------------------
@@ -364,13 +376,145 @@ describe('a bound control drives the whole program, not just itself', () => {
     card2.unmount()
   })
 
-  it('Timer: Start decrements through the bound variable', () => {
-    // The countdown writes `$left`, so a sibling sees it. Driven with fake
-    // timers rather than by waiting a real second.
-    const card = mount('$left = 3\nroot = Col([Timer($left, "Left"), Text("left " + $left)])')
-    expect(card.text()).toContain('left 3')
-    const start = card.all('button').find(b => b.textContent === 'Start')!
-    act(() => { (start as HTMLButtonElement).click() })
+  it('Timer: Start ticks, and the first tick moves the bound variable', () => {
+    // The countdown writes `$left`, so a sibling sees it. The clock is advanced
+    // explicitly rather than by waiting a real second.
+    vi.useFakeTimers()
+    try {
+      const card = mount('$left = 3\nroot = Col([Timer($left, "Left"), Text("left " + $left)])')
+      expect(card.text()).toContain('left 3')
+      act(() => { startButton(card).click() })
+      tick()
+      expect(card.text()).toContain('left 2')
+      card.unmount()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
+// --- 3b. the one control that writes on a clock -----------------------------
+
+/**
+ * `Timer` is the only component in this batch that writes without being touched:
+ * an interval writes the bound variable every second. That makes five things
+ * true or false independently of what the markup looks like — it advances, it
+ * never goes below zero, it writes once per second rather than twice, it resumes
+ * from `$state` instead of the program's default, and it stops writing when the
+ * card is gone. None of them are rendering assertions, which is why they are
+ * here and not in the structure block.
+ *
+ * What this file still cannot say: whether a ticking Timer steals focus from a
+ * sibling `Input` in a real browser, or whether an IME composition in one of
+ * these controlled fields survives the re-evaluation each keystroke triggers.
+ * jsdom has no focus model worth trusting and no composition events at all.
+ * Both stay NOT VERIFIED until the DSH browser run.
+ */
+describe('Timer ticks, stops, and cleans up after itself', () => {
+  const PROGRAM = '$left = 3\nroot = Col([Timer($left, "Left"), Text("left " + $left)])'
+
+  beforeEach(() => { vi.useFakeTimers() })
+  afterEach(() => { vi.useRealTimers() })
+
+  it('advances one second per tick, then stops at zero', () => {
+    const card = mount(PROGRAM)
+    act(() => { startButton(card).click() })
+
+    tick()
+    expect(card.text()).toContain('left 2')
+    tick()
+    expect(card.text()).toContain('left 1')
+    tick()
+    expect(card.text()).toContain('left 0')
+
+    // Reaching zero clears the interval, so nothing further is written. This
+    // asserts the stop, not the `Math.max(0, …)` clamp inside the tick: that
+    // clamp is unreachable from a mounted timer (the tick that would go below
+    // zero is also the tick that stops it), and deleting it leaves this file
+    // green. Recorded rather than pretended, or the next reader would believe
+    // the clamp is covered.
+    tick(3000)
+    expect(card.text()).toContain('left 0')
+    expect(card.text()).not.toContain('left -')
+    card.unmount()
+  })
+
+  it('runs exactly one interval, not two', () => {
+    // Counting the pending timers rather than the decrements, because two
+    // intervals that fire inside one `act` both read the same stale `remaining`
+    // and write the same value: the double decrement is invisible in a batched
+    // advance, and would only appear as a card that ticks twice as fast on a
+    // real clock. The effect depends on `running` alone and every tick rewrites
+    // the whole card, so this is the guard against a dependency list that starts
+    // rebuilding the interval on each of those rewrites.
+    const card = mount(PROGRAM)
+    const idle = vi.getTimerCount()
+    act(() => { startButton(card).click() })
+    expect(vi.getTimerCount()).toBe(idle + 1)
+    tick()
+    tick()
+    expect(vi.getTimerCount()).toBe(idle + 1)
+    card.unmount()
+  })
+
+  it('pauses without writing, and resumes from where it stopped', () => {
+    const card = mount(PROGRAM)
+    act(() => { startButton(card).click() })
+    tick()
+    expect(card.text()).toContain('left 2')
+
+    act(() => { startButton(card, 'Pause').click() })
+    tick(5000)
+    expect(card.text()).toContain('left 2')
+
+    act(() => { startButton(card).click() })
+    tick()
+    expect(card.text()).toContain('left 1')
+    card.unmount()
+  })
+
+  it('resumes from $state after a remount, not from the program default', () => {
+    const first = mount(PROGRAM)
+    act(() => { startButton(first).click() })
+    tick()
+    tick()
+    expect(first.text()).toContain('left 1')
+    first.unmount()
+
+    reload()
+
+    const second = mount(PROGRAM)
+    // The program says 3, the stored value says 1. The stored value wins, which
+    // is what makes a mid-countdown reload survivable.
+    expect(second.text()).toContain('left 1')
+    second.unmount()
+  })
+
+  it('clears its interval when the card goes away', () => {
+    // Counted, not inferred from a value. A remount cannot tell you this: a
+    // leaked interval writes into the store it captured, and a reload replaces
+    // that store, so the write lands nowhere observable and a value-based test
+    // passes while the timer leaks. (Measured: deleting `clearInterval` leaves
+    // a value-based version of this test green and only turns "pauses" red.)
+    const card = mount(PROGRAM)
+    const idle = vi.getTimerCount()
+    act(() => { startButton(card).click() })
+    expect(vi.getTimerCount()).toBe(idle + 1)
+
+    card.unmount()
+    expect(vi.getTimerCount()).toBe(idle)
+  })
+
+  it('does not start, and stays disabled, when nothing is bound', () => {
+    const card = mount('root = Col([Timer(5, "Sitting")])')
+    const buttons = card.all('button') as HTMLButtonElement[]
+    expect(buttons.length).toBe(2)
+    for (const button of buttons) expect(button.disabled).toBe(true)
+
+    act(() => { buttons[0]!.click() })
+    tick(3000)
+    // Still drawn, still showing what the program said.
+    expect(card.text()).toContain('00:05')
     card.unmount()
   })
 })
