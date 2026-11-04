@@ -1,0 +1,4 @@
+
+> @dsh-unified/visualize@0.1.0 typecheck /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d64-088894c20000/repo
+> tsc -p tsconfig.json && tsc -p tsconfig.client.json
+

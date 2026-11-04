@@ -1,0 +1,145 @@
+
+> @dsh-unified/visualize@0.1.0 test /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d64-088894c20000/repo
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d64-088894c20000/repo[39m
+
+ [32m✓[39m tests/openui-functions.spec.ts [2m([22m[2m64 tests[22m[2m)[22m[33m 404[2mms[22m[39m
+ [32m✓[39m tests/fragment.spec.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 197[2mms[22m[39m
+ [32m✓[39m tests/openui-evaluate.spec.ts [2m([22m[2m25 tests[22m[2m)[22m[33m 413[2mms[22m[39m
+ [32m✓[39m tests/lint.spec.ts [2m([22m[2m49 tests[22m[2m)[22m[33m 610[2mms[22m[39m
+ [32m✓[39m tests/core.spec.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 294[2mms[22m[39m
+ [32m✓[39m tests/style-files.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 994[2mms[22m[39m
+     [33m[2m✓[22m[39m lists the global file and one file per workspace with what exists [33m 301[2mms[22m[39m
+ [32m✓[39m tests/lint-gate.spec.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 209[2mms[22m[39m
+ [32m✓[39m tests/images.spec.ts [2m([22m[2m39 tests[22m[2m)[22m[33m 1617[2mms[22m[39m
+ [32m✓[39m tests/tool.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 182[2mms[22m[39m
+ [32m✓[39m tests/storage.spec.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 507[2mms[22m[39m
+ [32m✓[39m tests/streaming-preview.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 84[2mms[22m[39m
+ [32m✓[39m tests/openui-signatures.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/style-setting.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 199[2mms[22m[39m
+ [32m✓[39m tests/self-repair.spec.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 198[2mms[22m[39m
+ [32m✓[39m tests/style.spec.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 296[2mms[22m[39m
+ [32m✓[39m tests/card-state.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+ [32m✓[39m tests/shell.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/page-mode.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 192[2mms[22m[39m
+[90mstdout[2m | tests/openui-inventory.spec.tsx[2m > [22m[2mcomponent inventory[2m > [22m[2mreports the split by group, which must sum to 48
+[22m[39mDrawing (10): rendered —; missing Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText
+Inputs (13): rendered Button, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Slider, Checkbox, RadioGroup, DatePicker, Timer, Form; missing —
+Layout (9): rendered Col, Row, Box, Grid, Card, Divider, Spacer; missing Carousel, Popover
+Media and data (4): rendered —; missing Image, Icon, Table, Chart
+Play (2): rendered —; missing Flashcard, Celebration
+Text (10): rendered Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code; missing —
+=== 30 / 48 rendered ===
+
+ [32m✓[39m tests/openui-card.spec.tsx [2m([22m[2m15 tests[22m[2m)[22m[32m 195[2mms[22m[39m
+ [32m✓[39m tests/openui-inventory.spec.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 199[2mms[22m[39m
+ [32m✓[39m tests/openui-layout-4a1.spec.tsx [2m([22m[2m40 tests[22m[2m)[22m[32m 292[2mms[22m[39m
+ [32m✓[39m tests/openui-text-4a2.spec.tsx [2m([22m[2m64 tests[22m[2m)[22m[33m 1086[2mms[22m[39m
+ [32m✓[39m tests/openui-actions.spec.tsx [2m([22m[2m24 tests[22m[2m)[22m[33m 1200[2mms[22m[39m
+     [33m[2m✓[22m[39m re-evaluates the tree on click (A01) [33m 301[2mms[22m[39m
+ [32m✓[39m tests/openui-state.spec.tsx [2m([22m[2m26 tests[22m[2m)[22m[33m 1313[2mms[22m[39m
+     [33m[2m✓[22m[39m restores a Slider value after a reload (case 1, the acceptance case) [33m 507[2mms[22m[39m
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mturn cards view[2m > [22m[2mshows the cards while the host folds
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mturn cards view[2m > [22m[2mstays empty when the toolview card is already in view
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ [32m✓[39m tests/window-doc.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 295[2mms[22m[39m
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mturn tail draws both backends (P3-06)[2m > [22m[2mdraws a program card while the host folds (requirement 1)
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ [32m✓[39m tests/card-images.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 3701[2mms[22m[39m
+     [33m[2m✓[22m[39m serves a stored image as an opaque, sandboxed download [33m 3199[2mms[22m[39m
+ [32m✓[39m tests/stream-assembly.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 98[2mms[22m[39m
+[90mstderr[2m | tests/openui-interaction.spec.tsx[2m > [22m[2m$state interaction loop[2m > [22m[2mrenders a bound Slider as enabled
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/openui-interaction.spec.tsx[2m > [22m[2m$state interaction loop[2m > [22m[2mleaves an unbound Slider read-only rather than pretending
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mturn tail draws both backends (P3-06)[2m > [22m[2mkeeps HTML cards working alongside program cards (requirement 4)
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mturn tail draws both backends (P3-06)[2m > [22m[2mstays empty when the host does not fold, for either backend (requirement 2)
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/openui-interaction.spec.tsx[2m > [22m[2m$state interaction loop[2m > [22m[2mre-evaluates OTHER components when the slider moves
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ [32m✓[39m tests/page-launcher.spec.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 1601[2mms[22m[39m
+     [33m[2m✓[22m[39m shows title, summary, an inert sandboxed thumbnail, and an open button — never the page itself [33m 700[2mms[22m[39m
+     [33m[2m✓[22m[39m opens the page in a new tab whose only content is the sandboxed frame [33m 395[2mms[22m[39m
+[90mstderr[2m | tests/openui-interaction.spec.tsx[2m > [22m[2m$state interaction loop[2m > [22m[2mkeeps the program itself unchanged while state moves
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ [32m✓[39m tests/openui-interaction.spec.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 605[2mms[22m[39m
+     [33m[2m✓[22m[39m renders a bound Slider as enabled [33m 400[2mms[22m[39m
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mone card, one state, either surface (requirement 3)[2m > [22m[2mmounting the turn tail does not overwrite a stored value with the default
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mone card, one state, either surface (requirement 3)[2m > [22m[2man interaction in the turn tail is what the toolview would see
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ [32m✓[39m tests/frame-images.spec.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1704[2mms[22m[39m
+     [33m[2m✓[22m[39m renders loaded images as data URLs and leaves a failed one to its placeholder [33m 1002[2mms[22m[39m
+[90mstderr[2m | tests/turn-cards.spec.tsx[2m > [22m[2mone card, one state, either surface (requirement 3)[2m > [22m[2mkeeps two sessions apart on the turn tail
+[22m[39mWarning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ [32m✓[39m tests/prompt-bridge.spec.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 1318[2mms[22m[39m
+     [33m[2m✓[22m[39m relays its own frame’s prompt into the sink [33m 707[2mms[22m[39m
+ [32m✓[39m tests/turn-cards.spec.tsx [2m([22m[2m26 tests[22m[2m)[22m[33m 1389[2mms[22m[39m
+     [33m[2m✓[22m[39m shows the cards while the host folds [33m 707[2mms[22m[39m
+ [32m✓[39m tests/frame-helpers.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 2097[2mms[22m[39m
+     [33m[2m✓[22m[39m takes data before fonts are ready, then draws once with the latest [33m 700[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps an explicit legend and sizing, and fades a fill down the plot area [33m 388[2mms[22m[39m
+ [32m✓[39m tests/openui-inputs-4a3.spec.tsx [2m([22m[2m43 tests[22m[2m)[22m[33m 2206[2mms[22m[39m
+     [33m[2m✓[22m[39m writes only that slot when the control is used [33m 305[2mms[22m[39m
+ [32m✓[39m tests/live-style.spec.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 816[2mms[22m[39m
+     [33m[2m✓[22m[39m renders a streaming card in the style the node half configured for the page [33m 691[2mms[22m[39m
+ [32m✓[39m tests/openui-stage2-render.spec.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m tests/frame-scheme.spec.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 251[2mms[22m[39m
+ [32m✓[39m tests/frame-state.spec.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 2347[2mms[22m[39m
+     [33m[2m✓[22m[39m lets fragment scripts read saved values synchronously on load [33m 489[2mms[22m[39m
+     [33m[2m✓[22m[39m restores kept controls before a script that reads through dshViz [33m 309[2mms[22m[39m
+ [32m✓[39m tests/settings-section.spec.tsx [2m([22m[2m13 tests[22m[2m)[22m[33m 2379[2mms[22m[39m
+     [33m[2m✓[22m[39m offers every style as one radio group with a live preview in that style [33m 1197[2mms[22m[39m
+     [33m[2m✓[22m[39m saves a choice through the host form and hands it to this page right away [33m 500[2mms[22m[39m
+[90mstdout[2m | tests/lint-adversarial.spec.ts[2m > [22m[2mlintFragment on adversarial input[2m > [22m[2mreports the slowest case
+[22m[39mslowest lint cases (ms): deep template nesting=1335.8, regex restart on /[ (Codex repro, scaled)=885.9, unterminated regex class=705.6, regex restart after ==591.5, many "id" pairs=424.4
+
+ [32m✓[39m tests/lint-adversarial.spec.ts [2m([22m[2m100 tests[22m[2m)[22m[33m 15275[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: realistic cards [33m 414[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: regex restart on /[ (Codex repro, scaled) [33m 890[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: regex restart after = [33m 594[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: unterminated regex class [33m 709[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: deep template nesting [33m 1339[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: many </ [33m 374[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: nested fetch( [33m 341[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: many method-like fetch() { [33m 351[2mms[22m[39m
+     [33m[2m✓[22m[39m stays under the machine budget (200 ms on the reference machine) and never throws: many "id" pairs [33m 426[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m40 passed[39m[22m[90m (40)[39m
+[2m      Tests [22m [1m[32m809 passed[39m[22m[90m (809)[39m
+[2m   Start at [22m 14:09:06
+[2m   Duration [22m 21.84s[2m (transform 76.93s, setup 0ms, import 125.85s, tests 46.99s, environment 81.44s)[22m
+

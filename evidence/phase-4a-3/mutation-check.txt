@@ -1,0 +1,14 @@
+# Mutation check — do the new guards actually go red?
+# Each mutation is applied, the spec is run, then the source is restored.
+# Recorded 2026-11-04T14:14:29+08:00 on Linux / node v22.13.1 / pnpm 10.28.2
+
+## M1 — delete Timer's clearInterval (simulate a leaked interval)
+   src/client/OpenUICard.tsx: 'return () => clearInterval(id)' -> 'return undefined'
+     × pauses without writing, and resumes from where it stopped 24ms
+     × clears its interval when the card goes away 9ms
+
+## M2 — append the figure's bytes to the persisted meta
+   src/core/legacy-tool.ts: source: value.source -> value.source + 'A'.repeat(204800)
+AssertionError: expected 205772 to be less than 4096.32
+
+## restored — git diff for src/ (empty means clean):

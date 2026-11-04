@@ -1,0 +1,19 @@
+
+> @dsh-unified/visualize@0.1.0 build /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d64-088894c20000/repo
+> tsdown
+
+ℹ tsdown v0.22.14 powered by rolldown v1.2.3
+ℹ config file: /root/.codebuddy/artifact/2f8a7d30-9c21-4f0b-1d64-088894c20000/repo/tsdown.config.ts (unrun)
+ℹ entry: src/index.ts
+ℹ target: es2024
+ℹ tsconfig: tsconfig.json
+ℹ entry: src/client/index.tsx
+ℹ tsconfig: tsconfig.json
+ℹ Build start
+ℹ [CJS] lib/client.js  375.56 kB │ gzip: 99.89 kB
+ℹ [CJS] 1 files, total: 375.56 kB
+✔ Build complete in 1672ms
+ℹ [ESM] lib/index.js    240.42 kB │ gzip: 73.71 kB
+ℹ [ESM] lib/index.d.ts   10.07 kB │ gzip:  3.81 kB
+ℹ [ESM] 2 files, total: 250.49 kB
+✔ Build complete in 1758ms

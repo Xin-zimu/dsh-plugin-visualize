@@ -1,0 +1,175 @@
+{
+  "phase": "4A-3",
+  "title": "Inputs group — the eleven that bind $state",
+  "capturedAt": "2026-11-04T14:16+08:00",
+  "status": "IMPLEMENTED — no component in this batch has been seen in a browser",
+  "verdict": "NOT ACCEPTED. Of the six exit-gate items, #1 is implemented, #2 is unit tested, #4 passes, #6 is restated against a Linux baseline; #3 and #5 are unreachable in the environment that closed this batch.",
+  "scope": {
+    "components": [
+      "Input",
+      "TextArea",
+      "Select",
+      "SegmentedControl",
+      "Checkbox",
+      "RadioGroup",
+      "DatePicker",
+      "Timer",
+      "Form",
+      "IconButton",
+      "Pressable"
+    ],
+    "inventoryBefore": "19 / 48",
+    "inventoryAfter": "30 / 48",
+    "inputsGroup": "complete — rendered 13 of 13, missing none",
+    "measuredFrom": "tests/openui-inventory.spec.tsx reading RENDERED_COMPONENTS, not a hand-kept list"
+  },
+  "environment": {
+    "platform": "Linux x86_64 (cloud sandbox), no DSH host, no browser profile, no bsk daemon",
+    "node": "v22.13.1",
+    "pnpm": "10.28.2",
+    "registry": "https://mirrors.tencent.com/npm/",
+    "head": "74ca8f7",
+    "whatThisMeans": "The unit half of the gate is measurable here. The browser half is not: there is no host to load the plugin into and no way to drive the host's own appearance control, so #3 and #5 are NOT VERIFIED rather than failed."
+  },
+  "commands": [
+    {
+      "command": "pnpm install --frozen-lockfile",
+      "result": "PASS",
+      "evidence": "lockfileVersion 9.0 accepted unchanged by pnpm 10.28.2"
+    },
+    {
+      "command": "pnpm run typecheck",
+      "result": "PASS, exit 0 (tsconfig.json and tsconfig.client.json)",
+      "evidence": "tsc-linux.txt"
+    },
+    {
+      "command": "pnpm run test",
+      "result": "PASS — 809 passed / 0 failed / 809, 40 files",
+      "evidence": "test-4a3-linux.txt"
+    },
+    {
+      "command": "pnpm run build",
+      "result": "PASS after unrun@0.3.1 was declared (D23); lib/index.js 240 kB, lib/client.js 376 kB, lib/index.d.ts 10 kB",
+      "evidence": "build-linux.txt"
+    },
+    {
+      "command": "node --experimental-strip-types evidence/phase-2/differential.mjs",
+      "result": "PASS — cases: 31 | matched: 31 | differing: 0; differential.json byte-identical to the committed one",
+      "evidence": "differential-4a3.txt"
+    },
+    {
+      "command": "pnpm vitest run tests/openui-inventory.spec.tsx",
+      "result": "30 / 48 rendered; Inputs 13 / 13; Text 10 / 10; Layout 7 / 9",
+      "evidence": "inventory-linux.txt"
+    },
+    {
+      "command": "pnpm vitest run tests/openui-inputs-4a3.spec.tsx",
+      "result": "43 / 43 PASS (37 before this session)",
+      "evidence": "test-4a3-linux.txt"
+    }
+  ],
+  "exitCriteria": [
+    {
+      "item": 1,
+      "criterion": "Every component in the batch renders from a real program",
+      "result": "IMPLEMENTED",
+      "evidence": "inventory 30 / 48 measured from RENDERED_COMPONENTS; all eleven drawn in tests/openui-inputs-4a3.spec.tsx; not seen in a browser"
+    },
+    {
+      "item": 2,
+      "criterion": "Bound inputs write $state and survive a reload (4A-3 onward)",
+      "result": "UNIT TESTED",
+      "evidence": "the loop is driven through the real card in jsdom: dispatch, then read the sibling Text the program recomputed; persistence through the same cardStates store a Slider uses, with an explicit reload() between mounts"
+    },
+    {
+      "item": 3,
+      "criterion": "Layout, colour and contrast hold in both colour schemes",
+      "result": "NOT VERIFIED",
+      "evidence": "no host to measure against; the three-layer variable probe cannot run without one"
+    },
+    {
+      "item": 4,
+      "criterion": "The differential still reports 0 differences",
+      "result": "PASS",
+      "evidence": "31 / 31, 0 differing; output file unchanged byte for byte"
+    },
+    {
+      "item": 5,
+      "criterion": "Browser evidence on an isolated profile, with the AGENTS.md §9 hash check",
+      "result": "NOT VERIFIED",
+      "evidence": "structurally unavailable here: no DSH install, no profile, no bundle-hash comparison to make"
+    },
+    {
+      "item": 6,
+      "criterion": "tests/<batch> added; the 15-failure baseline unchanged",
+      "result": "PASS, restated",
+      "evidence": "809 / 809 on Linux. The 15-failure baseline was the Windows test rig: 14 of the 15 do not exist on Linux (7 EPERM on symlink/rename, 5 path-joining, 1 stub branch, 1 cascade timeout, 1 description assertion) and the 15th was D24. The portable gate is the failure SET, named and caused, not the count."
+    }
+  ],
+  "notVerified": [
+    {
+      "id": "V1",
+      "item": "IME composition in a bound Input",
+      "why": "every keystroke writes $state and re-evaluates the whole program, and the field's value is that state; composition events and the candidate window do not exist in jsdom",
+      "howToVerifyLocally": "In a real card, type a two-character Chinese word with a pinyin IME into Input($t, 'Text'). Pass: every character lands, the candidate window is not interrupted, and a sibling Text(@Format(…)) agrees. Fail: a dropped character, a reset composition, or a caret jump."
+    },
+    {
+      "id": "V2",
+      "item": "A ticking Timer beside a focused Input",
+      "why": "the countdown writes $state once a second, so the whole card re-evaluates once a second; focus and caret behaviour under re-render is a browser property",
+      "howToVerifyLocally": "One card with Timer($s, 'Left') and Input($n, 'Name'). Focus the input, start the timer, type slowly for ~5 s across several ticks. Pass: focus and caret never move and no character is lost. Fail: focus jumps away, the caret resets, or input is swallowed."
+    },
+    {
+      "id": "V3",
+      "item": "Both colour schemes for all eleven components",
+      "why": "no host to switch appearance in",
+      "howToVerifyLocally": "Switch through the host's own 外观 control in both directions, never by setting data-ds-dark-theme, and run the three-layer variable probe from evidence/phase-4a-1/a1-probe.mjs."
+    },
+    {
+      "id": "V4",
+      "item": "Bundle hash (§9) match before measurement",
+      "why": "no profile to compare against",
+      "howToVerifyLocally": "Rebuild, then hash the profile's installed lib/ against the build before believing any measurement; pnpm reports 'Already up to date' for a file: dependency while keeping the hard-linked old copy."
+    },
+    {
+      "id": "V5",
+      "item": "Refresh and history replay for a card whose fields were edited",
+      "why": "needs a real session log and a real reload",
+      "howToVerifyLocally": "Type into three fields, reload the page, then reopen the conversation from history. Pass: the values are the ones that were typed, not the program defaults."
+    }
+  ],
+  "defects": [
+    {
+      "id": "D23",
+      "summary": "The build depended on an optional peer nobody declared (unrun)",
+      "detail": "tsdown@0.22.14 needs unrun to load tsdown.config.ts and lists it as an optional peer; pnpm does not install optional peers that were never asked for, so install && build failed on every clean machine while working on the developer's.",
+      "status": "Fixed in chore(build); verified with node_modules deleted"
+    },
+    {
+      "id": "D24",
+      "summary": "A meta-size assertion measured the temp path, and had never executed",
+      "detail": "metaBytes < FRAGMENT.length + 600 versus a measured 972; the constant is ~760 (the fragment is stored twice, plus an absolute path and two content addresses). On Windows the test failed three lines earlier, so the assertion had never run on either platform.",
+      "status": "Replaced with a ratio assertion (metaBytes < FIGURE.byteLength / 50), validated by re-introducing the defect: 205772 vs 4096.32"
+    },
+    {
+      "id": "D25",
+      "summary": "The first Timer cleanup test passed for the wrong reason",
+      "detail": "A leaked interval writes into the store it captured, and a reload has already replaced that store, so a value-based remount test stayed green with clearInterval deleted.",
+      "status": "Cleanup is now asserted by counting pending timers; deleting the cleanup turns two tests red"
+    }
+  ],
+  "openQuestions": [
+    {
+      "topic": "The persisted meta stores the fragment twice",
+      "detail": "presentationMeta writes both fragment and the pre-fork source; for a html card nothing reads source (visualizeMetaFrom needs fragment, openuiMetaFrom returns early when fragment is present), so it is 234 bytes a card of dead payload.",
+      "whyNotFixedHere": "removing it changes the persisted shape and needs an ADR; the benefit is 234 bytes, the risk is historical replay",
+      "recorded": "session-log.md §6"
+    }
+  ],
+  "mutationChecks": {
+    "purpose": "a guard that has never been seen to go red is a guess about what it protects",
+    "evidence": "mutation-check.txt",
+    "M1": "delete Timer's clearInterval -> 'pauses without writing' and 'clears its interval when the card goes away' both fail",
+    "M2": "append the figure's bytes to the persisted meta -> 'expected 205772 to be less than 4096.32'"
+  }
+}

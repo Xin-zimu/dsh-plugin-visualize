@@ -15,7 +15,7 @@ this says what the current slice is allowed to do.
 | 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
-| 4A | Component catalogue: 40 renderers, in five batches | **4A-1 and 4A-2 PASS** (11 done); 29 left in 4A-3…4A-5 |
+| 4A | Component catalogue: 40 renderers, in five batches | **4A-1, 4A-2 PASS** (19 done); **4A-3 implemented, not accepted** (30 of 48); 18 left in 4A-4…4A-5 |
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | Not started — separate from 4A, one security review each |
 | 5 | Unified prompt, security review, release | Not started |
 
@@ -121,10 +121,10 @@ are in the report; they are not counted as browser passes.
 
 ---
 
-## Stage 4A — The component catalogue (4A-1 and 4A-2 PASS; 4A-3 next)
+## Stage 4A — The component catalogue (4A-1, 4A-2 PASS; 4A-3 implemented, awaiting a browser)
 
 **Goal.** Turn the signatures the language already understands into components
-the browser actually draws. Measured inventory — **19 / 48** — from
+the browser actually draws. Measured inventory — **30 / 48** — from
 `tests/openui-inventory.spec.tsx`, which reads the renderer's own table rather
 than a hand-kept list.
 
@@ -132,7 +132,7 @@ than a hand-kept list.
 | --- | --- | --- | --- |
 | Layout | 9 | Col, Row, Box, Grid, Card, Divider, Spacer | Carousel, Popover (4A-5) |
 | Text | 10 | Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code | **— complete** |
-| Inputs | 13 | Button, Slider | IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form (**4A-3**) |
+| Inputs | 13 | Button, Slider, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form | **— complete** |
 | Drawing | 10 | — | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText (4A-5) |
 | Media and data | 4 | — | Image, Icon, Table, Chart (**4A-4**) |
 | Play | 2 | — | Flashcard, Celebration (4A-5) |
@@ -268,6 +268,63 @@ restyle an accepted one. The new AA-safe tier is additive.
 probe and the measured-token allowlist in `tests/openui-layout-4a1.spec.tsx` both
 caught work in this batch — the allowlist refused `--font-mono` and
 `--dsw-alias-label-secondary` until each had a measurement behind it.
+
+---
+
+### 4A-3 — the rest of the Inputs group (IMPLEMENTED, NOT ACCEPTED)
+
+**Scope.** `Input`, `TextArea`, `Select`, `SegmentedControl`, `Checkbox`,
+`RadioGroup`, `DatePicker`, `Timer`, `Form`, `IconButton`, `Pressable` — the
+eleven that complete the Inputs group, 13 / 13.
+
+**Verdict: IMPLEMENTED, not accepted.** Record:
+`docs/reports/PHASE-4A-3-REPORT.md`; manifest
+`evidence/phase-4a-3/MANIFEST.json`. The renderers exist and the unit tests are
+green, but **no item in this batch has been seen in a browser**, and
+`AGENTS.md` §5 does not allow calling that PASS.
+
+| Gate item | Result |
+| --- | --- |
+| All eleven have real renderers | IMPLEMENTED — inventory 30 / 48, Inputs group complete |
+| Arguments match the signature table | PASS — one writable slot per control, always the first, asserted against `BINDING_ARG` |
+| Bound inputs write `$state` and survive a reload | UNIT TESTED — not browser-verified |
+| Layout, colour and contrast in both schemes | **NOT VERIFIED** |
+| Differential still 0 differences | PASS — 31/31, `differential.json` byte-identical |
+| Browser evidence on an isolated profile, with the §9 hash check | **NOT VERIFIED** — the environment that closed this batch has no DSH host |
+| `tests/<batch>` added; failure baseline unchanged | PASS — 809 / 809 on Linux. The "15 failures" baseline was the Windows test rig; 14 of the 15 do not exist on Linux (report §4) |
+
+**One state path, reused rather than rebuilt.** Every renderer reads the bound
+slot, draws it, and calls `write(name, next)`. No renderer keeps a copy of a
+bound value, so none can drift out of sync with `$state`. `IconButton` and
+`Pressable` carry their action through `write.runAction`, the channel `Button`
+already used — deliberately not a second route into state.
+
+**Two risks this batch cannot close, recorded as NOT VERIFIED.** Both are
+questions about a live document, and jsdom answers neither:
+
+1. **IME composition.** Every keystroke writes `$state` and re-evaluates the
+   whole program, and the field's value is that state. Whether a pinyin
+   composition survives the round trip is a browser question.
+2. **A ticking `Timer` beside an `Input`.** The countdown writes `$state` once a
+   second, so the whole card re-evaluates once a second. Whether the focused
+   field keeps its focus, caret and half-typed content is likewise a browser
+   question.
+
+Neither has been observed failing. They are recorded as risks so that the local
+acceptance run tests them on purpose rather than by accident.
+
+**Three defects closed on the way, none in product code.** D23: `pnpm run build`
+did not work on a clean machine, because `tsdown` lists `unrun` as an optional
+peer and pnpm never installed it — the build depended on the developer's store.
+D24: `card-images.spec.ts` carried a meta-size assertion that had never executed
+(it failed three lines earlier on Windows) and that measured the host's temp path
+instead of the payload. D25: the first `Timer` cleanup test passed for the wrong
+reason — a leaked interval writes into a store a reload has already replaced — so
+cleanup is now asserted by counting pending timers, a form that goes red when the
+cleanup goes.
+
+**Carried forward.** 18 components remain: 4 in 4A-4 (`Table`, `Chart`, `Icon`,
+`Image`) and 14 in 4A-5.
 
 ---
 

@@ -19,9 +19,9 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | 4A-2 closed (PASS); the Text group is complete; 4A-3 is the next feature slice |
+| Stage | 4A-3 **implemented, not accepted** — the Inputs group is complete (30 of 48 render); what remains is the browser run |
 | Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-1, 4A-2 PASS** (19 of 48 render), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
+| Status | **4A-3 IMPLEMENTED at `b2e0064`, NOT ACCEPTED** (30 of 48 render) — the unit half is green on Linux at **809 / 809**, and nothing in the batch has been seen in a browser. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
 
 ## 2a. Published, and what publishing cost
 
@@ -349,6 +349,13 @@ differential was re-run and still reports **31/31, 0 differences**
 
 | Test | Command | Result | Evidence |
 | --- | --- | --- | --- |
+| Suite (4A-3, Linux) | `pnpm run test` | **809 / 809** (40 files) — 43 in the batch spec, up from 37; the one pre-existing failure fixed (D24) | `evidence/phase-4a-3/test-4a3-linux.txt` |
+| Types (4A-3) | `pnpm run typecheck` | PASS, exit 0, both projects | `evidence/phase-4a-3/tsc-linux.txt` |
+| Build (4A-3) | `pnpm run build` | PASS after `unrun` was declared (D23); re-verified with `node_modules` deleted | `evidence/phase-4a-3/build-linux.txt` |
+| Language differential (4A-3) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences**; output byte-identical | `evidence/phase-4a-3/differential-4a3.txt` |
+| Inventory (4A-3) | `pnpm vitest run tests/openui-inventory.spec.tsx` | **30 / 48**, Inputs group complete | `evidence/phase-4a-3/inventory-linux.txt` |
+| Mutation checks (4A-3) | two defects re-introduced on purpose, spec re-run, source restored | **both new guards went red** (Timer cleanup; meta size 205772 > 4096) | `evidence/phase-4a-3/mutation-check.txt` |
+| Browser 4A-3 | — | **NOT RUN** — the environment that closed this batch has no DSH host | `evidence/phase-4a-3/MANIFEST.json` → `notVerified` |
 | Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-host.txt` |
 | Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-client.txt` |
 | Suite (4A-2) | `npx vitest run` | **749 / 15** (764) — phase verdict was reached on 747; the 2 extra are the structural guards added at close | `evidence/phase-4a-2/test-4a2-maintenance.txt` |
@@ -395,8 +402,28 @@ differential was re-run and still reports **31/31, 0 differences**
 | `Link` colour has no host token that passes AA in both schemes | A `var()` bridge would fail in one scheme | Recorded in ADR-008; declared as a measured `light-dark()` pair (`LINK_LITERAL`) |
 | Protocol-relative URLs allowed upstream, refused here | A recorded divergence, not a drift | ADR-008; the fork's allowlist is a strict subset of upstream's |
 | `Mailto:`/`tel:` links degrade to text | A card cannot start an email or a call | Deliberate in ADR-008; nothing in the catalogue needs them, and they invoke OS handlers |
+| The persisted meta stores the fragment twice | 234 bytes a card; for a html card nothing reads `source` (`visualizeMetaFrom` needs `fragment`, `openuiMetaFrom` returns early when it is present) | **Recorded, deliberately not changed in 4A-3.** Removing it changes the persisted shape and needs an ADR |
+| The build needed an undeclared optional peer | `pnpm install --frozen-lockfile && pnpm run build` failed on any clean machine | **Fixed in 4A-3** — `unrun` declared as a dev dependency (D23) |
+| "15 known failures" was a Windows-rig count | A count carried across platforms hides what actually changed; one of the 15 had never run at all | **Restated in 4A-3** — 14 of the 15 do not exist on Linux, and the 15th was D24. The portable gate is the failure *set*, each entry named and caused |
+| A Timer cleanup test passed for the wrong reason | A leaked interval writes into a store a reload has already replaced, so the leak is invisible to a value-based test | **Fixed in 4A-3** — cleanup asserted by counting pending timers (D25) |
 
 ## 7. Next step
+
+**4A-3 is implemented and not accepted.** The eleven renderers exist, the unit
+loop is green (809 / 809 on Linux), the differential is 31/31, and the evidence
+directory now holds a `MANIFEST.json` that says so. What is missing is not code:
+
+1. **The browser run**, on an isolated profile, with the §9 hash check before
+   any measurement. Until it happens, `STAGE.md` calls the batch IMPLEMENTED.
+2. **The two risk cases, on purpose** — IME composition in a bound `Input`, and a
+   ticking `Timer` beside a focused `Input`. Steps are in
+   `evidence/phase-4a-3/MANIFEST.json` → `notVerified` V1/V2. Neither has been
+   observed failing; they are unmeasured, not broken.
+3. **Only then 4A-4** (`Table`, `Chart`, `Icon`, `Image`), which is also where
+   `IconButton`'s placeholder glyph gets a real `Icon` to draw.
+
+Everything below is the previous session's note, kept because its lessons still
+apply to the local run.
 
 **The working tree was dirty and is now committed.** The three accepted phases
 (stage 3, 4A-1, infra-1) sat on top of `9b46cec` for a session and were committed
@@ -539,6 +566,39 @@ Six things carried forward:
 ---
 
 ## History
+
+### Session 14 — 2026-11-04
+
+**Rebuilt the baseline on Linux, then closed what that exposed.** The session
+started from the checkpoint `74ca8f7` on a machine with no DSH host, so the
+first job was to find out which of the "15 known failures" were the product and
+which were the Windows test rig. Answer: **14 of 15 were the rig** — seven
+`EPERM` on symlink/rename, five from `D:/work/...\~\AppData\...` path joining,
+one a `ctx.fs.readText` stub branch, one a cascade timeout, one a description
+assertion. The fifteenth, `card-images.spec.ts`, was a real fault (D24) that had
+never executed on either platform.
+
+**Three defects, none in product code.** D23: `tsdown` needs `unrun` as an
+optional peer that pnpm never installed, so `install && build` failed on any
+clean machine while working on the one where it had been added by hand — declared
+in `chore(build)` instead. D24: the meta-size assertion measured the host's temp
+path and had never run; replaced with a ratio against the figure, validated by
+re-introducing the leak (205 772 vs 4 096). D25: the first `Timer` cleanup test
+passed for the wrong reason — a leaked interval writes into a store a reload has
+already replaced — so cleanup is now asserted by counting pending timers.
+
+**Six Timer cases added**, because `Timer` is the only control in this batch
+that writes without a gesture, and the old `Timer: Start decrements…` asserted no
+decrement at all. Two limits recorded rather than papered over: a value-based
+cleanup test cannot see a leak (D25), and `Math.max(0, remaining - 1)` inside the
+tick is unreachable from a mounted timer, so deleting it leaves the file green.
+
+**What was deliberately not done.** No browser run — there is no host here, and
+`AGENTS.md` §5 does not allow a unit pass to stand in for one. The two risks that
+need a live document (IME composition, a ticking Timer beside a focused input)
+are in `MANIFEST.json` → `notVerified` with steps, not in the pass set. The
+`source` redundancy in the persisted meta is recorded in §6 rather than removed:
+234 bytes a card is not worth a persisted-shape change without an ADR.
 
 ### Session 13 — 2026-11-03/04
 
