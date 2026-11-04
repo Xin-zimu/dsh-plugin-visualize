@@ -656,7 +656,7 @@ Then the old objects were made unreachable and destroyed: work branches deleted,
 leaked blob ids now return "GONE" from `git cat-file`, and an exhaustive scan of
 all 731 blobs in the object database finds the token **nowhere**.
 
-A full recovery bundle was written to `D:\Deepseek WorkSpace\.pre-cleanup-backup\`
+A full recovery bundle was written to a scratch directory **outside the repository** (the checkout's parent, named `.pre-cleanup-backup`)
 **before** the rewrite, outside the repository, so a botched history edit would
 have been recoverable.
 
@@ -771,8 +771,8 @@ Media and data complete. The new spec is 21/21, the validate gate 6/6.
 archive `dsh-plugin-visualize-4a3-handoff-v3.zip` (7 487 610 bytes) carried a
 full tree *and* a `4a3-close/` folder with four patches and an incremental
 bundle. Its entries were listed and extracted to
-`D:\Deepseek WorkSpace\.handoff-4a3-v3` — **outside the repository** — so
-nothing could overwrite the working tree.
+a scratch directory outside the repository — so nothing could overwrite the
+working tree.
 
 **The four commits were genuinely absent, and the bundle proved it.** Before the
 restore `git cat-file -t` returned absent for all four hashes, `main` was at
