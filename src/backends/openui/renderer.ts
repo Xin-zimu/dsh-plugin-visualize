@@ -64,6 +64,17 @@ function checkNames(program: ReturnType<typeof parseProgram>): Diagnostic[] {
       continue
     }
     if (COMPONENT_NAMES.has(call.name)) continue
+    // An action group is not a component and is not sigil-led either.
+    //
+    // `Action([...])` groups several steps under one Button, and it is the form
+    // the component catalogue, `openui-actions.ts` and the renderer all accept.
+    // It was rejected here anyway, because this check only admitted names either
+    // in the component table or behind an `@`: a declared action step written
+    // without the sigil fell through to "unknown component". The prompt told a
+    // model to use a form the validator would not pass, and a model that followed
+    // the prompt was refused while one that "corrected" it succeeded — the worst
+    // shape of contract drift (ADR-002), found in the 4A-5 browser run.
+    if (ACTION_NAMES.has(call.name)) continue
     diagnostics.push({
       severity: 'error',
       code: 'VZO002',

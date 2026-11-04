@@ -223,11 +223,14 @@ describe('4A-3 renders every component in the batch', () => {
     for (const name of BATCH) expect(RENDERED_COMPONENTS).toContain(name)
   })
 
-  it('draws 30 of the 48 declared components', () => {
-    // 19 before this batch, +11 here. Counted from the renderer's own table, so
-    // this cannot drift away from what is actually drawn.
-    // 30 at the end of 4A-3; 34 since 4A-4 added Table, Chart, Icon and Image.
-    expect(RENDERED_COMPONENTS).toHaveLength(34)
+  it('draws every one of the 48 declared components', () => {
+    // 19 before this batch, +11 here, +4 in 4A-4, +14 in 4A-5. Counted from the
+    // renderer's own table, so this cannot drift away from what is actually
+    // drawn — and the equality against the signature table is the stronger
+    // statement: not "48 names" but "these exact 48".
+    expect(RENDERED_COMPONENTS).toHaveLength(48)
+    const declared = COMPONENTS.map(component => component.name)
+    expect(RENDERED_COMPONENTS.slice().sort()).toEqual(declared.slice().sort())
   })
 })
 
@@ -267,7 +270,10 @@ describe('every input has exactly one writable slot, and it is the first', () =>
     cardStates.flush()
     // Exactly one variable is stored, and it is `done`.
     const key = stateKeyFor({ ...META, program }, 's1', 'call-1')
-    expect(Object.keys(storedValues(key) as object)).toEqual(['done'])
+    // A card with a session and a call id has a durable identity; without the
+    // assertion the next line would silently read a null key.
+    expect(key, 'the card should have a state key').toBeDefined()
+    expect(Object.keys(storedValues(key ?? '') as object)).toEqual(['done'])
     card.unmount()
   })
 })

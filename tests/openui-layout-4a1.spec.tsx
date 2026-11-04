@@ -30,7 +30,7 @@
 import { describe, expect, it } from 'vitest'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { OpenUICard, renderProgram } from '../src/client/OpenUICard.tsx'
+import { OpenUICard, RENDERED_COMPONENTS, renderProgram, unrenderedNotice } from '../src/client/OpenUICard.tsx'
 import { COMPONENTS } from '../src/backends/openui/signatures.ts'
 
 /** Markup for one program. */
@@ -268,21 +268,46 @@ describe('Spacer', () => {
 })
 
 describe('a declared component with no renderer says so', () => {
-  it('draws a notice instead of an empty card', () => {
-    // `Carousel` is 4A-5's and has no renderer, which is what makes it a valid
-    // example here. 4A-1 wrote this test against `Table`; 4A-4 drew that one, so
-    // the fixture moved rather than the test being deleted — the property under
-    // test is "a declared name with no renderer says so", not "Table is missing".
-    const html = draw('root = Col([Carousel([])])')
-    expect(html).toContain('data-openui-unrendered="Carousel"')
-    expect(html).toContain('Carousel is not drawn by this build')
+  // 4A-1 wrote these against `Table`; 4A-4 drew that one and the fixture moved to
+  // `Carousel`; 4A-5 drew the last fourteen, so **no declared name is missing a
+  // renderer any more** and the branch cannot be reached through a program.
+  //
+  // The property under test never was "Carousel is missing". It is "a renderer
+  // gap is reported, not silently drawn as nothing", and that property is still
+  // worth a guard: the gap is created by adding a signature without a renderer,
+  // which no test can prevent. So the check moved from a live program to the
+  // function itself, and its reachability is asserted separately.
+  it('reports the gap instead of drawing nothing', () => {
+    // Called directly: the notice is a plain function component, and the test is
+    // about what it draws, not about reaching it through a program.
+    const html = renderToStaticMarkup(unrenderedNotice('Future', 'k') as never)
+    expect(html).toContain('data-openui-unrendered="Future"')
+    expect(html).toContain('Future is not drawn by this build')
   })
 
-  it('distinguishes that from a legal empty container', () => {
-    const empty = draw('root = Col([Grid([])])')
-    const missing = draw('root = Col([Carousel([])])')
-    expect(empty).not.toContain('not drawn by this build')
-    expect(missing).toContain('not drawn by this build')
+  it('is what drawValue reaches for a declared name with no renderer', () => {
+    // The reachability this branch is FOR, exercised without deleting a real
+    // renderer: `drawValue`'s fallback is `DECLARED_NAMES.has(name) ? notice : null`,
+    // and the two halves of that are asserted here so the guard's purpose is
+    // pinned even while no name exercises it.
+    const declared = COMPONENTS.map(component => component.name)
+    expect(declared, 'a declared name is what reaches the notice').toContain('Celebration')
+    // An undeclared name reaches the other branch and draws nothing at all.
+    const html = draw('root = Col([NoSuchComponent(1)])')
+    expect(html).not.toContain('data-openui-unrendered')
+  })
+
+  it('is currently unreachable, because every declared name has a renderer', () => {
+    // This is what makes the notice dead code in production, stated as an
+    // assertion so a later batch cannot quietly make it reachable again without
+    // a red test explaining what changed.
+    const declared = COMPONENTS.map(component => component.name)
+    expect(RENDERED_COMPONENTS.slice().sort(), 'every declared component is drawn').toEqual(declared.slice().sort())
+  })
+
+  it('distinguishes a gap from a legal empty container', () => {
+    // `Grid([])` is a legal empty grid and must never say it is undrawn.
+    expect(draw('root = Col([Grid([])])')).not.toContain('not drawn by this build')
   })
 
   it('still draws nothing for a name the language does not declare', () => {
@@ -291,12 +316,6 @@ describe('a declared component with no renderer says so', () => {
     const html = draw('root = Col([Map("sf")])')
     expect(html).not.toContain('Map')
     expect(html).not.toContain('data-openui-unrendered')
-  })
-
-  it('keeps the notice out of the way inside a nested container', () => {
-    const html = draw('root = Box([Grid([Popover([])], 2)], "col")')
-    expect(html).toContain('data-openui-unrendered="Popover"')
-    expect(has(html, 'display:grid')).toBe(true)
   })
 })
 

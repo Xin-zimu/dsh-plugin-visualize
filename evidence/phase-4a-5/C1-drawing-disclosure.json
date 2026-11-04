@@ -1,0 +1,643 @@
+{
+ "at": "2026-11-04T17:57:51.019Z",
+ "probe": "4A-5 drawing and disclosure",
+ "stamp": {
+  "at": "2026-11-04T17:56:21.697Z",
+  "session": "rzab",
+  "buildSha256": "A0E744D1CBF5B9ABA3C8DCBBD2475F4C32367A4DCE578A95BE5DD38AA35823D7",
+  "installedSha256": "A0E744D1CBF5B9ABA3C8DCBBD2475F4C32367A4DCE578A95BE5DD38AA35823D7"
+ },
+ "program": "$done = false\nroot = Col([Title(\"A5 drawing\"), Svg([G([Circle(24, 24, 16, \"info\"), Rect(52, 8, 32, 32, \"success\", \"none\", 0, 1, 4)], \"translate(0 0)\"), Ellipse(120, 24, 20, 12, \"warning\"), Line(0, 52, 200, 52, \"ink\", 2), Path(\"M 10 70 L 30 88 L 50 70\", \"none\", \"danger\", 2), Polyline(\"70,88 90,70 110,88\", \"purple\", 2), Polygon(\"130,88 150,70 170,88\", \"pink\"), SvgText(\"drawing\", 100, 110, 12, \"ink\", \"middle\", \"semibold\")], \"0 0 200 120\"), Divider(), Title(\"disclosure and play\"), Row([Popover(\"What is this?\", \"An inline panel clamped inside the card.\"), Flashcard(\"front\", \"back\", \"tap to flip\")]), Carousel([Card([Text(\"one\")], \"soft\"), Card([Text(\"two\")], \"soft\"), Card([Text(\"three\")], \"soft\")], 140, 2), Button(\"Finish\", @Set($done, true)), Celebration($done)])",
+ "prompt": "Use the visualize tool with backend openui, title A5 drawing and disclosure. One statement per line, no explanation. Write exactly this program, character for character: $done = false\nroot = Col([Title(\"A5 drawing\"), Svg([G([Circle(24, 24, 16, \"info\"), Rect(52, 8, 32, 32, \"success\", \"none\", 0, 1, 4)], \"translate(0 0)\"), Ellipse(120, 24, 20, 12, \"warning\"), Line(0, 52, 200, 52, \"ink\", 2), Path(\"M 10 70 L 30 88 L 50 70\", \"none\", \"danger\", 2), Polyline(\"70,88 90,70 110,88\", \"purple\", 2), Polygon(\"130,88 150,70 170,88\", \"pink\"), SvgText(\"drawing\", 100, 110, 12, \"ink\", \"middle\", \"semibold\")], \"0 0 200 120\"), Divider(), Title(\"disclosure and play\"), Row([Popover(\"What is this?\", \"An inline panel clamped inside the card.\"), Flashcard(\"front\", \"back\", \"tap to flip\")]), Carousel([Card([Text(\"one\")], \"soft\"), Card([Text(\"two\")], \"soft\"), Card([Text(\"three\")], \"soft\")], 140, 2), Button(\"Finish\", @Set($done, true)), Celebration($done)]) Then reply with the single word DRAWN. Do not explain and do not change the content.",
+ "submit": {
+  "clicked": true
+ },
+ "cardsBefore": 24,
+ "cardsAfter": 26,
+ "C1": {
+  "cards": 26,
+  "unrendered": [],
+  "counts": {
+   "svg": 1,
+   "g": 1,
+   "circle": 1,
+   "ellipse": 1,
+   "rect": 1,
+   "line": 1,
+   "path": 1,
+   "polyline": 1,
+   "polygon": 1,
+   "text": 1
+  },
+  "refusedMarkers": [],
+  "viewBox": "0 0 200 120",
+  "svgBox": {
+   "x": 427,
+   "y": 69,
+   "w": 300,
+   "h": 180
+  },
+  "geometry": {
+   "circle": {
+    "cx": "24",
+    "cy": "24",
+    "r": "16"
+   },
+   "rect": {
+    "x": "52",
+    "y": "8",
+    "w": "32",
+    "rx": "4"
+   },
+   "line": {
+    "x1": "0",
+    "x2": "200"
+   },
+   "pathD": "M 10 70 L 30 88 L 50 70",
+   "polylinePoints": "70,88 90,70 110,88",
+   "polygonPoints": "130,88 150,70 170,88"
+  },
+  "transform": "translate(0 0)",
+  "paints": {
+   "circle": {
+    "fill": "rgb(86, 134, 254)",
+    "stroke": "none",
+    "strokeWidth": "1px",
+    "opacity": "1"
+   },
+   "rect": {
+    "fill": "rgb(34, 197, 94)",
+    "stroke": "none",
+    "strokeWidth": "1px",
+    "opacity": "1"
+   },
+   "line": {
+    "fill": "none",
+    "stroke": "rgb(249, 250, 251)",
+    "strokeWidth": "2px",
+    "opacity": "1"
+   },
+   "path": {
+    "fill": "none",
+    "stroke": "rgb(239, 68, 68)",
+    "strokeWidth": "2px",
+    "opacity": "1"
+   },
+   "text": {
+    "fill": "rgb(249, 250, 251)",
+    "stroke": "none",
+    "strokeWidth": "1px",
+    "opacity": "1"
+   }
+  },
+  "textContent": "drawing",
+  "textAnchor": "middle"
+ },
+ "listenerInstrument": {
+  "installed": true,
+  "already": true
+ },
+ "listenerBaseline": {
+  "dragenter": 1,
+  "dragover": 1,
+  "dragleave": 1,
+  "drop": 1
+ },
+ "openPanel": {
+  "clicked": true,
+  "cardBefore": {
+   "x": 426.66668701171875,
+   "y": 7.6666669845581055,
+   "w": 680,
+   "h": 535.6666870117188
+  }
+ },
+ "panelOpen": {
+  "open": true,
+  "placement": "below",
+  "role": "dialog",
+  "ariaModal": "false",
+  "position": "absolute",
+  "zIndex": "1",
+  "ariaExpanded": "true",
+  "panelRect": {
+   "left": 434.66668701171875,
+   "top": 337.9895935058594,
+   "right": 616.0000305175781,
+   "bottom": 387.3229293823242,
+   "w": 181.33334350585938,
+   "h": 49.333335876464844
+  },
+  "cardRect": {
+   "left": 426.66668701171875,
+   "top": 7.6666669845581055,
+   "right": 1106.6666870117188,
+   "bottom": 543.3333539962769,
+   "w": 680,
+   "h": 535.6666870117188
+  },
+  "insideCard": true,
+  "overflowsCard": {
+   "left": false,
+   "right": false,
+   "top": false,
+   "bottom": false
+  },
+  "composerRect": {
+   "left": 410.66668701171875,
+   "top": 619.3333740234375,
+   "right": 1118.6666870117188,
+   "bottom": 655.3333740234375
+  },
+  "coversComposer": false,
+  "inBodyDirectly": false,
+  "parentTag": "SPAN",
+  "text": "An inline panel clamped inside the card."
+ },
+ "cardAfterOpen": {
+  "x": 426.66668701171875,
+  "y": 7.6666669845581055,
+  "w": 680,
+  "h": 535.6666870117188
+ },
+ "insidePress": {
+  "stillOpen": true
+ },
+ "panelOpenBeforeOutside": 1,
+ "outsidePress": {
+  "stillOpen": false,
+  "panels": 0
+ },
+ "beforeEscape": 1,
+ "escape": {
+  "panels": 0,
+  "focusOnTrigger": true,
+  "activeTag": "BUTTON",
+  "ariaExpanded": "false"
+ },
+ "listenerAfter": {
+  "dragenter": 1,
+  "dragover": 1,
+  "dragleave": 1,
+  "drop": 1
+ },
+ "listenerLeak": [],
+ "play": {
+  "flashcard": {
+   "stateBefore": "front",
+   "visibleFaces": 1,
+   "hiddenFaces": 1,
+   "hint": 1
+  },
+  "carousel": {
+   "tracks": 1,
+   "items": 3,
+   "itemWidths": [
+    140,
+    140,
+    140
+   ],
+   "scrollable": false,
+   "overflowX": "auto",
+   "tabIndex": "0"
+  },
+  "celebrationBefore": 0
+ },
+ "flashcardClick": {
+  "clicked": true,
+  "stateBefore": "front"
+ },
+ "flashcardAfter": {
+  "stateAfter": "back",
+  "pressed": "true",
+  "visibleFaces": 1,
+  "hiddenFaces": 1,
+  "visibleText": "back"
+ },
+ "celebrationReset": {
+  "cleared": 1
+ },
+ "celebrationStateBefore": {
+  "hasFinish": true,
+  "stored": null,
+  "bursts": 0
+ },
+ "finish": {
+  "clicked": true
+ },
+ "celebrationSamples": [
+  {
+   "at": 60,
+   "pieces": 36
+  },
+  {
+   "at": 200,
+   "pieces": 36
+  },
+  {
+   "at": 400,
+   "pieces": 36
+  },
+  {
+   "at": 800,
+   "pieces": 36
+  },
+  {
+   "at": 1500,
+   "pieces": 0
+  },
+  {
+   "at": 2400,
+   "pieces": 0
+  },
+  {
+   "at": 3200,
+   "pieces": 0
+  }
+ ],
+ "celebrationAfterFinish": 36,
+ "celebrationAfterFinishAgain": 0,
+ "schemeToggle": {
+  "before": "dark",
+  "found": false
+ },
+ "C4": {
+  "scheme": "dark",
+  "background": [
+   0,
+   0,
+   0
+  ],
+  "sampleCount": 8,
+  "minRatio": 5.58,
+  "resolved": true,
+  "details": [
+   {
+    "tag": "circle",
+    "color": "rgb(86, 134, 254)",
+    "ratio": 6.24
+   },
+   {
+    "tag": "rect",
+    "color": "rgb(34, 197, 94)",
+    "ratio": 9.22
+   },
+   {
+    "tag": "ellipse",
+    "color": "rgb(245, 158, 11)",
+    "ratio": 9.78
+   },
+   {
+    "tag": "line",
+    "color": "rgb(249, 250, 251)",
+    "ratio": 20.1
+   },
+   {
+    "tag": "path",
+    "color": "rgb(239, 68, 68)",
+    "ratio": 5.58
+   },
+   {
+    "tag": "polyline",
+    "color": "rgb(183, 145, 226)",
+    "ratio": 8.16
+   },
+   {
+    "tag": "polygon",
+    "color": "rgb(239, 68, 68)",
+    "ratio": 5.58
+   },
+   {
+    "tag": "text",
+    "color": "rgb(249, 250, 251)",
+    "ratio": 20.1
+   }
+  ]
+ },
+ "checks": [
+  {
+   "name": "C1 svg drawn",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one circle",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one rect",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one ellipse",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one line",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one path",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one polyline",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one polygon",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one svg text",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 one group",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "C1 viewBox normalised",
+   "ok": true,
+   "detail": "0 0 200 120"
+  },
+  {
+   "name": "C1 transform applied",
+   "ok": true,
+   "detail": "translate(0 0)"
+  },
+  {
+   "name": "C1 circle geometry",
+   "ok": true,
+   "detail": {
+    "cx": "24",
+    "cy": "24",
+    "r": "16"
+   }
+  },
+  {
+   "name": "C1 path re-serialised",
+   "ok": true,
+   "detail": "M 10 70 L 30 88 L 50 70"
+  },
+  {
+   "name": "C1 points re-serialised",
+   "ok": true,
+   "detail": "70,88 90,70 110,88"
+  },
+  {
+   "name": "C1 svg text content",
+   "ok": true,
+   "detail": "drawing"
+  },
+  {
+   "name": "C1 svg text anchor",
+   "ok": true,
+   "detail": "middle"
+  },
+  {
+   "name": "C1 paint resolved to a colour",
+   "ok": true,
+   "detail": {
+    "fill": "rgb(86, 134, 254)",
+    "stroke": "none",
+    "strokeWidth": "1px",
+    "opacity": "1"
+   }
+  },
+  {
+   "name": "C1 no refusal markers on a valid drawing",
+   "ok": true,
+   "detail": []
+  },
+  {
+   "name": "C1 no unrendered notices",
+   "ok": true,
+   "detail": []
+  },
+  {
+   "name": "P1 panel opens",
+   "ok": true,
+   "detail": true
+  },
+  {
+   "name": "P1 panel is inside the card",
+   "ok": true,
+   "detail": {
+    "left": false,
+    "right": false,
+    "top": false,
+    "bottom": false
+   }
+  },
+  {
+   "name": "P1 panel is not a body child",
+   "ok": true,
+   "detail": "SPAN"
+  },
+  {
+   "name": "P1 panel is absolute, not fixed",
+   "ok": true,
+   "detail": "absolute"
+  },
+  {
+   "name": "P1 panel is non-modal",
+   "ok": true,
+   "detail": "false"
+  },
+  {
+   "name": "P1 trigger says expanded",
+   "ok": true,
+   "detail": "true"
+  },
+  {
+   "name": "P3 panel does not cover the host composer",
+   "ok": true,
+   "detail": {
+    "left": 410.66668701171875,
+    "top": 619.3333740234375,
+    "right": 1118.6666870117188,
+    "bottom": 655.3333740234375
+   }
+  },
+  {
+   "name": "P2 opening did not move the card",
+   "ok": true,
+   "detail": {
+    "before": {
+     "x": 426.66668701171875,
+     "y": 7.6666669845581055,
+     "w": 680,
+     "h": 535.6666870117188
+    },
+    "after": {
+     "x": 426.66668701171875,
+     "y": 7.6666669845581055,
+     "w": 680,
+     "h": 535.6666870117188
+    }
+   }
+  },
+  {
+   "name": "P4 inside press keeps it open",
+   "ok": true,
+   "detail": {
+    "stillOpen": true
+   }
+  },
+  {
+   "name": "P4 outside press closes it",
+   "ok": true,
+   "detail": {
+    "openBefore": 1,
+    "after": {
+     "stillOpen": false,
+     "panels": 0
+    }
+   }
+  },
+  {
+   "name": "P3 Escape closes it",
+   "ok": true,
+   "detail": {
+    "panels": 0,
+    "focusOnTrigger": true,
+    "activeTag": "BUTTON",
+    "ariaExpanded": "false"
+   }
+  },
+  {
+   "name": "P3 Escape restores focus to the trigger",
+   "ok": true,
+   "detail": "BUTTON"
+  },
+  {
+   "name": "P6 no document listener leaked",
+   "ok": true,
+   "detail": []
+  },
+  {
+   "name": "flashcard flips",
+   "ok": true,
+   "detail": {
+    "before": "front",
+    "after": "back"
+   }
+  },
+  {
+   "name": "flashcard says it is pressed",
+   "ok": true,
+   "detail": "true"
+  },
+  {
+   "name": "flashcard shows one face",
+   "ok": true,
+   "detail": {
+    "stateBefore": "front",
+    "visibleFaces": 1,
+    "hiddenFaces": 1,
+    "hint": 1
+   }
+  },
+  {
+   "name": "flashcard keeps its hint",
+   "ok": true,
+   "detail": 1
+  },
+  {
+   "name": "carousel draws one item per child",
+   "ok": true,
+   "detail": 3
+  },
+  {
+   "name": "carousel is a snap scroller",
+   "ok": true,
+   "detail": {
+    "tracks": 1,
+    "items": 3,
+    "itemWidths": [
+     140,
+     140,
+     140
+    ],
+    "scrollable": false,
+    "overflowX": "auto",
+    "tabIndex": "0"
+   }
+  },
+  {
+   "name": "celebration silent before the condition",
+   "ok": true,
+   "detail": 0
+  },
+  {
+   "name": "celebration bursts after the condition",
+   "ok": true,
+   "detail": [
+    {
+     "at": 60,
+     "pieces": 36
+    },
+    {
+     "at": 200,
+     "pieces": 36
+    },
+    {
+     "at": 400,
+     "pieces": 36
+    },
+    {
+     "at": 800,
+     "pieces": 36
+    },
+    {
+     "at": 1500,
+     "pieces": 0
+    },
+    {
+     "at": 2400,
+     "pieces": 0
+    },
+    {
+     "at": 3200,
+     "pieces": 0
+    }
+   ]
+  },
+  {
+   "name": "celebration clears itself",
+   "ok": true,
+   "detail": {
+    "lastSample": {
+     "at": 3200,
+     "pieces": 0
+    }
+   }
+  },
+  {
+   "name": "C4 dark scheme reached",
+   "ok": true,
+   "detail": "dark"
+  },
+  {
+   "name": "C4 every paint resolved",
+   "ok": true,
+   "detail": 8
+  },
+  {
+   "name": "C4 drawing stays visible against the card",
+   "ok": true,
+   "detail": 5.58
+  }
+ ],
+ "verdict": "PASS"
+}

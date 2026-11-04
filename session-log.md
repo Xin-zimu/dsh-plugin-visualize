@@ -406,7 +406,7 @@ differential was re-run and still reports **31/31, 0 differences**
 | `@OpenUrl`/`@CopyToClipboard`/`@ToAssistant` refused | A card cannot open, copy or message | Deliberate; each needs a security review (4B) |
 | Two bridged tokens do not exist in the host | `--viz-series-4` and `--font-sans` resolved to nothing and silently used fallbacks | **Fixed in 4A-1 and re-verified in both themes** (D17, D18) |
 | A declared-but-undrawn component drew nothing | A renderer gap looked like an intentionally empty card | **Fixed in 4A-1** — an explicit notice, pinned by tests (A7) |
-| 12 of 48 components render | The language knows all 48; the renderer draws 12 | **Superseded — 19 of 48 after 4A-2**; 29 assigned to 4A-3…4A-5 |
+| 12 of 48 components render | The language knows all 48; the renderer draws 12 | **Closed** — 19 after 4A-2, 30 after 4A-3, 34 after 4A-4, **48 of 48 after 4A-5** |
 | Cross-generation replay unverified | A9 cannot be run on the profile's older session | Log written by a newer harness; recorded, not counted. **Unchanged by 4A-2** |
 | 15 Windows test failures | Noise that could hide a regression | Accepted; `docs/testing/TEST_PLAN.md` |
 | Small supporting text was 3.71:1 on white | 11px meta text (`Copy`, markers, citations) was below AA | **Fixed in 4A-2** — `--muted-foreground-strong` on the host's secondary tier, 5.8:1 / 12.11:1 (D22) |
@@ -419,10 +419,18 @@ differential was re-run and still reports **31/31, 0 differences**
 | The build needed an undeclared optional peer | `pnpm install --frozen-lockfile && pnpm run build` failed on any clean machine | **Fixed in 4A-3** — `unrun` declared as a dev dependency (D23) |
 | "15 known failures" was a Windows-rig count | A count carried across platforms hides what actually changed; one of the 15 had never run at all | **Restated in 4A-3** — 14 of the 15 do not exist on Linux, and the 15th was D24. The portable gate is the failure *set*, each entry named and caused |
 | A Timer cleanup test passed for the wrong reason | A leaked interval writes into a store a reload has already replaced, so the leak is invisible to a value-based test | **Fixed in 4A-3** — cleanup asserted by counting pending timers (D25) |
+| The validator rejected the documented `Action([...])` form | The prompt taught a form `checkNames` refused, so an obedient model was rejected and a "correcting" one succeeded | **Fixed in 4A-5** — the action table is consulted for the sigil-less form too; the old test was reversed, not deleted |
+| `Celebration` never fired for a bare-variable condition | `Celebration($done)` passes a binding marker; `boolOf` on that object is constant true, so the transition never happened. Every test used the comparison form, so none touched it | **Fixed in 4A-5** — `fieldOf` unwraps the binding; three regression cases, mutation-verified |
+| An idle bsk session is recycled after 5 minutes | The Agent Window and its browser close with it, which looks like a crashed environment | Recorded in 4A-5; start sessions with a longer `--session-idle` for a long acceptance run |
+| A fresh agent tab is `about:blank` and cannot be synced | `cooperate sync` fails with "Receiving end does not exist" until the tab navigates, because the content script is not injected | Recorded in 4A-5; navigate before the first sync |
 
 ## 7. Next step
 
-**4A-4 is accepted. Next is 4A-5** — the fourteen that remain: the ten SVG
+**Stage 4A is closed at 48 / 48.** Next is **Stage 4B** — the three refused
+actions (`@OpenUrl`, `@CopyToClipboard`, `@ToAssistant`), each with its own
+security review, then Stage 5 (unified prompt, security review, release).
+
+~~4A-4 is accepted. Next is 4A-5~~ — the fourteen that remain: the ten SVG
 drawing primitives plus `Flashcard`, `Celebration`, `Carousel` and `Popover`.
 Three things carry forward:
 
@@ -605,6 +613,72 @@ Six things carried forward:
 ---
 
 ## History
+
+### Session 18 — 2026-11-05 (Stage 4A-5 closed: 48 / 48)
+
+**Stage 4A-5 is closed.** The last fourteen components are implemented,
+`tests/openui-inventory.spec.tsx` reports **48 / 48**, and the browser acceptance
+run passed **45 / 45** on an isolated profile with the §9 bundle hash checked
+before any measurement.
+
+Two decisions were written before the code, both by request:
+
+- **ADR-011** — SVG arguments are validated by their own grammar and
+  re-serialised; `transform`, `d` and `points` are tokenised, paint is a closed
+  list, and `url(` is refused. The ADR deliberately does **not** claim that an
+  SVG string could execute JavaScript here, because in this backend it could not:
+  the renderer builds props from an explicit argument table and nothing parses
+  markup. Over-claiming a security conclusion is as harmful as missing one.
+- **ADR-012** — `Popover` is inline and non-modal: absolute positioning inside
+  the card, no portal, no focus trap, placement clamped to the card's measured
+  rectangle. `position: absolute` is not containment by itself, which is why the
+  clamp is computed and the result is measured rather than asserted.
+
+**Two product defects, both found only by the browser run.**
+
+1. **The validator rejected the documented `Action([...])` form.** `ACTION_STEPS`
+   declares `Action`, the catalogue teaches `Action([...])`, and
+   `openui-actions.ts` implements it — but `checkNames` only consulted the action
+   table for names starting with `@`, so the sigil-less form became
+   `VZO002 unknown component "Action"`. The prompt was teaching a form the
+   validator refused: a model that obeyed was rejected and one that silently
+   "corrected" the program succeeded. Fixed in `src/backends/openui/renderer.ts`;
+   the existing test that asserted rejection was **reversed** to assert
+   acceptance, with the change of position recorded in the test itself.
+2. **`Celebration` never fired for a bare-variable condition.** `Celebration($done)`
+   — the form the skill text shows — passes a binding marker, not a boolean, and
+   `boolOf` on that object is `Boolean({...})`, i.e. constant true. The component
+   therefore never saw a false→true transition and never drew a burst, while
+   `$done` demonstrably became true in the persisted state. Every existing test
+   used `Celebration($n == 1)`, whose argument is already a boolean, so none of
+   them touched this path. Fixed with `fieldOf(props[0]).current`.
+
+Both fixes are mutation-verified: restoring the old form turns exactly the new
+regression test red, and nothing else.
+
+**Five probe defects were found and fixed, and they are recorded because telling
+them apart from product defects is the point.** A ten-line program (the language
+allows one statement per line); a double `JSON.parse` of an already-parsed
+`evaluate` result; reading the DOM in the same page script that clicked it, before
+React had rendered; counting `[data-openui-popover]` as if triggers were panels;
+and pressing Finish on a card whose persisted `$done` was already true, where no
+burst is the correct answer. Each of those once looked like a failing component.
+
+The step-per-invocation probes (`probe-p4-step.mjs`,
+`probe-celebration-step.mjs`) exist for exactly this reason: a single chained
+script cannot distinguish "the product is wrong" from "the probe read too early".
+
+**Verified:** `tsc` 0 errors on both projects; `vitest run` 889 passed / 15
+failed / 904, failure set **identical name by name** to
+`evidence/publish/test-before-publish.txt`; build `lib/client.js` 438.21 kB,
+`lib/index.js` 240.42 kB; bundle hash `A0E744D1…` matching the installed copy;
+browser acceptance **45 / 45**; inventory **48 / 48**.
+
+Also recorded: the bsk harness recycles an idle session after five minutes and
+closes the Agent Window with it, and a freshly created agent tab is `about:blank`
+where the extension's content script is not injected, so `cooperate sync` fails
+with "Receiving end does not exist" until the tab navigates. Both cost real time
+this session and are now written down.
 
 ### Session 17 — 2026-11-04 (unpublished history cleaned of leaked credentials)
 

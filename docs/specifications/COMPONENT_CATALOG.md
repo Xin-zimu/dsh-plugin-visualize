@@ -21,9 +21,11 @@ is measured, not inferred: `evidence/phase-3/unrendered-component-check.txt`.
 | Program | `validate` errors | What the reader sees |
 | --- | --- | --- |
 | `root = Col([Grid([])])` | none | a drawn, empty grid |
-| `root = Col([Carousel([])])` | none | a "Carousel is not drawn by this build" notice |
-| `root = Col([Popover([])])` | none | a "Popover is not drawn by this build" notice |
 | `root = Col([Map([])])` | `VZO002 unknown component "Map"` | the call is rejected |
+
+*The `Carousel`/`Popover` rows that stood here as examples of the gap are gone:
+4A-5 drew both, and the notice is now unreachable through a program. Its own guard
+is asserted directly in `tests/openui-layout-4a1.spec.tsx`.*
 
 The safety net covers names the **language** does not know (`Map` is
 open-intelligent-ui's, not ours). For names the language declares but the
@@ -44,7 +46,7 @@ was *meant* to be empty. The two are now different by construction:
 | Case | What is drawn |
 | --- | --- |
 | Legal empty container, e.g. `Grid([])` | the container itself, e.g. `display:grid` with zero children |
-| Declared component with no renderer, e.g. `Carousel([])` | a muted notice: `Carousel is not drawn by this build`, carrying `data-openui-unrendered="Carousel"`` |
+| Declared component with no renderer — unreachable since 4A-5; the notice is `X is not drawn by this build`, carrying `data-openui-unrendered="X"` | a muted notice, so a renderer gap never looks like an intentional blank |
 | Name the language does not declare, e.g. `Map` | nothing; the host rejects the program at validation (`VZO002`) |
 
 The notice is not a substitute for the renderer — it is a diagnostic that stops a
@@ -86,17 +88,31 @@ renderer gap from looking like an intentional blank.
 | `Chart` | Media and data | `type, data, x?, series?, format?, currency?, stacked?, height?` | **ADR-010.** Row objects in, countable inline SVG out: one `data-chart-mark` element per datum. `type`: bar \| line \| area \| pie \| donut \| scatter, unknown falls back to bar. Invalid data draws a stated refusal; a non-finite value is a counted **gap**, never a coerced zero. A legend appears only with more than one series |
 | `Icon` | Media and data | `name, size?, color?` | No icon set ships in this build, so a narrow glyph renders its own name in a bordered box — visibly a glyph, never an empty square. `size`: sm \| md \| lg \| xl. `role="img"` with the name as its accessible label |
 | `Image` | Media and data | `src, alt, aspectRatio?, radius?, fit?` | **ADR-009.** A real `<img>` **only** for an absolute `http:`/`https:` URL, parsed with `new URL`. `data:`, `blob:`, `file:`, `javascript:`, protocol-relative and relative sources render the alt text plus the reason, and produce **no `<img>` element at all**. Adds `loading=lazy`, `decoding=async`, `referrerPolicy=no-referrer`; a failed load degrades to the same visible refusal |
+| `Svg` | Drawing | `children, viewBox, width?, height?` | **ADR-011.** `viewBox` must be four numbers with a positive width and height; anything else draws a stated notice, because a drawing with no extent is indistinguishable from a failed component |
+| `G` | Drawing | `children, transform?, opacity?` | `transform` is parsed as the SVG grammar (translate/scale/rotate/skewX/skewY/matrix, at most four) and re-emitted from its numbers. A malformed transform refuses the **whole** argument: half a transform draws a shape nobody asked for |
+| `Circle` | Drawing | `cx, cy, r, fill?, stroke?, strokeWidth?, opacity?` | Default fill is `currentColor`, not SVG's black, so a shape is legible on a dark card |
+| `Ellipse` | Drawing | `cx, cy, rx, ry, fill?, stroke?, strokeWidth?, opacity?` | Same defaults as `Circle` |
+| `Rect` | Drawing | `x, y, width, height, fill?, stroke?, strokeWidth?, opacity?, rx?` | Same defaults as `Circle`; `rx` is optional and its absence is not a refusal |
+| `Line` | Drawing | `x1, y1, x2, y2, stroke?, strokeWidth?, opacity?` | Default stroke is `currentColor`, 2 px |
+| `Path` | Drawing | `d, fill?, stroke?, strokeWidth?, opacity?` | `d` must start with a move and contain only path commands and numbers; a half argument group is refused rather than left for the browser to truncate into a different shape. Filled only when a fill is given |
+| `Polyline` | Drawing | `points, stroke?, strokeWidth?, fill?, opacity?` | At least one and at most 256 coordinate pairs; any letter refuses it |
+| `Polygon` | Drawing | `points, fill?, stroke?, strokeWidth?, opacity?` | Same grammar as `Polyline`; closed and filled by default |
+| `SvgText` | Drawing | `text, x, y, size?, fill?, anchor?, weight?` | A text node, never markup: React escapes it. `anchor`: start \| middle \| end, unknown falls back to start. Weight maps to a numeric weight, because the host's stack resolves `normal` and `medium` to the same face |
+| `Carousel` | Layout | `children, itemWidth?, gap?` | A snap scroller with one fixed-width wrapper per child. `itemWidth` is clamped to 80–640 px. The track is focusable (`tabindex=0`) because a scroll container is not, and a keyboard user could otherwise not reach items beyond the first. Scroll position is transient: not `$state`, not persisted |
+| `Popover` | Layout | `trigger, content` | **ADR-012.** Inline and non-modal: `position: absolute` inside the card, no portal, no focus trap, `aria-modal="false"`. Placement comes from the pure function in `src/client/openui-popover.ts` and is clamped to the card's measured rectangle — below, then above, then height-limited, then expanded over the card. Escape closes and returns focus; an outside press closes; two cards do not affect each other; unmounting removes both listeners |
+| `Flashcard` | Play | `front, back, hint?` | Both faces stay mounted, with the inactive one `aria-hidden` and transparent, so the flip is a state change rather than a content swap and the card does not resize. `aria-pressed` reports which face is showing. The hint stays visible after the flip |
+| `Celebration` | Play | `when` | Fires on the **false→true transition**, not on the value being true, so a re-render does not retrigger it and a card that loads already true does not celebrate. Draws 36 pieces inside the card (never a portal) and clears itself after 2.2 s from one effect whose cleanup is the only cancel path |
 
 ## Not yet available — validated but not drawn
 
-These are declared by the language and have no renderer, so a program using one
-shows a "not drawn by this build" notice. The batch column is the stage-4A plan
-(`STAGE.md`).
+**Nothing.** As of 4A-5 every name `signatures.ts` declares has a renderer, so
+the rendered set equals the declared set: **48 / 48**.
 
-| Batch | Components |
-| --- | --- |
-| ~~4A-4~~ | `Table`, `Chart`, `Icon`, `Image` — **complete**, 34 / 48 |
-| 4A-5 | `Svg`, `G`, `Circle`, `Ellipse`, `Rect`, `Line`, `Path`, `Polyline`, `Polygon`, `SvgText`, `Flashcard`, `Celebration`, `Carousel`, `Popover` |
+The "not drawn by this build" notice still exists and is still tested, because the
+gap it reports is created by adding a signature without a renderer — a two-file
+mistake no test can prevent, and one that would otherwise ship as a silently blank
+card. `tests/openui-layout-4a1.spec.tsx` asserts both that the notice renders and
+that it is currently unreachable.
 
 The authoritative list is measured, not typed: `tests/openui-inventory.spec.tsx`.
 If this table and that output disagree, the output is right.

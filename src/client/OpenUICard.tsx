@@ -18,7 +18,7 @@
  * reproduces the card without calling the model again.
  */
 
-import { createElement, isValidElement, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createElement, isValidElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { openuiMetaFrom } from '../fragment.ts'
 import type { OpenUIMeta } from '../fragment.ts'
 import { parseProgram } from '../backends/openui/parse.ts'
@@ -26,6 +26,18 @@ import { evaluateProgram } from '../backends/openui/evaluate.ts'
 import type { BindingDescriptor, EvaluationValue } from '../backends/openui/evaluate.ts'
 import { COMPONENT_NAMES } from '../backends/openui/signatures.ts'
 import { cardStateKey, cardStates } from './card-state.ts'
+import {
+  stated,
+  svgLength,
+  svgNumber,
+  svgOpacity,
+  svgPaint,
+  svgPath,
+  svgPoints,
+  svgTransform,
+  svgViewBox,
+} from './openui-svg.ts'
+import { placePopover, type Box, type PlacementResult } from './openui-popover.ts'
 import { applyAction, SUPPORTED_STEPS, UNSUPPORTED_STEPS } from './openui-actions.ts'
 import {
   buildRecord,
@@ -1572,6 +1584,253 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
       key, type, rows, xName, seriesNames, format, currency, stacked, height,
     })
   },
+
+  // --- 4A-5: drawing ------------------------------------------------------
+  //
+  // Ten primitives under ADR-011. Every free-form string here is parsed and
+  // re-serialised by src/client/openui-svg.ts before it reaches a DOM attribute,
+  // and colour goes into `style` rather than a presentation attribute: a `var()`
+  // inside an SVG attribute is not reliably resolved, and an unresolved paint is
+  // a black shape on a dark card that no unit test can see.
+
+  Svg: (props, _write, key) => {
+    const viewBox = svgViewBox(props[1])
+    if (viewBox === undefined) {
+      // The one visible refusal in this group: with no readable viewBox there is
+      // no drawing left to protect, so the component says why instead of drawing
+      // a box that looks like a renderer failure (ADR-011 §10).
+      return notice(key, 'Svg has no readable viewBox — expected four numbers with a positive width and height')
+    }
+    const natural = Number(viewBox.split(' ')[2])
+    const width = length(props[2])
+    const height = length(props[3])
+    return createElement(
+      'svg',
+      {
+        key,
+        role: 'img',
+        'aria-label': 'drawing, viewBox ' + viewBox,
+        'data-openui-svg': 'root',
+        viewBox,
+        preserveAspectRatio: 'xMidYMid meet',
+        ...width === undefined ? {} : { width },
+        ...height === undefined ? {} : { height },
+        style: {
+          display: 'block',
+          width: width ?? '100%',
+          maxWidth: width !== undefined || !(natural > 0)
+            ? undefined
+            : Math.max(280, Math.round(natural * 1.5)) + 'px',
+          ...height === undefined ? {} : { height },
+          // Clipped to the viewBox, which is what keeps a drawing that exceeds
+          // its own coordinate space inside the card (ADR-012's principle
+          // applied to the drawing group).
+          overflow: 'hidden',
+        } satisfies CSSProperties,
+      },
+      children(props[0]),
+    )
+  },
+
+  G: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const transform = stated(props[1]) ? svgTransform(props[1]) : undefined
+    if (stated(props[1]) && transform === undefined) refs.list.push('transform')
+    const alpha = svgOpacity(props[2])
+    if (stated(props[2]) && alpha === undefined) refs.list.push('opacity')
+    return createElement(
+      'g',
+      {
+        key,
+        ...transform === undefined ? {} : { transform },
+        ...alpha === undefined ? {} : { style: { opacity: alpha } satisfies CSSProperties },
+        ...refusedAttrs(refs.list),
+      },
+      children(props[0]),
+    )
+  },
+
+  Circle: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const paint = drawingPaint({
+      fill: props[3], stroke: props[4], strokeWidth: props[5], opacity: props[6], filled: true,
+    })
+    return createElement('circle', {
+      key,
+      cx: coordinate(props[0], 'cx', refs),
+      cy: coordinate(props[1], 'cy', refs),
+      r: extent(props[2], 'r', refs),
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  Ellipse: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const paint = drawingPaint({
+      fill: props[4], stroke: props[5], strokeWidth: props[6], opacity: props[7], filled: true,
+    })
+    return createElement('ellipse', {
+      key,
+      cx: coordinate(props[0], 'cx', refs),
+      cy: coordinate(props[1], 'cy', refs),
+      rx: extent(props[2], 'rx', refs),
+      ry: extent(props[3], 'ry', refs),
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  Rect: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const paint = drawingPaint({
+      fill: props[4], stroke: props[5], strokeWidth: props[6], opacity: props[7], filled: true,
+    })
+    const radius = optionalExtent(props[8], 'rx', refs)
+    return createElement('rect', {
+      key,
+      x: coordinate(props[0], 'x', refs),
+      y: coordinate(props[1], 'y', refs),
+      width: extent(props[2], 'width', refs),
+      height: extent(props[3], 'height', refs),
+      ...radius === undefined ? {} : { rx: radius },
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  Line: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const paint = drawingPaint({
+      fill: undefined, stroke: props[4], strokeWidth: props[5], opacity: props[6], filled: false,
+    })
+    return createElement('line', {
+      key,
+      x1: coordinate(props[0], 'x1', refs),
+      y1: coordinate(props[1], 'y1', refs),
+      x2: coordinate(props[2], 'x2', refs),
+      y2: coordinate(props[3], 'y2', refs),
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  Path: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const path = svgPath(props[0])
+    if (path === undefined) refs.list.push('d')
+    // A path is filled only when the author asked for a fill: upstream draws an
+    // unfilled path as a stroked line, and a closed outline filled by default
+    // would ink in shapes nobody meant to fill.
+    const paint = drawingPaint({
+      fill: props[1], stroke: props[2], strokeWidth: props[3], opacity: props[4],
+      filled: false, declaredFill: stated(props[1]),
+    })
+    return createElement('path', {
+      key,
+      ...path === undefined ? {} : { d: path },
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  Polyline: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const points = svgPoints(props[0])
+    if (points === undefined) refs.list.push('points')
+    const paint = drawingPaint({
+      fill: props[3], stroke: props[1], strokeWidth: props[2], opacity: props[4],
+      filled: false, declaredFill: stated(props[3]),
+    })
+    return createElement('polyline', {
+      key,
+      ...points === undefined ? {} : { points },
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  Polygon: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const points = svgPoints(props[0])
+    if (points === undefined) refs.list.push('points')
+    const paint = drawingPaint({
+      fill: props[1], stroke: props[2], strokeWidth: props[3], opacity: props[4], filled: true,
+    })
+    return createElement('polygon', {
+      key,
+      ...points === undefined ? {} : { points },
+      style: paint.style,
+      ...refusedAttrs([...refs.list, ...paint.refused]),
+    })
+  },
+
+  SvgText: (props, _write, key) => {
+    const refs: Refusals = { list: [] }
+    const label = text(props[0], '')
+    const size = svgLength(props[3])
+    if (stated(props[3]) && size === undefined) refs.list.push('size')
+    const paint = svgPaint(props[4], COLOR_VARS)
+    if (stated(props[4]) && paint === undefined) refs.list.push('fill')
+    const anchor = SVG_ANCHORS[text(props[5], 'start')] ?? 'start'
+    const weight = SVG_WEIGHTS[text(props[6], 'normal')] ?? SVG_WEIGHTS.normal!
+    return createElement(
+      'text',
+      {
+        key,
+        x: coordinate(props[1], 'x', refs),
+        y: coordinate(props[2], 'y', refs),
+        'data-openui-svg-text': '',
+        textAnchor: anchor,
+        style: {
+          ...size === undefined ? {} : { fontSize: size },
+          fill: paint ?? 'currentColor',
+          fontWeight: weight,
+        } satisfies CSSProperties,
+        ...refusedAttrs(refs.list),
+      },
+      // A text child, never markup: React escapes it, and there is no innerHTML
+      // route in this renderer at all (ADR-011 §9).
+      label,
+    )
+  },
+
+  // --- 4A-5: disclosure and play ------------------------------------------
+
+  Carousel: (props, _write, key) => createElement(CarouselView, {
+    key,
+    items: itemList(props[0]),
+    itemWidth: num(arg(props[1], 240), 240),
+    gap: space(props[2], 3),
+  }),
+
+  Popover: (props, _write, key) => createElement(PopoverView, {
+    key,
+    trigger: props[0] as ReactNode,
+    content: props[1] as ReactNode,
+  }),
+
+  Flashcard: (props, _write, key) => createElement(FlashcardView, {
+    key,
+    front: props[0] as ReactNode,
+    back: props[1] as ReactNode,
+    hint: text(props[2], ''),
+  }),
+
+  Celebration: (props, _write, key) => {
+    // fieldOf, not boolOf: when the condition is a bare variable --
+    // Celebration($done), which is the form the skill text shows -- the argument
+    // arrives as a binding marker rather than a boolean. boolOf on that object
+    // returns Boolean({...}), i.e. always true, so the component saw a constant
+    // true and never observed the false-to-true transition it exists to fire on.
+    //
+    // Found in the 4A-5 browser run and reproduced against the real card, where a
+    // burst never appeared while $done demonstrably moved to true. The unit test
+    // that passed used the comparison form (Celebration($n == 1)), whose argument
+    // is already a boolean, so the binding path was never exercised.
+    const condition = fieldOf(props[0]).current
+    return createElement(CelebrationView, { key, when: boolOf(condition, false) })
+  },
 }
 
 /** What the parser and the walker hand the renderer. */
@@ -2503,6 +2762,632 @@ function ChartLegend({
   )
 }
 
+/**
+ * A horizontally scrolling, snapping row — `Carousel`.
+ *
+ * The scroll state is local and transient: it is not `$state`, it is not
+ * persisted, and a reload starts at the first item. That is the same line
+ * `Popover` draws for its open flag (ADR-012 §6), and it is drawn deliberately
+ * rather than by omission.
+ */
+function CarouselView({
+  items,
+  itemWidth,
+  gap,
+}: {
+  readonly items: readonly ReactNode[]
+  readonly itemWidth: number
+  readonly gap: number
+}): ReactNode {
+  const track = useRef<HTMLDivElement>(null)
+  const [edges, setEdges] = useState({ start: true, end: true })
+  const width = Math.min(640, Math.max(80, Math.round(itemWidth)))
+  const count = items.length
+
+  // The effect key is the item count, not the items: re-running on every render
+  // would detach and reattach the listener whenever state elsewhere in the card
+  // changed. The cleanup is the only place the listener is removed.
+  useEffect(() => {
+    const element = track.current
+    if (element === null) return undefined
+    const read = (): void => {
+      const start = element.scrollLeft < 4
+      const end = element.scrollLeft + element.clientWidth >= element.scrollWidth - 4
+      setEdges(previous => (previous.start === start && previous.end === end ? previous : { start, end }))
+    }
+    read()
+    element.addEventListener('scroll', read, { passive: true })
+    return () => element.removeEventListener('scroll', read)
+  }, [count])
+
+  const page = (direction: number): void => {
+    const element = track.current
+    if (element === null) return
+    element.scrollBy({ left: direction * element.clientWidth * 0.85, behavior: 'smooth' })
+  }
+
+  const navStyle: CSSProperties = {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 26,
+    height: 26,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'var(--border)',
+    background: 'var(--background)',
+    color: 'var(--foreground)',
+    cursor: 'pointer',
+    fontSize: SIZES.sm,
+    lineHeight: 1,
+    padding: 0,
+  }
+
+  return createElement(
+    'div',
+    { style: { position: 'relative', minWidth: 0, maxWidth: '100%' } satisfies CSSProperties },
+    createElement(
+      'div',
+      {
+        ref: track,
+        'data-openui-carousel': 'track',
+        // A scroll container is not focusable by default, and a keyboard user
+        // cannot reach its hidden items without a focus stop. `tabIndex` alone
+        // is what makes the arrow keys scroll it.
+        tabIndex: 0,
+        role: 'group',
+        'aria-label': 'carousel, ' + count + ' items',
+        style: {
+          display: 'flex',
+          gap,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollSnapType: 'x mandatory',
+          paddingBottom: 4,
+          maxWidth: '100%',
+        } satisfies CSSProperties,
+      },
+      items.map((item, index) => createElement(
+        'div',
+        {
+          key: 'item' + index,
+          'data-openui-carousel': 'item',
+          style: { flex: '0 0 auto', width, scrollSnapAlign: 'start', minWidth: 0 } satisfies CSSProperties,
+        },
+        item,
+      )),
+    ),
+    edges.start ? null : createElement('button', {
+      type: 'button',
+      'aria-label': 'Previous',
+      'data-openui-carousel': 'prev',
+      onClick: () => page(-1),
+      style: { ...navStyle, left: 2 },
+    }, '‹'),
+    edges.end ? null : createElement('button', {
+      type: 'button',
+      'aria-label': 'Next',
+      'data-openui-carousel': 'next',
+      onClick: () => page(1),
+      style: { ...navStyle, right: 2 },
+    }, '›'),
+  )
+}
+
+/**
+ * An inline, non-modal disclosure — `Popover`, under ADR-012.
+ *
+ * No portal, no `position: fixed`, no focus trap. The panel is absolutely
+ * positioned inside the card, and its position comes from the pure function in
+ * `openui-popover.ts` so the containment arithmetic is tested without a layout
+ * engine and the browser run confirms the wiring rather than discovering the
+ * maths.
+ *
+ * The one thing that is easy to get wrong and is therefore called out: the
+ * listeners below are attached **only while open** and removed in the effect's
+ * cleanup, which is the single place they are removed. The 4A-3 `Timer` lesson
+ * is that a component acquiring a global resource must show where it releases it.
+ */
+function PopoverView({ trigger, content }: {
+  readonly trigger: ReactNode
+  readonly content: ReactNode
+}): ReactNode {
+  const [open, setOpen] = useState(false)
+  const [placement, setPlacement] = useState<PlacementResult | undefined>(undefined)
+  const anchor = useRef<HTMLSpanElement>(null)
+  const button = useRef<HTMLButtonElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+
+  const measure = useCallback((): void => {
+    const anchorElement = anchor.current
+    const triggerElement = button.current
+    const panelElement = panel.current
+    if (anchorElement === null || triggerElement === null) return
+    const cardElement = anchorElement.closest('[data-openui-card]')
+    const card = cardElement?.getBoundingClientRect()
+    const boxOf = (rect: DOMRect): Box => ({
+      left: rect.left, top: rect.top, width: rect.width, height: rect.height,
+    })
+    const panelRect = panelElement?.getBoundingClientRect()
+    const next = placePopover({
+      // No card ancestor means this is not inside a card at all (a unit test, a
+      // page-mode render): fall back to the viewport so the panel still lands
+      // somewhere sensible instead of at a zero-sized origin.
+      card: card === undefined
+        ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+        : boxOf(card),
+      trigger: boxOf(triggerElement.getBoundingClientRect()),
+      anchor: boxOf(anchorElement.getBoundingClientRect()),
+      panel: panelRect === undefined || panelRect.width === 0
+        // First paint: the panel has no measured size yet. An estimate is
+        // better than a zero, because a zero always reports "fits below".
+        ? { left: 0, top: 0, width: Math.max(120, triggerElement.offsetWidth), height: 120 }
+        : boxOf(panelRect),
+    })
+    setPlacement(previous => (previous !== undefined
+      && previous.placement === next.placement
+      && Math.abs(previous.left - next.left) < 0.5
+      && Math.abs(previous.top - next.top) < 0.5
+      && previous.width === next.width
+      && previous.maxHeight === next.maxHeight
+      ? previous
+      : next))
+  }, [])
+
+  // Measure after layout, before paint: a frame of the panel at the wrong
+  // position is visible as a jump.
+  useLayoutEffect(() => {
+    if (!open) { setPlacement(undefined); return }
+    measure()
+  }, [open, measure])
+
+  useEffect(() => {
+    if (!open) return undefined
+    const onPointer = (event: Event): void => {
+      const target = event.target as Node | null
+      if (target === null) return
+      if (panel.current?.contains(target) === true) return
+      if (button.current?.contains(target) === true) return
+      // Its own instance only: a press outside card A's popover must not close
+      // card B's, which is why this handler closes over its own state rather
+      // than reaching for a shared one.
+      setOpen(false)
+    }
+    const onKey = (event: Event): void => {
+      if ((event as KeyboardEvent).key !== 'Escape') return
+      setOpen(false)
+      // Focus goes back to the trigger, because the panel it was in is gone and
+      // leaving focus on a removed node drops it to the body.
+      button.current?.focus()
+    }
+    const onResize = (): void => measure()
+    document.addEventListener('pointerdown', onPointer, true)
+    document.addEventListener('keydown', onKey, true)
+    window.addEventListener('resize', onResize)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer, true)
+      document.removeEventListener('keydown', onKey, true)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [open, measure])
+
+  const panelStyle: CSSProperties = placement === undefined
+    ? {}
+    : {
+      left: placement.left,
+      top: placement.top,
+      width: placement.width,
+      ...placement.maxHeight === undefined ? {} : { maxHeight: placement.maxHeight },
+    }
+
+  return createElement(
+    'span',
+    { style: { position: 'relative', display: 'inline-block', minWidth: 0 } satisfies CSSProperties },
+    createElement(
+      'span',
+      { ref: anchor, style: { display: 'inline-block' } satisfies CSSProperties },
+      createElement(
+        'button',
+        {
+          ref: button,
+          type: 'button',
+          'data-openui-popover': 'trigger',
+          'aria-expanded': open,
+          onClick: () => setOpen(previous => !previous),
+          style: {
+            font: 'inherit',
+            fontSize: SIZES.sm,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '2px 6px',
+            minHeight: 24,
+            cursor: 'pointer',
+            color: 'var(--foreground)',
+            background: 'transparent',
+            borderWidth: 1,
+            borderStyle: 'dashed',
+            borderColor: 'var(--border)',
+            borderRadius: 'calc(var(--radius) * 1.2)',
+          } satisfies CSSProperties,
+        },
+        trigger,
+      ),
+    ),
+    open ? createElement(
+      'div',
+      {
+        ref: panel,
+        role: 'dialog',
+        // Not modal: the content outside stays available, and a focus trap here
+        // would fight the host's own Tab navigation (ADR-012 §3).
+        'aria-modal': 'false',
+        'data-openui-popover': 'panel',
+        'data-openui-popover-placement': placement?.placement ?? 'unmeasured',
+        style: {
+          position: 'absolute',
+          zIndex: 1,
+          minWidth: 160,
+          maxWidth: '100%',
+          overflowY: 'auto',
+          padding: '8px 10px',
+          background: 'var(--background)',
+          color: 'var(--foreground)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'var(--border)',
+          borderRadius: 'calc(var(--radius) * 1.2)',
+          boxShadow: '0 6px 18px light-dark(rgb(0 0 0 / 12%), rgb(0 0 0 / 45%))',
+          fontSize: SIZES.sm,
+          ...panelStyle,
+        } satisfies CSSProperties,
+      },
+      content,
+    ) : null,
+  )
+}
+
+/**
+ * A card that flips between two faces — `Flashcard`.
+ *
+ * Both faces are always in the DOM and the inactive one is `aria-hidden`, so the
+ * flip is a state change and not a content swap: a screen reader announces the
+ * face that is showing, and the hidden face is not read twice. `aria-pressed`
+ * says which face is visible to anything that cannot see the rotation.
+ *
+ * The two faces share one grid cell rather than being absolutely positioned, so
+ * the card is as tall as its taller face and the surrounding layout does not
+ * jump when it flips. A reduced-motion user gets the same content with the
+ * transition removed, not a different component.
+ */
+function FlashcardView({
+  front,
+  back,
+  hint,
+}: {
+  readonly front: ReactNode
+  readonly back: ReactNode
+  readonly hint: string
+}): ReactNode {
+  const [flipped, setFlipped] = useState(false)
+  const face = (content: ReactNode, visible: boolean, key: string): ReactNode => createElement(
+    'span',
+    {
+      key,
+      'data-openui-flashcard': visible ? 'visible' : 'hidden',
+      'aria-hidden': !visible,
+      style: {
+        gridArea: '1 / 1',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        padding: '10px 8px',
+        // The hidden face keeps its space but is not painted, so the card does
+        // not resize on flip.
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 140ms ease',
+        pointerEvents: visible ? 'auto' : 'none',
+        minWidth: 0,
+      } satisfies CSSProperties,
+    },
+    content,
+  )
+
+  return createElement(
+    'button',
+    {
+      type: 'button',
+      'data-openui-flashcard': 'card',
+      'data-openui-flashcard-state': flipped ? 'back' : 'front',
+      'aria-pressed': flipped,
+      'aria-label': hint === '' ? 'flashcard, tap to flip' : hint,
+      onClick: () => setFlipped(previous => !previous),
+      style: {
+        font: 'inherit',
+        color: 'var(--foreground)',
+        display: 'grid',
+        width: '100%',
+        minHeight: 96,
+        cursor: 'pointer',
+        textAlign: 'center',
+        background: 'var(--card)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'var(--border)',
+        borderRadius: 'calc(var(--radius) * 1.4)',
+      } satisfies CSSProperties,
+    },
+    face(front, !flipped, 'front'),
+    face(back, flipped, 'back'),
+    // The hint is a permanent affordance, not a face: it must stay readable
+    // after the flip or the reader loses the instruction that caused it.
+    createElement(
+      'span',
+      {
+        'data-openui-flashcard': 'hint',
+        style: {
+          gridArea: '2 / 1',
+          fontSize: SIZES.xs,
+          color: 'var(--muted-foreground-strong)',
+          paddingBottom: 6,
+        } satisfies CSSProperties,
+      },
+      hint === '' ? 'Tap to flip' : hint,
+    ),
+  )
+}
+
+/**
+ * Confetti when its condition turns true — `Celebration`.
+ *
+ * Two properties make this safe to put in a card that re-renders on every state
+ * change, and both are the 4A-3 `Timer` lesson:
+ *
+ *   - it fires on the **transition** into true, not on the value being true, so a
+ *     re-render does not retrigger it and a card left at `true` does not loop;
+ *   - the clear timer is owned by one effect whose cleanup is the only place it
+ *     is cancelled, so unmounting mid-burst leaves nothing running.
+ *
+ * It never portals to `document.body`: the burst is drawn inside the card, even
+ * though that is visually smaller than a full-window one. ADR-012 §1 forbids a
+ * card from mounting into the host's document, and confetti is exactly the
+ * decorative case where the exception would be tempting.
+ */
+function CelebrationView({ when }: { readonly when: boolean }): ReactNode {
+  const [burst, setBurst] = useState(0)
+  const previous = useRef<boolean | null>(null)
+
+  useEffect(() => {
+    const last = previous.current
+    previous.current = when
+    // Only a change from a known false fires. `null` is the first paint: a card
+    // that loads already true has not just achieved anything.
+    if (last === false && when) setBurst(value => value + 1)
+  }, [when])
+
+  useEffect(() => {
+    if (burst === 0) return undefined
+    const timer = setTimeout(() => setBurst(0), 2200)
+    return () => clearTimeout(timer)
+  }, [burst])
+
+  if (burst === 0) return null
+
+  const pieces = Array.from({ length: 36 }, (_value, index) => createElement('i', {
+    key: 'p' + index,
+    'aria-hidden': 'true',
+    style: {
+      position: 'absolute',
+      left: ((index * 37) % 100) + '%',
+      top: 0,
+      width: 6,
+      height: 10,
+      borderRadius: 2,
+      background: SERIES_VARS[index % SERIES_VARS.length]!,
+      animation: 'none',
+      // A deterministic spread: the same burst every time, so the browser run
+      // can assert a piece count rather than "some confetti appeared".
+      transform: 'translate(' + (((index * 71) % 200) - 100) + 'px, ' + (30 + ((index * 53) % 60)) + 'px)',
+      opacity: 0.85,
+    } satisfies CSSProperties,
+  }))
+
+  return createElement(
+    'div',
+    {
+      'data-openui-celebration': 'burst',
+      role: 'status',
+      'aria-live': 'polite',
+      'aria-label': 'celebration',
+      style: {
+        position: 'absolute',
+        inset: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        borderRadius: 'inherit',
+      } satisfies CSSProperties,
+    },
+    pieces,
+  )
+}
+
+/** A list of refused argument names, collected while building one element. */
+interface Refusals {
+  list: string[]
+}
+
+/**
+ * Mark an element whose arguments were refused — ADR-011 §10.
+ *
+ * A refused value is dropped rather than drawn, because a wrong shape inside a
+ * drawing is worse than a missing one: the reader cannot tell it from a shape
+ * the author meant. It is recorded structurally instead, so the browser run can
+ * assert exactly which argument was refused rather than "something is off".
+ * @param names - the refused argument names, in the order they were read.
+ * @returns attributes to spread, or an empty object.
+ */
+function refusedAttrs(names: readonly string[]): Record<string, string> {
+  if (names.length === 0) return {}
+  return { 'data-openui-svg-refused': names.join(' ') }
+}
+
+/**
+ * A required coordinate.
+ *
+ * Absent still has to produce a number: React would drop an `undefined`
+ * attribute and the browser would then draw the element at 0, which is a
+ * plausible-looking shape in the wrong place. The refusal is recorded, and the
+ * element is drawn at the origin of its own coordinate space.
+ * @param value - the raw argument.
+ * @param name - the argument's name, for the refusal marker.
+ * @param refs - the refusal collector.
+ * @returns the coordinate.
+ */
+function coordinate(value: unknown, name: string, refs: Refusals): number {
+  const parsed = svgNumber(value)
+  if (parsed === undefined) {
+    refs.list.push(name)
+    return 0
+  }
+  return parsed
+}
+
+/**
+ * A required extent: a coordinate that may not be negative.
+ * @param value - the raw argument.
+ * @param name - the argument's name, for the refusal marker.
+ * @param refs - the refusal collector.
+ * @returns the extent.
+ */
+function extent(value: unknown, name: string, refs: Refusals): number {
+  const parsed = svgLength(value)
+  if (parsed === undefined) {
+    refs.list.push(name)
+    return 0
+  }
+  return parsed
+}
+
+/**
+ * An **optional** extent.
+ *
+ * Separate from {@link extent} because the two cases must not look the same: an
+ * absent optional argument is not a refusal, and marking it as one would put a
+ * refusal notice on every `Rect` that simply has square corners. That is the
+ * difference between "the author did not ask for a radius" and "the author asked
+ * for a radius this renderer would not draw".
+ * @param value - the raw argument.
+ * @param name - the argument's name, for the refusal marker.
+ * @param refs - the refusal collector.
+ * @returns the extent, or undefined when absent or refused.
+ */
+function optionalExtent(value: unknown, name: string, refs: Refusals): number | undefined {
+  if (!stated(value)) return undefined
+  const parsed = svgLength(value)
+  if (parsed === undefined) refs.list.push(name)
+  return parsed
+}
+
+/** The `text-anchor` values the language names. */
+const SVG_ANCHORS: Readonly<Record<string, 'start' | 'middle' | 'end'>> = {
+  start: 'start',
+  middle: 'middle',
+  end: 'end',
+}
+
+/**
+ * How the language's three weights map to numeric weights.
+ *
+ * Numbers rather than keywords because the host's font stack resolves `normal`
+ * and `medium` to the same face, which would make two named weights draw
+ * identically.
+ */
+const SVG_WEIGHTS: Readonly<Record<string, number>> = {
+  normal: 440,
+  medium: 560,
+  semibold: 640,
+}
+
+/**
+ * Resolve the paint arguments shared by every shape into CSS declarations.
+ *
+ * Colour is set through `style` and not as a presentation attribute: a `var()`
+ * inside an SVG presentation attribute is not reliably resolved, and the failure
+ * is invisible — an unresolved `fill` draws black, which reads as a deliberate
+ * colour on a light card and as a missing shape on a dark one (ADR-011 §7).
+ *
+ * The defaults matter as much as the values. SVG fills black unless told
+ * otherwise, so a shape with no `fill` argument is given `currentColor`; a
+ * stroked shape with no `stroke` is given `currentColor` too. Either way the
+ * drawing inherits the card's ink and is legible in both schemes.
+ * @param input - the raw paint arguments and whether this element is filled.
+ * @returns the style declarations, plus the names of the refused arguments.
+ */
+function drawingPaint(input: {
+  readonly fill: unknown
+  readonly stroke: unknown
+  readonly strokeWidth: unknown
+  readonly opacity: unknown
+  /** Whether this element is a filled shape by nature. */
+  readonly filled: boolean
+  /** Overrides `filled` for shapes that fill only on request (Path, Polyline). */
+  readonly declaredFill?: boolean
+}): { style: CSSProperties, refused: string[] } {
+  const refused: string[] = []
+  const style: Record<string, string | number> = {}
+  const wantsFill = input.declaredFill ?? input.filled
+
+  const fill = svgPaint(input.fill, COLOR_VARS)
+  if (stated(input.fill) && fill === undefined) refused.push('fill')
+  const stroke = svgPaint(input.stroke, COLOR_VARS)
+  if (stated(input.stroke) && stroke === undefined) refused.push('stroke')
+
+  if (fill !== undefined) {
+    style.fill = fill
+  } else if (wantsFill && !stated(input.stroke)) {
+    style.fill = 'currentColor'
+  } else {
+    style.fill = 'none'
+  }
+  if (stroke !== undefined) {
+    style.stroke = stroke
+  } else if (!wantsFill || stated(input.stroke)) {
+    style.stroke = 'currentColor'
+  }
+
+  const width = svgLength(input.strokeWidth)
+  if (stated(input.strokeWidth) && width === undefined) refused.push('strokeWidth')
+  if (width !== undefined && width > 0) style.strokeWidth = width
+  else if (style.stroke !== undefined && style.fill === 'none') style.strokeWidth = 2
+
+  const alpha = svgOpacity(input.opacity)
+  if (stated(input.opacity) && alpha === undefined) refused.push('opacity')
+  if (alpha !== undefined) style.opacity = alpha
+
+  // Round joins and caps, so a thin polyline does not end in spikes.
+  style.strokeLinecap = 'round'
+  style.strokeLinejoin = 'round'
+  return { style: style as CSSProperties, refused }
+}
+
+/**
+ * The children of a container, as an array of nodes.
+ *
+ * Distinct from `children()` because a Carousel needs the items as a list to
+ * give each one a fixed width; a single child must still become a one-item
+ * list rather than a list of its own arguments.
+ * @param value - the evaluated children argument.
+ * @returns the items.
+ */
+function itemList(value: unknown): ReactNode[] {
+  if (Array.isArray(value)) return value.flat() as ReactNode[]
+  if (value === null || value === undefined) return []
+  return [value as ReactNode]
+}
+
 /** Every component name this build can actually draw. */
 export const RENDERED_COMPONENTS: readonly string[] = Object.keys(COMPONENTS)
 
@@ -2535,11 +3420,19 @@ const UNRENDERED_STYLE: CSSProperties = {
  * look like a blank card, and a reader cannot tell that apart from a card that
  * was meant to be empty. The notice is small and muted: it is a diagnostic, not
  * a component.
+ * **This is now unreachable through a program.** After 4A-5 every name
+ * `signatures.ts` declares has a renderer, so `COMPONENTS[name] === undefined`
+ * implies the name is not declared, and `drawValue` returns `null` for it. The
+ * branch is kept, and exported so it is still tested, for one reason: the gap it
+ * reports is created by adding a signature without adding a renderer, which is a
+ * two-file mistake no test can prevent and which would otherwise ship as a
+ * silently blank card. Deleting the branch would make that mistake invisible
+ * again; keeping it tested costs one import.
  * @param name - the declared component name.
  * @param key - React key for the notice.
  * @returns the notice node.
  */
-function unrenderedNotice(name: string, key: string): ReactNode {
+export function unrenderedNotice(name: string, key: string): ReactNode {
   return createElement(
     'div',
     { key, style: UNRENDERED_STYLE, 'data-openui-unrendered': name },
@@ -3073,6 +3966,12 @@ const ROOT_STYLE: CSSProperties = {
   alignItems: 'stretch',
   gap: 12,
   minWidth: 0,
+  // The containing block for an open Popover panel (ADR-012 section 1).
+  // Positioning alone is not containment - the panel's placement is clamped to
+  // this element's measured rectangle - but it is what makes the panel's
+  // coordinates relative to the card rather than to whatever ancestor happens
+  // to be positioned. It does not affect flow and does not resize the card.
+  position: 'relative',
 }
 
 /** A quiet notice, used when a program cannot be drawn. */

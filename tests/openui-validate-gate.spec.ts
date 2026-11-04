@@ -42,11 +42,29 @@ describe('validate gate', () => {
     expect(codes('$v = 1\nroot = Col([Pressable([Text("t")], @Set($v, 2), true)])')).toEqual([])
   })
 
-  it('rejects Action([...]) as an action wrapper, which is what the host does', () => {
-    // This is the O1 shape. It is asserted rather than merely avoided so that a
-    // later change to the language cannot silently make the two disagree.
+  it('accepts Action([...]) as an action group, which the renderer always did', () => {
+    // This assertion used to be the opposite, and the reversal is the point.
+    //
+    // The gate rejected `Action([...])` with VZO002 while the renderer, the
+    // component catalogue and `openui-actions.ts` all accepted it: `ACTION_STEPS`
+    // declares `Action`, but this check only admitted a step behind an `@`, so
+    // the sigil-less group fell through to "unknown component".
+    //
+    // The 4A-5 browser run is what exposed it. The prompt told the model to write
+    // `Action([...])`; the model wrote it; the mount refused; the model then
+    // "corrected" the program to a bare `@Set` and the card drew. A user watching
+    // that sees a plugin that rejects its own documented syntax — and only a run
+    // against a real model could reveal it, because every fixture here was
+    // written by someone who already knew which form passed.
     const wrapped = codes('$v = 0\nroot = Col([IconButton("check", Action([@Set($v, 1)]), "L")])')
-    expect(wrapped).toContain('VZO002')
+    expect(wrapped).toEqual([])
+  })
+
+  it('still rejects a component-shaped name that is neither declared nor an action', () => {
+    // The fix must not become "accept anything": the closed-table argument is what
+    // the whole validator rests on (ADR-002, ADR-004).
+    expect(codes('root = Col([Action([@Set($v, 1)])])')).toEqual([])
+    expect(codes('root = Col([NotAThing("x")])')).toContain('VZO002')
   })
 
   it('rejects an unknown component and names it', () => {

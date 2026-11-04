@@ -15,7 +15,7 @@ this says what the current slice is allowed to do.
 | 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
-| 4A | Component catalogue: 40 renderers, in five batches | **4A-1, 4A-2, 4A-3, 4A-4 PASS** (34 done); 14 left in 4A-5 |
+| 4A | Component catalogue: 48 renderers, in five batches | **PASS — closed 2026-11-05** (48/48); `docs/reports/PHASE-4A-5-REPORT.md` |
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | Not started — separate from 4A, one security review each |
 | 5 | Unified prompt, security review, release | Not started |
 
@@ -121,21 +121,21 @@ are in the report; they are not counted as browser passes.
 
 ---
 
-## Stage 4A — The component catalogue (4A-1…4A-4 PASS)
+## Stage 4A — The component catalogue (4A-1…4A-5 PASS)
 
 **Goal.** Turn the signatures the language already understands into components
-the browser actually draws. Measured inventory — **34 / 48** — from
+the browser actually draws. Measured inventory — **48 / 48** — from
 `tests/openui-inventory.spec.tsx`, which reads the renderer's own table rather
 than a hand-kept list.
 
 | Group | Total | Rendered | Missing |
 | --- | --- | --- | --- |
-| Layout | 9 | Col, Row, Box, Grid, Card, Divider, Spacer | Carousel, Popover (4A-5) |
+| Layout | 9 | Col, Row, Box, Grid, Card, Divider, Spacer, Carousel, Popover | **— complete** |
 | Text | 10 | Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code | **— complete** |
 | Inputs | 13 | Button, Slider, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer, Form | **— complete** |
-| Drawing | 10 | — | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText (4A-5) |
+| Drawing | 10 | Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText | **— complete** |
 | Media and data | 4 | Table, Chart, Icon, Image | **— complete** |
-| Play | 2 | — | Flashcard, Celebration (4A-5) |
+| Play | 2 | Flashcard, Celebration | **— complete** |
 
 **In scope.** `src/client/` only, plus each batch's tests.
 
@@ -397,7 +397,38 @@ restored: `Image` accepting every scheme (2 tests red), a chart coercing gaps to
 zero (2 red), `Table` not padding a short row (1 red), and the validate gate
 stubbed to return no errors (2 red).
 
-**Carried forward.** 14 components remain, all in 4A-5.
+**Carried forward.** Nothing. Stage 4A is complete: all 48 declared components
+are drawn, and `tests/openui-inventory.spec.tsx` asserts the rendered set equals
+the declared set rather than a remembered count.
+
+### 4A-5 — drawing, disclosure and play (PASS, closed 2026-11-05)
+
+**Scope.** `Svg`, `G`, `Circle`, `Ellipse`, `Rect`, `Line`, `Path`,
+`Polyline`, `Polygon`, `SvgText`, `Flashcard`, `Celebration`, `Carousel`,
+`Popover` — the last fourteen, taking the inventory from 34/48 to 48/48.
+
+**Decisions.** ADR-011 (SVG values are grammar-validated and re-serialised) and
+ADR-012 (`Popover` is inline, clamped to the card, non-modal, no focus trap).
+Both were written before the renderers.
+
+**Exit criteria, and where the evidence is:**
+
+| Criterion | Evidence |
+| --- | --- |
+| Every component renders from a real program | `tests/openui-inventory.spec.tsx`, one legal program per name |
+| Layout, colour and contrast in both schemes | `evidence/phase-4a-5/C1-drawing-disclosure.json` — 8 paint samples in dark, minimum 5.58:1 |
+| Differential still 0 | unchanged; no language semantics were touched |
+| Browser evidence on an isolated profile, §9 hash checked | 45/45, bundle hash matched before measuring |
+| Batch tests added; 15-failure baseline unchanged | 904 tests, failure set identical name by name |
+
+**Two defects were found here, not by a unit test.** The validator rejected the
+documented `Action([...])` form (`VZO002`), and `Celebration` never fired for a
+bare-variable condition because the argument arrives as a binding marker and
+`boolOf` on that object is constant true. Both were reproduced before being
+fixed, both have a mutation-verified regression test, and both are recorded in
+`docs/reports/PHASE-4A-5-REPORT.md`.
+
+**Carried forward.** Nothing from this batch.
 
 ---
 ## Stage 4B — External actions (separate, later)

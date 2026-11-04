@@ -30,9 +30,9 @@ for (const component of COMPONENTS) {
 }
 
 describe('component inventory', () => {
-  it('draws 30 of the 48 declared components after 4A-3', () => {
+  it('draws all 48 declared components after 4A-5', () => {
     expect(declared).toHaveLength(48)
-    expect(RENDERED_COMPONENTS).toHaveLength(34)
+    expect(RENDERED_COMPONENTS).toHaveLength(48)
   })
 
   it('has no renderer for a name the language does not declare', () => {
@@ -86,14 +86,14 @@ describe('component inventory', () => {
   it('leaves the remaining catalogue in the batches STAGE.md assigns', () => {
     const missing = declared.filter(name => !rendered.has(name))
     // One row per batch, so a component cannot be quietly dropped from the plan.
-    // 4A-1, 4A-2, 4A-3 and 4A-4 are absent because they are complete: an entry with
-    // no names would just assert that nothing is left, which the per-group checks
-    // above already do.
-    const batches: Record<string, readonly string[]> = {
-      '4A-5': ['Svg', 'G', 'Circle', 'Ellipse', 'Rect', 'Line', 'Path', 'Polyline', 'Polygon', 'SvgText', 'Flashcard', 'Celebration', 'Carousel', 'Popover'],
-    }
+    // 4A-1 through 4A-5 are absent because they are complete: an entry with no
+    // names would just assert that nothing is left, which the per-group checks
+    // above already do. An empty map here is the assertion that the catalogue is
+    // finished — the list is derived, not remembered.
+    const batches: Record<string, readonly string[]> = {}
     const planned = Object.values(batches).flat()
     expect(missing.slice().sort()).toEqual(planned.slice().sort())
+    expect(missing, 'the whole catalogue should be drawn').toEqual([])
   })
 
   it('actually draws each of the four 4A-1 components, rather than listing it', () => {
@@ -153,5 +153,37 @@ describe('component inventory', () => {
       expect(error, `${name} failed to evaluate`).toBeUndefined()
       expect(node, `${name} drew nothing`).not.toBeNull()
     }
+  })
+  it('actually draws each of the fourteen 4A-5 components, rather than listing it', () => {
+    // Same check as every earlier batch: a name in the table whose renderer
+    // returns null or the renderer-gap notice would still count as "rendered".
+    // The drawing group is the one where this matters most, because a shape with
+    // every argument refused draws an element that is present and invisible.
+    const programs: Record<string, string> = {
+      Svg: 'root = Col([Svg([Circle(10, 10, 5)], "0 0 20 20")])',
+      G: 'root = Col([Svg([G([Circle(10, 10, 5)], "rotate(30 10 10)")], "0 0 20 20")])',
+      Circle: 'root = Col([Svg([Circle(10, 10, 5, "info")], "0 0 20 20")])',
+      Ellipse: 'root = Col([Svg([Ellipse(10, 10, 6, 4)], "0 0 20 20")])',
+      Rect: 'root = Col([Svg([Rect(0, 0, 8, 6, "ink")], "0 0 20 20")])',
+      Line: 'root = Col([Svg([Line(0, 0, 10, 10)], "0 0 20 20")])',
+      Path: 'root = Col([Svg([Path("M 0 0 L 10 10")], "0 0 20 20")])',
+      Polyline: 'root = Col([Svg([Polyline("0,0 5,5 10,0")], "0 0 20 20")])',
+      Polygon: 'root = Col([Svg([Polygon("0,0 10,0 5,8")], "0 0 20 20")])',
+      SvgText: 'root = Col([Svg([SvgText("hi", 2, 10)], "0 0 20 20")])',
+      Flashcard: 'root = Col([Flashcard("front", "back", "tap")])',
+      Celebration: '$n = 0\nroot = Col([Celebration($n == 1)])',
+      Carousel: 'root = Carousel([Text("a"), Text("b")])',
+      Popover: 'root = Col([Popover("more", "the detail")])',
+    }
+    for (const [name, program] of Object.entries(programs)) {
+      const { node, error } = renderProgram(program)
+      expect(error, `${name} failed to evaluate`).toBeUndefined()
+      expect(node, `${name} drew nothing`).not.toBeNull()
+    }
+    // One row per component, so a name cannot be quietly dropped from the list
+    // above and still pass by being absent from it.
+    expect(Object.keys(programs).sort()).toEqual(
+      ['Svg', 'G', 'Circle', 'Ellipse', 'Rect', 'Line', 'Path', 'Polyline', 'Polygon', 'SvgText', 'Flashcard', 'Celebration', 'Carousel', 'Popover'].sort(),
+    )
   })
 })
