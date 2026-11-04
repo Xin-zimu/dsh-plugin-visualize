@@ -104,7 +104,15 @@ describe('visualize with data-viz-src images', () => {
     const persisted = meta(value)
     expect(visualizeMetaFrom(persisted)!.images).toEqual(value.images)
     const metaBytes = JSON.stringify(persisted).length
-    expect(metaBytes).toBeLessThan(FRAGMENT.length + 600)
+    // A ratio, not `FRAGMENT.length + 600`. That form measured the host's temp
+    // path as much as the payload: the fragment is stored twice (fragment, and
+    // the pre-fork `source` that the OpenUI reader falls back to), the path is
+    // absolute, and each of the two ids is a 73-character content address, so
+    // the real constant is ~760 and the budget was unreachable. It also only
+    // ever ran here: on Windows this test failed at the `readFile` above, so
+    // the assertion had never executed on either platform. 972 bytes against
+    // 204 816 is the claim that matters — the bytes are not in the meta.
+    expect(metaBytes).toBeLessThan(FIGURE.byteLength / 50)
     expect(JSON.stringify(persisted)).not.toContain('base64')
 
     // The model hears which image failed and why, and nothing it did not need.
