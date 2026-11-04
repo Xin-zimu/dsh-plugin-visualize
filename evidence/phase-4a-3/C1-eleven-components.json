@@ -1,0 +1,43 @@
+{
+ "at": "2026-11-04T14:56:03.488Z",
+ "probe": "C1",
+ "stamp": {
+  "at": "2026-11-04T14:47:31.216Z",
+  "session": "taek",
+  "buildSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22",
+  "installedSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22"
+ },
+ "prompt": "Use the visualize tool with backend openui, title A3 eleven components. One statement per line, no explanation. Declare these state variables first: $txt = \"hello\", $area = \"two lines\", $sel = \"a\", $seg = \"one\", $chk = true, $radio = 1, $date = \"2026-11-04\", $secs = 90, $form = \"in form\", $icon = 0, $press = 1. Then write exactly one root = statement drawing a Col whose children are, in this order: Input($txt, \"Text field\"); TextArea($area, \"Multi line\"); Select($sel, [\"a\", \"b\"], \"Choose\"); SegmentedControl($seg, [\"one\", \"two\"]); Checkbox($chk, \"Agree\"); RadioGroup($radio, [{value: 1, label: \"First\"}, {value: 2, label: \"Second\"}], \"Pick one\"); DatePicker($date, \"When\"); Timer($secs, \"Countdown\"); Form([Input($form, \"Inside form\")]); IconButton(\"check\", @Set($icon, 1), \"Icon action\"); Pressable([Text(\"Tap me\")], @Set($press, 2), true). Then reply with the single word DRAWN. Do not explain and do not change the content.",
+ "submit": {
+  "clicked": true,
+  "label": "发送消息"
+ },
+ "cardsBefore": 20,
+ "cardsAfter": 22,
+ "measured": {
+  "cards": 22,
+  "totalNodes": 49,
+  "unrendered": [],
+  "Input": 1,
+  "TextArea": 1,
+  "Select": 1,
+  "SegmentedControl": 2,
+  "Checkbox": 1,
+  "RadioGroup": 2,
+  "DatePicker": 1,
+  "Timer": 1,
+  "Form": 1,
+  "IconButton": 1,
+  "Pressable": 1,
+  "labels": [
+   "Text field",
+   "Agree",
+   "When",
+   "Inside form"
+  ],
+  "timerText": "01:30",
+  "bodyText": "A3 eleven components\nText field\nMulti line\nChoose\na\nb\none\ntwo\nAgree\nPick one\nFirst\nSecond\nWhen\nCountdown\n01:30\nStart\nReset\nInside form\ncheck\nTap me"
+ },
+ "problems": [],
+ "verdict": "PASS"
+}

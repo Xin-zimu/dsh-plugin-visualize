@@ -15,7 +15,7 @@ this says what the current slice is allowed to do.
 | 1.3 | Closing B07 (layout) and B08 (dark theme) | **Done — both PASS in a browser** |
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
-| 4A | Component catalogue: 40 renderers, in five batches | **4A-1, 4A-2 PASS** (19 done); **4A-3 implemented, not accepted** (30 of 48); 18 left in 4A-4…4A-5 |
+| 4A | Component catalogue: 40 renderers, in five batches | **4A-1, 4A-2, 4A-3 PASS** (30 done); 18 left in 4A-4…4A-5 |
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | Not started — separate from 4A, one security review each |
 | 5 | Unified prompt, security review, release | Not started |
 
@@ -121,7 +121,7 @@ are in the report; they are not counted as browser passes.
 
 ---
 
-## Stage 4A — The component catalogue (4A-1, 4A-2 PASS; 4A-3 implemented, awaiting a browser)
+## Stage 4A — The component catalogue (4A-1, 4A-2, 4A-3 PASS)
 
 **Goal.** Turn the signatures the language already understands into components
 the browser actually draws. Measured inventory — **30 / 48** — from
@@ -271,27 +271,33 @@ caught work in this batch — the allowlist refused `--font-mono` and
 
 ---
 
-### 4A-3 — the rest of the Inputs group (IMPLEMENTED, NOT ACCEPTED)
+### 4A-3 — the rest of the Inputs group (PASS, closed 2026-11-04)
 
 **Scope.** `Input`, `TextArea`, `Select`, `SegmentedControl`, `Checkbox`,
 `RadioGroup`, `DatePicker`, `Timer`, `Form`, `IconButton`, `Pressable` — the
 eleven that complete the Inputs group, 13 / 13.
 
-**Verdict: IMPLEMENTED, not accepted.** Record:
-`docs/reports/PHASE-4A-3-REPORT.md`; manifest
-`evidence/phase-4a-3/MANIFEST.json`. The renderers exist and the unit tests are
-green, but **no item in this batch has been seen in a browser**, and
-`AGENTS.md` §5 does not allow calling that PASS.
+**Verdict: PASS.** Record: `docs/reports/PHASE-4A-3-REPORT.md`; manifest
+`evidence/phase-4a-3/MANIFEST.json`. The batch was closed as IMPLEMENTED on a
+cloud sandbox with no host; it is accepted here, on a real DSH install, where the
+browser half of the gate finally became measurable.
 
 | Gate item | Result |
 | --- | --- |
-| All eleven have real renderers | IMPLEMENTED — inventory 30 / 48, Inputs group complete |
+| All eleven have real renderers | PASS — inventory 30 / 48, Inputs group complete, and **all eleven counted by structure in the host DOM** (C1) |
 | Arguments match the signature table | PASS — one writable slot per control, always the first, asserted against `BINDING_ARG` |
-| Bound inputs write `$state` and survive a reload | UNIT TESTED — not browser-verified |
-| Layout, colour and contrast in both schemes | **NOT VERIFIED** |
+| Bound inputs write `$state` and survive a reload | PASS in a browser — typed values survived a real reload *and* a history replay (V5) |
+| Layout, colour and contrast in both schemes | PASS — both schemes entered through the host's own 外观 control; 21 variables per card all resolve; min contrast 5.8:1 light / 12.11:1 dark (V3) |
 | Differential still 0 differences | PASS — 31/31, `differential.json` byte-identical |
-| Browser evidence on an isolated profile, with the §9 hash check | **NOT VERIFIED** — the environment that closed this batch has no DSH host |
-| `tests/<batch>` added; failure baseline unchanged | PASS — 809 / 809 on Linux. The "15 failures" baseline was the Windows test rig; 14 of the 15 do not exist on Linux (report §4) |
+| Browser evidence on an isolated profile, with the §9 hash check | PASS — isolated server on :3093 + bsk 0.4.1; G0 compares both SHA-256 values and they match (V4) |
+| `tests/<batch>` added; failure baseline unchanged | PASS — 43/43 on the batch spec; Windows 794/15/809 with the failing **set** identical to the recorded baseline, name by name |
+
+**The §9 gate earned its keep on this run.** The profile held the *previous*
+bundle (354 465 bytes against a 375 564-byte build): pnpm had reported
+"already up to date" for a `file:` dependency while keeping the hard-linked old
+copy. Measuring first would have produced a believable failure of a correct
+build. The install was refreshed, both hashes matched `4D071A86…`, and only then
+was anything measured.
 
 **One state path, reused rather than rebuilt.** Every renderer reads the bound
 slot, draws it, and calls `write(name, next)`. No renderer keeps a copy of a
@@ -299,19 +305,29 @@ bound value, so none can drift out of sync with `$state`. `IconButton` and
 `Pressable` carry their action through `write.runAction`, the channel `Button`
 already used — deliberately not a second route into state.
 
-**Two risks this batch cannot close, recorded as NOT VERIFIED.** Both are
-questions about a live document, and jsdom answers neither:
+**The two carried risks were closed by measurement, not by argument.**
 
-1. **IME composition.** Every keystroke writes `$state` and re-evaluates the
-   whole program, and the field's value is that state. Whether a pinyin
-   composition survives the round trip is a browser question.
-2. **A ticking `Timer` beside an `Input`.** The countdown writes `$state` once a
-   second, so the whole card re-evaluates once a second. Whether the focused
-   field keeps its focus, caret and half-typed content is likewise a browser
-   question.
+1. **IME composition (V1).** Driven through `Input.imeSetComposition` over CDP,
+   so the browser really entered composition mode — proven by the page recording
+   5 `input` events with `isComposing === true`. The pre-edit advanced
+   `n → ni → nih → nihao` with no step dropped or reordered, the caret advanced
+   monotonically, focus never left the field, the node was never replaced, and
+   the commit `你好` landed once and reached `$state`. A synthetic
+   `CompositionEvent` would *not* have proved this: the browser does not enter
+   composition mode for one, so a component that clobbers the pre-edit still
+   looks clean.
+2. **A ticking `Timer` beside a focused `Input` (V2).** The timer really ticked
+   (8 distinct values, `01:00` → `00:53`). Six characters typed as real key
+   events across those ticks: all six landed in order, focus never left, the
+   input node was never replaced, and the caret advanced `1…6`.
 
-Neither has been observed failing. They are recorded as risks so that the local
-acceptance run tests them on purpose rather than by accident.
+**One fidelity gap found in the test, not the product.** The unit spec calls
+`renderProgram` directly, which skips the backend's name check, so it accepts
+`Action([@Set($v, 1)])` where the live path correctly rejects it with
+`VZO002 unknown component "Action"`. The skill text documents a bare
+`@Set($v, value)` step, so a model never writes the rejected form. Recorded as
+observation O1 in the manifest and left for the 4A-4 test batch: it is a
+test-only edit and out of this run's minimal-change scope.
 
 **Three defects closed on the way, none in product code.** D23: `pnpm run build`
 did not work on a clean machine, because `tsdown` lists `unrun` as an optional

@@ -1,0 +1,248 @@
+{
+ "at": "2026-11-04T14:44:31.233Z",
+ "probe": "V1",
+ "url": "http://127.0.0.1:3093/?token=…",
+ "via": "CDP Input.imeSetComposition + Input.insertText",
+ "newSessionCards": 0,
+ "pageReady": true,
+ "submit": {
+  "clicked": true,
+  "label": "发送消息",
+  "x": 980.3333740234375,
+  "y": 567
+ },
+ "cardsBefore": 0,
+ "cardsAfter": 1,
+ "fixture": {
+  "totalCards": 2,
+  "cardsWithIme": 2,
+  "inputCount": 2,
+  "labels": [
+   "中文输入",
+   "其他字段"
+  ],
+  "disabled": [
+   false,
+   false
+  ],
+  "values": [
+   "start",
+   "n0"
+  ]
+ },
+ "snapshots": [
+  {
+   "label": "before",
+   "value": "start",
+   "focused": true,
+   "selection": {
+    "start": 5,
+    "end": 5
+   },
+   "stateText": "T=start",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "composition-n",
+   "value": "startn",
+   "focused": true,
+   "selection": {
+    "start": 6,
+    "end": 6
+   },
+   "stateText": "T=startn",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "composition-ni",
+   "value": "startni",
+   "focused": true,
+   "selection": {
+    "start": 7,
+    "end": 7
+   },
+   "stateText": "T=startni",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "composition-nih",
+   "value": "startnih",
+   "focused": true,
+   "selection": {
+    "start": 8,
+    "end": 8
+   },
+   "stateText": "T=startnih",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "composition-nihao",
+   "value": "startnihao",
+   "focused": true,
+   "selection": {
+    "start": 10,
+    "end": 10
+   },
+   "stateText": "T=startnihao",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "pre-commit",
+   "value": "startnihao",
+   "focused": true,
+   "selection": {
+    "start": 10,
+    "end": 10
+   },
+   "stateText": "T=startnihao",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "committed",
+   "value": "start你好",
+   "focused": true,
+   "selection": {
+    "start": 7,
+    "end": 7
+   },
+   "stateText": "T=start你好",
+   "nText": "N=n0",
+   "sameNode": true
+  },
+  {
+   "label": "settled",
+   "value": "start你好",
+   "focused": true,
+   "selection": {
+    "start": 7,
+    "end": 7
+   },
+   "stateText": "T=start你好",
+   "nText": "N=n0",
+   "sameNode": true
+  }
+ ],
+ "caretPath": [
+  5,
+  6,
+  7,
+  8,
+  10
+ ],
+ "events": [
+  {
+   "type": "compositionstart",
+   "data": "",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "start",
+   "sel": 5
+  },
+  {
+   "type": "compositionupdate",
+   "data": "n",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "start",
+   "sel": 5
+  },
+  {
+   "type": "input",
+   "data": "n",
+   "isComposing": true,
+   "inputType": "insertCompositionText",
+   "valueAfter": "startn",
+   "sel": 6
+  },
+  {
+   "type": "compositionupdate",
+   "data": "ni",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "startn",
+   "sel": 5
+  },
+  {
+   "type": "input",
+   "data": "ni",
+   "isComposing": true,
+   "inputType": "insertCompositionText",
+   "valueAfter": "startni",
+   "sel": 7
+  },
+  {
+   "type": "compositionupdate",
+   "data": "nih",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "startni",
+   "sel": 5
+  },
+  {
+   "type": "input",
+   "data": "nih",
+   "isComposing": true,
+   "inputType": "insertCompositionText",
+   "valueAfter": "startnih",
+   "sel": 8
+  },
+  {
+   "type": "compositionupdate",
+   "data": "nihao",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "startnih",
+   "sel": 5
+  },
+  {
+   "type": "input",
+   "data": "nihao",
+   "isComposing": true,
+   "inputType": "insertCompositionText",
+   "valueAfter": "startnihao",
+   "sel": 10
+  },
+  {
+   "type": "compositionupdate",
+   "data": "你好",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "startnihao",
+   "sel": 5
+  },
+  {
+   "type": "input",
+   "data": "你好",
+   "isComposing": true,
+   "inputType": "insertCompositionText",
+   "valueAfter": "start你好",
+   "sel": 7
+  },
+  {
+   "type": "compositionend",
+   "data": "你好",
+   "isComposing": null,
+   "inputType": null,
+   "valueAfter": "start你好",
+   "sel": 7
+  }
+ ],
+ "otherField": {
+  "value": "n0",
+  "stateText": "N=n0"
+ },
+ "preEditReachedState": [
+  "T=startn",
+  "T=startni",
+  "T=startnih",
+  "T=startnihao"
+ ],
+ "problems": [],
+ "verdict": "PASS"
+}

@@ -1,0 +1,857 @@
+{
+ "at": "2026-11-04T14:49:02.619Z",
+ "probe": "V3",
+ "stamp": {
+  "at": "2026-11-04T14:47:31.216Z",
+  "session": "taek",
+  "buildSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22",
+  "installedSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22"
+ },
+ "switches": {
+  "light": {
+   "switched": true,
+   "before": {
+    "dark": true
+   },
+   "after": {
+    "dark": false
+   },
+   "label": "浅色"
+  },
+  "dark": {
+   "switched": true,
+   "before": {
+    "dark": false
+   },
+   "after": {
+    "dark": true
+   },
+   "label": "深色"
+  }
+ },
+ "measured": {
+  "light": {
+   "theme": "light",
+   "scheme": "light",
+   "count": 2,
+   "cards": [
+    {
+     "width": 675,
+     "height": 191,
+     "overflowX": false,
+     "cardBg": "rgba(0, 0, 0, 0)",
+     "variables": [
+      {
+       "name": "--border",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--card",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-bg-layer-2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l1",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary-foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-secondary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-tertiary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-markdown-code-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-radius-sm",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-amber-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-deepseek-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-green-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-red-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--font-sans",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--muted-foreground-strong",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--radius",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      }
+     ],
+     "texts": [
+      {
+       "text": "A3 V1 IME",
+       "ratio": 18.9,
+       "size": 12,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "中文输入",
+       "ratio": 5.8,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "T=ab",
+       "ratio": 18.9,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "其他字段",
+       "ratio": 5.8,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "N=n0",
+       "ratio": 18.9,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      }
+     ],
+     "controls": [
+      {
+       "tag": "input",
+       "role": null,
+       "label": "中文输入",
+       "w": 675,
+       "h": 27,
+       "bg": "rgb(255, 255, 255)",
+       "border": "0.666667px rgba(0, 0, 0, 0.1)",
+       "opacity": "1"
+      },
+      {
+       "tag": "input",
+       "role": null,
+       "label": "其他字段",
+       "w": 675,
+       "h": 27,
+       "bg": "rgb(255, 255, 255)",
+       "border": "0.666667px rgba(0, 0, 0, 0.1)",
+       "opacity": "1"
+      }
+     ],
+     "timerText": null,
+     "progressNow": null
+    },
+    {
+     "width": 680,
+     "height": 191,
+     "overflowX": false,
+     "cardBg": "rgba(0, 0, 0, 0)",
+     "variables": [
+      {
+       "name": "--border",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--card",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-bg-layer-2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l1",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary-foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-secondary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-tertiary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-markdown-code-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-radius-sm",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-amber-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-deepseek-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-green-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-red-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--font-sans",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--muted-foreground-strong",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--radius",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      }
+     ],
+     "texts": [
+      {
+       "text": "A3 V1 IME",
+       "ratio": 18.9,
+       "size": 12,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "中文输入",
+       "ratio": 5.8,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "T=ab",
+       "ratio": 18.9,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "其他字段",
+       "ratio": 5.8,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "N=n0",
+       "ratio": 18.9,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      }
+     ],
+     "controls": [
+      {
+       "tag": "input",
+       "role": null,
+       "label": "中文输入",
+       "w": 680,
+       "h": 27,
+       "bg": "rgb(255, 255, 255)",
+       "border": "0.666667px rgba(0, 0, 0, 0.1)",
+       "opacity": "1"
+      },
+      {
+       "tag": "input",
+       "role": null,
+       "label": "其他字段",
+       "w": 680,
+       "h": 27,
+       "bg": "rgb(255, 255, 255)",
+       "border": "0.666667px rgba(0, 0, 0, 0.1)",
+       "opacity": "1"
+      }
+     ],
+     "timerText": null,
+     "progressNow": null
+    }
+   ]
+  },
+  "dark": {
+   "theme": "dark",
+   "scheme": "dark",
+   "count": 2,
+   "cards": [
+    {
+     "width": 675,
+     "height": 191,
+     "overflowX": false,
+     "cardBg": "rgba(0, 0, 0, 0)",
+     "variables": [
+      {
+       "name": "--border",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--card",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-bg-layer-2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l1",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary-foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-secondary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-tertiary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-markdown-code-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-radius-sm",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-amber-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-deepseek-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-green-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-red-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--font-sans",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--muted-foreground-strong",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--radius",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      }
+     ],
+     "texts": [
+      {
+       "text": "A3 V1 IME",
+       "ratio": 17.45,
+       "size": 12,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "中文输入",
+       "ratio": 12.11,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "T=ab",
+       "ratio": 17.45,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "其他字段",
+       "ratio": 12.11,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "N=n0",
+       "ratio": 17.45,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      }
+     ],
+     "controls": [
+      {
+       "tag": "input",
+       "role": null,
+       "label": "中文输入",
+       "w": 675,
+       "h": 27,
+       "bg": "rgb(44, 44, 46)",
+       "border": "0.666667px rgba(255, 255, 255, 0.12)",
+       "opacity": "1"
+      },
+      {
+       "tag": "input",
+       "role": null,
+       "label": "其他字段",
+       "w": 675,
+       "h": 27,
+       "bg": "rgb(44, 44, 46)",
+       "border": "0.666667px rgba(255, 255, 255, 0.12)",
+       "opacity": "1"
+      }
+     ],
+     "timerText": null,
+     "progressNow": null
+    },
+    {
+     "width": 680,
+     "height": 191,
+     "overflowX": false,
+     "cardBg": "rgba(0, 0, 0, 0)",
+     "variables": [
+      {
+       "name": "--border",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--card",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-bg-layer-2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l1",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-border-l2",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-brand-primary-new-colorprimary-new-color",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-primary-foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-secondary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-alias-label-tertiary",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-font-markdown-code-font-family",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-radius-sm",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-amber-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-deepseek-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-green-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--dsw-static-red-500",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--font-sans",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--foreground",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--muted-foreground-strong",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      },
+      {
+       "name": "--radius",
+       "declaredOnRoot": true,
+       "hostToken": null,
+       "hostResolves": null
+      }
+     ],
+     "texts": [
+      {
+       "text": "A3 V1 IME",
+       "ratio": 17.45,
+       "size": 12,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "中文输入",
+       "ratio": 12.11,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "T=ab",
+       "ratio": 17.45,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "其他字段",
+       "ratio": 12.11,
+       "size": 11,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      },
+      {
+       "text": "N=n0",
+       "ratio": 17.45,
+       "size": 14,
+       "large": false,
+       "need": 4.5,
+       "passes": true
+      }
+     ],
+     "controls": [
+      {
+       "tag": "input",
+       "role": null,
+       "label": "中文输入",
+       "w": 680,
+       "h": 27,
+       "bg": "rgb(44, 44, 46)",
+       "border": "0.666667px rgba(255, 255, 255, 0.12)",
+       "opacity": "1"
+      },
+      {
+       "tag": "input",
+       "role": null,
+       "label": "其他字段",
+       "w": 680,
+       "h": 27,
+       "bg": "rgb(44, 44, 46)",
+       "border": "0.666667px rgba(255, 255, 255, 0.12)",
+       "opacity": "1"
+      }
+     ],
+     "timerText": null,
+     "progressNow": null
+    }
+   ]
+  }
+ },
+ "cardBg_light": "rgba(0, 0, 0, 0)",
+ "cardBg_dark": "rgba(0, 0, 0, 0)",
+ "themeReachedCard": {
+  "lightText": "[\"A3 V1 IME:18.9\",\"中文输入:5.8\",\"T=ab:18.9\",\"其他字段:5.8\",\"N=n0:18.9\"]",
+  "darkText": "[\"A3 V1 IME:17.45\",\"中文输入:12.11\",\"T=ab:17.45\",\"其他字段:12.11\",\"N=n0:17.45\"]",
+  "identical": false
+ },
+ "problems": [],
+ "verdict": "PASS"
+}

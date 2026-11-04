@@ -2,8 +2,9 @@
   "phase": "4A-3",
   "title": "Inputs group — the eleven that bind $state",
   "capturedAt": "2026-11-04T14:16+08:00",
-  "status": "IMPLEMENTED — no component in this batch has been seen in a browser",
-  "verdict": "NOT ACCEPTED. Of the six exit-gate items, #1 is implemented, #2 is unit tested, #4 passes, #6 is restated against a Linux baseline; #3 and #5 are unreachable in the environment that closed this batch.",
+  "acceptedAt": "2026-11-04T23:00+08:00",
+  "status": "ACCEPTED — all eleven components rendered in a real DSH host, and V1–V5 verified there",
+  "verdict": "ACCEPTED. All six exit-gate items are met with evidence on this machine: #1 the eleven render in the host, #2 bound inputs survive a reload and a history replay in a browser, #3 both colour schemes measured through the host's own appearance control, #4 the differential is still 31/31 and byte-identical, #5 browser evidence taken on an isolated profile with the §9 hash check passing, #6 the batch spec is present and the Windows failure set is unchanged.",
   "scope": {
     "components": [
       "Input",
@@ -21,148 +22,198 @@
     "inventoryBefore": "19 / 48",
     "inventoryAfter": "30 / 48",
     "inputsGroup": "complete — rendered 13 of 13, missing none",
-    "measuredFrom": "tests/openui-inventory.spec.tsx reading RENDERED_COMPONENTS, not a hand-kept list"
+    "measuredFrom": "tests/openui-inventory.spec.tsx reading RENDERED_COMPONENTS, not a hand-kept list",
+    "renderedInBrowser": "C1-eleven-components.json — all eleven counted by structure in the host DOM"
   },
   "environment": {
-    "platform": "Linux x86_64 (cloud sandbox), no DSH host, no browser profile, no bsk daemon",
-    "node": "v22.13.1",
-    "pnpm": "10.28.2",
-    "registry": "https://mirrors.tencent.com/npm/",
-    "head": "74ca8f7",
-    "whatThisMeans": "The unit half of the gate is measurable here. The browser half is not: there is no host to load the plugin into and no way to drive the host's own appearance control, so #3 and #5 are NOT VERIFIED rather than failed."
+    "linuxBaseline": {
+      "platform": "Linux x86_64 (cloud sandbox), no DSH host, no browser profile, no bsk daemon",
+      "node": "v22.13.1",
+      "pnpm": "10.28.2",
+      "head": "74ca8f7 plus the four closing commits (489acac)",
+      "result": "809 / 809, typecheck PASS, build PASS, differential 31/31"
+    },
+    "windowsAcceptance": {
+      "platform": "Windows 11 x64, real DSH host, isolated Edge profile, bsk 0.4.1",
+      "node": "v24.22.1",
+      "pnpm": "11.28.0",
+      "git": "2.48.1.windows.1",
+      "headBefore": "74ca8f7",
+      "headAfter": "489acac + this acceptance branch",
+      "dshServer": "isolated server on 127.0.0.1:3093 with DSH_HOME=tmp/dsh-p3, profile p3web",
+      "browser": "Microsoft Edge 156.0.4314.58, bsk extension 0.4.1, version_skew false",
+      "whatThisMeans": "Both halves of the gate are now measurable. The unit half matches the Linux baseline apart from the documented Windows-only failure set; the browser half is measured in a real host."
+    }
+  },
+  "hashGate": {
+    "rule": "AGENTS.md §9 — the bundle the browser ran must be the bundle this tree built",
+    "buildClientSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22",
+    "installedClientSha256BeforeFix": "2B7B238FDA607E19C0140632798DF446E766F5D334FE0BE0BDB83F28119982F6",
+    "staleBundleFound": true,
+    "staleBytes": "354465 installed vs 375564 built — the N-1 bundle was still hard-linked in the profile",
+    "fix": "removed the profile's node_modules/@dsh-unified/visualize and reinstalled, per session-log.md §traps",
+    "installedClientSha256AfterFix": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22",
+    "result": "MATCH before any measurement was taken; the smoke gate re-checks it on every run"
   },
   "commands": [
     {
       "command": "pnpm install --frozen-lockfile",
       "result": "PASS",
-      "evidence": "lockfileVersion 9.0 accepted unchanged by pnpm 10.28.2"
+      "evidence": "unrun 0.3.1 installed from the committed lockfile; D23 does not recur"
     },
     {
       "command": "pnpm run typecheck",
-      "result": "PASS, exit 0 (tsconfig.json and tsconfig.client.json)",
-      "evidence": "tsc-linux.txt"
+      "result": "PASS, exit 0",
+      "evidence": "tsc-windows.txt"
     },
     {
       "command": "pnpm run test",
-      "result": "PASS — 809 passed / 0 failed / 809, 40 files",
-      "evidence": "test-4a3-linux.txt"
+      "result": "PASS — 794 passed / 15 failed / 809, and the 15 are the documented baseline",
+      "evidence": "test-4a3-windows.txt"
     },
     {
       "command": "pnpm run build",
-      "result": "PASS after unrun@0.3.1 was declared (D23); lib/index.js 240 kB, lib/client.js 376 kB, lib/index.d.ts 10 kB",
-      "evidence": "build-linux.txt"
+      "result": "PASS — lib/client.js 375564 bytes",
+      "evidence": "build-windows.txt"
     },
     {
       "command": "node --experimental-strip-types evidence/phase-2/differential.mjs",
-      "result": "PASS — cases: 31 | matched: 31 | differing: 0; differential.json byte-identical to the committed one",
-      "evidence": "differential-4a3.txt"
+      "result": "PASS — 31/31, 0 differing, differential.json byte-identical",
+      "evidence": "differential-4a3-windows.txt"
     },
     {
       "command": "pnpm vitest run tests/openui-inventory.spec.tsx",
-      "result": "30 / 48 rendered; Inputs 13 / 13; Text 10 / 10; Layout 7 / 9",
+      "result": "30 / 48 rendered; Inputs 13 / 13",
       "evidence": "inventory-linux.txt"
     },
     {
       "command": "pnpm vitest run tests/openui-inputs-4a3.spec.tsx",
-      "result": "43 / 43 PASS (37 before this session)",
-      "evidence": "test-4a3-linux.txt"
+      "result": "43 / 43 PASS",
+      "evidence": "test-4a3-windows.txt"
+    },
+    {
+      "command": "node evidence/lib/probe.mjs --what=smoke",
+      "result": "SMOKE PASS — G0 environment, G1 input, G2 submit, G3 render",
+      "evidence": "G0 reports both hashes equal"
     }
   ],
   "exitCriteria": [
     {
       "item": 1,
       "criterion": "Every component in the batch renders from a real program",
-      "result": "IMPLEMENTED",
-      "evidence": "inventory 30 / 48 measured from RENDERED_COMPONENTS; all eleven drawn in tests/openui-inputs-4a3.spec.tsx; not seen in a browser"
+      "result": "PASS (browser)",
+      "evidence": "C1-eleven-components.json: counted by structure in the host DOM — Input 1, TextArea 1, Select 1, SegmentedControl 2, Checkbox 1, RadioGroup 2, DatePicker 1, Timer 1, Form 1, IconButton 1, Pressable 1; data-openui-unrendered is empty. Screenshot: screenshot-eleven-components.png"
     },
     {
       "item": 2,
       "criterion": "Bound inputs write $state and survive a reload (4A-3 onward)",
-      "result": "UNIT TESTED",
-      "evidence": "the loop is driven through the real card in jsdom: dispatch, then read the sibling Text the program recomputed; persistence through the same cardStates store a Slider uses, with an explicit reload() between mounts"
+      "result": "PASS (browser)",
+      "evidence": "V5-persistence.json: a value typed into the host (V5-…) was still there after a real page reload AND after reopening the conversation from history — the program default is 'start', so persistence is the only explanation"
     },
     {
       "item": 3,
       "criterion": "Layout, colour and contrast hold in both colour schemes",
-      "result": "NOT VERIFIED",
-      "evidence": "no host to measure against; the three-layer variable probe cannot run without one"
+      "result": "PASS (browser)",
+      "evidence": "V3-themes.json: dark and light both entered through the host's own Settings → 通用设置 → 外观 control, never by setting data-ds-dark-theme. 21 bridged variables per card, every one declared on the card root and every host token resolves. Minimum text contrast 5.8:1 light and 12.11:1 dark, both above AA 4.5:1. No horizontal overflow; no zero-height control."
     },
     {
       "item": 4,
       "criterion": "The differential still reports 0 differences",
       "result": "PASS",
-      "evidence": "31 / 31, 0 differing; output file unchanged byte for byte"
+      "evidence": "31 / 31, 0 differing, evidence/phase-2/differential.json unchanged byte for byte"
     },
     {
       "item": 5,
       "criterion": "Browser evidence on an isolated profile, with the AGENTS.md §9 hash check",
-      "result": "NOT VERIFIED",
-      "evidence": "structurally unavailable here: no DSH install, no profile, no bundle-hash comparison to make"
+      "result": "PASS",
+      "evidence": "Isolated DSH server on :3093 (DSH_HOME=tmp/dsh-p3, profile p3web) driven through bsk 0.4.1; G0 compares build and installed lib/client.js SHA-256 on every smoke run and they match (4D071A86…). A stale N-1 bundle was found first and fixed before any measurement, which is exactly the trap §9 exists for."
     },
     {
       "item": 6,
       "criterion": "tests/<batch> added; the 15-failure baseline unchanged",
-      "result": "PASS, restated",
-      "evidence": "809 / 809 on Linux. The 15-failure baseline was the Windows test rig: 14 of the 15 do not exist on Linux (7 EPERM on symlink/rename, 5 path-joining, 1 stub branch, 1 cascade timeout, 1 description assertion) and the 15th was D24. The portable gate is the failure SET, named and caused, not the count."
+      "result": "PASS",
+      "evidence": "tests/openui-inputs-4a3.spec.tsx present, 43 / 43. On Windows the run is 794 / 15 / 809 and the failing SET is identical to evidence/publish/test-before-publish.txt — compared name by name, zero added and zero removed. The batch's own 43 tests all pass on Windows."
     }
   ],
-  "notVerified": [
+  "notVerified": [],
+  "browserRuns": [
+    {
+      "id": "C1",
+      "claim": "All eleven components render from one real program in the host",
+      "result": "PASS",
+      "evidence": "C1-eleven-components.json, screenshot-eleven-components.png",
+      "probe": "evidence/phase-4a-3/probe-c1-eleven.mjs"
+    },
     {
       "id": "V1",
-      "item": "IME composition in a bound Input",
-      "why": "every keystroke writes $state and re-evaluates the whole program, and the field's value is that state; composition events and the candidate window do not exist in jsdom",
-      "howToVerifyLocally": "In a real card, type a two-character Chinese word with a pinyin IME into Input($t, 'Text'). Pass: every character lands, the candidate window is not interrupted, and a sibling Text(@Format(…)) agrees. Fail: a dropped character, a reset composition, or a caret jump."
+      "claim": "IME composition in a bound Input does not drop characters or disturb the pre-edit",
+      "result": "PASS",
+      "evidence": "V1-ime-composition.json",
+      "probe": "evidence/phase-4a-3/probe-v1-ime-cdp.mjs",
+      "method": "Genuine composition mode through CDP Input.imeSetComposition, not a synthetic CompositionEvent — the page recorded 7 composition events and 5 input events carrying isComposing=true, which is what proves the browser really entered composition.",
+      "measured": "Pre-edit advanced start → startn → startni → startnih → startnihao with no step dropped or reordered; caret advanced monotonically 5→6→7→8→10; focus never left the field; the node was never replaced; the commit 你好 landed once and reached $state (sibling Text read T=start你好); the other bound field stayed at n0.",
+      "note": "The design does write $state on each input, pre-edit included. That is recorded, not defended: it is a defect only if it disturbs the composition, and the six assertions above measure exactly that. It did not."
     },
     {
       "id": "V2",
-      "item": "A ticking Timer beside a focused Input",
-      "why": "the countdown writes $state once a second, so the whole card re-evaluates once a second; focus and caret behaviour under re-render is a browser property",
-      "howToVerifyLocally": "One card with Timer($s, 'Left') and Input($n, 'Name'). Focus the input, start the timer, type slowly for ~5 s across several ticks. Pass: focus and caret never move and no character is lost. Fail: focus jumps away, the caret resets, or input is swallowed."
+      "claim": "A ticking Timer beside a focused Input does not steal focus, reset the caret, or swallow input",
+      "result": "PASS",
+      "evidence": "V2-timer-focus.json",
+      "probe": "evidence/phase-4a-3/probe-v2-timer-focus.mjs",
+      "measured": "The timer really ticked: 8 distinct values 01:00 → 00:53 across the run. Six characters typed one real key event at a time across those ticks: all six landed in order, focus never left the field, the input node was never replaced, the caret advanced 1→2→3→4→5→6 and ended at the end of the text, and $state read N=ABCDEF."
     },
     {
       "id": "V3",
-      "item": "Both colour schemes for all eleven components",
-      "why": "no host to switch appearance in",
-      "howToVerifyLocally": "Switch through the host's own 外观 control in both directions, never by setting data-ds-dark-theme, and run the three-layer variable probe from evidence/phase-4a-1/a1-probe.mjs."
+      "claim": "Layout, colour and contrast hold in both colour schemes",
+      "result": "PASS",
+      "evidence": "V3-themes.json",
+      "probe": "evidence/phase-4a-3/probe-v3-themes.mjs"
     },
     {
       "id": "V4",
-      "item": "Bundle hash (§9) match before measurement",
-      "why": "no profile to compare against",
-      "howToVerifyLocally": "Rebuild, then hash the profile's installed lib/ against the build before believing any measurement; pnpm reports 'Already up to date' for a file: dependency while keeping the hard-linked old copy."
+      "claim": "The bundle the browser ran is the bundle this tree built (§9)",
+      "result": "PASS",
+      "evidence": "G0 in every smoke run; hashGate above"
     },
     {
       "id": "V5",
-      "item": "Refresh and history replay for a card whose fields were edited",
-      "why": "needs a real session log and a real reload",
-      "howToVerifyLocally": "Type into three fields, reload the page, then reopen the conversation from history. Pass: the values are the ones that were typed, not the program defaults."
+      "claim": "Edited field values survive a refresh and a history replay",
+      "result": "PASS",
+      "evidence": "V5-persistence.json",
+      "probe": "evidence/phase-4a-3/probe-v5-persistence.mjs"
+    }
+  ],
+  "observations": [
+    {
+      "id": "O1",
+      "summary": "The 4A-3 unit spec drives renderProgram directly, so it never exercises the name check",
+      "detail": "tests/openui-inputs-4a3.spec.tsx calls renderProgram(source, {}) from src/client/OpenUICard.tsx, which is drawProgram without the backend's checkNames pass. The spec therefore accepts Action([@Set($v, 1)]) as an IconButton action, while the live path rejects it with VZO002 'unknown component \"Action\"' — verified against the real validator. A model following the skill text never writes that form (languageReference() documents a bare @Set($v, value) step), so this is a fidelity gap in the test, not a live defect.",
+      "impact": "None on the product. It does mean the jsdom suite is slightly more permissive than the host, which is worth knowing before trusting a green spec as a statement about what a program may contain.",
+      "status": "Recorded, not fixed — changing the fixtures to the documented form is a test-only edit, and it is out of the minimal-change scope this acceptance run was given. It belongs in the 4A-4 test batch."
     }
   ],
   "defects": [
     {
       "id": "D23",
       "summary": "The build depended on an optional peer nobody declared (unrun)",
-      "detail": "tsdown@0.22.14 needs unrun to load tsdown.config.ts and lists it as an optional peer; pnpm does not install optional peers that were never asked for, so install && build failed on every clean machine while working on the developer's.",
-      "status": "Fixed in chore(build); verified with node_modules deleted"
+      "status": "Fixed in chore(build); confirmed here — install --frozen-lockfile pulled unrun 0.3.1 from the lockfile and the build passed"
     },
     {
       "id": "D24",
       "summary": "A meta-size assertion measured the temp path, and had never executed",
-      "detail": "metaBytes < FRAGMENT.length + 600 versus a measured 972; the constant is ~760 (the fragment is stored twice, plus an absolute path and two content addresses). On Windows the test failed three lines earlier, so the assertion had never run on either platform.",
-      "status": "Replaced with a ratio assertion (metaBytes < FIGURE.byteLength / 50), validated by re-introducing the defect: 205772 vs 4096.32"
+      "status": "Fixed; the ratio assertion is in the tree and the card-images tests that fail on Windows fail on symlink/EPERM setup, not on this assertion"
     },
     {
       "id": "D25",
       "summary": "The first Timer cleanup test passed for the wrong reason",
-      "detail": "A leaked interval writes into the store it captured, and a reload has already replaced that store, so a value-based remount test stayed green with clearInterval deleted.",
-      "status": "Cleanup is now asserted by counting pending timers; deleting the cleanup turns two tests red"
+      "status": "Fixed; cleanup is asserted by counting pending timers"
     }
   ],
   "openQuestions": [
     {
       "topic": "The persisted meta stores the fragment twice",
-      "detail": "presentationMeta writes both fragment and the pre-fork source; for a html card nothing reads source (visualizeMetaFrom needs fragment, openuiMetaFrom returns early when fragment is present), so it is 234 bytes a card of dead payload.",
-      "whyNotFixedHere": "removing it changes the persisted shape and needs an ADR; the benefit is 234 bytes, the risk is historical replay",
+      "detail": "presentationMeta writes both fragment and the pre-fork source; for a html card nothing reads source, so it is 234 bytes a card of dead payload.",
+      "whyNotFixedHere": "removing it changes the persisted shape and needs an ADR",
       "recorded": "session-log.md §6"
     }
   ],
@@ -171,5 +222,28 @@
     "evidence": "mutation-check.txt",
     "M1": "delete Timer's clearInterval -> 'pauses without writing' and 'clears its interval when the card goes away' both fail",
     "M2": "append the figure's bytes to the persisted meta -> 'expected 205772 to be less than 4096.32'"
+  },
+  "screenshots": {
+    "policy": "Not committed. Each is a full-viewport capture of a real host window, so it carries the sidebar session list and conversation text. The 2026-11-04 history rewrite purged 22 such files, and .gitignore now excludes evidence/**/*.png structurally. The hashes below let a reader confirm locally that a capture they hold is the one this run took.",
+    "files": [
+      {
+        "name": "screenshot-eleven-components.png",
+        "sha256": "4020DDBCCB8FC50B9A1BA704DB18E7A283095BE9946017AB3B4DE4D442D923BB",
+        "bytes": 106313,
+        "shows": "the eleven-component card: Select, SegmentedControl, Checkbox, RadioGroup, DatePicker, Timer at 01:30 with its progress bar, Form input, IconButton, Pressable"
+      },
+      {
+        "name": "screenshot-ime-card-dark.png",
+        "sha256": "7F8C63D60A4F0494013128F383F083BD61FF1704A932223B774E86A961E7AB12",
+        "bytes": 195012,
+        "shows": "the IME card after a commit, its sibling Text agreeing (T=start你好再) and 其他字段 untouched at n0"
+      },
+      {
+        "name": "screenshot-new-session-dark.png",
+        "sha256": "9722918A6D3BDB672DDF28E4FBC3911FA201A7ADED207005E58E03BD45905771",
+        "bytes": 68407,
+        "shows": "a fresh conversation in the acceptance profile, used to locate the composer's send control"
+      }
+    ]
   }
 }

@@ -30,3 +30,10 @@ upstream/open-intelligent-ui/next-env.d.ts
 # Browser-harness runtime state (see docs/testing/BROWSER_HARNESS.md).
 # The stamp records when the last smoke pass ran; it is machine-local.
 evidence/.smoke-stamp.json
+
+# Screenshots are full-viewport captures of a real host window: they carry
+# conversation text, the sidebar's session list and sometimes the account
+# name. 22 of them had to be purged from every commit in the 2026-11-04
+# history rewrite, so the rule is now structural rather than remembered.
+# Captures stay machine-local; their SHA-256 goes in the phase MANIFEST.
+/evidence/**/*.png

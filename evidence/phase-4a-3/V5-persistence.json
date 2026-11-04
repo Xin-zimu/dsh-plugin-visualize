@@ -1,0 +1,117 @@
+{
+ "at": "2026-11-04T14:49:51.261Z",
+ "probe": "V5",
+ "stamp": {
+  "at": "2026-11-04T14:47:31.216Z",
+  "session": "taek",
+  "buildSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22",
+  "installedSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22"
+ },
+ "initial": {
+  "found": true,
+  "cards": 18,
+  "controls": [
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "中文输入",
+    "value": "ab",
+    "checked": null
+   },
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "其他字段",
+    "value": "n0",
+    "checked": null
+   }
+  ],
+  "texts": [
+   "T=ab",
+   "N=n0"
+  ],
+  "timer": null
+ },
+ "typed": {
+  "typed": true,
+  "mark": "V5-mw28gnu7",
+  "value": "V5-mw28gnu7"
+ },
+ "afterTyping": {
+  "found": true,
+  "cards": 18,
+  "controls": [
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "中文输入",
+    "value": "V5-mw28gnu7",
+    "checked": null
+   },
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "其他字段",
+    "value": "n0",
+    "checked": null
+   }
+  ],
+  "texts": [
+   "T=V5-mw28gnu7",
+   "N=n0"
+  ],
+  "timer": null
+ },
+ "afterReload": {
+  "found": true,
+  "cards": 18,
+  "controls": [
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "中文输入",
+    "value": "V5-mw28gnu7",
+    "checked": null
+   },
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "其他字段",
+    "value": "n0",
+    "checked": null
+   }
+  ],
+  "texts": [
+   "T=V5-mw28gnu7",
+   "N=n0"
+  ],
+  "timer": null
+ },
+ "afterHistory": {
+  "found": true,
+  "cards": 18,
+  "controls": [
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "中文输入",
+    "value": "V5-mw28gnu7",
+    "checked": null
+   },
+   {
+    "tag": "input",
+    "type": "text",
+    "label": "其他字段",
+    "value": "n0",
+    "checked": null
+   }
+  ],
+  "texts": [
+   "T=V5-mw28gnu7",
+   "N=n0"
+  ],
+  "timer": null
+ },
+ "problems": [],
+ "verdict": "PASS"
+}

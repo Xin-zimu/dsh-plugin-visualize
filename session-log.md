@@ -19,9 +19,9 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | 4A-3 **implemented, not accepted** — the Inputs group is complete (30 of 48 render); what remains is the browser run |
+| Stage | 4A-3 **ACCEPTED 2026-11-04** — the Inputs group is complete (30 of 48 render) and all eleven have now been seen in a real DSH host |
 | Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-3 IMPLEMENTED at `b2e0064`, NOT ACCEPTED** (30 of 48 render) — the unit half is green on Linux at **809 / 809**, and nothing in the batch has been seen in a browser. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
+| Status | **4A-3 ACCEPTED** (30 of 48 render) — the unit half is green (809 / 809 on Linux) **and the browser half is now done**: V1–V5 plus a card drawing all eleven components, measured in a real DSH host with the §9 hash gate passing first. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
 
 ## 2a. Published, and what publishing cost
 
@@ -355,7 +355,13 @@ differential was re-run and still reports **31/31, 0 differences**
 | Language differential (4A-3) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences**; output byte-identical | `evidence/phase-4a-3/differential-4a3.txt` |
 | Inventory (4A-3) | `pnpm vitest run tests/openui-inventory.spec.tsx` | **30 / 48**, Inputs group complete | `evidence/phase-4a-3/inventory-linux.txt` |
 | Mutation checks (4A-3) | two defects re-introduced on purpose, spec re-run, source restored | **both new guards went red** (Timer cleanup; meta size 205772 > 4096) | `evidence/phase-4a-3/mutation-check.txt` |
-| Browser 4A-3 | — | **NOT RUN** — the environment that closed this batch has no DSH host | `evidence/phase-4a-3/MANIFEST.json` → `notVerified` |
+| Browser 4A-3 — eleven components | isolated profile, host DOM counted by structure | **PASS** — all eleven counted; `data-openui-unrendered` empty | `evidence/phase-4a-3/C1-eleven-components.json`, `screenshot-eleven-components.png` |
+| Browser 4A-3 — V1 IME | genuine `Input.imeSetComposition` over CDP | **PASS** — 5 `input` events with `isComposing=true`; pre-edit `startn→startni→startnih→startnihao` intact; caret 5→6→7→8→10; focus held; commit 你好 reached `$state` | `evidence/phase-4a-3/V1-ime-composition.json` |
+| Browser 4A-3 — V2 Timer focus | real key events across 8 ticks | **PASS** — timer 01:00 → 00:53; six characters all landed in order; focus and node identity held; caret 1→6 | `evidence/phase-4a-3/V2-timer-focus.json` |
+| Browser 4A-3 — V3 themes | host's own 外观 control, both directions | **PASS** — 21 variables per card all resolve; min contrast **5.8:1 light / 12.11:1 dark** | `evidence/phase-4a-3/V3-themes.json` |
+| Browser 4A-3 — V4 hash gate (§9) | `Get-FileHash` build vs installed, before any measurement | **MATCH** `4D071A86…` — after finding and fixing a **stale N-1 bundle** (354465 vs 375564 bytes) | `MANIFEST.json` → `hashGate` |
+| Browser 4A-3 — V5 persistence | real reload + history replay | **PASS** — a typed value survived both; the default is `start` | `evidence/phase-4a-3/V5-persistence.json` |
+| Suite (4A-3, Windows) | `pnpm run test` | **794 / 15 / 809** — the 15-failure **set** compared name-by-name with the recorded baseline: **zero added, zero removed**; batch spec 43/43 | `evidence/phase-4a-3/test-4a3-windows.txt` |
 | Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-host.txt` |
 | Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-client.txt` |
 | Suite (4A-2) | `npx vitest run` | **749 / 15** (764) — phase verdict was reached on 747; the 2 extra are the structural guards added at close | `evidence/phase-4a-2/test-4a2-maintenance.txt` |
@@ -409,18 +415,22 @@ differential was re-run and still reports **31/31, 0 differences**
 
 ## 7. Next step
 
-**4A-3 is implemented and not accepted.** The eleven renderers exist, the unit
-loop is green (809 / 809 on Linux), the differential is 31/31, and the evidence
-directory now holds a `MANIFEST.json` that says so. What is missing is not code:
+**4A-3 is accepted. Next is 4A-4** (`Table`, `Chart`, `Icon`, `Image`), which is
+also where `IconButton`'s placeholder glyph gets a real `Icon` to draw. Two
+things from this run belong to it:
 
-1. **The browser run**, on an isolated profile, with the §9 hash check before
-   any measurement. Until it happens, `STAGE.md` calls the batch IMPLEMENTED.
-2. **The two risk cases, on purpose** — IME composition in a bound `Input`, and a
-   ticking `Timer` beside a focused `Input`. Steps are in
-   `evidence/phase-4a-3/MANIFEST.json` → `notVerified` V1/V2. Neither has been
-   observed failing; they are unmeasured, not broken.
-3. **Only then 4A-4** (`Table`, `Chart`, `Icon`, `Image`), which is also where
-   `IconButton`'s placeholder glyph gets a real `Icon` to draw.
+1. **Carry the documented action form into the fixtures.** The 4A-3 unit spec
+   calls `renderProgram` directly, which skips the backend's name check, so it
+   accepts `Action([@Set($v, 1)])` while the live path rejects it with
+   `VZO002 unknown component "Action"`. The skill text documents a bare
+   `@Set($v, value)` step and a model writes that, so nothing is broken — but a
+   jsdom spec that is more permissive than the host is a trap worth closing.
+   Observation **O1** in `evidence/phase-4a-3/MANIFEST.json`.
+2. **Reuse the probes, do not rewrite them.** `probe-v1-ime-cdp.mjs`,
+   `probe-v2-timer-focus.mjs`, `probe-v3-themes.mjs`, `probe-v5-persistence.mjs`
+   and `probe-c1-eleven.mjs` in `evidence/phase-4a-3/` are the working shape for
+   browser acceptance: each refuses to run without a fresh smoke stamp and exits
+   2 when the environment — not the product — is what failed.
 
 Everything below is the previous session's note, kept because its lessons still
 apply to the local run.
@@ -566,6 +576,83 @@ Six things carried forward:
 ---
 
 ## History
+
+### Session 15 — 2026-11-04 (4A-3 browser acceptance)
+
+**The handoff ZIP was v3, not v1 — checked before touching anything.** The
+archive `dsh-plugin-visualize-4a3-handoff-v3.zip` (7 487 610 bytes) carried a
+full tree *and* a `4a3-close/` folder with four patches and an incremental
+bundle. Its entries were listed and extracted to
+`D:\Deepseek WorkSpace\.handoff-4a3-v3` — **outside the repository** — so
+nothing could overwrite the working tree.
+
+**The four commits were genuinely absent, and the bundle proved it.** Before the
+restore `git cat-file -t` returned absent for all four hashes, `main` was at
+`74ca8f7` (18 commits), and the bundle's declared prerequisite was exactly
+`74ca8f768b05c24c2f375f8e3c249c8d8c346373`. `git bundle verify` reported
+"okay". After fetching, the tree hash was **`ad54c26…`**, matching the published
+value, and the count went 18 → 22. Work happened on a new branch
+`stage-4a-3/browser-acceptance` cut from `stage-4a-3/cloud-close`; `main` was
+not moved, no history was rewritten, nothing was force-pushed.
+
+**§9 caught a stale bundle before a single measurement was taken.** The profile
+held a 354 465-byte `client.js` against a 375 564-byte build — the N-1 bundle,
+still hard-linked after pnpm reported "already up to date" for the `file:`
+dependency. Removing the profile's plugin directory and reinstalling brought both
+halves to `4D071A86…`. Measuring first would have reported a correct build as a
+broken one, which is the exact trap §9 exists for.
+
+**V1 and V2 — the two risks the cloud could not close — both PASS.** A synthetic
+`CompositionEvent` proves nothing because it never puts the browser into
+composition mode, so V1 was driven through `Input.imeSetComposition` over CDP and
+*verified* real by requiring `isComposing === true` on the events the page
+received: 7 composition events and 5 such input events. The pre-edit survived
+intact (`startn → startni → startnih → startnihao`), the caret advanced
+5→6→7→8→10 without a jump, focus never left, the node was never replaced, and the
+commit `你好` reached `$state`. V2 started a real countdown and typed six
+characters across 8 ticks (`01:00` → `00:53`): all six landed in order, focus and
+node identity held, caret 1→6.
+
+**V3 measured rather than eyeballed.** Both schemes were entered through the
+host's own **Settings → 通用设置 → 外观** control, never by setting
+`data-ds-dark-theme`. 21 bridged variables per card, every one declared on the
+card root and every one naming a host token that resolves; minimum text contrast
+**5.8:1 light / 12.11:1 dark**. No horizontal overflow, no zero-height control.
+
+**V5 and the eleven-component card.** A typed value survived a real page reload
+*and* reopening the conversation from history, with the program default being
+`start` — persisted state is the only explanation. Separately, one card drew
+**all eleven** components, counted by structure in the host DOM rather than by
+"the text is somewhere in the markup" (`AGENTS.md` §6).
+
+**Windows numbers, stated honestly.** 794 passed / 15 failed / 809. The 15 are
+the documented pre-existing baseline and were compared **name by name** against
+`evidence/publish/test-before-publish.txt`: zero added, zero removed. The batch's
+own spec is 43/43. The Linux 809/809 is unchanged and is not claimed to have been
+reproduced on Windows — 14 of the 15 are Windows-only environment faults (symlink
+privilege, path joining), and they are not product regressions.
+
+**One observation, recorded not fixed (O1).** The unit spec calls
+`renderProgram` directly and so skips the backend's name check: it accepts
+`Action([@Set($v, 1)])` where the live path correctly returns
+`VZO002 unknown component "Action"` (verified against the real validator). The
+documented form is a bare `@Set($v, value)` step, so a model following the skill
+text never writes the rejected shape. A test-fidelity gap, not a live defect, and
+closing it is a test-only edit for the 4A-4 batch rather than something to smuggle
+into an acceptance run.
+
+**Five dead ends, all in the probe and none in the product** — recorded because
+they are all the same mistake: reporting a product failure from a broken
+measurement. A synthetic composition event cannot enter composition mode; a
+`.join` written with a literal newline is a syntax error; `cdp.mjs`'s
+`evaluate` already parses JSON so parsing twice throws; a synthetic `Enter` does
+not submit on this host build (the send control was used); and the timer renders
+`mm:ss` in `[role=timer]`, not bare digits. Each looked like a defect until the
+DOM or the source was read. §10 applied to my own runs.
+
+**4A-3 is ACCEPTED.** `STAGE.md`, `docs/reports/PHASE-4A-3-REPORT.md` and
+`evidence/phase-4a-3/MANIFEST.json` were updated from the measurements, not from
+the plan. 30 of 48 components render; 18 remain in 4A-4 and 4A-5.
 
 ### Session 14 — 2026-11-04
 

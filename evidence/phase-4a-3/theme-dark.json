@@ -1,0 +1,25 @@
+{
+ "at": "2026-11-04T14:47:53.024Z",
+ "what": "theme",
+ "facts": {
+  "stamp": {
+   "at": "2026-11-04T14:47:31.216Z",
+   "session": "taek",
+   "buildSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22",
+   "installedSha256": "4D071A86CA7A854B1A7145BEFEBFC1DB462E7A8AD738DA275767A0AB67892E22"
+  },
+  "ageMs": 3823,
+  "gate": "theme",
+  "want": "dark",
+  "before": {
+   "dark": true,
+   "scheme": "dark"
+  },
+  "after": {
+   "dark": true,
+   "scheme": "dark"
+  },
+  "verdict": "THEME SWITCHED"
+ },
+ "detail": []
+}

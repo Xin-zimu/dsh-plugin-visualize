@@ -1,0 +1,134 @@
+{
+ "at": "2026-11-04T14:46:00.194Z",
+ "probe": "V2",
+ "url": "http://127.0.0.1:3093/?token=…",
+ "via": "CDP real keystrokes during Timer ticks",
+ "submit": {
+  "clicked": true,
+  "x": 980.3333740234375,
+  "y": 555
+ },
+ "cardsAfter": 2,
+ "fixture": {
+  "cards": 2,
+  "hasField": true,
+  "fieldDisabled": false,
+  "buttons": [
+   {
+    "text": "Start",
+    "label": null
+   },
+   {
+    "text": "Reset",
+    "label": null
+   }
+  ],
+  "timerText": "01:00",
+  "allText": [
+   "A3 V2 Timer focus",
+   "Left01:00StartResetNameN=",
+   "Left01:00StartReset",
+   "Left01:00",
+   "Left",
+   "01:00",
+   "",
+   "",
+   "StartReset",
+   "Start",
+   "Reset",
+   "Name"
+  ]
+ },
+ "timerStart": {
+  "started": true,
+  "focused": true
+ },
+ "samples": [
+  {
+   "label": "before-typing",
+   "value": "",
+   "focused": true,
+   "caret": 0,
+   "sameNode": true,
+   "timer": "01:00",
+   "stateText": "N="
+  },
+  {
+   "label": "typed-A",
+   "value": "A",
+   "focused": true,
+   "caret": 1,
+   "sameNode": true,
+   "timer": "00:59",
+   "stateText": "N=A"
+  },
+  {
+   "label": "typed-B",
+   "value": "AB",
+   "focused": true,
+   "caret": 2,
+   "sameNode": true,
+   "timer": "00:58",
+   "stateText": "N=AB"
+  },
+  {
+   "label": "typed-C",
+   "value": "ABC",
+   "focused": true,
+   "caret": 3,
+   "sameNode": true,
+   "timer": "00:57",
+   "stateText": "N=ABC"
+  },
+  {
+   "label": "typed-D",
+   "value": "ABCD",
+   "focused": true,
+   "caret": 4,
+   "sameNode": true,
+   "timer": "00:56",
+   "stateText": "N=ABCD"
+  },
+  {
+   "label": "typed-E",
+   "value": "ABCDE",
+   "focused": true,
+   "caret": 5,
+   "sameNode": true,
+   "timer": "00:55",
+   "stateText": "N=ABCDE"
+  },
+  {
+   "label": "typed-F",
+   "value": "ABCDEF",
+   "focused": true,
+   "caret": 6,
+   "sameNode": true,
+   "timer": "00:54",
+   "stateText": "N=ABCDEF"
+  },
+  {
+   "label": "after",
+   "value": "ABCDEF",
+   "focused": true,
+   "caret": 6,
+   "sameNode": true,
+   "timer": "00:53",
+   "stateText": "N=ABCDEF"
+  }
+ ],
+ "word": "ABCDEF",
+ "timerTicked": true,
+ "distinctTimerValues": [
+  "01:00",
+  "00:59",
+  "00:58",
+  "00:57",
+  "00:56",
+  "00:55",
+  "00:54",
+  "00:53"
+ ],
+ "problems": [],
+ "verdict": "PASS"
+}
