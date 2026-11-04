@@ -21,7 +21,7 @@ to the history. If you are an agent starting work, read this first.
 | --- | --- |
 | Stage | 4A-4 **ACCEPTED 2026-11-04** — Table, Chart, Icon and Image render in a real DSH host (34 of 48); 4A-5 remains |
 | Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-4 ACCEPTED** (34 of 48 render). 4A-3 was accepted earlier the same day after its browser run (V1–V5, all eleven input components). 4A-4 added Table, Chart, Icon and Image, with two ADRs deciding the security shape before the code: ADR-009 (Image source allowlist) and ADR-010 (Chart row contract). Both batches have browser evidence with the §9 hash gate passing first. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
+| Status | **4A-4 ACCEPTED** (34 of 48 render), on a **cleaned history**: the unpublished commits were rebuilt on 2026-11-04 to remove a leaked session token and username from `b73bd6a` (see §traps and Session 17). Tree `4d50897…` is byte-identical before and after; `origin/main` is unchanged and unpushed. 4A-3 was accepted earlier the same day after its browser run (V1–V5, all eleven input components). 4A-4 added Table, Chart, Icon and Image, with two ADRs deciding the security shape before the code: ADR-009 (Image source allowlist) and ADR-010 (Chart row contract). Both batches have browser evidence with the §9 hash gate passing first. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
 
 ## 2a. Published, and what publishing cost
 
@@ -414,6 +414,7 @@ differential was re-run and still reports **31/31, 0 differences**
 | `Link` colour has no host token that passes AA in both schemes | A `var()` bridge would fail in one scheme | Recorded in ADR-008; declared as a measured `light-dark()` pair (`LINK_LITERAL`) |
 | Protocol-relative URLs allowed upstream, refused here | A recorded divergence, not a drift | ADR-008; the fork's allowlist is a strict subset of upstream's |
 | `Mailto:`/`tel:` links degrade to text | A card cannot start an email or a call | Deliberate in ADR-008; nothing in the catalogue needs them, and they invoke OS handlers |
+| A Windows account name survives in two **published** commits | `b2e0064` and `f65cf41` quote it in a session-log sentence. It is a name, not a credential, and `74ca8f7` already reworded the same sentence in later history | **Recorded, deliberately not rewritten.** Rewriting published history was ruled out by the owner; the value is unreachable from any current file |
 | The persisted meta stores the fragment twice | 234 bytes a card; for a html card nothing reads `source` (`visualizeMetaFrom` needs `fragment`, `openuiMetaFrom` returns early when it is present) | **Recorded, deliberately not changed in 4A-3.** Removing it changes the persisted shape and needs an ADR |
 | The build needed an undeclared optional peer | `pnpm install --frozen-lockfile && pnpm run build` failed on any clean machine | **Fixed in 4A-3** — `unrun` declared as a dev dependency (D23) |
 | "15 known failures" was a Windows-rig count | A count carried across platforms hides what actually changed; one of the 15 had never run at all | **Restated in 4A-3** — 14 of the 15 do not exist on Linux, and the 15th was D24. The portable gate is the failure *set*, each entry named and caused |
@@ -551,6 +552,14 @@ is not what the browser runs. To refresh it, remove the profile's
 confirm with `Get-FileHash` on both halves. This cost a full measurement cycle
 this session; the §9 check is what caught it.
 
+**A redacted working tree is not a redacted history.** `git grep <secret> <file>`
+searches what is on disk; `git grep <secret> $(git rev-list origin/main..main)`
+searches what is in the commits. Removing a value in a *later* commit leaves it
+intact in the object of the earlier one, and `git log -p` will still show it.
+Run the second command before claiming a leak is fixed, and prefer fixing the
+commit that introduced it over adding a commit that removes it — a follow-up
+commit is a tombstone, not a deletion.
+
 Five traps, all hit across this session and the last:
 
 - **The daemon needs a persistent foreground task.** `bsk status` from a normal
@@ -597,6 +606,87 @@ Six things carried forward:
 
 ## History
 
+### Session 17 — 2026-11-04 (unpublished history cleaned of leaked credentials)
+
+**A mistake of mine, corrected. Session 15 claimed to have fixed a leak and had
+only cleaned the working tree.** I wrote "fixed with those existing tools" and
+made a follow-up commit (`02ddc65`) — which removes the value from the *files* but
+leaves it in the *commit objects*. The owner caught it. "The final file is
+redacted" is not "the history is redacted", and I had said the stronger thing.
+
+## What was actually true
+
+| Surface | Session token | Windows username |
+| --- | --- | --- |
+| Unpublished commits (`origin/main..main`) | **in `b73bd6a` only** | **in `b73bd6a` only** |
+| Published history (`origin/main`, 18 commits) | none | **in `b2e0064`, `f65cf41`** |
+| Working tree | none | none tracked; 11 files under gitignored `tmp/` |
+| Object database | 2 blobs | 1 blob |
+| The handoff ZIP and the scratch extraction | none | — |
+
+Two facts made this fixable without rewriting published history. The leak was
+confined to **one commit**, and that commit had **not been pushed** — `origin/main`
+was still `74ca8f7`. The username in published history is a separate, older
+matter: `74ca8f7` ("docs: name the leaked value without reproducing it") already
+reworded exactly that sentence, and it is published. Per the owner's instruction,
+published history was **not** rewritten.
+
+## The rewrite, and why it is safe to call lossless
+
+Only the seven unpublished commits were rebuilt, on top of the published
+`74ca8f7`:
+
+1. the four already-clean commits (`3fc839a`, `b87bf19`, `f1fb248`, `489acac`)
+   replayed with author, committer and both timestamps preserved;
+2. the leaked commit rebuilt **from the redacted tree** rather than replayed, so
+   the five sensitive files were never staged at all;
+3. `300e805` (4A-4) cherry-picked on top — verified beforehand that it does not
+   touch any of the five files.
+
+Result: **seven commits became six** — the separate "fix" commit became
+unnecessary once the original commit no longer contained the defect, so it was
+folded in rather than kept as a tombstone for a value that no longer exists in
+history.
+
+**The tree hash proves nothing was lost:** `4d5089777e77dc543022509445a329e28f0abcbd`
+before and after. Content is byte-identical; only the commit objects moved.
+
+Then the old objects were made unreachable and destroyed: work branches deleted,
+`git reflog expire --expire=now --all`, `git gc --prune=now`. The two known
+leaked blob ids now return "GONE" from `git cat-file`, and an exhaustive scan of
+all 731 blobs in the object database finds the token **nowhere**.
+
+A full recovery bundle was written to `D:\Deepseek WorkSpace\.pre-cleanup-backup\`
+**before** the rewrite, outside the repository, so a botched history edit would
+have been recoverable.
+
+## What remains, and what was deliberately not done
+
+- **The published username reference stays.** It is in two published commits,
+  already reworded by `74ca8f7`, and rewriting an already-public history is the
+  thing the owner told me not to do. It is a Windows account name, not a
+  credential, and it is now unreachable from any current file.
+- **The leaked session token is inert.** It was minted by this session's own DSH
+  server on `:3093`, that process was stopped at close-out, and port 3093 now
+  refuses connections. A DSH token is scoped to the process that issued it. I
+  confirmed the port is dead rather than assuming it. **No rotation is needed**,
+  but the token should still never be reused in a document — which is why the
+  history rewrite happened rather than relying on inertness.
+- **`tmp/` still contains the username** in 11 machine-local files (server logs,
+  session caches). They are gitignored, were never committed, and never will be;
+  they are the profile's own state rather than repository content.
+
+## The rule this earns
+
+`AGENTS.md` §5 says evidence, not claims — and I broke it in the *other*
+direction: I had the evidence (a redacted working tree) and reported the claim
+(a redacted history) it did not support. The check that would have caught it is
+one command: `git grep <secret> $(git rev-list origin/main..main)` — search the
+**commits**, not the files. `session-log.md` §traps now carries it.
+
+**State after cleanup:** `main` = `9fd22d4`, tree `4d50897…` (identical),
+`origin/main` still `74ca8f7` and unpushed, working tree clean, 821/15/836,
+differential 31/31, inventory 34/48, all evidence verdicts unchanged.
 ### Session 16 — 2026-11-04 (4A-3 merged, 4A-4 built and accepted)
 
 **The 4A-3 acceptance branch was merged, fast-forward only.** `main` went
