@@ -103,6 +103,32 @@ renderer gap from looking like an intentional blank.
 | `Flashcard` | Play | `front, back, hint?` | Both faces stay mounted, with the inactive one `aria-hidden` and transparent, so the flip is a state change rather than a content swap and the card does not resize. `aria-pressed` reports which face is showing. The hint stays visible after the flip |
 | `Celebration` | Play | `when` | Fires on the **false→true transition**, not on the value being true, so a re-render does not retrigger it and a card that loads already true does not celebrate. Draws 36 pieces inside the card (never a portal) and clears itself after 2.2 s from one effect whose cleanup is the only cancel path |
 
+## Actions — declared, and mostly refused
+
+An action is the step a `Button` carries. Two work; three do not.
+
+| Action | Validates | Executes | Notes |
+| --- | --- | --- | --- |
+| `@Set($var, value)` | yes | **yes** | Writes one declared variable |
+| `@Reset()` | yes | **yes** | Returns variables to their declared defaults |
+| `Action([...])` | yes | **yes** | Runs several steps in order |
+| `@OpenUrl(url)` | yes | **no** | **Deferred — host capability unavailable.** ADR-014 |
+| `@CopyToClipboard(text)` | yes | **no** | **Proposed, conditions pending.** ADR-013 |
+| `@ToAssistant(message)` | yes | **no** | **Deferred — trusted host submission capability unavailable.** ADR-015 |
+
+The three refused actions are declared by the language so that a program naming
+one **validates** rather than failing with `VZO002`. They are then refused at
+dispatch, which means the Button renders normally and does nothing when pressed.
+
+That combination is deliberate but easy to get wrong, so the skill text says so
+explicitly and `tests/skill-actions-consistency.spec.ts` pins the two together:
+a documentation change that drops the warning, or a dispatcher change that
+silently starts executing one of them, fails that test.
+
+**Use `Link("label", "https://…")` to offer a URL** — it is a link the reader
+clicks, subject to ADR-008's protocol allowlist, and it is what `@OpenUrl` would
+have produced on a user's press.
+
 ## Not yet available — validated but not drawn
 
 **Nothing.** As of 4A-5 every name `signatures.ts` declares has a renderer, so

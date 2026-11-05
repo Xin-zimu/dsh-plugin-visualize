@@ -1008,8 +1008,13 @@ ${enumText}
 
 ${functionText}
 
-**Actions** — the \`action\` of a Button is one step: \`@Set($var, value)\`,
-\`@Reset()\`, \`@OpenUrl(url)\`, \`@CopyToClipboard(text)\`,
-\`@ToAssistant(message)\`.
+**Actions** — the \`action\` of a Button is one step. Two work:
+\`@Set($var, value)\` and \`@Reset()\`; wrap several in \`Action([...])\`.
+
+**Do not use \`@OpenUrl\`, \`@CopyToClipboard\` or \`@ToAssistant\`.** The language
+declares them, but this build refuses them, so a Button carrying one does nothing
+when pressed. Write the address out as text, or use
+\`Link(\"label\", \"https://example.com\")\` — a link the reader clicks themselves,
+which is what those actions would have done.
 `
 }
