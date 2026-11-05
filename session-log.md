@@ -614,6 +614,79 @@ Six things carried forward:
 
 ## History
 
+### Session 25 — 2026-11-06 (v0.1.0 released)
+
+**Stage 5 closed. Released `v0.1.0` at `40b8241`, tag and GitHub Release both
+published. No force push at any point.**
+
+Release: https://github.com/Xin-zimu/dsh-plugin-visualize/releases/tag/v0.1.0
+
+### The order it was done in, and why each gate was re-checked
+
+The owner set the sequence and it was followed exactly. Three times during the
+round a gate could have been satisfied by an *older* result; each time the newer
+one was obtained instead.
+
+| Step | What was done | Result |
+| --- | --- | --- |
+| 1 | `lib/` deleted entirely, rebuilt from source, hashed | `E1BF4A82…456CEB` — reproduced from nothing |
+| 2 | N5 committed **alone** | `10b9bea`, 1 file, 5 insertions / 3 deletions, docstring only |
+| 3 | Premise corrections committed | `56afff4`, 9 files, 881 insertions |
+| 4 | Audit + adjudication committed | `3e5f586`, 4 files |
+| 5 | Evidence committed | `44ab279`, 40 files, no screenshots, handoff zip excluded |
+| 6 | Full local gates on the candidate | tsc 0/0; 924 / 15 / 0 / 939; failure set identical |
+| 7 | CI on `44ab279` | success, `e1bf4a82…`, `windows: baseline 15, found 7, new 0` |
+| 8 | **CHANGELOG corrections found → new HEAD** | `40b8241` — and CI was **re-run**, not inherited |
+| 9 | CI on `40b8241` | success, same hash, Linux 0 failures, `failsOnBoth: []` |
+| 10 | Tag `v0.1.0` + GitHub Release | published, non-draft, non-prerelease |
+
+**Step 8 is the one worth recording.** Preparing the release notes surfaced two
+factual errors in `CHANGELOG.md`: `Known issues` still claimed **"No CI"**, and
+described all 15 failures as platform behaviour when 2 are fixture defects. Fixing
+them changed HEAD, which invalidated the CI result from step 7. Rather than tag
+`44ab279` on the strength of that result, or tag `40b8241` on the strength of it,
+CI was re-run on the new HEAD and the hash and gate lines re-read from the log.
+That is the difference between "CI passed recently" and "CI passed on this
+commit".
+
+### The conditional that was never triggered
+
+The owner's stop condition was: if the artefact hash changes, halt and re-check the
+build and the browser evidence. It was checked **five** times — after the N5 edit,
+after a full `lib/` deletion and rebuild, on the release candidate, from CI's
+Ubuntu leg, and from CI's Windows leg. All five: `E1BF4A82B3C808899BA868009CF9DEAD
+15F941E6A3614040DB1E73C031456CEB`. The browser evidence from the previous session
+therefore still describes the released artefact, and the halt was never needed.
+
+CI also independently confirms the two properties the release rests on:
+`BUILDS IDENTICAL: the bundle does not depend on the platform`, and
+`failsOnBoth: []`.
+
+### What the release notes say, and what they refuse to hide
+
+The notes carry the three caveats from the adjudication — CI dependence for
+symlink containment, the undiagnosed 5,020 ms timeout, and that 12 of the 15
+failures sit in modules this release ships — plus both Deferred actions with their
+**corrected** reasons. The notes state plainly that the original premise was false
+and point at ADR-014 §10 / ADR-015 §10 rather than presenting the deferrals as if
+nothing had been learned.
+
+### Not done
+
+- `lib/` is **not** committed. It is gitignored, built by `prepublishOnly`, and
+  never committed in this repository's history. AGENTS.md §7 permits committing it
+  "only when releasing"; that permission was not used, because `main` is not the
+  distribution channel and a stale committed bundle is the exact trap §9 describes.
+  The released artefact is reproduced from source at the tag, verified by hash.
+- No `npm publish`. The owner authorised a tag and a GitHub Release; publishing to
+  a registry is a separate decision and was not requested.
+
+### Next stage, per the owner
+
+Fix the 15 Windows failures first — not more components. Then `@ToAssistant`
+runtime verification and the upstream interface request as separate workstreams.
+
+---
 ### Session 24 — 2026-11-06 (final release gate: GO recommended, not released)
 
 **The three items the owner named are closed.** Report:
