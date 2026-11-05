@@ -123,12 +123,17 @@ function click(view: ReturnType<typeof mount>, label: string) {
 }
 
 describe('action descriptor shapes', () => {
-  it('reads the three supported steps from the evaluator', () => {
+  it('reads the supported steps from the evaluator', () => {
     expect(SUPPORTED_STEPS.has('Set')).toBe(true)
     expect(SUPPORTED_STEPS.has('Reset')).toBe(true)
     expect(SUPPORTED_STEPS.has('Action')).toBe(true)
-    // Out of scope for this phase, and recognised so a refusal can name them.
-    expect([...UNSUPPORTED_STEPS].sort()).toEqual(['CopyToClipboard', 'OpenUrl', 'ToAssistant'])
+    // `CopyToClipboard` moved into this set when stage 4B shipped it (ADR-013).
+    // Asserting it is supported rather than that the set has three members is the
+    // point: the *behaviour* is what the tests below cover, and this one only says
+    // which vocabulary the dispatcher will consider.
+    expect(SUPPORTED_STEPS.has('CopyToClipboard')).toBe(true)
+    // Still recognised so a refusal can name them, and still not executed.
+    expect([...UNSUPPORTED_STEPS].sort()).toEqual(['OpenUrl', 'ToAssistant'])
   })
 })
 
@@ -197,11 +202,15 @@ describe('applyAction', () => {
   })
 
   it('refuses the out-of-scope steps without side effects (A06)', () => {
-    for (const name of ['@OpenUrl', '@CopyToClipboard', '@ToAssistant']) {
+    // `@CopyToClipboard` is no longer in this list: it shipped in 4B and is covered
+    // by tests/openui-clipboard-4b.spec.tsx. Deleting it from here without that
+    // file existing would have quietly removed the only check on it.
+    for (const name of ['@OpenUrl', '@ToAssistant']) {
       const descriptor = { kind: 'element', name, args: ['https://example.com'], line: 1 }
       const outcome = applyAction(descriptor, defaults)
       expect(outcome.patch).toEqual({})
       expect(outcome.diagnostics.map(d => d.code)).toEqual(['action.unsupported'])
+      expect(outcome.clipboard, name + ' must not reach the clipboard').toBeUndefined()
     }
   })
 
