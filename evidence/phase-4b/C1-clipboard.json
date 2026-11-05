@@ -1,0 +1,40 @@
+{
+  "phase": "4B",
+  "date": "2026-11-05",
+  "subject": "@CopyToClipboard browser acceptance",
+  "bundle": {
+    "clientSha256": "E2B0ED7B0F071A984B7437AA62C1F3ADDCBDC649705863FC5DEB025A53D04E70",
+    "installedMatchesBuild": true,
+    "checkedBeforeMeasuring": true
+  },
+  "gates": { "G0": "pass", "G1": { "sent": 31, "received": 31 }, "G2": "pass", "G3": "pass" },
+  "decisiveCopy": {
+    "method": "one real CDP click on the card control, system clipboard read from outside the browser",
+    "clipboardBefore": "SENTINEL-FINAL",
+    "clipboardAfter": "sk-live-SHOULD-NOT-LEAK",
+    "shownOnCard": "sk-live-SHOULD-NOT-LEAK",
+    "equal": true,
+    "statusLineAfter": "Copied",
+    "whyThisMatters": "jsdom can only prove a mock was called; this reads the OS clipboard, which is what any other application would paste"
+  },
+  "noAutomaticPath": {
+    "reloadWithoutClick": { "clipboardBefore": "SENTINEL-2", "clipboardAfter": "SENTINEL-2", "wrote": false }
+  },
+  "otherActionsRefused": {
+    "clickedOpenUrlButton": true,
+    "tabsBefore": 2,
+    "tabsAfter": 2,
+    "clipboardUnchanged": "SENTINEL-2",
+    "verdict": "@OpenUrl neither navigated nor copied"
+  },
+  "contrast": {
+    "dark": { "control": 17.45, "payload": 13.34, "meetsAA": true },
+    "light": { "control": 18.9, "payload": 18.9, "meetsAA": true },
+    "note": "the control uses the outline variant; primary is 4.23:1 in light, a recorded accepted defect of the existing Button palette that a new control must not inherit"
+  },
+  "notes": [
+    "readText() cannot be awaited from a script without a user activation: it never settles and the CDP call hits the 20s harness bound. The clipboard is read from the OS instead, which is stronger evidence.",
+    "sync then observe then act invalidates the context the action needs: the order is observe, sync, act.",
+    "a session fixes its control policy at creation, so --policy strict cannot be added later."
+  ]
+}

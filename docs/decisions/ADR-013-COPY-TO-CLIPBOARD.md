@@ -1,10 +1,15 @@
 # ADR-013 — `@CopyToClipboard`: writing the clipboard
 
-- **Status:** **proposed — the one action with a viable path. Still NOT accepted;
-  the action stays refused until its conditions are implemented and tested.**
-  ADR-014 and ADR-015 are both Deferred for want of a host capability. This one is
-  not, and the difference is worth stating: the capability it needs already exists
-  in the browser and is already used by `Code`'s copy button.
+- **Status:** **accepted and implemented.** `@CopyToClipboard` is out of
+  `UNSUPPORTED_STEPS` and shipped, with every condition below enforced and
+  mutation-tested. It is the one of the three whose capability exists.
+  ADR-014 and ADR-015 are both Deferred for want of a host capability.
+- **Implemented in:** `src/client/openui-actions.ts` (`clipboardPayload`,
+  `MAX_CLIPBOARD_TEXT`, the dispatcher branch) and
+  `src/client/OpenUICard.tsx` (`copyPayloadOf`, `CopyButton`, `writeClipboard`).
+- **Evidence:** `tests/openui-clipboard-4b.spec.tsx` (19 tests, 7 mutations),
+  `evidence/phase-4b/C1-clipboard.json` (real browser, OS clipboard read back),
+  `docs/reports/PHASE-4B-REPORT.md`.
 - **Date:** 2026-11-05
 - **Relates to:** `ADR-4B-THREAT-MODEL.md`, ADR-004, ADR-008 (the `Link`
   precedent for protocol policy), `src/client/openui-actions.ts`

@@ -16,7 +16,7 @@ this says what the current slice is allowed to do.
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
 | 4A | Component catalogue: 48 renderers, in five batches | **PASS — closed 2026-11-05** (48/48); `docs/reports/PHASE-4A-5-REPORT.md` |
-| 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | Not started — separate from 4A, one security review each |
+| 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | **PASS — closed 2026-11-05.** `@CopyToClipboard` shipped (ADR-013); the other two Deferred on host capability |
 | 5 | Unified prompt, security review, release | Not started |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
@@ -431,21 +431,36 @@ fixed, both have a mutation-verified regression test, and both are recorded in
 **Carried forward.** Nothing from this batch.
 
 ---
-## Stage 4B — External actions (separate, later)
+## Stage 4B — External actions (PASS: one shipped, two deferred)
 
-Three actions are refused by name today (`UNSUPPORTED_STEPS`), which is why
-nothing can reach outside a card yet. Each needs its own security review before
-it ships; they are **not** part of 4A and must not be bundled with it.
+**Closed 2026-11-05.** One action ships; two are deferred for want of a host
+capability, which the stage was explicitly allowed to conclude rather than force.
 
-| Action | Requirement before it may ship |
+| Action | Outcome | Requirement before it may ship |
+| --- | --- | --- |
+| `@CopyToClipboard` | **SHIPPED** (ADR-013) | Only from a real user gesture, and the control shows the exact text first; a refused permission is reported, never thrown |
+| `@OpenUrl` | **Deferred** (ADR-014) | Needs a host-mediated open. `window.open` and `location.assign` are forbidden: the card must not decide to navigate |
+| `@ToAssistant` | **Deferred** (ADR-015) | Needs a host-mediated submit. Never by DOM manipulation or synthetic input, which would produce a message the host cannot attribute or refuse |
+
+**The finding that outlived the stage.** A capability has three states, not two:
+*not available*, *available but unauthorised*, and *available and authorised*.
+`@CopyToClipboard` is the middle one — `navigator.clipboard` is one call away, so
+nothing but policy stands between the program and the effect. **A callable browser
+API is evidence of possibility, never of permission.**
+
+**Exit criteria, all met.**
+
+| Criterion | Evidence |
 | --- | --- |
-| `@OpenUrl` | Protocol allowlist (http/https only); `javascript:`, `data:`, `file:` and protocol-relative targets are silent no-ops, matching upstream |
-| `@CopyToClipboard` | Only from a real user gesture; a refused permission is reported, never thrown |
-| `@ToAssistant` | **Fill the composer, never auto-submit.** Upstream submits; for this host, auto-submission is a separate external action requiring its own decision |
+| One ADR per action | ADR-013 (accepted), ADR-014 and ADR-015 (Deferred), plus the shared `ADR-4B-THREAT-MODEL.md` |
+| Every refused path has a test | `tests/openui-clipboard-4b.spec.tsx`, 19 tests across the ten ADR categories |
+| Guards proved able to fail | 7 mutations, each turning 1–6 tests red |
+| Browser evidence the allowed path works | OS clipboard read back after one real CDP click: sentinel → `sk-live-SHOULD-NOT-LEAK` |
+| Browser evidence the refused paths do nothing | `@OpenUrl` clicked: tab count unchanged, clipboard unchanged |
+| The other two stay refused | asserted at dispatch and by an inert Button |
 
-**Exit criteria.** One ADR per action (each widens the surface ADR-004
-describes), a refusal test for every rejected protocol, and browser evidence
-that the allowed path works and the refused paths do nothing.
+Also fixed, from an earlier stage: `Code`'s copy button reported "Copied" even
+when the write was denied.
 
 ---
 

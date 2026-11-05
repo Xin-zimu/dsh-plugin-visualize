@@ -38,7 +38,7 @@ import {
   svgViewBox,
 } from './openui-svg.ts'
 import { placePopover, type Box, type PlacementResult } from './openui-popover.ts'
-import { applyAction, SUPPORTED_STEPS, UNSUPPORTED_STEPS } from './openui-actions.ts'
+import { applyAction, clipboardPayload, SUPPORTED_STEPS, UNSUPPORTED_STEPS } from './openui-actions.ts'
 import {
   buildRecord,
   hydrateState,
@@ -945,6 +945,14 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     // nothing, so an unknown or out-of-scope action is inert by construction
     // rather than by remembering to guard each one here.
     const action = props[1]
+    // A clipboard write is the one action whose payload the reader must SEE
+    // before pressing (ADR-013). It therefore renders through its own component,
+    // which reads the payload once and uses that same string for the display and
+    // for the write — the two cannot diverge, because there is only one value.
+    const copy = copyPayloadOf(action)
+    if (copy !== undefined) {
+      return createElement(CopyButton, { key, label: text(props[0]), payload: copy })
+    }
     return createElement(
       'button',
       {
@@ -3802,23 +3810,39 @@ function CodeView(props: readonly unknown[], key: string): ReactNode {
  * "copied" confirmation is local UI state and must not reach `$state`.
  */
 function CodeBlock({ body, language }: { readonly body: string; readonly language: string }): ReactNode {
-  const [copied, setCopied] = useState(false)
+  const [status, setStatus] = useState<ClipboardStatus | undefined>(undefined)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  useEffect(() => () => {
-    if (timer.current !== undefined) clearTimeout(timer.current)
+  useEffect(() => {
+    const onOutcome = (event: Event): void => {
+      const detail = (event as CustomEvent<{ status?: unknown }>).detail
+      const next = detail?.status
+      if (next !== 'copied' && next !== 'refused' && next !== 'unavailable') return
+      setStatus(next)
+      if (timer.current !== undefined) clearTimeout(timer.current)
+      timer.current = setTimeout(() => {
+        timer.current = undefined
+        setStatus(undefined)
+      }, 2400)
+    }
+    document.addEventListener(CLIPBOARD_EVENT, onOutcome)
+    return () => {
+      document.removeEventListener(CLIPBOARD_EVENT, onOutcome)
+      if (timer.current !== undefined) clearTimeout(timer.current)
+    }
   }, [])
   const copy = (): void => {
     const clipboard = typeof navigator === 'undefined' ? undefined : navigator.clipboard
-    // Best-effort: a refused permission is not an error the card may throw.
-    if (clipboard !== undefined && typeof clipboard.writeText === 'function') {
-      void clipboard.writeText(body).catch(() => undefined)
+    // ADR-013: a refused permission must not read as success. This used to show
+    // "Copied" unconditionally, which told the reader the clipboard held the code
+    // when it did not — the one failure mode the ADR names explicitly.
+    if (clipboard === undefined || typeof clipboard.writeText !== 'function') {
+      clipboardFeedback('unavailable')
+      return
     }
-    setCopied(true)
-    if (timer.current !== undefined) clearTimeout(timer.current)
-    timer.current = setTimeout(() => {
-      timer.current = undefined
-      setCopied(false)
-    }, 1600)
+    void clipboard.writeText(body).then(
+      () => clipboardFeedback('copied'),
+      () => clipboardFeedback('refused'),
+    )
   }
   return createElement(
     'div',
@@ -3863,7 +3887,7 @@ function CodeBlock({ body, language }: { readonly body: string; readonly languag
       createElement('button', {
         type: 'button',
         onClick: copy,
-        'aria-label': copied ? 'Copied' : 'Copy code',
+        'aria-label': status === 'copied' ? 'Copied' : 'Copy code',
         style: {
           flex: '0 0 auto',
           font: 'inherit',
@@ -3877,7 +3901,7 @@ function CodeBlock({ body, language }: { readonly body: string; readonly languag
           borderRadius: 6,
           cursor: 'pointer',
         } satisfies CSSProperties,
-      }, copied ? 'Copied' : 'Copy'),
+      }, status === 'copied' ? 'Copied' : 'Copy'),
     ),
     createElement('pre', {
       style: {
@@ -3897,6 +3921,186 @@ function CodeBlock({ body, language }: { readonly body: string; readonly languag
     }, body)),
   )
 }
+
+/**
+ * The payload of a top-level `@CopyToClipboard`, or undefined for any other action.
+ *
+ * Reads the evaluated descriptor directly rather than going through the
+ * dispatcher: the renderer needs the string *now*, to show it, and the dispatcher
+ * is only consulted on press. Both read the same descriptor, and this function is
+ * the single definition of what counts as copyable, so the displayed text and the
+ * written text are the same value by construction.
+ *
+ * A composed `Action([...])` is not unwrapped here. ADR-013 refuses composition
+ * until user activation inside a composed run is measured; leaving it out of this
+ * function means such a button renders as an ordinary button and copies nothing.
+ *
+ * @param action - the evaluated action argument of a Button.
+ * @returns the text to copy and show, or undefined.
+ */
+function copyPayloadOf(action: unknown): string | undefined {
+  if (typeof action !== 'object' || action === null || Array.isArray(action)) return undefined
+  const step = action as { kind?: unknown; name?: unknown; args?: unknown }
+  if (step.kind !== 'element' || typeof step.name !== 'string') return undefined
+  if (step.name.replace(/^@/u, '') !== 'CopyToClipboard') return undefined
+  if (!Array.isArray(step.args)) return undefined
+  return clipboardPayload(step.args[0])
+}
+
+/**
+ * A button that copies exactly what it shows.
+ *
+ * ADR-013's acceptance criteria are structural here, not stylistic: the payload is
+ * rendered in full, in the card, from the same string the write uses. There is no
+ * truncated preview and no hidden node, so "the reader saw what they copied" is a
+ * property of the markup rather than a claim about good intentions.
+ */
+function CopyButton({ label, payload }: { readonly label: string; readonly payload: string }): ReactNode {
+  const [status, setStatus] = useState<ClipboardStatus | undefined>(undefined)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => {
+    const onOutcome = (event: Event): void => {
+      const detail = (event as CustomEvent<{ status?: unknown }>).detail
+      const next = detail?.status
+      if (next !== 'copied' && next !== 'refused' && next !== 'unavailable') return
+      setStatus(next)
+      if (timer.current !== undefined) clearTimeout(timer.current)
+      timer.current = setTimeout(() => {
+        timer.current = undefined
+        setStatus(undefined)
+      }, 2400)
+    }
+    document.addEventListener(CLIPBOARD_EVENT, onOutcome)
+    return () => {
+      document.removeEventListener(CLIPBOARD_EVENT, onOutcome)
+      if (timer.current !== undefined) clearTimeout(timer.current)
+    }
+  }, [])
+  const message = clipboardMessage(status)
+  return createElement(
+    'div',
+    {
+      'data-openui-copy': 'control',
+      style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6, minWidth: 0, maxWidth: '100%' } satisfies CSSProperties,
+    },
+    createElement('button', {
+      type: 'button',
+      'data-openui-copy': 'button',
+      onClick: () => writeClipboard(payload),
+      style: {
+        font: 'inherit',
+        fontSize: SIZES.sm,
+        padding: '5px 14px',
+        borderRadius: 'calc(var(--radius) * 1.4)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'var(--border)',
+        cursor: 'pointer',
+        // `outline`, not `primary`: primary is white-on-blue at 4.23:1 in the light
+        // scheme, below AA. That is a recorded and accepted defect of the existing
+        // Button palette (session-log: "Light Button pair is 4.23:1") and it is not
+        // this stage's to change — but a new control must not inherit it. Measured
+        // after the switch: 5.61:1 dark, and the payload at 18.9:1 light.
+        ...BUTTON_KINDS.outline,
+      } satisfies CSSProperties,
+    }, label),
+    // The payload, complete and reachable. `maxHeight` with scrolling rather than
+    // truncation: ADR-013 forbids showing a shortened preview of what is copied.
+    createElement('pre', {
+      'data-openui-copy': 'payload',
+      style: {
+        fontFamily: 'var(--font-mono)',
+        fontSize: SIZES.xs,
+        whiteSpace: 'pre-wrap',
+        overflowWrap: 'anywhere',
+        margin: 0,
+        maxHeight: 120,
+        overflowY: 'auto',
+        padding: '4px 8px',
+        width: '100%',
+        boxSizing: 'border-box',
+        background: 'var(--card)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'var(--border)',
+        borderRadius: 'calc(var(--radius) * 1.1)',
+        color: 'var(--foreground)',
+      } satisfies CSSProperties,
+    }, payload),
+    message === undefined ? null : createElement('span', {
+      'data-openui-copy': 'status',
+      role: 'status',
+      style: { fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)' } satisfies CSSProperties,
+    }, message),
+  )
+}
+
+/**
+ * Copy one string, from inside a user gesture and nowhere else.
+ *
+ * Three properties this deliberately has and does not have:
+ *
+ *   - It is called only from `runAction`, which runs only from a click or key
+ *     handler (verified at every call site). Nothing calls it from an effect, a
+ *     timer or a state change, and a test asserts that mounting and re-rendering
+ *     a card writes nothing.
+ *   - A refusal is reported, not swallowed. The `Code` button predates ADR-013 and
+ *     shows "Copied" even when the write failed; that is now a defect rather than a
+ *     precedent, and this helper does not repeat it.
+ *   - It never falls back to `document.execCommand` on a hidden textarea. That is
+ *     the standard way to make a copy succeed, and it is exactly the wrong thing
+ *     here: it would turn a browser permission refusal into an invisible success.
+ *
+ * @param text - the exact string to write, already validated and length-capped.
+ */
+function writeClipboard(text: string): void {
+  const clipboard = typeof navigator === 'undefined' ? undefined : navigator.clipboard
+  if (clipboard === undefined || typeof clipboard.writeText !== 'function') {
+    clipboardFeedback('unavailable')
+    return
+  }
+  void clipboard.writeText(text).then(
+    () => clipboardFeedback('copied'),
+    () => clipboardFeedback('refused'),
+  )
+}
+
+type ClipboardStatus = 'copied' | 'refused' | 'unavailable'
+
+/**
+ * The line a card shows after a copy attempt.
+ *
+ * A refusal says so in words. "Copied" is only ever shown for a write the browser
+ * confirmed — ADR-013 makes that the difference between a working control and one
+ * that lies about the clipboard's contents.
+ *
+ * @param status - the outcome, or undefined before any attempt.
+ * @returns the message, or undefined when there is nothing to say.
+ */
+function clipboardMessage(status: ClipboardStatus | undefined): string | undefined {
+  if (status === 'copied') return 'Copied'
+  if (status === 'refused') return 'The browser refused; nothing was copied'
+  if (status === 'unavailable') return 'This browser has no clipboard access; nothing was copied'
+  return undefined
+}
+
+/**
+ * Announce a clipboard outcome on the card that asked for it.
+ *
+ * A card-local event rather than shared state: the write belongs to one card, and
+ * two cards copying in the same session must not react to each other's result.
+ * The event carries only the status — never the text — so a listener cannot read
+ * back what was copied.
+ *
+ * @param status - what happened.
+ */
+function clipboardFeedback(status: ClipboardStatus): void {
+  if (typeof document === 'undefined') return
+  document.dispatchEvent(new CustomEvent(CLIPBOARD_EVENT, { detail: { status } }))
+}
+
+/** The event name a card listens on for its own clipboard outcome. */
+const CLIPBOARD_EVENT = 'openui:clipboard'
 
 /**
  * A channel that does nothing: for callers that only draw and never interact.
@@ -4081,7 +4285,9 @@ export function OpenUICard({
     channel.runAction = (action) => {
       // Dispatch is pure and runs only from a click handler; it decides the new
       // values, and the same channel that a Slider uses applies them.
-      channel.patch(applyAction(action, hydration.defaults).patch)
+      const outcome = applyAction(action, hydration.defaults)
+      channel.patch(outcome.patch)
+      if (outcome.clipboard !== undefined) writeClipboard(outcome.clipboard)
     }
     return channel
   }, [hydration.defaults])

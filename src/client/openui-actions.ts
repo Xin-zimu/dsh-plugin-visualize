@@ -34,6 +34,15 @@ export interface ActionOutcome {
   readonly patch: Readonly<Record<string, EvaluationValue>>
   /** Why a step was refused, or a note about one that applied. Empty on a clean run. */
   readonly diagnostics: readonly ActionDiagnostic[]
+  /**
+   * Text the caller must copy, when the step asked for it.
+   *
+   * A clipboard write is an effect, not a value, so it cannot be expressed as a
+   * state patch: this module stays pure and hands the caller an instruction that
+   * only a genuine user gesture may carry out. `undefined` means "no write was
+   * requested"; it never means "a write was requested and dropped".
+   */
+  readonly clipboard?: string
 }
 
 /** One finding from a dispatch. */
@@ -54,11 +63,19 @@ export interface ActionDiagnostic {
  * deliberate edit, not an accident.
  */
 export const UNSUPPORTED_STEPS: ReadonlySet<string> = new Set([
-  'OpenUrl', 'CopyToClipboard', 'ToAssistant',
+  'OpenUrl', 'ToAssistant',
 ])
 
-/** Steps this build executes. */
-export const SUPPORTED_STEPS: ReadonlySet<string> = new Set(['Set', 'Reset', 'Action'])
+/**
+ * Steps this build executes.
+ *
+ * `CopyToClipboard` is here but is **not** a state step: it produces no patch and
+ * is refused when nested, because a clipboard write is an effect rather than a
+ * value. See {@link ActionOutcome.clipboard}.
+ */
+export const SUPPORTED_STEPS: ReadonlySet<string> = new Set([
+  'Set', 'Reset', 'Action', 'CopyToClipboard',
+])
 
 /** The evaluated shape of an action, as the renderer receives it. */
 interface ActionDescriptor {
@@ -100,6 +117,42 @@ interface Run {
   readonly defaults: Readonly<Record<string, EvaluationValue>>
   readonly patch: Record<string, EvaluationValue>
   readonly diagnostics: ActionDiagnostic[]
+  /** Turn one evaluated argument into copyable text, or undefined when it is not text. */
+  readonly clipboardText: (value: unknown) => string | undefined
+  /** Set when a step asked for a clipboard write. */
+  clipboard?: string
+}
+
+/**
+ * Longest string this build will copy.
+ *
+ * Chosen rather than derived: 32 KiB is comfortably larger than any text a card
+ * legitimately displays (a code block, a URL, a paragraph) and far smaller than the
+ * payloads that make a silent clipboard overwrite harmful. It is refused, never
+ * truncated: truncating would leave the clipboard holding something other than the
+ * text the user pressed the control to copy.
+ */
+export const MAX_CLIPBOARD_TEXT = 32 * 1024
+
+/**
+ * Read one argument as clipboard text.
+ *
+ * Only strings, numbers and booleans are text. An object or a list is refused
+ * rather than coerced, because String({...}) yields "[object Object]" — writing a
+ * value the user never saw to their clipboard is worse than a refusal they can read.
+ *
+ * @param value - the evaluated first argument.
+ * @returns the text, or undefined when it is not copyable.
+ */
+export function clipboardPayload(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    if (value === '') return undefined
+    if (value.length > MAX_CLIPBOARD_TEXT) return undefined
+    return value
+  }
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value)
+  if (typeof value === 'boolean') return String(value)
+  return undefined
 }
 
 /** Deepest action tree this dispatcher will walk. */
@@ -155,6 +208,36 @@ function apply(action: unknown, run: Run, depth: number): void {
     return
   }
 
+  if (name === 'CopyToClipboard') {
+    // Nested inside `Action([...])` is refused on purpose, and this is the whole
+    // of the reasoning: a composed action runs several steps from one gesture,
+    // and whether that gesture's *user activation* is still live by the time the
+    // clipboard call happens is a browser-timing property this build has not
+    // measured. The safe answer while it is unmeasured is "no" — an explicit
+    // refusal the card can show, rather than a silent attempt that may or may not
+    // write. Top-level (depth 0) is a direct press on the control, which is the
+    // case the ADR authorises.
+    if (depth > 0) {
+      run.diagnostics.push({
+        severity: 'refused',
+        code: 'action.clipboard-not-composed',
+        message: '@CopyToClipboard runs on its own, not inside Action([...]); a composed run has no proven user activation',
+      })
+      return
+    }
+    const payload = run.clipboardText(descriptor.args[0])
+    if (payload === undefined) {
+      run.diagnostics.push({
+        severity: 'refused',
+        code: 'action.clipboard-empty',
+        message: '@CopyToClipboard needs text to copy',
+      })
+      return
+    }
+    run.clipboard = payload
+    return
+  }
+
   if (name === 'Reset') {
     // Upstream's executor calls `store.reset()` with no argument: every declared
     // variable returns to its default, and `@Reset($a, $b)`'s bindings are not
@@ -207,10 +290,12 @@ export function applyAction(
   action: unknown,
   defaults: Readonly<Record<string, EvaluationValue>>,
 ): ActionOutcome {
-  const run: Run = { defaults, patch: {}, diagnostics: [] }
+  const run: Run = { defaults, patch: {}, diagnostics: [], clipboardText: clipboardPayload }
   if (action === undefined || action === null) {
     return { patch: {}, diagnostics: [] }
   }
   apply(action, run, 0)
-  return { patch: run.patch, diagnostics: run.diagnostics }
+  return run.clipboard === undefined
+    ? { patch: run.patch, diagnostics: run.diagnostics }
+    : { patch: run.patch, diagnostics: run.diagnostics, clipboard: run.clipboard }
 }

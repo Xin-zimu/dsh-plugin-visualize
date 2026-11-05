@@ -614,6 +614,78 @@ Six things carried forward:
 
 ## History
 
+### Session 19 — 2026-11-05 (Stage 4B: one action shipped, two deferred)
+
+**Stage 4B closed.** `@CopyToClipboard` is out of `UNSUPPORTED_STEPS` and shipped.
+`@OpenUrl` and `@ToAssistant` are Deferred — not rejected, not forgotten, and not
+implemented through a side door.
+
+**The stage's most useful output is a distinction, not a feature.** The first draft
+of the threat model asked "can the host do this?" and treated the answer as a
+boolean. Wrong: there are three states. A capability can be *not available* (no
+interface, nothing reachable), *available but unauthorised* (something reachable
+could act and the program has no permission), or *available and authorised* (a
+host interface mediates and attributes it). Collapsing that is how a missing check
+gets mistaken for a missing API.
+
+`@CopyToClipboard` is the middle state, and that is the whole difficulty:
+`navigator.clipboard.writeText` is one call away and `Code`'s copy button already
+uses it. **A callable browser API is evidence of possibility, never of permission.**
+Where the API is present, this stage's conditions are the only thing between the
+program and the effect.
+
+**What shipped, and the properties that make it acceptable.** The control shows the
+exact text before the press; `copyPayloadOf` reads the evaluated descriptor once and
+`CopyButton` uses that one string for both the `<pre>` and the write, so the shown
+and copied values cannot diverge by construction. A press is the only trigger —
+every `runAction` call site is an `onClick` or `onKeyDown`. Composition inside
+`Action([...])` is refused until user activation in a composed run is measured.
+32 KiB cap, refused rather than truncated. No `execCommand` fallback: it would turn
+a permission refusal into an invisible success.
+
+**Two things were fixed on the way**, both older than this stage:
+
+1. `Code`'s copy button showed "Copied" **unconditionally**, so a denied permission
+   told the reader the clipboard held their code when it did not. It now reports all
+   three outcomes. This was a shipped defect; writing down what the behaviour should
+   be is what exposed it.
+2. The new control uses `BUTTON_KINDS.outline`, not `primary`. Primary is 4.23:1 in
+   the light scheme, below AA — a recorded and accepted defect of the existing
+   Button palette. Changing it is not this stage's to do, but a new control must not
+   inherit it. Measured after the switch: 17.45:1 dark, 18.9:1 light.
+
+**Why the two deferrals are honest rather than convenient.** `@OpenUrl` has no
+host-mediated open; a card can reach `window.open`, which is the card deciding to
+navigate (ADR-004 forbids it) and which a popup blocker swallows silently, so the
+program believes it navigated. `@ToAssistant` has no submit interface, and reaching
+the composer through the DOM would produce a message the host could not attribute
+or refuse. Both stay refused, and a test asserts it.
+
+`ADR-015`'s first draft required proving a message could not have come from
+rendered untrusted content. **That was withdrawn**: the evaluator tracks no
+provenance, so it would have been a claim the code could not enforce. Replaced by a
+position needing none — all card content is untrusted, without exception — plus a
+host-rendered confirmation and a user-turn-only delivery path.
+
+**Verified:** `tsc` 0 errors on both projects; `vitest run` **910 passed / 15
+failed / 927**, failure set **identical name by name** to the published baseline;
+build clean; bundle hash `E2B0ED7B…` matching the installed copy before any
+measurement (§9); browser acceptance reading the **operating system's clipboard**
+after one real CDP click — `SENTINEL-FINAL` → `sk-live-SHOULD-NOT-LEAK`, equal to
+the text on the card, with the status line reading `Copied`.
+
+jsdom cannot make that measurement: a mocked `navigator.clipboard` proves only that
+a mock was called. Seven mutations proved the guards can fail (copy-on-mount turned
+6 tests red; truncating the shown payload, 3; allowing composition, 2; the rest 1
+each).
+
+**Harness lessons, recorded because each cost time:** `clipboard.readText()` cannot
+be awaited without a user activation — the promise never settles and the CDP call
+hits its 20 s bound, wedging the session; reading the OS clipboard is simpler and
+stronger. `sync → observe → act` fails because `observe` consumes the context the
+action needs; the order is **observe → sync → act**. A session fixes its control
+policy at creation, so `--policy strict` cannot be added later.
+
 ### Session 18 — 2026-11-05 (Stage 4A-5 closed: 48 / 48)
 
 **Stage 4A-5 is closed.** The last fourteen components are implemented,
