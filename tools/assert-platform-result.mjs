@@ -74,10 +74,24 @@ if (platform === 'linux') {
     .map(line => norm(line.replace(/^\s*FAIL\s+/, '')))
     .sort()
   const newFailures = failed.filter(x => !baseline.includes(x))
-  const missing = baseline.filter(x => !failed.includes(x))
-  if (newFailures.length > 0) problems.push('windows has ' + newFailures.length + ' NEW failure(s): ' + newFailures.join(' | '))
-  if (missing.length > 0) problems.push('windows has ' + missing.length + ' baseline failure(s) that now pass. That is progress only if it was intended - confirm, then update the baseline: ' + missing.join(' | '))
-  console.log('windows: baseline ' + baseline.length + ', found ' + failed.length)
+  const nowPassing = baseline.filter(x => !failed.includes(x))
+
+  // Only NEW failures are an error. A baseline failure that starts passing is the
+  // environment being better, not the code being worse, and turning that into a red
+  // build would train people to update the baseline until it agrees — which is how a
+  // baseline stops meaning anything.
+  //
+  // This is not hypothetical. The GitHub Windows runner reports 7 of the baseline 15,
+  // because it can create symlinks: the six containment tests that could not run on a
+  // stock Windows box execute there and pass. That is the point of running them.
+  if (newFailures.length > 0) {
+    problems.push('windows has ' + newFailures.length + ' NEW failure(s): ' + newFailures.join(' | '))
+  }
+  if (nowPassing.length > 0) {
+    console.log('note: ' + nowPassing.length + ' baseline failure(s) pass on this runner.')
+    console.log('      Not an error: a better environment is not a worse build.')
+  }
+  console.log('windows: baseline ' + baseline.length + ', found ' + failed.length + ', new ' + newFailures.length)
 }
 
 console.log(JSON.stringify({ platform, counts, failureSet: { failed: failed.length, skipped: skipped.length }, problems }, null, 1))
