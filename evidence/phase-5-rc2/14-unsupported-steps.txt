@@ -1,0 +1,9 @@
+=== UNSUPPORTED_STEPS printed from the module (npx unrun evidence/phase-5-rc2/print-steps.mjs) ===
+source file sha256: 792539CAE31A488D7F09EA89AD4303451B8F85EDDDBEA731BC773A5FF53AD435
+UNSUPPORTED_STEPS = ["OpenUrl","ToAssistant"]
+UNSUPPORTED_STEPS.size = 2
+SUPPORTED_STEPS = ["Set","Reset","Action","CopyToClipboard"]
+SUPPORTED_STEPS.size = 4
+EXPECTED UNSUPPORTED = ["OpenUrl","ToAssistant"]
+MATCH = true
+EXIT=0

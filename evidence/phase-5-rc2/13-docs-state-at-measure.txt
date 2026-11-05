@@ -1,0 +1,31 @@
+--- docs files with mtime, sorted by mtime desc (top 12) ---
+
+LastWriteTime      Length FullName
+-------------      ------ --------
+2026/11/6 2:53:39   16347 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\specifications\COMPONENT_CATALOG.md
+2026/11/6 2:52:28   13794 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\decisions\ADR-4B-THREAT-MODEL.md
+2026/11/6 2:52:16   21393 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\decisions\ADR-015-TO-ASSISTANT.md
+2026/11/6 2:51:36   17032 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\decisions\ADR-014-OPEN-URL.md
+2026/11/5 17:50:40  20589 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\reports\PHASE-4B-2-INVESTIGATION.md
+2026/11/5 17:35:29  12341 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\reports\PHASE-5-AUDIT.md
+2026/11/5 17:35:15   9236 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\testing\PLATFORM-FAILURES.md
+2026/11/5 16:30:59   8441 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\decisions\ADR-013-COPY-TO-CLIPBOARD.md
+2026/11/5 16:30:51   9727 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\reports\PHASE-4B-REPORT.md
+2026/11/5 1:59:45    8453 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\reports\PHASE-4A-5-REPORT.md
+2026/11/5 0:32:29    8579 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\decisions\ADR-012-POPOVER-CONTAINMENT.md
+2026/11/5 0:32:29   10513 D:\Deepseek WorkSpace\dsh-plugin-visualize\docs\decisions\ADR-011-SVG-VALUE-WHITELIST.md
+
+
+--- sha256 of the four docs the release gates read or that are edited ---
+7FAC1B8E57388E0C18E8A53A2F4228EB25F79E382A403ABB6936748890FB1C2B  16347 bytes  2026-11-06T02:53:39.8397615+08:00  docs/specifications/COMPONENT_CATALOG.md
+C09AB6A851F69F86D91C21142EB70AC2D560793A2C3B89AC5CA682BF06F56FDC  6235 bytes  2026-11-06T02:52:08.6898540+08:00  CHANGELOG.md
+E1310ECB2B9D8301634AF53D449B1CB247B22884C4CE9E8B92A58D54650028F2  6407 bytes  2026-11-06T02:52:13.7396393+08:00  README.md
+5B0A24D70284EAD56DFB91E4F0648CA012AE5A78D2FFF747602C6F3C94F1CE7A  17032 bytes  2026-11-06T02:51:36.3020174+08:00  docs/decisions/ADR-014-OPEN-URL.md
+0BCB77BD6686232E7D4E2A250B04C646B5231AF00DA099105A25D526B2C658BE  21393 bytes  2026-11-06T02:52:16.6919666+08:00  docs/decisions/ADR-015-TO-ASSISTANT.md
+D289DF06DEEA9D89422283C430FD54644332E6CFA70A8ACA37565199C4785A2D  13794 bytes  2026-11-06T02:52:28.0908847+08:00  docs/decisions/ADR-4B-THREAT-MODEL.md
+--- git diff --stat docs ---
+ docs/decisions/ADR-014-OPEN-URL.md       | 160 ++++++++++++++++++++++--
+ docs/decisions/ADR-015-TO-ASSISTANT.md   | 205 ++++++++++++++++++++++++++++---
+ docs/decisions/ADR-4B-THREAT-MODEL.md    |  28 ++++-
+ docs/specifications/COMPONENT_CATALOG.md |  29 ++++-
+ 4 files changed, 395 insertions(+), 27 deletions(-)

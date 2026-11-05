@@ -1,0 +1,21 @@
+{
+ "input": "evidence/phase-5-rc2/vitest.json",
+ "counts": {
+  "passed": 924,
+  "failed": 15,
+  "pending": 0,
+  "todo": 0,
+  "total": 939,
+  "sum": 939,
+  "closes": true
+ },
+ "failureSet": {
+  "baseline": 15,
+  "current": 15,
+  "identical": true
+ },
+ "onlyInBaseline": [],
+ "onlyInCurrent": [],
+ "verdict": "MATCH"
+}
+EXIT=0

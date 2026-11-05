@@ -1,0 +1,78 @@
+# N5 — `src/client/openui-actions.ts` docstring correction, and its measured impact
+
+Owner requirement: "修正后重新检查产物哈希、构建确定性及相关测试。不得默认注释修改不会影响 bundle。"
+
+So the claim that a comment cannot reach the bundle was MEASURED, not assumed.
+
+## 1. What was wrong
+
+Lines 10-12 said:
+
+    Scope (P3-07): `@Set`, `@Reset` and `Action([...])` — the three that only
+    touch local `$state`. `@OpenUrl`, `@CopyToClipboard` and `@ToAssistant` are
+    recognised and refused, so they are inert rather than silently mis-handled.
+
+`@CopyToClipboard` SHIPPED in stage 4B (ADR-013) and is in SUPPORTED_STEPS. It is
+not refused. The sentence was true at P3-07 and stale since.
+
+## 2. The change
+
+    Scope: `@Set`, `@Reset` and `Action([...])` touch local `$state`; the stage-4B
+    batch added `@CopyToClipboard`, which produces no patch and is refused when
+    nested (see {@link ActionOutcome.clipboard}). `@OpenUrl` and `@ToAssistant` are
+    recognised and refused, so a Button carrying one is inert rather than silently
+    mis-handled — and it says which name it declined when pressed.
+
+git diff --stat -- src
+    src/client/openui-actions.ts | 8 +++++---
+    1 file changed, 5 insertions(+), 3 deletions(-)
+
+The diff is entirely inside the module docstring. No code, no export, no behaviour.
+
+## 3. Bundle hash — PRE vs POST
+
+PRE   client.js  E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB  450559 B
+POST  client.js  E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB  450559 B
+                                  CLIENT UNCHANGED: True
+
+PRE   index.js   8D4BC669C1C04DCEC274A98D9038DC2590E6EAC342F341FEAF8571F849D8D1CF
+POST  index.js   8D4BC669C1C04DCEC274A98D9038DC2590E6EAC342F341FEAF8571F849D8D1CF
+                                  INDEX  UNCHANGED: True
+
+## 4. Why the hash is unchanged — two checks, not a hopeful assumption
+
+(a) The text is NOT in the bundle at all:
+      new docstring found in lib/client.js : False
+      old docstring found in lib/client.js : False
+    tsdown strips comments; neither the old nor the new wording survives.
+
+(b) CONTROL — a real code change DOES move the hash:
+      mutated  MAX_CLIPBOARD_TEXT = 32 * 1024  ->  33 * 1024
+      rebuilt  client.js SHA256 = AAE2F13D782C217CD79D93B074C9BA922D87F97610162E682BC51613F8376BB9
+      CHANGED: True
+      then restored the file and rebuilt:
+      restored client.js SHA256 = E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+      BACK TO BASE: True
+
+Without (b), (a) would be a guess: an unchanged hash proves nothing if the build
+were stale or if the toolchain were not reading the file. (b) proves the build is
+live and that only a CODE change moves the hash.
+
+## 5. Tests after the fix
+
+tsc -p tsconfig.json          exit 0
+tsc -p tsconfig.client.json   exit 0
+
+npx vitest run --reporter=json --outputFile=evidence/phase-5-final/vitest-post-n5.json
+    passed 924  failed 15  pending 0  todo 0  total 939   sum 939   closes: true
+    IDENTICAL FAILURE SET vs pre-N5: true
+    new failures: none
+    now passing:  none
+
+So the docstring correction changed no test outcome, no bundle byte, and no
+behaviour. It corrected a statement that had been false for one stage.
+
+## 6. Scope limit
+
+This is a comment fix and nothing else. It does not implement, enable, or widen any
+action. `UNSUPPORTED_STEPS` is still exactly ['OpenUrl','ToAssistant'].

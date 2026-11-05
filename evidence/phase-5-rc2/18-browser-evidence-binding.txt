@@ -1,0 +1,6 @@
+=== C1-acceptance.json bundle hash vs TODAY build hash ===
+C1-acceptance.json bundle.clientSha256 : E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+today build lib/client.js SHA256      : E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+IDENTICAL                             : True
+--- which commit added C1-acceptance.json ---
+6b26aab docs: audit the release candidate and stop refused actions being silently inert

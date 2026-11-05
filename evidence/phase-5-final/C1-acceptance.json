@@ -1,0 +1,94 @@
+{
+  "phase": "5",
+  "round": "final-gate",
+  "date": "2026-11-05T19:25:25.049Z",
+  "subject": "Stage 5 final release gate, re-measured on an isolated profile",
+  "environment": {
+    "profile": "p3web (isolated, DSH_HOME=tmp/dsh-p3)",
+    "url": "http://127.0.0.1:3093/",
+    "pluginPackage": "@dsh-unified/visualize 0.1.0 (this repository)",
+    "buildSha256": "E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB",
+    "installedSha256": "E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB",
+    "installedMatchesBuild": true,
+    "liveDesktopProfileNote": "the GUI on :56091 runs @nagi-ovo/dsh-visualize 0.1.7 and is NOT this code; it was not used as evidence"
+  },
+  "gates": {
+    "G0": "pass",
+    "G1": {
+      "sent": 31,
+      "received": 31
+    },
+    "G2": {
+      "submitted": true,
+      "echoed": true
+    },
+    "G3": {
+      "paragraphs": 21,
+      "settled": true
+    }
+  },
+  "identity": {
+    "forkMarker": true,
+    "upstreamMarker": false
+  },
+  "openui": {
+    "totalCards": 20,
+    "gateCards": 1,
+    "frames": 4,
+    "sandboxed": 4,
+    "sandboxValues": [
+      "allow-scripts"
+    ],
+    "gateRefused": [
+      "OpenUrl",
+      "ToAssistant"
+    ],
+    "gateCopyButtons": 1,
+    "gateCopyPayload": "release-gate-token",
+    "gateLinks": [
+      {
+        "href": "https://example.com",
+        "rel": "noreferrer noopener",
+        "target": "_blank"
+      }
+    ],
+    "forkMarker": true,
+    "upstreamMarker": false,
+    "hostHref": "http://127.0.0.1:3093/"
+  },
+  "theme": {
+    "dark": {
+      "foreground": "#f9fafb",
+      "card": "#2c2c2e",
+      "bodyBg": "rgb(21, 21, 23)"
+    },
+    "light": {
+      "foreground": "#0f1115",
+      "card": "#fff",
+      "bodyBg": "rgb(255, 255, 255)"
+    }
+  },
+  "stateStorage": {
+    "vizKeys": 6
+  },
+  "refusedActionFeedback": {
+    "noticeBeforeAnyPress": 0,
+    "openUrl": {
+      "noticeShown": true,
+      "text": "@OpenUrl is not available in this build"
+    },
+    "toAssistant": {
+      "noticeShown": true,
+      "text": "@ToAssistant is not available in this build"
+    },
+    "autoHideAfterMs": 3200,
+    "noticeAfterTimeout": 0,
+    "hostHrefUnchanged": true
+  },
+  "clipboard": {
+    "seeded": "SENTINEL-BEFORE-COPY",
+    "after": "release-gate-token",
+    "equalsPayload": true,
+    "via": "real CDP click (trusted gesture), OS clipboard read back with Get-Clipboard"
+  }
+}

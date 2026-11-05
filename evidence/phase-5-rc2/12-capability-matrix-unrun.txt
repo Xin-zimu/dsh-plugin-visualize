@@ -1,0 +1,48 @@
+{
+ "generatedFrom": [
+  "src/backends/openui/signatures.ts  COMPONENTS, ACTION_STEPS, FUNCTION_NAMES",
+  "src/client/OpenUICard.tsx          RENDERED_COMPONENTS",
+  "src/client/openui-actions.ts       SUPPORTED_STEPS, UNSUPPORTED_STEPS"
+ ],
+ "components": {
+  "declared": 48,
+  "rendered": 48,
+  "missing": [],
+  "extra": [],
+  "status": "Supported"
+ },
+ "functions": {
+  "declared": 73
+ },
+ "actions": [
+  {
+   "name": "@Set",
+   "status": "Supported"
+  },
+  {
+   "name": "@Reset",
+   "status": "Supported"
+  },
+  {
+   "name": "@OpenUrl",
+   "status": "Deferred"
+  },
+  {
+   "name": "@CopyToClipboard",
+   "status": "Supported",
+   "note": "Supported, user gesture and visible payload required; refused inside Action([...])"
+  },
+  {
+   "name": "@ToAssistant",
+   "status": "Deferred"
+  },
+  {
+   "name": "@Action",
+   "status": "Supported",
+   "note": "Supported; composes steps, but not a clipboard write"
+  }
+ ],
+ "actionsUnclassified": [],
+ "actionsInBothSets": []
+}
+EXIT=0

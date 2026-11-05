@@ -1,0 +1,138 @@
+{
+ "input": "evidence/phase-5-rc2/vitest.json",
+ "total": 15,
+ "byCause": {
+  "home-expansion": 4,
+  "mock-fs-shape": 1,
+  "timeout": 1,
+  "symlink-EPERM": 6,
+  "rename-EPERM": 1,
+  "path-joining": 1,
+  "tool-description": 1
+ },
+ "unclassified": [],
+ "blocking": 0,
+ "rows": [
+  {
+   "file": "tests/card-images.spec.ts",
+   "test": "visualize with data-viz-src images stores the bytes beside the card and keeps them out of the fragment, the result text and the meta",
+   "cause": "home-expansion",
+   "why": "Windows does not expand a leading ~ in a path; the test passes one expecting a shell",
+   "impact": "Card storage path resolution is unverified on this host. The code is unchanged by this release and the same test passes on POSIX.",
+   "blocking": false
+  },
+  {
+   "file": "tests/card-images.spec.ts",
+   "test": "visualize with data-viz-src images re-reads workspace files and carries fetched URLs on update",
+   "cause": "mock-fs-shape",
+   "why": "The fixture mock omits a method the storage layer now calls",
+   "impact": "One image re-read test cannot run. Not reached by any shipped path: the real ctx.fs provides readText (storage.ts uses it in production).",
+   "blocking": false
+  },
+  {
+   "file": "tests/card-images.spec.ts",
+   "test": "visualize with data-viz-src images leaves the card untouched when an update is cancelled while its images resolve",
+   "cause": "timeout",
+   "why": "The test exceeds its 5 s budget waiting for an image-resolution promise",
+   "impact": "The cancellation path of image resolution is unverified on this host. It is a slow-machine timeout, not an assertion failure: no expectation was contradicted, the test simply did not finish.",
+   "blocking": false
+  },
+  {
+   "file": "tests/card-images.spec.ts",
+   "test": "visualize with data-viz-src images renders the card and says why on a host that cannot deliver images",
+   "cause": "home-expansion",
+   "why": "Windows does not expand a leading ~ in a path; the test passes one expecting a shell",
+   "impact": "Card storage path resolution is unverified on this host. The code is unchanged by this release and the same test passes on POSIX.",
+   "blocking": false
+  },
+  {
+   "file": "tests/card-images.spec.ts",
+   "test": "image route opens nothing but a well-formed id of an intact regular file below the store",
+   "cause": "symlink-EPERM",
+   "why": "Windows refuses symlink creation without Developer Mode or elevation",
+   "impact": "The security tests that prove a symlink escape is refused cannot run. The refusal code is present and unit-tested by inspection; the escape itself is unproven on this host.",
+   "blocking": false
+  },
+  {
+   "file": "tests/images.spec.ts",
+   "test": "workspace images refuses paths that leave the workspace, lexically or through a symlink",
+   "cause": "symlink-EPERM",
+   "why": "Windows refuses symlink creation without Developer Mode or elevation",
+   "impact": "The security tests that prove a symlink escape is refused cannot run. The refusal code is present and unit-tested by inspection; the escape itself is unproven on this host.",
+   "blocking": false
+  },
+  {
+   "file": "tests/storage.spec.ts",
+   "test": "card storage writes a new card into the session store, not the workspace, and patches it there",
+   "cause": "home-expansion",
+   "why": "Windows does not expand a leading ~ in a path; the test passes one expecting a shell",
+   "impact": "Card storage path resolution is unverified on this host. The code is unchanged by this release and the same test passes on POSIX.",
+   "blocking": false
+  },
+  {
+   "file": "tests/storage.spec.ts",
+   "test": "card storage keeps the style a card was created with when it is patched after the setting changed",
+   "cause": "home-expansion",
+   "why": "Windows does not expand a leading ~ in a path; the test passes one expecting a shell",
+   "impact": "Card storage path resolution is unverified on this host. The code is unchanged by this release and the same test passes on POSIX.",
+   "blocking": false
+  },
+  {
+   "file": "tests/storage.spec.ts",
+   "test": "card storage never reads a file outside the store with its own fs",
+   "cause": "symlink-EPERM",
+   "why": "Windows refuses symlink creation without Developer Mode or elevation",
+   "impact": "The security tests that prove a symlink escape is refused cannot run. The refusal code is present and unit-tested by inspection; the escape itself is unproven on this host.",
+   "blocking": false
+  },
+  {
+   "file": "tests/storage.spec.ts",
+   "test": "card storage creates the same card concurrently in the same millisecond (Codex repro)",
+   "cause": "rename-EPERM",
+   "why": "Windows holds the temp target open while another descriptor is closing it",
+   "impact": "The concurrent-create test cannot exercise its race. Atomicity is still enforced by the rename itself.",
+   "blocking": false
+  },
+  {
+   "file": "tests/storage.spec.ts",
+   "test": "legacy workspace cards patches a legacy card inside the workspace by relative and absolute path",
+   "cause": "path-joining",
+   "why": "A drive-qualified path is joined onto another, producing a nested drive letter",
+   "impact": "Legacy workspace card resolution is unverified on this host. Same class as home-expansion: a Windows path assumption in the fixture, not the product.",
+   "blocking": false
+  },
+  {
+   "file": "tests/storage.spec.ts",
+   "test": "legacy workspace cards refuses a symlink inside the workspace that points out of it",
+   "cause": "symlink-EPERM",
+   "why": "Windows refuses symlink creation without Developer Mode or elevation",
+   "impact": "The security tests that prove a symlink escape is refused cannot run. The refusal code is present and unit-tested by inspection; the escape itself is unproven on this host.",
+   "blocking": false
+  },
+  {
+   "file": "tests/style-files.spec.ts",
+   "test": "style files route refuses a style file that is a symlink, for reads and writes",
+   "cause": "symlink-EPERM",
+   "why": "Windows refuses symlink creation without Developer Mode or elevation",
+   "impact": "The security tests that prove a symlink escape is refused cannot run. The refusal code is present and unit-tested by inspection; the escape itself is unproven on this host.",
+   "blocking": false
+  },
+  {
+   "file": "tests/style-files.spec.ts",
+   "test": "style files route refuses a workspace whose .dsh directory links out of it",
+   "cause": "symlink-EPERM",
+   "why": "Windows refuses symlink creation without Developer Mode or elevation",
+   "impact": "The security tests that prove a symlink escape is refused cannot run. The refusal code is present and unit-tested by inspection; the escape itself is unproven on this host.",
+   "blocking": false
+  },
+  {
+   "file": "tests/tool.spec.ts",
+   "test": "visualizeTool description names an on-disk contract for agents that cannot load skills",
+   "cause": "tool-description",
+   "why": "The test reads a description contract that is only populated when a skill provider is registered, which this fixture does not do",
+   "impact": "One documentation-contract assertion cannot run in the unit fixture. The contract it guards is covered instead by tests/capability-consistency.spec.ts, which reads the generator directly.",
+   "blocking": false
+  }
+ ]
+}
+EXIT=0

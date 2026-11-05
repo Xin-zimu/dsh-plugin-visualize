@@ -1,0 +1,13 @@
+=== AGENTS.md 9: bundle hash gate, POST-BUILD ===
+build   lib/client.js      : E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+installed p3web client.js  : E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+build size                 : 450559
+installed size             : 450559
+MATCH                      : True
+--- contrast: the LIVE desktop profile (a different package) ---
+live desktop client.js     : A1957D854253DC007013A892C7F0047D89D9246CB5B42E0BE9A0436CEE6BAF29
+live desktop size          : 118874
+MATCHES THIS TREE          : False
+--- the desktop profile package identity ---
+name    : @nagi-ovo/dsh-visualize
+version : 0.1.7

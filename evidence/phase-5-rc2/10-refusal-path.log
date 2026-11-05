@@ -1,0 +1,13 @@
+=== STEP 6: npx vitest run tests/openui-clipboard-4b.spec.tsx tests/openui-actions.spec.tsx ===
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ✓ tests/openui-clipboard-4b.spec.tsx (21 tests) 86ms
+ ✓ tests/openui-actions.spec.tsx (24 tests) 94ms
+
+ Test Files  2 passed (2)
+      Tests  45 passed (45)
+   Start at  02:52:48
+   Duration  1.64s (transform 420ms, setup 0ms, import 1.14s, tests 180ms, environment 1.33s)
+
+EXIT=0

@@ -1,0 +1,21 @@
+=== baseline FAIL name set from evidence/publish/test-before-publish.txt (the artefact failure-set.mjs compares against) ===
+baseline file mtime: 2026-11-04T01:10:14.1272420+08:00
+baseline totals line: Tests  15 failed | 749 passed (764)
+NOTE: that artefact records 764 tests; the current suite is 939. The comparison is on the failure NAME SET only.
+--- the 15 baseline FAIL lines (normalised) ---
+1. tests/card-images.spec.ts image route opens nothing but a well-formed id of an intact regular file below the store
+2. tests/card-images.spec.ts visualize with data-viz-src images leaves the card untouched when an update is cancelled while its images resolve
+3. tests/card-images.spec.ts visualize with data-viz-src images re-reads workspace files and carries fetched URLs on update
+4. tests/card-images.spec.ts visualize with data-viz-src images renders the card and says why on a host that cannot deliver images
+5. tests/card-images.spec.ts visualize with data-viz-src images stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+6. tests/images.spec.ts workspace images refuses paths that leave the workspace, lexically or through a symlink
+7. tests/storage.spec.ts card storage creates the same card concurrently in the same millisecond (Codex repro)
+8. tests/storage.spec.ts card storage keeps the style a card was created with when it is patched after the setting changed
+9. tests/storage.spec.ts card storage never reads a file outside the store with its own fs
+10. tests/storage.spec.ts card storage writes a new card into the session store, not the workspace, and patches it there
+11. tests/storage.spec.ts legacy workspace cards patches a legacy card inside the workspace by relative and absolute path
+12. tests/storage.spec.ts legacy workspace cards refuses a symlink inside the workspace that points out of it
+13. tests/style-files.spec.ts style files route refuses a style file that is a symlink, for reads and writes
+14. tests/style-files.spec.ts style files route refuses a workspace whose .dsh directory links out of it
+15. tests/tool.spec.ts visualizeTool description names an on-disk contract for agents that cannot load skills
+COUNT=15

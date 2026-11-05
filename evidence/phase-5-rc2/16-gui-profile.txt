@@ -1,0 +1,16 @@
+=== which process serves http://127.0.0.1:56091 ? ===
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+127.0.0.1        56091         26452
+
+
+owning PID = 26452
+name: DeepSeek Harness.exe
+cmdline: "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\DeepSeek Harness.exe" --expose-internals "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\app.asar\dsh\node_modules\@deepseek-ai\dsh-desktop-host\lib\index.js" "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\app.asar\dsh" C:\Users\86139\.dsh\profiles\desktop "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime" "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.mjs" "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\bin"
+--- HTTP probe ---
+HTTP 401 (auth-fenced)
+--- a plugin route ---
+HTTP 404 on /plugins/...
+=== does the LIVE desktop profile contain the fork symbols? ===
+(answered by node symbol scan in 15-ags9-bundle-gate.txt; repeated here in one line)

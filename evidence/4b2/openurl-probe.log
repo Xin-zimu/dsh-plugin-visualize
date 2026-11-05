@@ -1,0 +1,12 @@
+# openurl-probe — origin http://127.0.0.1:52851 (date 2026-11-05T09:46:18.622Z)
+#
+# 401/403 => a route is registered and the Connection fence refused us
+# 404     => no route at that path
+
+PASS  401   /open-in-app/apps            expect=registered got=registered  GET application catalog (dsh-host-open-in-app)
+PASS  401   /open-in-app/open            expect=registered got=registered  POST launch route (path-only; NOT a URL opener)
+PASS  401   /api/present.host            expect=registered got=registered  deliverables desktop metadata
+PASS  404   /open-in-app/no-such-route   expect=absent     got=absent      control: registered prefix, unregistered child
+PASS  404   /definitely-not-a-route-4b2  expect=absent     got=absent      control: nothing registered at all
+
+RESULT: all cases classified as expected

@@ -1,0 +1,36 @@
+=== PRE-BUILD lib/ state ===
+client.js  450559 bytes
+index.d.ts  10071 bytes
+index.js  241055 bytes
+pre  client.js SHA256: E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+pre  index.js  SHA256: 8D4BC669C1C04DCEC274A98D9038DC2590E6EAC342F341FEAF8571F849D8D1CF
+--- profile copy (AGENTS.md 9 gate, pre-build) ---
+profile client.js SHA256: E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+PROFILE EXISTS: True
+profile size: 450559 bytes
+=== npx tsdown (raw output) ===
+ℹ tsdown v0.22.14 powered by rolldown v1.2.3
+ℹ config file: D:\Deepseek WorkSpace\dsh-plugin-visualize\tsdown.config.ts 
+ℹ entry: src/client/index.tsx
+ℹ tsconfig: tsconfig.json
+ℹ entry: src/index.ts
+ℹ target: es2024
+ℹ tsconfig: tsconfig.json
+ℹ Build start
+ℹ Cleaning 4 files
+ℹ [CJS] lib\client.js  450.56 kB │ gzip: 119.60 kB
+ℹ [CJS] 1 files, total: 450.56 kB
+✔ Build complete in 2086ms
+ℹ [ESM] lib\index.js    241.06 kB │ gzip: 73.98 kB
+ℹ [ESM] lib\index.d.ts   10.07 kB │ gzip:  3.81 kB
+ℹ [ESM] 2 files, total: 251.13 kB
+✔ Build complete in 2187ms
+TSD_OWN_EXIT=0
+=== POST-BUILD lib/ state ===
+client.js  450559 bytes  450.56 kB(dec)  440 KiB
+index.d.ts  10071 bytes  10.07 kB(dec)  9.83 KiB
+index.js  241055 bytes  241.06 kB(dec)  235.41 KiB
+post client.js SHA256: E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+post index.js  SHA256: 8D4BC669C1C04DCEC274A98D9038DC2590E6EAC342F341FEAF8571F849D8D1CF
+--- index.js + index.d.ts byte sum ---
+index.js + index.d.ts = 251126 bytes = 251.126 kB(dec)

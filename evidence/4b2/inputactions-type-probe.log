@@ -1,0 +1,32 @@
+# evidence/4b2/inputactions-type-probe.log
+# Lead's independent verification of the @ToAssistant load-bearing claim.
+# Host: DSH 0.2.1-rc.5, @deepseek-ai/dsh-client-ui-tool (see node_modules versions).
+# Date: 2026-11-05. TypeScript via the repo's own tsconfig.client.json.
+#
+# Three files, three controls (AGENTS.md §6 — a guard never seen red is a guess).
+# Run: npx tsc -p tmp/probes/tsconfig.probe.json     (probes 1+2)
+#      npx tsc -p tmp/probes/tsconfig.mutation.json  (probe 3)
+
+### PROBE 1+2 (positive + negative control) — expect CLEAN, exit 0
+<no output>
+exit=0
+
+### PROBE 3 (mutation) — expect TS2339, exit 1
+tmp/probes/mutation.ts(7,46): error TS2339: Property 'thisMemberIsNotOnInputActions' does not exist on type 'InputActions'.
+exit=non-zero
+
+# INTERPRETATION
+# Probe 1 clean  => ToolCallViewProps.inputActions.submit(): void is well typed
+#                   on the SAME props type src/client/VisualizeCard.tsx receives.
+# Probe 2 clean  => the @ts-expect-error on a nonexistent property was SATISFIED,
+#                   so the probe distinguishes present from absent. Had that
+#                   property existed, tsc would report an unused @ts-expect-error
+#                   and this run would not be clean.
+# Probe 3 fails  => `inputActions` is strongly typed as InputActions, NOT `any`.
+#                   Without this the positive probe would prove nothing: an
+#                   unresolved module yields `any`, and `any.submit()` always typechecks.
+#
+# SCOPE OF THIS CLAIM: TYPE ONLY.
+# It proves the card's prop CONTRACT carries inputActions.submit(). It does NOT
+# prove the runtime value is present on a live card — that needs one G0/G3-gated
+# browser run (report §"What remains unverified").

@@ -1,0 +1,56 @@
+# evidence/phase-5-rc2/refusal-guard-mutation.txt
+# Stage 5 re-verification — Lead's mutation test of the two Deferred actions'
+# refusal guards. Date 2026-11-06.
+#
+# WHY: AGENTS.md §6 — "a guard that has never been seen to go red is a guess."
+# The owner requires that the refusal feedback for @OpenUrl and @ToAssistant still
+# works after the ADR corrections. A passing test proves nothing unless the same
+# test can fail when the guard is removed.
+#
+# MUTATION APPLIED to src/client/openui-actions.ts:
+#   UNSUPPORTED_STEPS: Set(['OpenUrl','ToAssistant'])  ->  Set([])
+#   SUPPORTED_STEPS:   + 'OpenUrl', 'ToAssistant'
+# i.e. the two Deferred actions were made executable. This is the exact regression
+# ADR-4B §9 rule 5 forbids ("The refusal stays").
+#
+# RESULT: 6 tests failed across 3 files. Exit 1.
+#
+#   FAIL  tests/openui-clipboard-4b.spec.tsx > 12. a refused action tells the user,
+#         it is not silently inert > renders a control that says which name was
+#         declined, on press
+#         AssertionError: a refused action must still draw a control:
+#         expected null not to be null
+#           at tests/openui-clipboard-4b.spec.tsx:268
+#
+#   FAIL  tests/openui-clipboard-4b.spec.tsx > 12. ... > does not copy, navigate or
+#         write state when the refused control is pressed
+#         TypeError: Cannot read properties of null (reading 'click')
+#           at tests/openui-clipboard-4b.spec.tsx:283
+#
+#   FAIL  tests/openui-clipboard-4b.spec.tsx > (4 more assertions on
+#         action.unsupported / "must be refused by name")
+#           at tests/openui-clipboard-4b.spec.tsx:211
+#
+#   Test Files  3 failed | 1 passed (4)
+#        Tests  6 failed | 53 passed (59)
+#
+# WHAT THIS PROVES, exactly:
+#   - The visible refusal notice for BOTH actions is genuinely asserted, not
+#     incidentally green. Removing the refusal removes the control that carries
+#     the notice, and the test catches it.
+#   - UNSUPPORTED_STEPS membership is load-bearing: capability-consistency and
+#     skill-actions-consistency both derive from it and both went red.
+#   - The tests are not vacuous: they fail for the right reason (a missing
+#     data-openui-refused-button element), not on an unrelated error.
+#
+# RESTORE: the file was restored from a byte-exact copy and re-diffed.
+#   git diff src/client/openui-actions.ts  ->  empty ("CLEAN: file restored exactly")
+#   Re-running the same four files afterwards:
+#     Test Files  4 passed (4)
+#          Tests  59 passed (59)     exit 0
+#
+# WHAT THIS DOES NOT PROVE:
+#   It is a unit-level guard on the dispatcher and the rendered notice. It is NOT a
+#   browser observation. The Stage 5 browser evidence for the same notice is
+#   evidence/phase-5/C1-acceptance.json (pre-existing, baseline 8db9598) and was
+#   NOT re-run in this session — see RESULTS.md "NOT VERIFIED".

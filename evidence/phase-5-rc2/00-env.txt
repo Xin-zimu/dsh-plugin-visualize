@@ -1,0 +1,50 @@
+v24.22.1
+11.19.1
+--- git ---
+63dcd92e64b31ee740267b8043f33fb5c9eb686a
+ M session-log.md
+?? docs/reports/PHASE-4B-2-INVESTIGATION.md
+?? dsh-plugin-visualize-4a3-handoff-v3.zip
+?? evidence/4b2/
+?? evidence/phase-5-rc2/
+--- diffstat 8db9598..HEAD -- src tests tools ---
+ src/client/OpenUICard.tsx            |  86 ++++++++++++++++++++++++++
+ tests/capability-consistency.spec.ts | 114 +++++++++++++++++++++++++++++++++++
+ tests/openui-clipboard-4b.spec.tsx   |  28 +++++++++
+ tools/assert-platform-result.mjs     | 103 +++++++++++++++++++++++++++++++
+ tools/capability-matrix.mjs          |  60 ++++++++++++++++++
+ tools/classify-failures.mjs          | 114 +++++++++++++++++++++++++++++++++++
+ tools/cross-platform.mjs             |  84 ++++++++++++++++++++++++++
+ 7 files changed, 589 insertions(+)
+--- names only ---
+M	src/client/OpenUICard.tsx
+A	tests/capability-consistency.spec.ts
+M	tests/openui-clipboard-4b.spec.tsx
+A	tools/assert-platform-result.mjs
+A	tools/capability-matrix.mjs
+A	tools/classify-failures.mjs
+A	tools/cross-platform.mjs
+--- diffstat 6b26aab(audit commit)..HEAD ---
+ .github/workflows/verify.yml            | 152 ++++++++++++++++++++++++++++++++
+ README.md                               |  12 ++-
+ docs/reports/PHASE-5-AUDIT.md           |  43 +++++++--
+ docs/testing/PLATFORM-FAILURES.md       |  85 ++++++++++++++----
+ evidence/phase-5/C2-cross-platform.json |  76 ++++++++++++++++
+ session-log.md                          |  55 ++++++++++++
+ tools/assert-platform-result.mjs        | 103 ++++++++++++++++++++++
+ tools/cross-platform.mjs                |  84 ++++++++++++++++++
+ 8 files changed, 582 insertions(+), 28 deletions(-)
+--- diffstat 6b26aab..HEAD -- src tests tools ---
+ tools/assert-platform-result.mjs | 103 +++++++++++++++++++++++++++++++++++++++
+ tools/cross-platform.mjs         |  84 +++++++++++++++++++++++++++++++
+ 2 files changed, 187 insertions(+)
+--- docs tree hash before run ---
+d37e95bd29feda01ecff274adc2de532a603f7e9
+
+Name                   Length
+----                   ------
+C1-acceptance.json       3010
+C2-cross-platform.json   3178
+probe-acceptance.mjs     4450
+
+

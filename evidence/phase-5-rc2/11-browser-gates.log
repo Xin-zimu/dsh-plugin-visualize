@@ -1,0 +1,25 @@
+=== node evidence/lib/probe.mjs --what=smoke ===
+BSK_SESSION env = []
+--- bsk daemon status ---
+error: unrecognized subcommand 'status'
+
+  tip: a similar subcommand exists: 'start'
+
+Usage: bsk.exe daemon [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+--- bsk sessions ---
+error: unrecognized subcommand 'sessions'
+
+  tip: a similar subcommand exists: 'session'
+
+Usage: bsk.exe [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+--- probe smoke (bounded) ---
+BLOCKED: bsk daemon is not reachable: Command failed: bsk status --json
+{
+ "verdict": "BLOCKED",
+ "reason": "bsk daemon is not reachable: Command failed: bsk status --json"
+}
+PROBE_EXIT=2

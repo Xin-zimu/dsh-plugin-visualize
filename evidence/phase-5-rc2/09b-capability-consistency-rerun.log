@@ -1,0 +1,16 @@
+=== STEP 5b: re-run capability gate AFTER concurrent doc edits ===
+catalogue sha256 BEFORE: 7FAC1B8E57388E0C18E8A53A2F4228EB25F79E382A403ABB6936748890FB1C2B
+catalogue mtime  BEFORE: 2026-11-06T02:53:39.8397615+08:00
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ✓ tests/skill-actions-consistency.spec.ts (4 tests) 4ms
+ ✓ tests/capability-consistency.spec.ts (10 tests) 5ms
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  02:55:41
+   Duration  926ms (transform 297ms, setup 0ms, import 766ms, tests 10ms, environment 0ms)
+
+EXIT=0
+catalogue sha256 AFTER : 7FAC1B8E57388E0C18E8A53A2F4228EB25F79E382A403ABB6936748890FB1C2B

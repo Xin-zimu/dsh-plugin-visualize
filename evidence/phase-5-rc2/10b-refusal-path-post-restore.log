@@ -1,0 +1,14 @@
+=== STEP 6b: re-run refusal specs after Lead mutation+restore ===
+openui-actions.ts sha256: 792539CAE31A488D7F09EA89AD4303451B8F85EDDDBEA731BC773A5FF53AD435
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ✓ tests/openui-clipboard-4b.spec.tsx (21 tests) 106ms
+ ✓ tests/openui-actions.spec.tsx (24 tests) 105ms
+
+ Test Files  2 passed (2)
+      Tests  45 passed (45)
+   Start at  02:55:43
+   Duration  1.75s (transform 434ms, setup 0ms, import 1.25s, tests 212ms, environment 1.44s)
+
+EXIT=0
