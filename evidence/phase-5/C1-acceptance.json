@@ -1,0 +1,77 @@
+{
+  "phase": "5",
+  "date": "2026-11-05",
+  "subject": "release candidate acceptance on a real host",
+  "bundle": {
+    "clientSha256": "E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB",
+    "installedMatchesBuild": true,
+    "checkedBeforeMeasuring": true
+  },
+  "gates": {
+    "G0": "pass",
+    "G1": {
+      "sent": 31,
+      "received": 31
+    },
+    "G2": {
+      "submitted": true,
+      "echoed": true
+    },
+    "G3": {
+      "paragraphs": 19,
+      "settled": true
+    }
+  },
+  "openui": {
+    "card": true,
+    "hasTitle": true,
+    "hasCopyButton": true,
+    "copyPayload": "release-candidate-token",
+    "hasRefusedButton": true,
+    "refusedAction": "OpenUrl",
+    "linkCount": 1,
+    "linkNoopener": true,
+    "note": "the copy control renders its payload in full; the refused action renders a control rather than nothing"
+  },
+  "refusedActionFeedback": {
+    "noticeBeforePress": false,
+    "pressed": true,
+    "noticeAfterPress": true,
+    "noticeText": "@OpenUrl is not available in this build",
+    "copyControlStillPresent": true,
+    "why": "the stage-5 fix: pressing a refused-action Button used to do nothing, with the reason only in a diagnostics array no user can read"
+  },
+  "htmlBackend": {
+    "frames": 4,
+    "withSandbox": 4,
+    "note": "every HTML card iframe carries a sandbox attribute; the count equals frames, so none is unsandboxed"
+  },
+  "theme": {
+    "dark": {
+      "foreground": "#f9fafb",
+      "card": "#2c2c2e",
+      "bodyBackground": "rgb(21, 21, 23)"
+    },
+    "light": {
+      "foreground": "#0f1115",
+      "card": "#fff",
+      "bodyBackground": "rgb(255, 255, 255)"
+    },
+    "note": "the tokens differ between schemes, so this is a real switch rather than a renamed attribute"
+  },
+  "stateStorage": {
+    "keys": 6,
+    "prefix": "dsh-visualize:state:",
+    "note": "card state is keyed per session and per card path, which is what isolates two cards"
+  },
+  "probeDefectsFound": [
+    "the first fixture used Heading, which openui-lang does not declare; the host answered VZO002 correctly and the fixture was wrong, not the product. The validator naming the unknown component is the behaviour working.",
+    "session start takes no --policy flag; the policy is negotiated by cooperate sync",
+    "navigate needs --context and --observation from a strict sync, and a session cannot change policy after creation",
+    "reading the clipboard with navigator.clipboard.readText() from a script never settles without a user activation; the OS clipboard was read instead, see the 4B evidence"
+  ],
+  "notVerified": [
+    "reload-and-restore was attempted three times and each attempt lost the CDP session to a page still settling. What is recorded instead is that state is persisted to localStorage under a per-session, per-card key. The restore path is covered by unit tests but not by this browser run.",
+    "the HTML backend was confirmed sandboxed and counted, but its rendered content was not inspected beyond the frame count"
+  ]
+}

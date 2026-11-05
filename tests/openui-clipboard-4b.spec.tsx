@@ -258,3 +258,31 @@ describe('11. the capability is scoped to the clipboard', () => {
     expect(typeof clipboardPayload, 'a read helper must not exist').toBe('function')
   })
 })
+
+describe('12. a refused action tells the user, it is not silently inert', () => {
+  it('renders a control that says which name was declined, on press', () => {
+    const program = 'root = Col([Button(' + q('Open docs') + ', @OpenUrl(' + q('https://example.com') + ')), Text(' + q('after') + ')])'
+    const { host } = mount(program)
+    // The control exists and is marked, so a user can see this button is real.
+    const button = host.querySelector<HTMLButtonElement>('[data-openui-refused-button="OpenUrl"]')
+    expect(button, 'a refused action must still draw a control').not.toBeNull()
+    expect(button!.getAttribute('title'), 'the reason is available before the press').toContain('OpenUrl')
+    // Nothing is said until it is pressed: a standing banner is noise.
+    expect(host.querySelector('[data-openui-refused-notice]')).toBeNull()
+    act(() => { button!.click() })
+    const notice = host.querySelector('[data-openui-refused-notice="OpenUrl"]')
+    expect(notice, 'pressing it must explain the refusal').not.toBeNull()
+    expect(notice!.textContent).toContain('OpenUrl')
+    expect(notice!.textContent).toMatch(/not available/i)
+  })
+
+  it('does not copy, navigate or write state when the refused control is pressed', async () => {
+    const program = 'root = Col([Button(' + q('Send it') + ', @ToAssistant(' + q('hi') + '))])'
+    const { host } = mount(program)
+    const button = host.querySelector<HTMLButtonElement>('[data-openui-refused-button="ToAssistant"]')
+    act(() => { button!.click() })
+    await flush()
+    expect(writes, 'a refused action must not reach the clipboard').toEqual([])
+    expect(host.querySelector('[data-openui-copy="button"]')).toBeNull()
+  })
+})

@@ -953,6 +953,13 @@ const COMPONENTS: Readonly<Record<string, Renderer>> = {
     if (copy !== undefined) {
       return createElement(CopyButton, { key, label: text(props[0]), payload: copy })
     }
+    // A step this build refuses must not be silently inert: pressing a Button whose
+    // action is @OpenUrl or @ToAssistant used to do nothing at all, with the reason
+    // visible only in a diagnostics array no user can read. The dispatcher's refusal
+    // is now shown under the button, using the same one-shot status line as a copy.
+    if (refusedActionOf(action) !== undefined) {
+      return createElement(RefusedButton, { key, label: text(props[0]), action: refusedActionOf(action) as string })
+    }
     return createElement(
       'button',
       {
@@ -3945,6 +3952,85 @@ function copyPayloadOf(action: unknown): string | undefined {
   if (step.name.replace(/^@/u, '') !== 'CopyToClipboard') return undefined
   if (!Array.isArray(step.args)) return undefined
   return clipboardPayload(step.args[0])
+}
+
+/**
+ * The name of the refused step a Button carries, or undefined when it carries none.
+ *
+ * A refused step and a malformed one are different cases and are treated
+ * differently. `@OpenUrl` is a name this build recognises and declines — the author
+ * did nothing wrong and deserves to be told which name was declined. An unparseable
+ * action is a program error, and the parser has already reported it.
+ *
+ * @param action - the evaluated action argument of a Button.
+ * @returns the bare action name, or undefined.
+ */
+function refusedActionOf(action: unknown): string | undefined {
+  if (typeof action !== 'object' || action === null || Array.isArray(action)) return undefined
+  const step = action as { kind?: unknown; name?: unknown }
+  if (step.kind !== 'element' || typeof step.name !== 'string') return undefined
+  const bare = step.name.replace(/^@/u, '')
+  return UNSUPPORTED_STEPS.has(bare) ? bare : undefined
+}
+
+/**
+ * A Button whose action this build refuses, which says so when pressed.
+ *
+ * Before this existed, such a Button rendered identically to a working one and did
+ * nothing when clicked: the refusal went into a diagnostics array that no user can
+ * read. A control that looks live and is not is worse than one that explains
+ * itself — the user cannot tell a refusal from a rendering bug.
+ *
+ * The reason is shown on press rather than as a permanent notice, because a
+ * standing banner under every such button is noise in a card the model drew for
+ * something else. `title` and `aria-describedby` carry it before the press for
+ * anyone who looks.
+ */
+function RefusedButton({ label, action }: { readonly label: string; readonly action: string }): ReactNode {
+  const [pressed, setPressed] = useState(false)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => {
+    if (timer.current !== undefined) clearTimeout(timer.current)
+  }, [])
+  const notice = '@' + action + ' is not available in this build'
+  const show = (): void => {
+    setPressed(true)
+    if (timer.current !== undefined) clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      timer.current = undefined
+      setPressed(false)
+    }, 3200)
+  }
+  return createElement(
+    'div',
+    {
+      'data-openui-refused': action,
+      style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6, minWidth: 0 } satisfies CSSProperties,
+    },
+    createElement('button', {
+      type: 'button',
+      'data-openui-refused-button': action,
+      title: notice,
+      onClick: show,
+      style: {
+        font: 'inherit',
+        fontSize: SIZES.sm,
+        alignSelf: 'flex-start',
+        padding: '5px 14px',
+        borderRadius: 'calc(var(--radius) * 1.4)',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: 'var(--border)',
+        cursor: 'pointer',
+        ...BUTTON_KINDS.outline,
+      } satisfies CSSProperties,
+    }, label),
+    pressed ? createElement('span', {
+      'data-openui-refused-notice': action,
+      role: 'status',
+      style: { fontSize: SIZES.xs, color: 'var(--muted-foreground-strong)' } satisfies CSSProperties,
+    }, notice) : null,
+  )
 }
 
 /**

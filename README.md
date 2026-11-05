@@ -15,17 +15,24 @@ one theme and one replay path.
 
 ## Status
 
-**Version 0.1.0, unreleased. Stage 4A-3 of 5 — implemented, awaiting a browser run.**
+**Version 0.1.0, release candidate. Stages 4A and 4B complete; stage 5 audit in**
+**progress. Not yet tagged.**
 
 | Works today | Not yet |
 | --- | --- |
-| One `visualize` tool, both backends registered | 18 components (4A-4, 4A-5) |
-| HTML cards, unchanged from upstream | `@OpenUrl` / `@CopyToClipboard` / `@ToAssistant` (refused by name, 4B) |
-| OpenUI programs are evaluated and drawn as host components — **30 of 48** | Cross-generation history replay (blocked on a host-compatible log) |
-| `$state` persists across a reload; Button and the whole Inputs group write it | `Popover` (the only component that overlays the host document, 4A-5) |
-| Layout primitives and the whole Text group, verified in both themes; the Inputs group renders and is unit-tested | Maps, image search, maths, embeds |
-| `Link` opens an http(s) URL — and only an http(s) URL (ADR-008) | Inline syntax highlighting in `Code` (deliberately absent) |
+| One `visualize` tool, both backends registered | `@OpenUrl` — no host-mediated open exists (ADR-014) |
+| HTML cards, unchanged from upstream | `@ToAssistant` — no host submit API exists (ADR-015) |
+| OpenUI programs drawn as host components — **48 of 48** | Cross-generation history replay (blocked on a host-compatible log) |
+| `$state` persists across a reload; every input writes it | Maps, image search, maths, embeds |
+| 73 functions and the whole Text, Layout, Inputs, Media, Drawing and Disclosure groups, measured in both themes | Inline syntax highlighting in `Code` (deliberately absent) |
+| `Link` opens an http(s) URL — and only an http(s) URL (ADR-008) | Composing `@CopyToClipboard` inside `Action([...])` |
+| `@CopyToClipboard` copies the text the control shows, on a press (ADR-013) | |
 | Legacy calls and legacy cards still work | |
+
+The two refused actions are **declared by the language and refused at dispatch**,
+deliberately: a program naming one validates rather than failing to parse, and the
+Button then explains the refusal when pressed instead of doing nothing. See
+`docs/specifications/COMPONENT_CATALOG.md` §Actions.
 
 Read `session-log.md` for the dated truth. It is the only file that says what
 is actually true right now. `docs/specifications/COMPONENT_CATALOG.md` lists every
@@ -37,11 +44,49 @@ Not on npm yet. From a checkout:
 
 ```sh
 git clone https://github.com/Xin-zimu/dsh-plugin-visualize
+cd dsh-plugin-visualize && pnpm install && pnpm run build
 dsh plugin --profile desktop add "$(pwd)"
 dsh --profile desktop --dump-config   # expect an id: dsh-visualize-unified row
 ```
 
+**Build before adding.** `dsh plugin add` copies `lib/` at install time, so a
+build made afterwards leaves the profile on the old bundle and the browser then
+behaves exactly as the unfixed build would. If a change appears to have no effect,
+compare the two hashes first:
+
+```powershell
+Get-FileHash lib/client.js -Algorithm SHA256
+Get-FileHash <DSH_HOME>/profiles/<profile>/node_modules/@dsh-unified/visualize/lib/client.js -Algorithm SHA256
+```
+
 Restart DSH, then ask for something worth looking at.
+
+### Uninstall
+
+```sh
+dsh plugin --profile desktop remove @dsh-unified/visualize
+```
+
+Cards already in a transcript stay readable: a card carries its own program,
+and the HTML backend's frames are self-contained. Removing the plugin removes
+the tool, not the history.
+
+## Compatibility and limits
+
+- **DSH** `>=0.2.1-alpha.4` (`engines.dsh`). The plugin uses `ctx.tools.register`,
+  `ctx.fs`, `connection.fetch.register`, `ctx.inject(['settings'])` and
+  `ctx.skills.registerProvider`; a host that lacks any of these fails to load it
+  rather than degrading.
+- **Browsers.** Verified on Edge 156. `navigator.clipboard.writeText` needs a
+  secure context; on a non-secure origin `@CopyToClipboard` reports
+  *"This browser has no clipboard access; nothing was copied"* instead of
+  pretending it worked.
+- **No `eval`, no `new Function`.** The OpenUI backend walks a fixed vocabulary.
+  A name that is not in the component table can never become an element.
+- **Known limits.** The two refused actions (above); 15 platform-shaped test
+  failures on Windows, each with its root cause recorded in
+  `docs/testing/PLATFORM-FAILURES.md`; no CI, so cross-platform claims are
+  read from the code rather than measured.
 
 ## For agents
 

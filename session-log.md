@@ -614,6 +614,74 @@ Six things carried forward:
 
 ## History
 
+### Session 20 — 2026-11-05 (Stage 5: release-candidate audit)
+
+**Verdict: releasable. No blocker. Three non-blockers, five deferred.**
+Report: `docs/reports/PHASE-5-AUDIT.md`.
+
+Two findings matter more than the rest, and neither came from the test suite.
+
+**A verification tool was lying.** The previous round reported `910 + 15 ≠ 927`.
+The missing two were not arithmetic: `tmp/diff.mjs` compared the tree against a
+hard-coded `tmp/full-after.json` captured hours earlier, so every later run printed
+`IDENTICAL: true` regardless of what had changed. Two genuine failures introduced
+by stage 4B sat behind it. Both scripts now take their input as an argument, and
+`evidence/lib/failure-set.mjs` additionally asserts that `passed + failed + pending
++ todo` equals the total — the check that would have caught it, because a
+disappearing test is a silent removal of a check and otherwise looks like an
+improvement.
+
+**A refused action was silently inert.** A Button whose action is `@OpenUrl` or
+`@ToAssistant` rendered identically to a working one and did nothing when pressed;
+the refusal existed only in a diagnostics array no user can read. A control that
+looks live and is not is worse than one that explains itself. It now names the
+declined step on press. Reproduced in a real browser before the fix
+(`noticeBeforePress: false`, `noticeAfterPress: true`,
+`"@OpenUrl is not available in this build"`), and three mutations confirm the
+tests guard it.
+
+**Capability drift now has a gate.** `tests/capability-consistency.spec.ts` reads
+the same tables the code reads — `COMPONENTS`, `ACTION_STEPS`, `SUPPORTED_STEPS`,
+`UNSUPPORTED_STEPS`, `languageReference()` — and fails when the catalogue or the
+skill text disagrees. It also asserts every declared action is in exactly one of
+the two sets, because a name in neither validates and then refuses as
+`action.unknown`, which reads like a bug rather than a decision. Three mutations
+turn it red. `tools/capability-matrix.mjs` renders the matrix from the same tables
+so the published table cannot be hand-written.
+
+**Documents were four phases stale.** The README said "Stage 4A-3 of 5" and "30 of
+48" components, and listed `Popover` as missing; the CHANGELOG ended at stage 1.2
+and claimed 8/48. Both now describe the release candidate. `CHANGELOG.md` gained a
+*Refused, deliberately* section so a reader meets the two refusals as decisions
+rather than as omissions.
+
+**The fifteen failures are documented, not argued away.**
+`docs/testing/PLATFORM-FAILURES.md` gives each one a root cause taken from its own
+message: 6 × `EPERM` creating symlinks, 4 × a literal `~` in a path, 1 × a
+drive-qualified path joined onto another, 1 × `EPERM` renaming over an open file,
+1 × a fixture mock missing `ctx.fs.readText`, 1 × a 5 s timeout, 1 × a description
+fixture with no provider. `tools/classify-failures.mjs` exits non-zero on any
+unclassified failure, so a new one cannot join the baseline by being ignored.
+
+The honest limits of that document are stated inside it. **Six of the fifteen are
+the tests that prove a symlink escape is refused**, and they cannot run on Windows,
+so that containment is unproven here. And **there is no CI**, so no POSIX run
+exists in `evidence/` — "these pass elsewhere" is read from the messages, not
+measured.
+
+**Verified:** `tsc` 0 errors on both projects; `vitest run` **924 passed / 15
+failed / 939**, counts close, failure set identical to the baseline name by name;
+build clean; bundle hash `E1BF4A82…` matching the installed copy before measuring
+(§9); real-host acceptance recorded in `evidence/phase-5/C1-acceptance.json` —
+48/48 components, 4/4 HTML frames sandboxed, dark and light tokens demonstrably
+different, the refused-action notice working, and the copy control showing its
+payload in full.
+
+**Not verified, and recorded as such:** the browser reload-and-restore round trip
+(three attempts, each losing the CDP session to a settling page; persistence is
+recorded and the restore path has unit tests, but the round trip is NOT VERIFIED),
+and the contents drawn inside the HTML frames.
+
 ### Session 19 — 2026-11-05 (Stage 4B: one action shipped, two deferred)
 
 **Stage 4B closed.** `@CopyToClipboard` is out of `UNSUPPORTED_STEPS` and shipped.
