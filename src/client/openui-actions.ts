@@ -7,9 +7,11 @@
  * `new Function`, and no lookup by a string the program chose at runtime beyond
  * a plain record of the steps this build supports.
  *
- * Scope (P3-07): `@Set`, `@Reset` and `Action([...])` — the three that only
- * touch local `$state`. `@OpenUrl`, `@CopyToClipboard` and `@ToAssistant` are
- * recognised and refused, so they are inert rather than silently mis-handled.
+ * Scope: `@Set`, `@Reset` and `Action([...])` touch local `$state`; the stage-4B
+ * batch added `@CopyToClipboard`, which produces no patch and is refused when
+ * nested (see {@link ActionOutcome.clipboard}). `@OpenUrl` and `@ToAssistant` are
+ * recognised and refused, so a Button carrying one is inert rather than silently
+ * mis-handled — and it says which name it declined when pressed.
  *
  * ## Timing contract, inherited from the evaluator
  *
