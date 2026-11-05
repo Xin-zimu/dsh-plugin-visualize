@@ -1,0 +1,125 @@
+name: verify
+
+# What this workflow is for, and what it is deliberately not.
+#
+# It exists because the release audit could only say "the fifteen failures are
+# platform-shaped" as an argument read from their error messages. That is not the
+# same as evidence. The same suite now runs on Linux and Windows, both reporters are
+# kept as artifacts, and tools/cross-platform.mjs compares them name by name.
+#
+# It is NOT a gate that hides failures: no step uses continue-on-error, and the job
+# fails when the tests fail. A skipped test is visible as a skip, not absorbed.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Both platforms must report. fail-fast would cancel the other leg on the
+      # first failure, which is exactly the comparison this workflow exists for.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      # vitest requires ^20 || ^22 || >=24. 22 is the version the release candidate
+      # was verified against on both platforms.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # pnpm 11.28.0 is what produced pnpm-lock.yaml; a different major would
+      # re-resolve instead of installing what was tested.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.28.0'
+
+      - name: Resolve the pnpm store path
+        id: store
+        shell: bash
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+
+      # --frozen-lockfile: fail rather than silently resolve a different tree.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (node)
+        run: npx tsc -p tsconfig.json
+
+      - name: Typecheck (client)
+        run: npx tsc -p tsconfig.client.json
+
+      # The JSON reporter is the artifact; the default reporter is for the log.
+      - name: Test
+        shell: bash
+        run: npx vitest run --reporter=default --reporter=json --outputFile=test-report.json
+
+      - name: Build
+        run: npx tsdown
+
+      # A build that differs between platforms would mean the shipped bundle depends
+      # on the machine that made it. Both legs must produce the same two hashes.
+      - name: Record bundle hashes
+        shell: bash
+        run: |
+          node -e "const {createHash}=require('node:crypto');const {readFileSync}=require('node:fs');for(const f of ['lib/client.js','lib/index.js']){const h=createHash('sha256').update(readFileSync(f)).digest('hex');console.log(f,h);require('node:fs').appendFileSync('hashes.txt',f+' '+h+'\n')}"
+          cat hashes.txt
+
+      - name: Verify the failure counts close
+        shell: bash
+        run: node evidence/lib/failure-set.mjs test-report.json
+        continue-on-error: false
+
+      # Kept even when a step fails: a failed run is when the report matters most.
+      - name: Upload the test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report-${{ matrix.os }}
+          path: |
+            test-report.json
+            hashes.txt
+          if-no-files-found: warn
+
+  compare:
+    name: compare platforms
+    needs: verify
+    # Runs even when a leg failed, so the comparison is produced for a red run too —
+    # that is the case a reviewer most needs it in.
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: reports
+
+      - name: Compare the two failure sets
+        run: |
+          ls -R reports
+          node tools/cross-platform.mjs \
+            reports/test-report-windows-latest/test-report.json \
+            reports/test-report-ubuntu-latest/test-report.json
+
+      - name: Compare the two builds
+        run: |
+          diff reports/test-report-windows-latest/hashes.txt reports/test-report-ubuntu-latest/hashes.txt \
+            && echo 'BUILDS IDENTICAL: the bundle does not depend on the platform' \
+            || (echo 'BUILDS DIFFER between platforms'; exit 1)
