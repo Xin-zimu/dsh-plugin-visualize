@@ -66,9 +66,22 @@ jobs:
         run: npx tsc -p tsconfig.client.json
 
       # The JSON reporter is the artifact; the default reporter is for the log.
+      #
+      # This step deliberately swallows the exit code, and that is the one place in
+      # this workflow where a red result is allowed to continue. The reason is
+      # narrow: the Windows suite is red by design, so an exit code there says
+      # nothing a reviewer can act on. The gate two steps below reads the JSON and
+      # is what decides — and it is stricter, because it also fails on a skip and on
+      # any failure outside the named baseline.
+      #
+      # The danger of swallowing an exit code is that the gate gets forgotten or
+      # weakened. That risk is handled by making the gate a separate, visible step
+      # whose name says what it does, not by trusting this comment.
       - name: Test
         shell: bash
-        run: npx vitest run --reporter=default --reporter=json --outputFile=test-report.json
+        run: |
+          npx vitest run --reporter=default --reporter=json --outputFile=test-report.json || true
+          test -f test-report.json || (echo 'vitest produced no report; treating that as a failure'; exit 1)
 
       - name: Build
         run: npx tsdown
@@ -81,10 +94,24 @@ jobs:
           node -e "const {createHash}=require('node:crypto');const {readFileSync}=require('node:fs');for(const f of ['lib/client.js','lib/index.js']){const h=createHash('sha256').update(readFileSync(f)).digest('hex');console.log(f,h);require('node:fs').appendFileSync('hashes.txt',f+' '+h+'\n')}"
           cat hashes.txt
 
-      - name: Verify the failure counts close
+      # The gate, and why it is not "did vitest exit 0".
+      #
+      # The Windows suite is red: fifteen known platform failures, documented in
+      # docs/testing/PLATFORM-FAILURES.md. A bare exit code would fail every Windows
+      # build, and the easy way out of that is to skip the tests — which is the one
+      # thing this workflow must never do.
+      #
+      # So the gate is stricter, not looser. Linux must have zero failures. Windows
+      # must have exactly the baseline fifteen, by name. Neither platform may skip
+      # anything, because a skip is a removed check and it would look like passing.
+      - name: Gate on the expected result for this platform
         shell: bash
-        run: node evidence/lib/failure-set.mjs test-report.json
-        continue-on-error: false
+        run: |
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            node tools/assert-platform-result.mjs test-report.json linux
+          else
+            node tools/assert-platform-result.mjs test-report.json windows
+          fi
 
       # Kept even when a step fails: a failed run is when the report matters most.
       - name: Upload the test report

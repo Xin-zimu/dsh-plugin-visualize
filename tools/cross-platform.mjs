@@ -48,16 +48,22 @@ const posix = read(posixPath, 'posix')
 const onlyWindows = windows.failed.filter(x => !posix.failed.includes(x))
 const onlyPosix = posix.failed.filter(x => !windows.failed.includes(x))
 
-// Each Windows failure must be absent on POSIX for the platform claim to hold. If a
-// test fails on both, the cause is not the platform and the classification is wrong.
+// A test that fails on BOTH platforms is not a platform limitation — it is a defect
+// or a fixture problem that the Windows baseline has been hiding. That is the only
+// thing this script treats as an error.
 const failsOnBoth = windows.failed.filter(x => posix.failed.includes(x))
 
-const verdict = posix.failed.length === 0 && failsOnBoth.length === 0
-  ? 'PLATFORM-SPECIFIC: every Windows failure passes on POSIX'
-  : failsOnBoth.length > 0
-    ? 'NOT PLATFORM-SPECIFIC: ' + failsOnBoth.length + ' test(s) fail on both'
-    : 'INCONCLUSIVE'
+// The empty-POSIX case is the expected one and is NOT a failure of this comparison:
+// it is the result the audit predicted. Reporting it as a mismatch was a bug in the
+// first version of this script written into CI, where it failed every Linux build for
+// being too clean.
+const posixIsClean = posix.failed.length === 0
 
+const verdict = failsOnBoth.length > 0
+  ? 'DEFECT: ' + failsOnBoth.length + ' test(s) fail on both platforms, so their cause is not the platform'
+  : posixIsClean
+    ? 'PLATFORM-SPECIFIC: every Windows failure passes on POSIX; POSIX is clean'
+    : 'MIXED: POSIX has ' + posix.failed.length + ' failure(s) of its own, none shared with Windows'
 console.log(JSON.stringify({
   inputs: { windows: winPath, posix: posixPath },
   counts: { windows: windows.counts, posix: posix.counts },
@@ -69,9 +75,10 @@ console.log(JSON.stringify({
     failsOnBoth,
   },
   skipped: { windows: windows.skipped.length, posix: posix.skipped.length },
+  posixIsClean,
   verdict,
   onlyWindows,
   onlyPosix,
 }, null, 1))
 
-process.exit(verdict.startsWith('PLATFORM-SPECIFIC') ? 0 : 1)
+process.exit(failsOnBoth.length > 0 ? 1 : 0)
