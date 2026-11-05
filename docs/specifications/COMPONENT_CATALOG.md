@@ -113,8 +113,8 @@ An action is the step a `Button` carries. Four work; two are refused.
 | `@Reset()` | yes | **yes** | Returns variables to their declared defaults |
 | `Action([...])` | yes | **yes** | Runs several steps in order |
 | `@CopyToClipboard(text)` | yes | **yes** | **ADR-013.** Copies its text on a press, and the Button then shows that text in full so the reader sees exactly what will be copied. Refused inside `Action([...])`; capped at 32 KiB, refused not truncated |
-| `@OpenUrl(url)` | yes | **no** | **Deferred — host capability unavailable.** ADR-014 |
-| `@ToAssistant(message)` | yes | **no** | **Deferred — trusted host submission capability unavailable.** ADR-015 |
+| `@OpenUrl(url)` | yes | **no** | **Deferred.** The host capability exists but is a sidebar tab, not an external open — see below. ADR-014 §10 |
+| `@ToAssistant(message)` | yes | **no** | **Deferred.** Submission is reachable; attribution and an unfakeable confirmation are not — see below. ADR-015 §10 |
 
 The two refused actions are declared by the language so that a program naming one
 **validates** rather than failing with `VZO002`. They are then refused at dispatch,
@@ -128,6 +128,31 @@ silently starts executing one of them, fails that test.
 **Use `Link("label", "https://…")` to offer a URL** — it is a link the reader
 clicks, subject to ADR-008's protocol allowlist, and it is what `@OpenUrl` would
 have produced on a user's press.
+
+### Why the two are deferred, corrected 2026-11-06
+
+Both were deferred on the stated ground that the host exposes no relevant API.
+**That was wrong**, and the corrections are recorded in ADR-014 §10 and ADR-015 §10
+rather than quietly edited away. Neither verdict changed; only the reason did.
+
+**`@OpenUrl`.** A host-mediated open *does* exist —
+`ctx.sidebarRight.openTab('browser', { params: { url } })` — and it is the call the
+host's own link gesture makes. It is **not this action**: it docks a tab inside the
+DSH window instead of opening the page in the reader's browser, and an iframe
+refusal in that tab is unobservable, which is the silent failure ADR-014 exists to
+prevent. It stays refused pending an upstream plugin-callable open-external API,
+and is not re-pointed at the sidebar in the meantime.
+
+**`@ToAssistant`.** Submission *is* reachable: every session-scope card already
+receives `inputActions`, which carries `submit()`. Role escalation is structurally
+impossible — the host builds the message source, so no caller can name a role. It
+stays refused on the two ADR-015 properties no host API supplies: the turn would
+carry **no visible attribution** (`rpcId` is dedupe-only and never rendered), and
+there is **no confirmation the card cannot fake**. A card-drawn dialog is the card's
+own surface, which is exactly what ADR-015 forbids, so it is not a substitute.
+Neither requirement is dropped.
+
+Both remain refused at dispatch, and the refusal notice is unchanged.
 
 ## Not yet available — validated but not drawn
 

@@ -70,18 +70,31 @@ new control must not copy it. Measured after the switch, in a real browser:
 
 ## 3. What was deliberately not built
 
+> **This section is the historical record as written on 2026-11-05 and is kept
+> unaltered.** Both headings below assert a host capability is unavailable. That
+> premise was **wrong**, discovered in Stage 4B-2 and corrected in ADR-014 §10 and
+> ADR-015 §10 (`docs/reports/PHASE-4B-2-INVESTIGATION.md`). **The decisions in this
+> section still stand** — only the stated reason changed. Read this section together
+> with those amendments; do not cite it as current.
+
 ### `@OpenUrl` — Deferred, host capability unavailable
 
 A card can reach `window.open` and `location.assign`, but both are the card
 deciding to navigate, which ADR-004 forbids; a popup blocker also swallows the
 first one silently, so the program believes it navigated while the user sees
-nothing. No host-mediated open exists.
+nothing. No host-mediated open exists. **[CORRECTED 2026-11-06 — one does exist,
+but it opens a sidebar tab rather than an external browsing context, so this
+conclusion survives and its reason does not. See ADR-014 §10.]**
 
 The first draft recommended an interim "render a link the user must press". It is
 withdrawn: that is not this action under another name, it is `Link`. Shipping it
 would add a second spelling for one effect with no containment gain.
 
 ### `@ToAssistant` — Deferred, trusted host submission capability unavailable
+
+**[CORRECTED 2026-11-06 — a submission path does exist and is already a prop on this
+plugin's card; what does not exist is transcript attribution and a confirmation the
+card cannot fake. Both requirements below are retained unrelaxed. ADR-015 §10.]**
 
 The highest-risk of the three, and the only one with a re-entrancy hazard.
 
@@ -164,7 +177,7 @@ Also measured:
 | `tsc -p tsconfig.client.json` | 0 errors |
 | `vitest run` | 910 passed / 15 failed / 927 |
 | Failure set vs baseline | **identical, name by name** |
-| Build | `lib/client.js` 251.13 kB |
+| Build | `lib/client.js` **450.56 kB**; the `251.13 kB` recorded here originally was tsdown's ESM total (`lib/index.js` + `lib/index.d.ts`), not the client bundle — corrected 2026-11-06, see `evidence/phase-5-rc2/RESULTS.md` F1 |
 | Bundle hash | `E2B0ED7B…`, installed copy identical |
 | Browser acceptance | copy verified against the OS clipboard |
 | Inventory | 48 / 48, unchanged |

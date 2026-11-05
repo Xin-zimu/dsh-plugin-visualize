@@ -45,14 +45,26 @@ Two actions are declared by the language and refused when a program names them.
 A Button carrying one renders normally and, when pressed, says which name is
 unavailable and why — it does not silently do nothing.
 
-- **`@OpenUrl`** — DSH exposes no host-mediated way to open a URL, and a card must
-  not decide to navigate: `window.open` from card code is forbidden by ADR-004,
-  and a popup blocker swallows it anyway, so the program would believe it had
-  navigated while nothing happened. Use `Link` instead, which navigates on a press
-  the reader makes themselves.
-- **`@ToAssistant`** — there is no plugin API for submitting a turn. Reaching the
-  composer through the DOM would produce a message the host could not attribute or
-  refuse.
+- **`@OpenUrl`** — deferred on a premise that no longer holds: the host does
+  expose a mediated open, `ctx.sidebarRight.openTab('browser', { params: { url } })`,
+  and it is the call the host's own link gesture makes. It is still not this
+  action. It docks a tab inside the DSH window instead of opening the page in the
+  reader's browser, and an iframe refusal in that tab is unobservable — the silent
+  failure ADR-014 exists to prevent. `window.open` from card code stays forbidden
+  by ADR-004. Before it ships: the action keeps its meaning — open an external URL
+  — and waits on an upstream plugin-callable open-external API; it is not quietly
+  re-pointed at the sidebar. Use `Link` instead, which navigates on a press the
+  reader makes themselves.
+- **`@ToAssistant`** — refused, but not because the host cannot submit a turn.
+  The contract already gives every session-scope card `inputActions`, and role
+  escalation is structurally impossible because the host builds the message source
+  itself. What no host API supplies is the two ADR-015 properties that decide this
+  action: the turn would carry no visible attribution (`rpcId` is dedupe-only and
+  never rendered), and there is no confirmation the card cannot fake — a
+  card-drawn dialog is the card's own surface, which is exactly what the ADR
+  forbids. Before it ships: an upstream card-attributed source the transcript
+  renders, and a plugin-callable consent surface. Neither requirement is dropped
+  in the meantime.
 
 Both are recorded as deferred with their conditions for a future implementation
 written down (ADR-014, ADR-015), so they can be evaluated rather than

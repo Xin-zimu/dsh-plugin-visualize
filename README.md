@@ -20,8 +20,8 @@ one theme and one replay path.
 
 | Works today | Not yet |
 | --- | --- |
-| One `visualize` tool, both backends registered | `@OpenUrl` — no host-mediated open exists (ADR-014) |
-| HTML cards, unchanged from upstream | `@ToAssistant` — no host submit API exists (ADR-015) |
+| One `visualize` tool, both backends registered | `@OpenUrl` — a mediated open exists but is a sidebar tab, so the action stays refused (ADR-014) |
+| HTML cards, unchanged from upstream | `@ToAssistant` — a submit path exists; the attribution and unfakeable confirmation do not (ADR-015) |
 | OpenUI programs drawn as host components — **48 of 48** | Cross-generation history replay (blocked on a host-compatible log) |
 | `$state` persists across a reload; every input writes it | Maps, image search, maths, embeds |
 | 73 functions and the whole Text, Layout, Inputs, Media, Drawing and Disclosure groups, measured in both themes | Inline syntax highlighting in `Code` (deliberately absent) |

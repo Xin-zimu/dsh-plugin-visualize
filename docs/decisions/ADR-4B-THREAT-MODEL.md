@@ -40,6 +40,18 @@ as evidence that the host can perform it. So the host surface was read.
 | **Write the system clipboard from the node half** | **no** | no clipboard service |
 | **Submit a message to the assistant** | **no** | no session-write or turn-submit API |
 
+> **[CORRECTED 2026-11-06]** Two rows of this table were wrong. A host-mediated
+> *submit* **does** exist and is reachable from this plugin — three paths, one of
+> them already a prop on this plugin's own card. A host-mediated *open* also
+> exists, but it opens a **sidebar tab**, not the user's browser, so the row above
+> is correct as written only if "in the user's browser" is read strictly. The
+> investigation is `docs/reports/PHASE-4B-2-INVESTIGATION.md`; corrections are
+> recorded in ADR-014 §10 and ADR-015 §10, and the mapping table is corrected
+> immediately below.
+>
+> This section is kept as written because **the method it describes was right** —
+> read the host surface rather than infer it. What it read was incomplete.
+
 ### Three states, not two
 
 "The host cannot do this" and "the host chooses not to expose this" are different
@@ -59,8 +71,8 @@ Mapping the three actions:
 | Action | State | Why |
 | --- | --- | --- |
 | `@CopyToClipboard` | **Available but unauthorised** | `navigator.clipboard.writeText` is one call away — `Code`'s copy button already uses it. That button is a user gesture on a visible control with a visible payload; the *programme* driving the same API is a different and larger claim. Nothing but this stage's conditions enforces the difference. |
-| `@OpenUrl` | **Not available** | A card can reach `window.open` and `location.assign`, but both are the card deciding to navigate, which ADR-004 forbids and a popup blocker can silently swallow. No host-mediated open exists. |
-| `@ToAssistant` | **Not available** | No submit interface. A card could type into the composer, which is exactly the bypass the ADR must forbid rather than permit. |
+| `@OpenUrl` | **Available, but not this capability** | **[CORRECTED 2026-11-06]** A host-mediated open exists — `ctx.sidebarRight.openTab('browser', {params:{url}})`, documented for plugins, with an allowlist stricter than ADR-014 §5 asked for. It opens a **sidebar tab, not a browsing context**, and conceals iframe refusals, which is the silent failure ADR-014 exists to prevent. So it is not `@OpenUrl`; see ADR-014 §10.2. |
+| `@ToAssistant` | **Available; two required properties are not** | **[CORRECTED 2026-11-06]** A native submit exists and is reachable (ADR-015 §10.1), and the user role is fixed by the host structurally (§10.2). What does **not** exist is a confirmation surface the card cannot forge (§10.3) or card attribution in the transcript (§10.4). ADR-015 §10. |
 
 The middle row is the one to keep in view. **A callable browser API is evidence of
 possibility, never of permission** — and where the API is present, the policy is the
@@ -68,8 +80,16 @@ only thing standing between the programme and the effect.
 
 This mapping also fixes what each ADR's status means: `@CopyToClipboard` is
 **proposed** (a viable path exists, conditions pending); `@OpenUrl` and
-`@ToAssistant` are **Deferred — host capability unavailable**. Deferred is not a
-softer refusal; each stays in `UNSUPPORTED_STEPS` and behaves identically to today.
+`@ToAssistant` are **Deferred**, and after the 2026-11-06 correction they are
+deferred for **narrower, named reasons** rather than "host capability unavailable"
+(ADR-014 §10, ADR-015 §10). Both stay in `UNSUPPORTED_STEPS` and behave identically
+to today. Deferred is not a softer refusal.
+
+**The distinction this stage should carry forward**, and the one the correction
+taught: *the host having a capability* and *the host having the capability with the
+safety properties the action needs* are different findings. Both actions moved from
+"the API is missing" to "the API exists but cannot be offered to a user safely".
+The refusal is unchanged; the work remaining is now specific enough to ask for.
 
 ## 3. Assets
 

@@ -1,8 +1,13 @@
 # ADR-015 — `@ToAssistant`: sending content to the assistant
 
-- **Status:** **Deferred — trusted host submission capability unavailable.** The
+- **Status:** **Deferred — two required properties have no host capability.** The
   action stays refused, and no interim implementation is written.
-- **Date:** 2026-11-05
+  **Amended 2026-11-06.** The original stated reason — "trusted host submission
+  capability unavailable" — is **false** and is corrected in §10. A turn-submit
+  path exists and is reachable from this plugin; what does *not* exist is card
+  attribution and a host-rendered confirmation the card cannot fake. The status is
+  unchanged and **no requirement was relaxed**.
+- **Date:** 2026-11-05 (amended 2026-11-06)
 - **Relates to:** `ADR-4B-THREAT-MODEL.md`, ADR-004 (boundaries), ADR-006
   (`$state` persistence), `src/client/openui-actions.ts`
 
@@ -13,9 +18,14 @@
 ## 1. Current state
 
 `@ToAssistant` is in `UNSUPPORTED_STEPS`. `applyAction` recognises the name and
-refuses it, so a Button carrying it is inert. Nothing in the plugin can submit a
-turn: there is no session-write or turn-submit API on the host surface this plugin
-is given (threat model §2).
+refuses it, so a Button carrying it is inert.
+
+**[CORRECTED 2026-11-06]** This paragraph originally read: *"Nothing in the plugin
+can submit a turn: there is no session-write or turn-submit API on the host surface
+this plugin is given (threat model §2)."* **That is false.** Three real submit paths
+exist, one of them already passed to this plugin's own card as a prop. See §10.
+The action remains refused because two *properties* this ADR requires cannot be
+satisfied — not because the capability is absent.
 
 The declared form is `@ToAssistant(message)`. The message is a string the program
 composes, which may include text the card is displaying.
@@ -68,6 +78,13 @@ one place where it matters most.
 
 ### Option B — no host API, so build a client-side submit through the DOM
 
+**[CORRECTED 2026-11-06]** The premise of the option name — "no host API" — is
+false (§10). This option remains **rejected for its own reasons**, which do not
+depend on the premise: it is the card reaching into the host's controls, it is
+brittle against the composer's ProseMirror implementation, and it produces a
+message the host cannot attribute or refuse. A native path exists (§10.1), so
+there has never been a reason to take this one.
+
 The card lives in the host document, so it could find the composer and set its
 value, or dispatch a submit event.
 
@@ -83,9 +100,22 @@ The action does **not** send. It opens a confirmation surface showing the exact
 text, attributed as "from this card", with Send and Cancel. Only Send, pressed by
 the user, submits — as the user's own turn, with the card's path attached.
 
-This needs a host capability that does not exist yet: a way for a plugin to
-request a turn submission that the host mediates and attributes. `ADR-4B-THREAT-
-MODEL.md` §2 records that gap; this option is what would fill it.
+**[CORRECTED 2026-11-06]** This originally said the needed capability "does not
+exist yet". It exists, in part (§10.1): a plugin *can* request a host-mediated turn
+submission, and the host delivers it as the user's own turn with the role fixed by
+construction. What the host does **not** provide is the rest of Option C:
+
+| Option C requires | Available? |
+| --- | --- |
+| A host-mediated submit the plugin can request | **Yes** — three doors, §10.1 |
+| Delivered as the user's own turn, role not an argument | **Yes** — structural, §10.2 |
+| An explicit preview showing the exact bytes | Plugin-side only |
+| A **confirmation surface the card cannot fake** | **No** — §10.3 |
+| Visible **attribution** that it came from a card | **No** — §10.4 |
+
+So Option C is **half available**: the submission machinery is there and is better
+than this ADR assumed, while the two properties that make it *safe to offer to a
+user* are not. That is why the action stays refused.
 
 ## 5. Recommendation
 
@@ -125,7 +155,7 @@ showed it in full and the user chose to send it.
 
 | Requirement | Why |
 | --- | --- |
-| **Host-rendered** | The card must not be able to draw the confirmation itself. A card that could fake the prompt could fake the consent. |
+| **Host-rendered** | The card must not be able to draw the confirmation itself. A card that could fake the prompt could fake the consent. **[CORRECTED 2026-11-06: no plugin-callable host surface for this exists — see §10.3. The requirement is retained, unrelaxed; the owner explicitly rejected downgrading it to a card-rendered confirm.]** |
 | **Shows the whole message** | What is approved equals what is sent, byte for byte. No truncation, no summarising. |
 | **Names the sender** | The user sees that this came from a card, not from themselves. |
 | **Cancellable without side effects** | Cancel sends nothing and leaves the card usable. |
@@ -138,14 +168,24 @@ authorised session, with no tool permissions of its own, and it can never become
 send this?"; it does not answer "is this content safe?", and the design must not
 let the first answer imply the second.
 
-### No submission path exists, and none may be improvised
+### The submission path may not be improvised
 
-The host exposes no plugin interface for submitting a turn (threat model §2). That
-absence is binding: this action may **not** be implemented by manipulating the DOM,
+**[CORRECTED 2026-11-06]** This heading read *"No submission path exists, and none
+may be improvised"*, and the paragraph below it asserted that *"the host exposes no
+plugin interface for submitting a turn"*. **That is false** — see §10.1. A native,
+host-mediated submit path exists and is reachable from this plugin.
+
+What survives unchanged, and is the point of the original paragraph, is the
+prohibition: this action may **not** be implemented by manipulating the DOM,
 synthesising input events, or driving the composer. Those routes would produce a
 message the host did not mediate, could not attribute and could not refuse —
-defeating every property in the table above at once. When the interface exists,
-this ADR is re-opened; until then the action is refused.
+defeating every property in the table above at once. That remains binding, and it
+is now a *choice* rather than a necessity: a native path exists, so there has never
+been a reason to take a DOM-shaped one.
+
+The action is **not** re-opened by the correction, because the native path does not
+supply §10.3's unforgeable confirmation or §10.4's attribution. It re-opens when
+both exist.
 
 ## 6. Security test matrix
 
@@ -194,3 +234,140 @@ actions.
 - Choose its own recipient or session.
 - Act on another card's behalf.
 - Retry itself after a failure.
+---
+
+## 10. Amendment 2026-11-06 — the stated reason was false; no requirement relaxed
+
+Appended, not substituted. The text above records what was decided on 2026-11-05;
+where it is now known to be wrong it is marked in place **and** corrected here.
+Nothing was deleted.
+
+**Full investigation:** `docs/reports/PHASE-4B-2-INVESTIGATION.md`.
+**Evidence:** `evidence/4b2/`.
+
+### 10.1 What was wrong: the capability exists, through three doors
+
+The §1 claim that no turn-submit API exists is false against DSH 0.2.1-rc.5.
+
+| Door | Path | Reachable because |
+| --- | --- | --- |
+| A | `ctx.conversation.send(text)` — `IConversation`, `dsh-client-ui-conversation/lib/types/client/service.d.ts:26-57`, impl `lib/client.js:4664-4670` | Needs a session-scope context |
+| B | `conversation.input.for(scope).submit()` — `contract/input.d.ts:184`, impl `lib/client.js:15202-15256` | Needs a session-scope context |
+| **C** | **`inputActions` — a declared standard prop carrying `submit()`** | **Already passed to this plugin's card** |
+
+**Door C is the one that matters**, because it needs no lookup and no scope
+juggling: `dsh-client-ui-slots/lib/types/index.d.ts:221,226` puts
+`SessionStandardProps` inside `PropsRuntime`; `dsh-client-ui-conversation/
+lib/types/client/contract/slots.d.ts:423-430` declares `inputActions: InputActions`
+on it; `InputActions.submit(): void` is at `contract/input.d.ts:258`; and
+`tool.call.toolview` — the slot this plugin's card registers under — is
+`scope: 'session'`. **The card already receives the submit capability as a prop.**
+
+The mechanism behind doors A and B is one line of cordis: `get()` returns a
+caller-scoped proxy (`cordis/lib/index.js:763-765`, trap at `:128`), so
+`ctx.sessions.scope(id)` yields a real session-scope context
+(`dsh-api-session-controller/lib/types/client/sessions/service.js:365-367`).
+**This plugin already relies on that chain** — `src/client/prompt-bridge.ts:122-163`
+resolves the composer facade through it and calls `setDraft`/`focus`/`notify`
+today. It simply never called `submit`.
+
+### 10.2 One requirement turned out to be stronger than assumed
+
+§5's mandatory property **"Role is not an argument"** is not merely satisfiable —
+it is **enforced by the host, structurally**:
+
+- `dsh-api-session-controller/lib/index.js:3218-3231` — the node entry builds the
+  source itself: `const source = { kind: "user", rpcId: request.requestId, ...principal }`.
+  The wire request has **no** `source` and no `role` field to send.
+- `:925-951` — `createUserMessage({ content, source })` then
+  `agent.followup(message)` (or `agent.steer` in steer mode).
+- `dsh-llm MessageSourceMap` (`lib/typert.host.js:476`):
+  `'user-rpc': { kind: 'user'; rpcId; ... }` — **user-rpc *is* kind:'user'**.
+- `system`/`developer` are separate, separately-validated event families
+  (`dsh-session/lib/types/surface.d.ts:90-96`). No `prompt`-shaped wire type
+  produces either.
+
+**T7 in the 4B threat model is therefore mitigated by the host, not by us.** That
+should be recorded as a guarantee we can rely on rather than assert.
+
+### 10.3 What is genuinely missing (1): a confirmation the card cannot fake
+
+§5 requires the confirmation to be **host-rendered**, because *"a card that could
+fake the prompt could fake the consent."* **No plugin-callable surface for this
+exists.**
+
+There *is* a host-styled approval panel
+(`dsh-client-ui-approval/lib/client.js:344-354`), but it is driven by the host's
+approval waterfall — `ctx.remote.$on("approval/request", …)` (`:355-357`) — with
+answerers composed by the deployment. `dsh-user-approval` states that *"the service
+itself never prompts a human"*, and `request()` **throws outside an open turn**
+(`lib/types/index.js:121-127`). `dsh-user-questions` is a tool-side service keyed
+by `ToolCallId`.
+
+A plugin can render a *host-styled* dialog in a session-scope slot. It is still the
+card's own surface, so it is **exactly the thing this ADR forbids**. The owner has
+explicitly rejected downgrading this requirement to "card-rendered, exact bytes":
+a card's content may be model-generated, it cannot prove its confirmation UI belongs
+to a trusted host, and a card-drawn confirm does not solve attribution either.
+
+### 10.4 What is genuinely missing (2): attribution
+
+§5 requires the delivered turn to say it came from a card. **No host capability
+delivers this.** The only distinguishing field is `rpcId` (+ optional `principal`),
+and the transcript never renders it: in `dsh-client-ui-chat/lib/client.js` it appears
+at `:2722-2737`, `:2826-2841` and `:2846-2847`, all three using it purely to
+**suppress duplicate optimistic echoes**. A grep for `user-rpc` across `ui-chat`
+and `ui-conversation`: **zero rendering hits**. A message submitted this way is
+indistinguishable from typed input.
+
+### 10.5 Two implementation traps, recorded so they are not rediscovered
+
+1. **`InputState.phase` is useless as an in-flight guard.** A plain (non-command)
+   send sets `phase` and leaves it `'plain'` for the whole flight —
+   `beginDetached` (`lib/client.js:5148-5155`) and `onEnter`'s default branch
+   (`:5168-5191`) never reach `'submitting'`. A guard keyed on it is permanently
+   open. Use `running`/`pendingSubmissions` (`SessionSnapshot`,
+   `dsh-cordis-client-runner/lib/client.js:2210`), whose echo is appended
+   **synchronously before the first await**
+   (`dsh-api-session-controller/lib/types/client/sessions/session.js:148-163`).
+2. **An archived session accepts the prompt, then blocks the turn**
+   (`archived-session-gate.js:17-25`). Optimistic card UI would lie about delivery.
+
+### 10.6 The node-side path exists and is rejected
+
+`agents.get(id).followup(msg)` is real (`agent-loop.js:800-814`), and this repo
+already uses the sibling `steer` (`src/self-repair.ts:402-418`). It is **worse on
+every axis that matters**: it bypasses composer mediation, bypasses the
+`rpcId`/`principal` audit trail, forces the plugin to *forge* a message source, and
+inverts the authority relationship — the plugin becomes the submitter instead of
+asking the host to submit. **Rejected.**
+
+### 10.7 The decision, and what is authorised next
+
+**`@ToAssistant` stays refused. Every §5 requirement is retained, unrelaxed.**
+
+Authorised, as an **isolated runtime probe only** — not an implementation:
+
+1. From a card's own context, read `typeof inputActions.submit`.
+2. In a dedicated test session, perform one controlled submission.
+3. Confirm the message reaches the intended session.
+4. Observe repeated clicks, session switching, and failure behaviour.
+5. **Do not** wire it into the action registry, and **do not** make it reachable by
+   a program or available to users by default.
+
+> **Note on what step 1 can prove.** Reading `typeof` proves a function exists at
+> runtime. It says nothing about whether submitting is correct, attributed, or safe.
+> Steps 2–4 are what test behaviour; step 1 only rules out an absent value.
+
+**Release still requires** both of §10.3 and §10.4. The upstream ask is therefore
+narrow and specific — it may be satisfied by an existing host mechanism this
+investigation did not find, not necessarily a new API:
+a **plugin-callable confirmation surface the card cannot forge**, and a **message
+source that is rendered as card-originated**.
+
+**Evidence grade: Read and Type only.** The type claim was checked with a positive
+probe, a satisfied `@ts-expect-error` negative control, and a mutation that fails
+with `TS2339 … does not exist on type 'InputActions'`
+(`evidence/4b2/inputactions-type-probe.*`). **No runtime submission was
+performed**, and nothing here is claimed as verified behaviour.
+

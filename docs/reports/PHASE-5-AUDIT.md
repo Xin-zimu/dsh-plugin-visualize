@@ -20,7 +20,7 @@ not authorise a release: that decision belongs to the owner.
 | `vitest run` | **924 passed / 15 failed / 939** |
 | Counts close | 924 + 15 = 939, asserted rather than assumed |
 | Failure set vs baseline | identical, name by name |
-| Build | `lib/client.js` 251.13 kB |
+| Build | `lib/client.js` **450.56 kB** (450,559 B); `lib/index.js` + `lib/index.d.ts` 251.13 kB — tsdown's ESM total, not the client bundle (corrected 2026-11-06, see `evidence/phase-5-rc2/RESULTS.md` F1) |
 | Bundle hash | `E1BF4A82…`, installed copy identical before measuring (§9) |
 | Components rendered | 48 / 48 |
 | Functions declared | 73 |
@@ -193,13 +193,15 @@ warning, and an action left in neither set each turned one test red.
 | N1 | **Action chains are not atomic** when a clipboard step is refused | §2.3; catalogue and CHANGELOG | Keep documenting it. Atomicity is a design decision, not a release fix |
 | N2 | **7 failures remain on CI Windows** — the `~` expansion, the path join, the rename lock, the fixture mock, the timeout, the description fixture | `evidence/phase-5/C2-cross-platform.json` | Fix the two fixture causes; investigate the timeout bound; accept the remaining Windows behaviours as documented |
 | N3 | **The 5-second timeout is unexplained** | `classify-failures.mjs`, cause `timeout` | Raise the bound or find what stalls; a timeout is not a diagnosis |
+| N4 | **This report's §1.1 build size was mislabelled** — `lib/client.js` is 450.56 kB, not 251.13 kB; the latter is tsdown's ESM total (`index.js` + `index.d.ts`). The same error was copied from `PHASE-4B-REPORT.md:167` | `evidence/phase-5-rc2/RESULTS.md` F1 | **CORRECTED 2026-11-06** in both reports. Worth noting the audit could not catch this itself: the adjacent row quotes the client-bundle hash, so size and hash described different files |
+| N5 | **`src/client/openui-actions.ts` docstring is stale** — lines 10-12 still say `@CopyToClipboard` "is recognised and refused", but it shipped in 4B | `evidence/phase-5-rc2/RESULTS.md` §Observation | **Deliberately NOT fixed this round.** Editing `src/` would change the bundle hash `E1BF4A82…` that binds the stage-5 browser evidence (§9 gate). Fix it in the same change that re-runs the browser evidence |
 
 ### DEFERRED
 
 | # | Item | Why deferred |
 | --- | --- | --- |
-| D1 | `@OpenUrl` | No host-mediated open exists; `window.open` from card code is forbidden by ADR-004 and a popup blocker swallows it silently. ADR-014 records the conditions |
-| D2 | `@ToAssistant` | No submit API exists; reaching the composer through the DOM would produce a message the host could not attribute or refuse. ADR-015 |
+| D1 | `@OpenUrl` | **Reason corrected 2026-11-06.** A host-mediated open *does* exist — `ctx.sidebarRight.openTab('browser', {params:{url}})` — but it opens a **sidebar tab, not an external browsing context**, and conceals iframe refusals. That is not this action. `window.open` from card code stays forbidden by ADR-004. Owner chose C2: seek an upstream plugin-callable open-external API. ADR-014 §10; PHASE-4B-2 §4 |
+| D2 | `@ToAssistant` | **Reason corrected 2026-11-06.** A submit path *does* exist and is already a prop on this plugin's card; role escalation is structurally impossible because the host builds the message source. What no host API supplies is visible **attribution** and a **confirmation the card cannot fake**. Owner: do not downgrade. ADR-015 §10; PHASE-4B-2 §3 |
 | D3 | Composing `@CopyToClipboard` | The user activation's survival through a composed run is unmeasured. Refused rather than attempted |
 | D4 | `presentationMeta` stores `fragment` twice | ~234 bytes per HTML card. Checked: no integrity risk, no extra sensitive persistence, no effect on restore, because both copies are written from one value in one operation. Technical debt, not a defect |
 | ~~D5~~ | ~~No CI at all~~ | **CLOSED** — `.github/workflows/verify.yml` runs both platforms and compares them |
@@ -217,3 +219,92 @@ Two findings are worth naming above the rest.
 Plus a capability-consistency gate, a failure classifier that refuses to pass an
 unclassified failure, `PLATFORM-FAILURES.md`, and a README and CHANGELOG that
 describe the release candidate instead of a stage four phases ago.
+---
+
+## 7. Re-verification at HEAD `63dcd92` — 2026-11-06
+
+The audit above was measured at baseline `8db9598`. This section records what was
+**re-run** after Stage 5 resumed, and — separately — what was not. Full raw evidence,
+28 files: `evidence/phase-5-rc2/`; summary: `evidence/phase-5-rc2/RESULTS.md`.
+
+### 7.1 Verdict of the re-run
+
+**Every test and type number in §1.1 reproduces exactly. One factual line was wrong
+and is now corrected (N4). No blocker, no new failure, no product regression.**
+
+| Check | Command | Exit | Result |
+| --- | --- | --- | --- |
+| Node typecheck | `npx tsc -p tsconfig.json` | **0** | 0 errors |
+| Client typecheck | `npx tsc -p tsconfig.client.json` | **0** | 0 errors |
+| Full suite | `npx vitest run --reporter=json` | 1 (15 known) | **924 / 15 / 0 / 939**, counts close |
+| Failure set vs baseline | `node evidence/lib/failure-set.mjs` | **0** | `identical:true`, `onlyInCurrent:[]` |
+| Root causes | `node tools/classify-failures.mjs` | **0** | 15/15 classified, 0 blocking |
+| Build | `npx tsdown` | **0** | `client.js` 450,559 B, SHA `E1BF4A82…`, deterministic |
+| Docs-vs-code gate | `npx vitest run tests/capability-consistency.spec.ts` | **0** | 10/10 |
+| Refusal path | clipboard-4b + actions specs | **0** | 45/45 |
+
+**`onlyInCurrent` is empty** — no test fails now that did not fail at baseline. That is
+the specific claim a release gate needs, and it is measured rather than inferred.
+
+### 7.2 What changed between the baseline and HEAD
+
+The earlier note that no post-baseline commit touched product code was **wrong**:
+`git diff --stat 8db9598..HEAD -- src tests tools` shows `src/client/OpenUICard.tsx`
++86 lines (the refused-button notice) and two test files +142. All of it landed in
+`6b26aab`, the commit that added this audit.
+
+The claim that *does* hold, and is stronger: **`6b26aab..HEAD` leaves `src/` and
+`tests/` byte-identical** (`git rev-parse HEAD:src` == `git rev-parse 6b26aab:src`),
+with only two read-only CI scripts added under `tools/`. That is why re-measuring is
+meaningful.
+
+### 7.3 The bundle-hash gate (§9) holds — and it binds the browser evidence
+
+`lib/client.js` and the isolated test profile's installed copy are **both**
+`E1BF4A82B3C80889…` at 450,559 bytes. That is also the exact hash
+`evidence/phase-5/C1-acceptance.json` recorded. So the stage-5 browser measurements
+are bound to the bundle this tree builds, and the rebuild reproduces it byte for byte.
+
+> **The live GUI on `127.0.0.1:56091` is NOT this plugin.** It runs
+> `@nagi-ovo/dsh-visualize` 0.1.7 (118,874 bytes, SHA `A1957D85…`), which contains
+> none of this fork's symbols. Any browser gate run against it measures upstream's
+> code and must never be filed as evidence about this tree.
+
+### 7.4 The refusal feedback, proved rather than assumed
+
+Both Deferred actions still refuse at dispatch, and `UNSUPPORTED_STEPS` is still
+exactly `['OpenUrl','ToAssistant']` (printed from the module the renderer imports).
+
+The guard was **mutation-tested**: re-inserting the two names into `SUPPORTED_STEPS`
+turned **6 tests red across 3 files** — including the one that reads the rendered
+`[data-openui-refused-notice]` element — then the file was restored byte-identically
+and all 59 pass again (`evidence/phase-5-rc2/refusal-guard-mutation.txt`).
+
+**Three limits on what that proves**, recorded rather than glossed:
+
+1. The notice is asserted for **`@OpenUrl`**. For `@ToAssistant` the suite asserts
+   dispatch refusal, control presence and no-copy — it does not click and read a
+   notice element.
+2. The unit test matches `/not available/i` plus the name, **not the exact sentence**.
+   The literal `@OpenUrl is not available in this build` is recorded only by the
+   browser artefact, which was not re-run.
+3. This is **DOM-level, not browser**. See §7.5.
+
+### 7.5 NOT VERIFIED in this re-run
+
+Stated as gaps, not covered.
+
+| Item | Why |
+| --- | --- |
+| **Browser gates G0–G3** | `probe.mjs --what=smoke` → **exit 2 BLOCKED**: the `bsk` daemon cannot start (`Job Object of this process does not allow breakaway`, `os error 5`). Per `AGENTS.md` §10, **exit 2 is an environment block and may never be counted as a product failure.** Not worked around |
+| Live GUI `127.0.0.1:56091` | Returns 401 (auth-fenced) and serves a different plugin. Not bypassed |
+| §1.1 browser rows (4/4 sandboxed frames, theme tokens, clipboard round-trip, notice before/after press) | **Carried forward, hash-matched — not re-measured.** They come from `evidence/phase-5/C1-acceptance.json`; §7.3 is why they remain credible |
+| Reload-and-restore | Remains NOT VERIFIED, as the original audit says |
+| The 6 symlink-containment tests | Still cannot execute on this host (`EPERM` creating symlinks). Claimed verified on CI, which was not re-run |
+
+### 7.6 What this re-verification does NOT do
+
+**It does not declare the release.** It establishes that the numbers are real and
+reproducible at the audited commit, that the corrected documents match the code, and
+that the two refusals still hold. The release decision belongs to the owner, and two
+browser-dependent rows remain carried forward rather than re-measured.
