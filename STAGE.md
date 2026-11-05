@@ -16,8 +16,9 @@ this says what the current slice is allowed to do.
 | 2 | OpenUI language core | **Done — differential 31/31, browser S01–S03 PASS, S04 PARTIAL** |
 | 3 | Persistence and the interaction loop | **PASS — closed 2026-11-03**; `docs/reports/PHASE-3-REPORT.md` |
 | 4A | Component catalogue: 48 renderers, in five batches | **PASS — closed 2026-11-05** (48/48); `docs/reports/PHASE-4A-5-REPORT.md` |
-| 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | **PASS — closed 2026-11-05.** `@CopyToClipboard` shipped (ADR-013); the other two Deferred on host capability |
-| 5 | Unified prompt, security review, release | Not started |
+| 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | **PASS — closed 2026-11-05.** `@CopyToClipboard` shipped (ADR-013); the other two Deferred — **reasons corrected 2026-11-06** (4B-2), verdict unchanged |
+| 4B-2 | Re-testing the two deferrals against the real host | **CLOSED 2026-11-06 — investigation only.** Both are EXTENDABLE; neither ships. `docs/reports/PHASE-4B-2-INVESTIGATION.md` |
+| 5 | Unified prompt, security review, release | **Final gate PASSED 2026-11-06 — GO recommended.** Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md`. **Not released:** tag and release remain the owner's decision |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -464,8 +465,80 @@ when the write was denied.
 
 ---
 
+## Stage 4B-2 — the two deferrals re-tested (CLOSED 2026-11-06, investigation only)
+
+**Scope, set by the owner:** determine whether the two Deferred actions can be
+implemented honestly, and at what cost. Not to implement them, not to relax a
+requirement, and not to re-stamp "Deferred" without investigating.
+
+**Result: both are EXTENDABLE. Neither ships.** The stated reasons in ADR-014 and
+ADR-015 were **false** and are corrected; the verdicts stand. Full report:
+`docs/reports/PHASE-4B-2-INVESTIGATION.md`; evidence in `evidence/4b2/`.
+
+| Action | Verdict | Why it still does not ship |
+| --- | --- | --- |
+| `@OpenUrl` | EXTENDABLE | A host-mediated open exists, but it is a **sidebar tab**, not an external open, and its iframe refusals are unobservable — the silent failure ADR-014 exists to prevent. Owner chose **C2**: keep the real meaning, seek an upstream plugin-callable open-external API |
+| `@ToAssistant` | EXTENDABLE | Submission **is** reachable (`inputActions` is already a prop on this plugin's card) and role escalation is structurally impossible. Two ADR-015 properties remain unavailable: transcript **attribution**, and a **confirmation the card cannot fake**. Owner: **do not downgrade** |
+
+**Exit criteria.**
+
+| Criterion | Evidence |
+| --- | --- |
+| Host surface read, not inferred | `evidence/4b2/openurl-host-findings.md`, `toassistant-host-findings.md` — file:line into the installed asar |
+| The decisive mechanism proved | `tmp/probes/cordis-scope-probe2.mjs` — 4 cases including a root-context negative control |
+| The card's submit prop proved by type | `evidence/4b2/inputactions-type-probe.log` — positive probe + satisfied `@ts-expect-error` + a mutation that fails `TS2339` |
+| No product code, no requirement relaxed | `git diff --stat` at the time: docs and evidence only |
+
+**The finding that outlived this stage**, and it is a correction to 4B's own
+three-state table: *the host having a capability* and *the host having it with the
+safety properties an action needs* are different findings. Both actions moved from
+"the API is missing" to "the API exists but cannot be offered to a user safely."
+That is a better position: the remaining work is now specific enough to ask for.
+
+**Two traps recorded so they are not rediscovered.** `InputState.phase` cannot be
+used as an in-flight guard — a plain send leaves it `'plain'` for the whole flight.
+And an archived session *accepts* a prompt and then blocks the turn, so optimistic
+card UI would lie about delivery.
+
+---
+
 ## Stage 5 — Unified prompt, security review, release
 
 Both skills merged into one, with the backend-choice rule; a full security pass
 recorded in a new `docs/testing/SECURITY_TEST.md`; packaging, install and
 uninstall tests; a `CHANGELOG.md` entry; first tagged release.
+
+### Resumed 2026-11-06 after 4B-2
+
+The audit was paused to investigate the two deferrals. It resumes on **the original
+release scope**, which is unchanged: neither Deferred action is in this release, and
+4B-2 does not widen it. Two things were required before resuming, and both are done:
+
+1. **The false premise was corrected** in ADR-014, ADR-015 and the shared
+   `ADR-4B-THREAT-MODEL.md`, in `README.md`, `CHANGELOG.md` and the component
+   catalogue. The original text is preserved and marked in place; each ADR carries
+   an amendment section. **Neither ADR was promoted to Accepted**, and no requirement
+   was relaxed.
+2. **The refusal feedback still works**, and that is now proved rather than assumed:
+   re-inserting the two names into `SUPPORTED_STEPS` turns **6 tests red** across
+   3 files, then the file was restored byte-identically and all 59 pass again
+   (`evidence/phase-5-rc2/refusal-guard-mutation.txt`).
+
+**Evidence grades are kept separate** and are not interchangeable:
+
+| Grade | What it can support | Where |
+| --- | --- | --- |
+| **Read** | "the source says X" | `evidence/4b2/*-findings.md` |
+| **Type** | "the compiler agrees the contract is X" | `evidence/4b2/inputactions-type-probe.*` |
+| **Ran** | "a command produced X, and its output is saved" | `evidence/phase-5-rc2/*` |
+
+4B-2 is **Read and Type only**. No browser was driven this round; nothing in it is
+claimed as verified behaviour, and it must not be cited as such.
+
+**Exit criteria for Stage 5** are the original ones plus one: every release-gate
+claim has a **Ran** artefact on the current HEAD, and anything not re-run is listed
+as NOT VERIFIED rather than inherited from the earlier audit.
+
+**This stage does not declare the release.** It produces the evidence; the decision
+belongs to the owner.
+

@@ -614,6 +614,219 @@ Six things carried forward:
 
 ## History
 
+### Session 24 — 2026-11-06 (final release gate: GO recommended, not released)
+
+**The three items the owner named are closed.** Report:
+`docs/reports/PHASE-5-FINAL-GATE.md`. Adjudication: `docs/testing/FAILURE-ADJUDICATION.md`.
+Evidence: `evidence/phase-5-final/`.
+
+**1. N5 fixed, and its bundle impact MEASURED rather than assumed.** The docstring said
+`@CopyToClipboard` is refused; it shipped in 4B. Comment-only edit, 5 insertions / 3
+deletions, entirely inside the module docstring. `lib/client.js` and `lib/index.js` hashes
+are **unchanged** — but that proves nothing alone, since a stale build would look
+identical. So a control was run: mutating real code (`MAX_CLIPBOARD_TEXT` 32→33 KiB) moved
+the hash to `AAE2F13D…`, and restoring it returned the base hash. The build is live and
+only a code change moves the hash. Suite after: 924/15/939, failure set identical.
+
+**2. The browser gate is now PASSED on a real host running THIS build.** The `bsk`
+blocker was a stale `~/.bsk/daemon.json` naming a dead pid plus a detached-start refusal.
+Cleared the stale state and started the daemon as a managed background job with
+`--foreground` — which is what its own error text recommended. No 401 was bypassed and no
+browser security setting was lowered.
+
+Identity was proved three ways, because the owner's concern was exactly this:
+the isolated `p3web` profile (`DSH_HOME=tmp/dsh-p3`, `:3093`) installs this repo via
+`file:`; its installed bundle and the build are both `E1BF4A82…`, 450,559 B (AGENTS.md §9
+gate MATCH); and the loaded page carries `data-openui-refused` (fork-only) while carrying
+no `@nagi-ovo` (upstream) marker. **The live GUI on `:56091` runs
+`@nagi-ovo/dsh-visualize` 0.1.7 — a different package — and was never used as evidence.**
+
+All four gates pass fresh: G0 hash match + 20 cards + no draft-editor crash; G1 31/31;
+G2 submitted and echoed; G3 21 paragraphs settled. Product checks on a card drawn *this*
+round: 4/4 frames sandboxed; theme tokens genuinely switch (dark `#f9fafb`/`#2c2c2e` ↔
+light `#0f1115`/`#fff`); OS clipboard `SENTINEL-BEFORE-COPY` → `release-gate-token`,
+equal to the displayed payload; both refusal notices appear on press and auto-expire.
+
+**Two probe errors were mine, and are recorded as such.** The first clipboard attempt left
+the sentinel untouched because script `element.click()` is not a trusted gesture — the
+product was right to refuse it. The first refusal read was empty because the notice
+self-hides after 3200 ms and two CLI round-trips exceed that; reading `RefusedButton`
+explained it, and press-and-read in one evaluation passed.
+
+**3. The 15 failures adjudicated, not waved through.** Four criteria stated before being
+applied (environmental cause; passes elsewhere by name; guarded behaviour covered by a
+passing test; unchanged from baseline). All 15 pass all four → `YES-WITH-NAMED-CAVEATS`.
+The strong evidence is the CI run, re-verified with `gh`: `headSha 15814e3`, success, and
+the Windows gate printing `baseline 15, found 7, new 0`. The 7 that persist are named.
+
+Three caveats travel with it. **C1:** six symlink-containment tests cannot run on this box
+(`EPERM` creating the symlink) — the release depends on CI Windows for that class of
+defect. **C2:** one 5,020 ms timeout has no diagnosis; weakest of the fifteen. **C3:** two
+of the fifteen are fixture defects, not platform behaviour — `ctx.fs.readText` is a real
+API (`dsh-fs/lib/types/index.d.ts:162`) and the mock at `tests/card-images.spec.ts:40-51`
+provides `readBytes` instead — so the honest split is **13 platform + 2 fixture**. Also
+stated plainly: 12 of the 15 are in modules this release ships, so "out of scope" is not
+available as an argument.
+
+**Verdict: GO, with two conditions** — the commit must carry the N5 fix and nothing else in
+`src/`, and `lib/client.js` must still hash to `E1BF4A82…456CEB` at tag time, because that
+is the bundle measured in the browser and the one the CI comparison is bound to.
+
+**Not done, and deliberately:** no tag, no release, no push. The report produces the
+recommendation; the decision is the owner's.
+
+**Reproduce:** `npx tsc -p tsconfig.json`, `npx tsc -p tsconfig.client.json`,
+`npx vitest run --reporter=json`, `npx tsdown`, then the browser gates in §9 of the report.
+
+---
+### Session 23 — 2026-11-06 (decisions applied: reason corrected, Stage 5 resumed)
+
+**Owner decision:** `@ToAssistant` — do **not** downgrade the safety requirements;
+`@OpenUrl` — **C2**, seek an upstream external-open API; **Stage 5 resumes** on its
+original scope. Both actions stay Deferred and neither blocks the release.
+Governing principle, recorded because it is easy to lose: *接口存在不等于已经具备
+安全发布条件* — finding an API does not relax a requirement.
+
+**What the correction actually says.** Three ADRs, plus the README, CHANGELOG,
+component catalogue and both earlier reports now state the corrected reason, and
+**the original text is preserved and marked in place** rather than rewritten — each
+ADR carries an appended amendment section (§10). Neither ADR was promoted to
+Accepted. The correction is narrow and worth stating precisely:
+
+- `@OpenUrl`: a mediated open **exists** (`ctx.sidebarRight.openTab('browser',
+  {params:{url}})`, documented for plugins, the host's own link gesture), but it is a
+  **sidebar tab, not an external browsing context**, and its iframe refusals are
+  unobservable — the exact silent failure ADR-014 exists to prevent.
+- `@ToAssistant`: submission is **reachable**, and role escalation is **structurally
+  impossible** (the host builds `source = {kind:'user', …}` itself). What is missing
+  is transcript **attribution** and a **confirmation the card cannot fake**. The owner
+  explicitly rejected softening either.
+
+**Stage 5 re-verified at HEAD `63dcd92`** — because the audit was measured at
+`8db9598` and had gone stale. Every test and type number reproduces exactly:
+924 passed / 15 failed / 0 skipped / 939, counts closing, failure set identical
+name-for-name with `onlyInCurrent: []`, all 15 classified, both `tsc` projects clean,
+build deterministic (`E1BF4A82…`, 450,559 B). Raw evidence, 28 files:
+`evidence/phase-5-rc2/`.
+
+**Two corrections the re-run produced, and one thing it refused to do.**
+
+1. **N4 — a mislabelled build size, copied forward.** `PHASE-5-AUDIT.md §1.1` said
+   `lib/client.js` is 251.13 kB. It is **450.56 kB**. 251.13 kB is tsdown's
+   `[ESM] 2 files, total` = `index.js` + `index.d.ts`. The same error was in
+   `PHASE-4B-REPORT.md:167`. Both corrected. The audit could not catch this itself
+   because the adjacent row quotes the *client-bundle* hash — size and hash described
+   different files.
+2. **§7.2 — a claim in my own brief was wrong.** "No post-baseline commit touched
+   product code" is false: `src/client/OpenUICard.tsx` +86 and two test files +142
+   landed in `6b26aab`. The claim that holds, and is stronger, is that
+   `6b26aab..HEAD` leaves `src/` and `tests/` **byte-identical** by tree hash.
+3. **N5 — deliberately not fixed.** `src/client/openui-actions.ts:10-12` still says
+   `@CopyToClipboard` is refused; it shipped in 4B. Editing `src/` would change the
+   bundle hash that binds the stage-5 browser evidence (§9). Recorded for whoever
+   re-runs that evidence.
+
+**The refusal feedback is proved, not assumed.** Re-inserting the two names into
+`SUPPORTED_STEPS` turned **6 tests red across 3 files** — including the one reading
+the rendered `[data-openui-refused-notice]`. The file was then restored and re-diffed
+byte-identical, and the 59 tests pass again. `UNSUPPORTED_STEPS` is still exactly
+`['OpenUrl','ToAssistant']`, printed from the module the renderer imports.
+
+**A finding about evidence that outranks the numbers.** The live GUI on
+`127.0.0.1:56091` runs `@nagi-ovo/dsh-visualize` **0.1.7**, not this fork: different
+package, 118,874 B, and none of this fork's symbols. **Any browser gate run against it
+measures upstream's code and must never be filed as evidence about this tree.** The
+§9 gate does hold for the isolated `p3web` profile — build and installed copy are both
+`E1BF4A82…`, the same hash `C1-acceptance.json` recorded, which is what keeps the
+stage-5 browser rows credible.
+
+**Honest grade.** Everything in 4B-2 is **Read** or **Type**; nothing is runtime
+"Ran". The browser gates were **NOT VERIFIED**: `probe.mjs --what=smoke` exited **2**
+because the `bsk` daemon cannot start (`Job Object does not allow breakaway`,
+`os error 5`). Per §10 that is an environment block and was not counted as a product
+failure, and the live-GUI 401 was not bypassed. The stage-5 browser rows (4/4 sandbox,
+theme tokens, clipboard round-trip, notice before/after press) are **carried forward
+hash-matched, not re-measured** — said plainly in the audit rather than folded into the
+pass column.
+
+**Boundary.** No product code, no tag, no release. `git diff --quiet -- src` is 0.
+Stage 5 is **not** declared releasable: it produces the evidence, and the release
+decision is the owner's.
+
+**Reproduce:** `npx tsc -p tsconfig.json`, `npx tsc -p tsconfig.client.json`,
+`npx vitest run`, `npx tsdown`, then
+`node evidence/lib/failure-set.mjs evidence/phase-5-rc2/vitest.json`.
+
+---
+### Session 22 — 2026-11-05 (Stage 4B-2: the two deferrals re-tested)
+
+**Both "host capability unavailable" verdicts were wrong, and the reason matters
+more than the verdicts.** ADR-014 and ADR-015 deferred `@OpenUrl` and
+`@ToAssistant` on the stated ground that DSH exposes no host-mediated open and
+no turn-submit API. Read against the installed host (0.2.1-rc.5) rather than
+against the earlier ADRs, both capabilities exist and both are reachable from
+this plugin's client bundle. Full report:
+`docs/reports/PHASE-4B-2-INVESTIGATION.md`; evidence in `evidence/4b2/`.
+
+**One mechanism explains the whole miss.** `cordis` `get()` returns a
+*the caller's* context — `getTraceable(this.ctx, …)` (`cordis/lib/index.js:763-765`)
+with the trap at `:128` returning the caller's ctx for the tracker property. So
+`ctx.sessions.scope(id)` yields a real session-scope context, and a service called
+from it runs addressed to that session. **This repo already relies on that chain**:
+`src/client/prompt-bridge.ts` resolves the composer facade through it today and
+calls `setDraft`/`focus`/`notify`. It simply never called `submit`.
+
+**`@ToAssistant` — EXTENDABLE, two properties still unmet.** The capability
+needs no new host API: `inputActions` (carrying `submit()`) is a *declared
+standard prop* on every session-scope slot, and `tool.call.toolview` is one, so
+**the card already receives it** — `VisualizeCard.tsx` just never destructures it.
+Verified by type with a negative control *and* a mutation: the positive probe
+typechecks, an impossible `@ts-expect-error` is satisfied, and a misspelt member
+fails with `TS2339 … does not exist on type 'InputActions'` — which is what makes
+the first result mean anything rather than an `any`. Role escalation is
+**structurally impossible**: the node half builds `source = { kind: "user", … }`
+itself (`api-session-controller/lib/index.js:3218-3231`); no wire field carries a role.
+That is a stronger guarantee than ADR-015 asked for and should be recorded.
+
+What is genuinely missing is two *concepts*, not two APIs: **attribution**
+(`rpcId` is dedupe-only — zero rendering hits, so the turn is indistinguishable
+from typing) and a **host-rendered confirmation the card cannot fake** (the
+approval panel is host-waterfall driven; `user-approval`'s `request()` throws
+outside an open turn). Both need a human decision, not more code.
+
+Also corrected: `InputState.phase` is **useless** as an in-flight guard — a plain
+send leaves it `'plain'` for the whole flight (`client.js:5148-5155`, `:5168-5191`).
+Use `running`/`pendingSubmissions`, whose echo is appended synchronously.
+
+**`@OpenUrl` — EXTENDABLE, recommend staying refused, for a different reason.**
+A documented, host-mediated open exists —
+`ctx.sidebarRight.openTab('browser', { params: { url } })`
+(`dsh-client-ui-sidebar-browser/README.md:43`) — and the host's *own* link gesture
+calls it, with `window.open` only as fallback (`ui-chat/lib/client.js:13284-13287`).
+Its parser (`sidebar-browser/lib/client.js:363-407`) is **stricter** than ADR-014
+asked: 16 KiB cap before parsing, credentials refused, http(s) only, and the DSH
+app's own origin refused. But it opens a **sidebar tab, not a browsing context**,
+and an iframe refusal is *invisible* (`sidebar-browser/README.md:107`) — trading a
+visible failure (popup blocker) for an unobservable one, which is exactly what
+ADR-014 existed to prevent. Shipping it under the current name would repeat
+ADR-014 Option B's error in a new costume. Either re-specify it as "show this page
+beside the conversation" or request a true upstream `openExternal` plugin API.
+
+**Honest grade: everything above is Read or Type, nothing is Ran-at-runtime.**
+No card was driven in a browser this session. The one probe that would close it —
+log `typeof inputActions.submit` from a card click — is named in the report and
+was deliberately left for the next round.
+
+**Boundary respected.** No product code, test, ADR or tag. `git diff --stat` empty;
+the only addition is `evidence/4b2/` plus the report. Stage 5 was not resumed.
+
+**Two method notes worth keeping.** A Lead `grep` returned zero `inputActions`
+hits in `node_modules` because **ripgrep honours `.gitignore`** — `Select-String`
+found it; the finding survived, the method that contradicted it did not. And the
+type probe was only trusted after two controls, per the rule that a guard never
+seen to go red is a guess.
+
+---
 ### Session 21 — 2026-11-05 (Stage 5: cross-platform evidence)
 
 **The audit's biggest claim was an argument, not a measurement, and this session
