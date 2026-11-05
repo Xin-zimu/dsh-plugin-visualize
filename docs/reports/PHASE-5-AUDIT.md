@@ -45,12 +45,37 @@ so the containment logic is present and readable but the escape itself is **unpr
 on this host**. A non-blocker for a renderer-plus-clipboard release, and a real gap
 for anyone claiming the storage layer is verified.
 
-### 1.3 The caveat
+### 1.3 The caveat, which has since been closed
 
-**There is no CI, so no POSIX run of this suite exists in `evidence/`.** Any claim
-that these fifteen pass elsewhere is a prediction read from the failure messages,
-not an observation. The messages are unambiguous about their cause, but that is an
-argument, not a measurement.
+This section originally said the cross-platform claim was **a prediction read from the
+failure messages rather than an observation**, because there was no CI and no POSIX
+run. That was the honest position and it was not good enough, so both gaps were
+closed during this stage.
+
+| Platform | Passed | Failed | Skipped | Total | Where |
+| --- | --- | --- | --- | --- | --- |
+| WSL Ubuntu 24.04, Node 22.23.4 | **939** | **0** | 0 | 939 | local, fresh clone, frozen lockfile |
+| CI ubuntu-latest | **939** | **0** | 0 | 939 | run `42003251408`, gate PASSED |
+| CI windows-latest | **932** | **7** | 0 | 939 | run `42003251408`, gate PASSED |
+| This Windows box, Node 24.22.1 | 924 | 15 | 0 | 939 | the baseline |
+
+**`failsOnBoth: []`** — no test fails on both platforms. A test failing everywhere
+would be a defect the Windows baseline was hiding; there are none.
+
+**Zero skips anywhere.** That is load-bearing: the suite is not green because things
+were excluded.
+
+### 1.4 The finding that changed the document
+
+The CI Windows runner reports **7** of the local 15, not 15. The eight that pass
+there are exactly the ones needing a working symlink or a POSIX-shaped path —
+**including six of the eight symlink containment tests that
+`PLATFORM-FAILURES.md` had recorded as unprovable on Windows.**
+
+GitHub's Windows runner can create symlinks; a stock Windows box cannot. So the
+containment check is no longer "present and readable" — it **executes and passes on
+Windows CI**. That is a stronger claim than this audit originally made, and it came
+from running the tests instead of reasoning about them.
 
 ## 2. Are there unresolved security or trust-boundary risks?
 
@@ -165,9 +190,9 @@ warning, and an action left in neither set each turned one test red.
 
 | # | Issue | Evidence | Recommendation |
 | --- | --- | --- | --- |
-| N1 | **No POSIX run exists**, so "the 15 failures are Windows-only" is read rather than measured | no CI config; no POSIX transcript in `evidence/` | Run the suite once on POSIX before the first public release and record it |
-| N2 | **6 symlink-escape tests cannot run on Windows** | `classify-failures.mjs`, cause `symlink-EPERM` | Add `skipIf(platform === 'win32')` so they report as skips. A matching count is not a visible skip |
-| N3 | **Action chains are not atomic** when a clipboard step is refused | §2.3; catalogue and CHANGELOG | Keep documenting it. Atomicity is a design decision, not a release fix |
+| N1 | **Action chains are not atomic** when a clipboard step is refused | §2.3; catalogue and CHANGELOG | Keep documenting it. Atomicity is a design decision, not a release fix |
+| N2 | **7 failures remain on CI Windows** — the `~` expansion, the path join, the rename lock, the fixture mock, the timeout, the description fixture | `evidence/phase-5/C2-cross-platform.json` | Fix the two fixture causes; investigate the timeout bound; accept the remaining Windows behaviours as documented |
+| N3 | **The 5-second timeout is unexplained** | `classify-failures.mjs`, cause `timeout` | Raise the bound or find what stalls; a timeout is not a diagnosis |
 
 ### DEFERRED
 
@@ -177,7 +202,7 @@ warning, and an action left in neither set each turned one test red.
 | D2 | `@ToAssistant` | No submit API exists; reaching the composer through the DOM would produce a message the host could not attribute or refuse. ADR-015 |
 | D3 | Composing `@CopyToClipboard` | The user activation's survival through a composed run is unmeasured. Refused rather than attempted |
 | D4 | `presentationMeta` stores `fragment` twice | ~234 bytes per HTML card. Checked: no integrity risk, no extra sensitive persistence, no effect on restore, because both copies are written from one value in one operation. Technical debt, not a defect |
-| D5 | No CI at all | Without it, baseline-matching is the only regression guard, and it cannot detect a platform-specific regression |
+| ~~D5~~ | ~~No CI at all~~ | **CLOSED** — `.github/workflows/verify.yml` runs both platforms and compares them |
 
 ## 6. What this audit changed
 

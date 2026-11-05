@@ -83,10 +83,14 @@ the tool, not the history.
   pretending it worked.
 - **No `eval`, no `new Function`.** The OpenUI backend walks a fixed vocabulary.
   A name that is not in the component table can never become an element.
-- **Known limits.** The two refused actions (above); 15 platform-shaped test
-  failures on Windows, each with its root cause recorded in
-  `docs/testing/PLATFORM-FAILURES.md`; no CI, so cross-platform claims are
-  read from the code rather than measured.
+- **Verified on Linux and Windows.** CI runs the full suite on both and compares
+  the results test by test: **939/939 pass on Linux, 932/939 on Windows CI**, zero
+  skips on either, and no test failing on both platforms. The seven Windows
+  failures are documented with their root causes in
+  `docs/testing/PLATFORM-FAILURES.md`. A stock Windows box without Developer Mode
+  sees fifteen rather than seven, because it cannot create symlinks.
+- **The build is reproducible across platforms.** `lib/client.js` has the same
+  SHA-256 whether it is built on Windows or Linux, and CI asserts that every run.
 
 ## For agents
 

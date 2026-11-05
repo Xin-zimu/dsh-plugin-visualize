@@ -115,25 +115,80 @@ Three reasons, and each is checkable rather than asserted:
    `~`-prefixed inputs; the security containment check has a *passing* sibling in
    `tests/images.spec.ts` for the lexical (non-symlink) escape.
 
-## 4. What this document does not establish
+## 4. The claim, now measured rather than argued
 
-It does **not** establish that the product works on Windows. It establishes that
-these fifteen failures are platform-shaped rather than product-shaped, and that
-nothing in this release changed them.
+This section used to say the failures were "platform-shaped rather than
+product-shaped" and that the POSIX-green expectation was **a prediction, not an
+observation**, because there was no CI. Both parts have since been measured.
 
-It also does not establish the reverse for other platforms. **There is no CI in
-this repository, so "the same test passes on POSIX" is a prediction, not an
-observation.** No POSIX run of this suite exists in `evidence/`. Treat the
-POSIX-green expectation as untested until a run is recorded (see §5).
+### 4.1 POSIX
+
+Run locally in WSL Ubuntu 24.04 (Node 22.23.4, pnpm 11.28.0) against a fresh clone,
+with `pnpm install --frozen-lockfile`:
+
+```
+passed 939   failed 0   skipped 0   total 939
+```
+
+Zero skips matters as much as zero failures: nothing was excluded to get there.
+
+### 4.2 Cross-platform, by name
+
+`tools/cross-platform.mjs` compares the two reports test by test. The result:
+
+```
+failsOnBoth: []
+verdict: PLATFORM-SPECIFIC — every locally-failing test passes on POSIX
+```
+
+**Not one test fails on both platforms.** A test failing everywhere would be a defect
+the Windows baseline was hiding; there are none.
+
+### 4.3 Windows on CI is better than Windows here
+
+The GitHub `windows-latest` runner reports **7** of these 15, not 15:
+
+```
+windows-latest   passed 932   failed 7   skipped 0   total 939   gate PASSED
+ubuntu-latest    passed 939   failed 0   skipped 0   total 939   gate PASSED
+```
+
+The eight that pass there are exactly the eight that need a working symlink or a
+POSIX-shaped path — **including six of the eight symlink containment tests this
+document had recorded as unprovable.** GitHub's runner can create symlinks; a stock
+Windows box cannot.
+
+So the containment check is no longer "present and readable" on Windows. It executes
+and passes on CI. That is a stronger statement than this document originally made,
+and it came from running the tests rather than reasoning about them.
+
+### 4.4 What remains unproven
+
+Two things, stated plainly:
+
+- **The seven that still fail on CI Windows** are the ones whose cause is the `~`
+  expansion, the drive-qualified path join, the rename-over-open-file lock, the
+  fixture mock, the timeout and the description fixture. Those are genuine Windows
+  behaviours and they are still not exercised on that platform.
+- **The product is not thereby proven correct on Windows.** It is proven that these
+  specific failures have environmental causes on both the local machine and the
+  runner, and that the same tests pass on Linux. A defect unrelated to these tests
+  would be invisible to all of this.
 
 ## 5. Recommendations
 
-| Priority | Action |
-| --- | --- |
-| **NON-BLOCKER, before a public release** | Run the suite once on a POSIX host and record the output under `evidence/`. Until then the cross-platform claim rests on reading, not measurement. |
-| **NON-BLOCKER** | Add `describe.skipIf(process.platform === 'win32')` to the six symlink tests, so the suite stops reporting them as failures and the skip is *visible* rather than a matching count. |
-| **NON-BLOCKER** | Fix the `~` fixtures to use `os.homedir()` instead of a literal `~`, which is what the product already does. |
-| **DEFERRED** | Add CI with a Windows job and a Linux job. Without it, the baseline-matching argument is the only guard, and it cannot detect a platform-specific regression. |
+| Priority | Action | Status |
+| --- | --- | --- |
+| ~~NON-BLOCKER~~ | Run the suite once on POSIX and record it | **DONE** — 939/939, `evidence/phase-5/C2-cross-platform.json` |
+| ~~DEFERRED~~ | Add CI with a Windows job and a Linux job | **DONE** — `.github/workflows/verify.yml`, run `42003251408` green |
+| **NON-BLOCKER** | Fix the `~` fixtures to use `os.homedir()` instead of a literal `~`, which is what the product already does | open |
+| **NON-BLOCKER** | Investigate the 5 s timeout: it is a slow-machine timeout, not a contradicted assertion, and raising the bound may be the whole fix | open |
+| **NON-BLOCKER** | Give the fixture mock a `readText`, so one image re-read test stops failing for a reason unrelated to what it checks | open |
 
-None of these is a release blocker for a version whose scope is the OpenUI
+Note what is **not** on this list any more: skipping the symlink tests on Windows.
+That recommendation was written when they could only fail there. On the CI Windows
+runner they pass, so adding a skip would now *remove* real coverage — a reminder
+that a skip added to hide a failure keeps hiding whatever comes after it.
+
+None of the open items is a release blocker for a version whose scope is the OpenUI
 renderer and the clipboard action, because none of them touches either.

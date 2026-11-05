@@ -1,0 +1,76 @@
+{
+  "phase": "5",
+  "date": "2026-11-05",
+  "subject": "cross-platform verification in CI",
+  "workflow": {
+    "file": ".github/workflows/verify.yml",
+    "runId": 42003251408,
+    "url": "https://github.com/Xin-zimu/dsh-plugin-visualize/actions/runs/42003251408",
+    "conclusion": "success",
+    "jobs": {
+      "verify (ubuntu-latest)": "success",
+      "verify (windows-latest)": "success",
+      "compare platforms": "success"
+    }
+  },
+  "localPosix": {
+    "where": "WSL Ubuntu 24.04, Node 22.23.4, pnpm 11.28.0, fresh clone at 6b26aab",
+    "passed": 939,
+    "failed": 0,
+    "skipped": 0,
+    "total": 939,
+    "countsClose": true
+  },
+  "localWindows": {
+    "where": "Windows 11, Node 24.22.1",
+    "passed": 924,
+    "failed": 15,
+    "skipped": 0,
+    "total": 939,
+    "countsClose": true
+  },
+  "ciLinux": {
+    "passed": 939,
+    "failed": 0,
+    "skipped": 0,
+    "total": 939,
+    "gate": "PASSED"
+  },
+  "ciWindows": {
+    "passed": 932,
+    "failed": 7,
+    "skipped": 0,
+    "total": 939,
+    "gate": "PASSED"
+  },
+  "theFinding": {
+    "summary": "The GitHub Windows runner reports 7 of the local Windows 15, because it can create symlinks.",
+    "whichOnesPass": [
+      "image route opens nothing but a well-formed id of an intact regular file below the store",
+      "workspace images refuses paths that leave the workspace, lexically or through a symlink",
+      "card storage keeps the style a card was created with when it is patched after the setting changed",
+      "card storage never reads a file outside the store with its own fs",
+      "legacy workspace cards refuses a symlink inside the workspace that points out of it",
+      "style files route refuses a style file that is a symlink, for reads and writes",
+      "style files route refuses a workspace whose .dsh directory links out of it",
+      "visualizeTool description names an on-disk contract for agents that cannot load skills"
+    ],
+    "whyItMatters": "Six of the eight are the symlink containment tests that docs/testing/PLATFORM-FAILURES.md recorded as unprovable on a stock Windows machine. In CI they execute and pass, so the containment check is measured on Windows rather than only read."
+  },
+  "crossPlatform": {
+    "failsOnBothPlatforms": [],
+    "verdict": "PLATFORM-SPECIFIC: every locally-failing test passes on POSIX; POSIX is clean",
+    "skipsOnEitherPlatform": 0
+  },
+  "buildReproducibility": {
+    "windowsClient": "e1bf4a82b3c808899ba868009cf9dead15f941e6a3614040db1e73c031456ceb",
+    "posixClient": "e1bf4a82b3c808899ba868009cf9dead15f941e6a3614040db1e73c031456ceb",
+    "identical": true,
+    "note": "the bundle does not depend on the platform that built it; CI asserts the same thing on every run"
+  },
+  "designErrorsFoundAndFixed": [
+    "the first CI gate compared Linux against the Windows baseline, so a clean platform failed for being clean",
+    "the Windows leg died before reaching its gate because vitest exits non-zero on the known failures; the exit code was doing the gating instead of the assertion",
+    "the gate then failed when baseline failures started passing, which punished a better runner; now only NEW failures fail it"
+  ]
+}

@@ -614,6 +614,61 @@ Six things carried forward:
 
 ## History
 
+### Session 21 — 2026-11-05 (Stage 5: cross-platform evidence)
+
+**The audit's biggest claim was an argument, not a measurement, and this session
+fixed that.** The previous report said the fifteen Windows failures were
+"platform-shaped rather than product-shaped" — read from their error messages.
+Three of them could plausibly have been product bugs: a `~` that is never expanded
+is a real path-handling question, and a missing `readText` in a fixture is a
+contract question. ChatGPT called this out and was right to.
+
+Now measured:
+
+```
+WSL Ubuntu 24.04   node 22.23.4   939 passed /  0 failed / 0 skipped / 939
+CI ubuntu-latest                  939 passed /  0 failed / 0 skipped / 939
+CI windows-latest                 932 passed /  7 failed / 0 skipped / 939
+this box           node 24.22.1   924 passed / 15 failed / 0 skipped / 939
+```
+
+**`failsOnBoth: []`** — not one test fails on both platforms. Zero skips anywhere,
+on either platform, which is load-bearing: nothing was excluded to get green.
+
+**The finding worth keeping.** The CI Windows runner reports 7 of the local 15 —
+and the eight that pass there are exactly the ones needing a working symlink or a
+POSIX-shaped path, **including six of the eight symlink containment tests that
+`PLATFORM-FAILURES.md` had recorded as unprovable on Windows.** GitHub's runner can
+create symlinks; a stock box cannot. So the containment check is no longer
+"present and readable" on Windows — it executes and passes there.
+
+That is a stronger claim than the audit made, and it came from running the tests
+instead of reasoning about them. It also invalidated one of the previous
+recommendations: `skipIf(platform === 'win32')` on the symlink tests would now
+*remove* real coverage. That recommendation is withdrawn and the reason is recorded,
+because a skip added to hide a failure keeps hiding whatever comes after it.
+
+**Build reproducibility, as a side effect.** The POSIX build of `lib/client.js` is
+`e1bf4a82…` and of `lib/index.js` `8d4bc669…` — byte-identical to the Windows
+build. The bundle does not depend on the machine that produced it, and CI now
+asserts that every run.
+
+**Three CI design errors, all mine, each fixed:** the first gate compared Linux
+against the Windows baseline so a clean platform failed for being clean; the
+Windows leg died before reaching its gate because `vitest` exits non-zero on the
+known failures, so the exit code was doing the gating; and the third version failed
+when baseline failures *started passing*, which punished a better runner. Only a
+NEW failure fails the gate now.
+
+The gate is deliberately **stricter** than an exit code, not looser: a skip fails,
+a new failure fails, and on Linux any failure at all fails. The Test step is the one
+place a red result continues, guarded by a check that the JSON report exists, and
+the gate is a separate named step so it cannot be overlooked.
+
+**Verified:** CI run `42003251408` — all three jobs success; local gates PASSED on
+both the Windows and POSIX reports; POSIX run in WSL against a fresh clone with
+`--frozen-lockfile`; `tsc` 0 errors on both projects on both platforms.
+
 ### Session 20 — 2026-11-05 (Stage 5: release-candidate audit)
 
 **Verdict: releasable. No blocker. Three non-blockers, five deferred.**
