@@ -1,13 +1,27 @@
 # Changelog
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-Versioning: semver. Nothing is tagged yet.
+Versioning: semver.
 
 This file is written for people who use the plugin. The reasoning behind each
 decision lives in `docs/decisions/`, and the per-stage evidence in `docs/reports/`;
 neither belongs here.
 
-## [Unreleased] — 0.1.0 release candidate
+## [0.1.0] — 2026-11-06
+
+First release. The plugin is usable for its stated scope: one `visualize` tool,
+two render backends, 48 of 48 OpenUI components, and three external actions of
+which one ships.
+
+Two actions are declared and **refused by design** — `@OpenUrl` and
+`@ToAssistant`. They are not forgotten and not half-built. Each has an ADR
+recording what a host would have to provide, and the stated reasons were
+corrected in this release after re-testing them against the installed host
+(ADR-014 §10, ADR-015 §10). Both were deferred on the premise that the host
+exposes no relevant API; that premise was false, and the corrections are
+recorded rather than quietly edited away. The verdicts did not change:
+a sidebar tab is not an external open, and no host API gives a card-submitted
+message visible attribution or a confirmation the card cannot fake.
 
 ### Added
 
@@ -95,7 +109,18 @@ rediscovered.
   file (1), a fixture mock that predates a call site (1), a 5 s timeout (1), and
   a description fixture with no skill provider registered (1). Root causes and
   what each leaves unverified: `docs/testing/PLATFORM-FAILURES.md`.
-- **No CI.** Cross-platform behaviour is read from the code rather than measured.
+
+  Each was adjudicated against four release-admission criteria rather than
+  waved through as "no regression": **13 are platform-shaped, 2 are fixture
+  defects**, and none contradicts an expectation about the renderer or the
+  clipboard action. Three caveats are carried with the release rather than
+  hidden: six symlink-containment tests cannot run on a stock Windows machine, so
+  CI covers them; one 5,020 ms timeout has no diagnosis yet; and 12 of the 15 sit
+  in modules this release ships, so "out of scope" is not an available argument.
+  Full reasoning: `docs/testing/FAILURE-ADJUDICATION.md`.
+- **CI covers Linux and Windows** (`.github/workflows/verify.yml`). It is not
+  decoration: six symlink-containment tests cannot run on a stock Windows machine,
+  so that class of defect is caught there rather than locally.
 - **Maps, image search, maths and embeds** are not implemented.
 - **`Code` has no syntax highlighting**, deliberately: it would mean shipping a
   highlighter into the host origin for a cosmetic gain.
