@@ -1,0 +1,73 @@
+# L1 of the evidence ladder: the REAL spec, the REAL 5 s bound, the product at HEAD.
+#
+# At the time of this run fixture-fixer's readText was already in the fs mock (10:38), while
+# src/storage.ts was still at HEAD (tilde-fixer's fix landed at 10:42). That makes this run the
+# load-bearing rung: fixing the fs mock did NOT remove the timeout. It only changed the message
+# of the error hidden underneath it, from `ctx.fs.readText is not a function` (L0, archived in
+# evidence/phase-5-final/vitest-release-candidate.json) to the ENOENT on the `~\AppData` path
+# printed further down under 'Unhandled Errors'.
+#
+# base: 23b925b   spec sha256: 931A8A67D35F43ACC2729F794C9D6D4C31033663E465E51020603A061298AC30
+# command: pnpm exec vitest run tests/card-images.spec.ts -t 'leaves the card untouched'
+
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tests/card-images.spec.ts (7 tests | 1 failed | 6 skipped) 5022ms
+     ↓ stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+     ↓ re-reads workspace files and carries fetched URLs on update
+     × leaves the card untouched when an update is cancelled while its images resolve 5020ms
+     ↓ renders the card and says why on a host that cannot deliver images
+     ↓ leaves a card without images exactly as before
+     ↓ serves a stored image as an opaque, sandboxed download
+     ↓ opens nothing but a well-formed id of an intact regular file below the store
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/card-images.spec.ts:157:3
+    155|   })
+    156|
+    157|   it('leaves the card untouched when an update is cancelled while its …
+       |   ^
+    158|     let started: () => void = () => {}
+    159|     const fetching = new Promise<void>(done => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+Error: ENOENT: no such file or directory, open 'C:\Users\86139\AppData\Local\Temp\viz-ws-HvFwwD\~\AppData\Local\Temp\viz-home-PHhg3P\visualize\sessions\sess-1\lab-a52c3de7.whale.html'
+ ❯ open node:internal/fs/promises:1345:25
+ ❯ readFile node:internal/fs/promises:2003:14
+ ❯ Object.readText tests/card-images.spec.ts:58:58
+     56|       // `ctx.fs.readText is not a function`, which is a fixture defec…
+     57|       // the behaviour this spec is about.
+     58|       readText: async (target: { targetKey: string }) => await readFil…
+       |                                                          ^
+     59|       readBytes: async (target: { targetKey: string }) => new Uint8Arr…
+     60|     },
+ ❯ Object.read src/storage.ts:457:27
+ ❯ execute src/core/legacy-tool.ts:268:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:\Users\86139\AppData\Local\Temp\viz-ws-HvFwwD\~\AppData\Local\Temp\viz-home-PHhg3P\visualize\sessions\sess-1\lab-a52c3de7.whale.html' }
+This error originated in "tests/card-images.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+     Errors  1 error
+   Start at  10:41:32
+   Duration  6.24s (transform 305ms, setup 0ms, import 945ms, tests 5.02s, environment 0ms)
+

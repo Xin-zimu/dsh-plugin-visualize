@@ -1,0 +1,157 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ × tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there 35ms
+   → expected undefined to be defined
+ ✓ tests/storage.spec.ts > card storage > keeps conversations apart 21ms
+ ✓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam 7ms
+ × tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed 17ms
+   → ENOENT ~\AppData\Local\Temp\viz-home-LkefoJ\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ✓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting 9ms
+ ✓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path 4ms
+ × tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs 12ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-q6RCb5\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-q6RCb5\visualize\sessions\linked'
+ × tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 48ms
+   → EPERM: operation not permitted, rename 'C:/Users/<user>\AppData\Local\Temp\viz-home-7FG39r\visualize\sessions\sess-5\lab-03ef8274.whale.html.21632.df76d31185b9.tmp' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-7FG39r\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ✓ tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path 15ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro) 10ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace 9ms
+ × tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it 12ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-YWbCtK\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-njkNEf\viz\link.html'
+ × tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path 18ms
+   → expected '~\.dsh-visualize-spec-absent\ws\viz\a…' to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace 13ms
+ ✓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb 4ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 2ms
+ × tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator 6ms
+   → expected undefined to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+ × tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it 16ms
+   → expected undefined to be defined
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+AssertionError: expected undefined to be defined
+ ❯ tests/storage.spec.ts:67:20
+     65|     // `update` depends on.
+     66|     const stored = await ownedPath(join(home, 'visualize'), created.pa…
+     67|     expect(stored).toBeDefined()
+       |                    ^
+     68|     expect(dirname(stored!)).toBe(join(home, 'visualize', 'sessions', …
+     69|     expect(basename(stored!)).toMatch(/^lab-[0-9a-f]{8}\.whale\.html$/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+Error: ENOENT ~\AppData\Local\Temp\viz-home-LkefoJ\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ❯ Object.readText tests/storage.spec.ts:40:39
+     38|       readText: async (target: { path: string }) => {
+     39|         const text = files[target.path]
+     40|         if (text === undefined) throw new Error(`ENOENT ${target.path}…
+       |                                       ^
+     41|         return text
+     42|       },
+ ❯ Object.read src/storage.ts:457:40
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ tests/storage.spec.ts:114:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-q6RCb5\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-q6RCb5\visualize\sessions\linked'
+ ❯ tests/storage.spec.ts:149:5
+    147|     await writeFile(join(outside, 'card.html'), '<p>secret</p>')
+    148|     await mkdir(join(home, 'visualize', 'sessions'), { recursive: true…
+    149|     await symlink(outside, join(home, 'visualize', 'sessions', 'linked…
+       |     ^
+    150|
+    151|     const { ctx, seam } = host()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-home-q6RCb5\outside', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-home-q6RCb5\visualize\sessions\linked' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+Error: EPERM: operation not permitted, rename 'C:/Users/<user>\AppData\Local\Temp\viz-home-7FG39r\visualize\sessions\sess-5\lab-03ef8274.whale.html.21632.df76d31185b9.tmp' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-7FG39r\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ❯ writeFileAtomic src/storage.ts:415:5
+    413|   try {
+    414|     await writeFile(temp, content, { encoding: 'utf8', mode: 0o600, fl…
+    415|     await rename(temp, path)
+       |     ^
+    416|   } catch (error) {
+    417|     // EEXIST means the name was taken and the file is not ours to rem…
+ ❯ Object.write src/storage.ts:257:29
+ ❯ execute src/core/legacy-tool.ts:340:7
+ ❯ tests/storage.spec.ts:175:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'rename', path: 'C:/Users/<user>\AppData\Local\Temp\viz-home-7FG39r\visualize\sessions\sess-5\lab-03ef8274.whale.html.21632.df76d31185b9.tmp', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-home-7FG39r\visualize\sessions\sess-5\lab-03ef8274.whale.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-YWbCtK\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-njkNEf\viz\link.html'
+ ❯ tests/storage.spec.ts:262:5
+    260|
+    261|   it('refuses a symlink inside the workspace that points out of it', a…
+    262|     await symlink(join(secretDir, 'secret.html'), join(workspace, 'viz…
+       |     ^
+    263|     await symlink(secretDir, join(workspace, 'viz', 'dir'))
+    264|     const { tool, resolved } = diskHost()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-secret-YWbCtK\secret.html', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-njkNEf\viz\link.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path
+AssertionError: expected '~\.dsh-visualize-spec-absent\ws\viz\a…' to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+
+Expected: "C:/Users/<user>\.dsh-visualize-spec-absent\ws\viz\a.html"
+Received: "~\.dsh-visualize-spec-absent\ws\viz\a.html"
+
+ ❯ tests/storage.spec.ts:289:52
+    287|     const native = `~${join(underHome, 'viz', 'a.html').slice(home.len…
+    288|     expect(native.slice(0, 2)).toBe(`~${sep}`)
+    289|     expect(await workspacePath(underHome, native)).toBe(join(underHome…
+       |                                                    ^
+    290|     expect(await workspacePath(underHome, '~/.dsh-visualize-spec-absen…
+    291|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator
+AssertionError: expected undefined to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+
+- Expected:
+"C:/Users/<user>\\.dsh-visualize-spec-absent\\visualize\\sessions\\s\\lab-ab12.whale.html"
+
++ Received:
+undefined
+
+ ❯ tests/storage.spec.ts:336:43
+    334|     expect(native.slice(0, 2)).toBe(`~${sep}`)
+    335|
+    336|     expect(await ownedPath(root, native)).toBe(absolute)
+       |                                           ^
+    337|     // A path that crossed a POSIX transcript or a model's own normali…
+    338|     expect(await ownedPath(root, '~/.dsh-visualize-spec-absent/visuali…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it
+AssertionError: expected undefined to be defined
+ ❯ tests/storage.spec.ts:353:22
+    351|       .execute({ fragment: '<p>hi</p>', title: 'Lab' }, exec('sess-9')…
+    352|     const absolute = await ownedPath(join(home, 'visualize'), reported…
+    353|     expect(absolute).toBeDefined()
+       |                      ^
+    354|     expect(await readFile(absolute!, 'utf8')).toBe('<p>hi</p>')
+    355|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 10 passed (18)
+   Start at  10:49:43
+   Duration  1.39s (transform 318ms, setup 0ms, import 852ms, tests 258ms, environment 0ms)
+

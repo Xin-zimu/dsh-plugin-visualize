@@ -1,0 +1,28 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ✓ tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there 30ms
+ ✓ tests/storage.spec.ts > card storage > keeps conversations apart 14ms
+ ✓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam 5ms
+ ✓ tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed 21ms
+ ✓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting 5ms
+ ✓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path 3ms
+ ✓ tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs 14ms
+ ✓ tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 48ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path 17ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro) 10ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace 8ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a directory link inside the workspace that points out of it 13ms
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a file symlink inside the workspace that points out of it
+ ✓ tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path 15ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace 12ms
+ ✓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb 2ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 3ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator 2ms
+ ✓ tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it 10ms
+
+ Test Files  1 passed (1)
+      Tests  18 passed | 1 skipped (19)
+   Start at  10:58:40
+   Duration  1.31s (transform 259ms, setup 0ms, import 815ms, tests 236ms, environment 0ms)
+

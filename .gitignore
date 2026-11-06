@@ -12,6 +12,10 @@ node_modules/
 # Scratch and generated state
 /tmp/
 *.tsbuildinfo
+
+# Local handoff bundles. These are transfer artefacts between sessions, never
+# inputs to a build, so an accidental `git add -A` must not pick one up.
+/dsh-plugin-visualize-*.zip
 .DS_Store
 Thumbs.db
 .vscode/

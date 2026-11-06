@@ -1,0 +1,287 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ✓ tests/images.spec.ts > sniffImageType > identifies each accepted format by its bytes 3ms
+ ✓ tests/images.spec.ts > sniffImageType > refuses everything else, whatever it is called 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 127.0.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 10.1.2.3 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 172.20.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 192.168.1.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 169.254.169.254 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 100.64.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 0.0.0.0 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 224.0.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 255.255.255.255 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::1 1ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses :: 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses fe80::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses fd00::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ff02::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:127.0.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:7f00:1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:a9fe:a9fe 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 64:ff9b::a00:1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 93.184.215.14 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 1.1.1.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 2606:4700:4700::1111 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits ::ffff:5db8:d70e 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 64:ff9b::101:101 0ms
+ ✓ tests/images.spec.ts > workspace images > reads a workspace file relative to the root 26ms
+ × tests/images.spec.ts > workspace images > refuses paths that leave the workspace, lexically or through a symlink 18ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-img-fDmbk4\outside\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-img-fDmbk4\ws\figs\link.png'
+ ✓ tests/images.spec.ts > workspace images > names what is wrong with a file inside it 16ms
+ ✓ tests/images.spec.ts > workspace images > caps one image and the whole card 27ms
+ ✓ tests/images.spec.ts > workspace images > charges an image once per reference, since every reference embeds a full copy 20ms
+ ✓ tests/images.spec.ts > workspace images > degrades with a message on a host whose fs cannot read bytes 13ms
+ ✓ tests/images.spec.ts > workspace images > reports every image undeliverable, without reading anything, when the host cannot deliver them 11ms
+ ✓ tests/images.spec.ts > URL images > refuses loopback, private and metadata targets before connecting (default policy) 13ms
+ ✓ tests/images.spec.ts > URL images > connects to a name only through the guarded lookup 14ms
+ ✓ tests/images.spec.ts > URL images > fetches an image and follows a redirect 5ms
+ ✓ tests/images.spec.ts > URL images > checks every redirect hop against the policy and the scheme 12ms
+ × tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there 38ms
+   → expected '~\AppData\Local\Temp\viz-home-nzlnrV\…' to match /^C:/Users/<user>\AppData\Loc…/visualize\
+ ✓ tests/storage.spec.ts > card storage > keeps conversations apart 25ms
+ ✓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam 9ms
+ × tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed 26ms
+   → ENOENT ~\AppData\Local\Temp\viz-home-hXauuX\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ✓ tests/images.spec.ts > URL images > refuses what is not an image, missing, too large, or too slow 214ms
+ × tests/card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta 63ms
+   → ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-qB7WAT\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ✓ tests/images.spec.ts > URL images > drops an unread redirect or error body at once instead of draining it to the deadline 12ms
+ ✓ tests/images.spec.ts > URL images > carries a URL image an earlier call fetched instead of fetching it again 2ms
+ ✓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting 11ms
+ ✓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path 5ms
+ × tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs 18ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-otAHUE\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-otAHUE\visualize\sessions\linked'
+ × tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 58ms
+   → ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-a8LMhX\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ × tests/card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update 69ms
+   → ctx.fs.readText is not a function
+ × tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path 18ms
+   → ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-UtAXzc\C:/Users/<user>\AppData\Local\Temp\viz-ws-UtAXzc\viz\lab-0badf00d.html'
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro) 12ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace 14ms
+ × tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it 13ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-DJ2YqY\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-alehJp\viz\link.html'
+ ✓ tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path 15ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace 13ms
+ ✓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb 3ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 3ms
+ × tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve 5015ms
+   → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ × tests/card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images 16ms
+   → ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-W611WF\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ✓ tests/card-images.spec.ts > visualize with data-viz-src images > leaves a card without images exactly as before 18ms
+ ✓ tests/card-images.spec.ts > image route > serves a stored image as an opaque, sandboxed download 397ms
+ × tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store 18ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-ws-O0CSWC\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-ztTVsj\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-qB7WAT\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:92:12
+     90|     // The fragment the model wrote is what the card stores and replay…
+     91|     expect(value.fragment).toBe(FRAGMENT)
+     92|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+     93|     expect(value.images!.map(i => [i.src, i.type, i.bytes])).toEqual([
+     94|       ['./figs/loss.png', 'image/png', FIGURE.byteLength],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-qB7WAT\visualize\sessions\sess-1\lab-27530d60.whale.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read src/storage.ts:457:40
+    455|       return {
+    456|         displayPath: target.displayPath,
+    457|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    458|         async write(content) {
+    459|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ run tests/card-images.spec.ts:74:56
+ ❯ tests/card-images.spec.ts:133:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/card-images.spec.ts:149:3
+    147|   })
+    148|
+    149|   it('leaves the card untouched when an update is cancelled while its …
+       |   ^
+    150|     let started: () => void = () => {}
+    151|     const fetching = new Promise<void>(done => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-W611WF\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:185:12
+    183|     const value = await run({ fragment: FRAGMENT, title: 'Lab' })
+    184|     expect(value.images).toBeUndefined()
+    185|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+    186|     expect(text(value)).toContain('3 images could not be embedded')
+    187|     expect(text(value)).toContain('needs dsh 0.1.7 or later')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-W611WF\visualize\sessions\sess-1\lab-27530d60.whale.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-ws-O0CSWC\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-ztTVsj\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+ ❯ tests/card-images.spec.ts:224:5
+    222|     const outside = join(workspace, 'secret.png')
+    223|     await writeFile(outside, PNG)
+    224|     await symlink(outside, join(dir, `${digest}.png`))
+       |     ^
+    225|     await writeFile(join(dir, `${'0'.repeat(64)}.png`), PNG)
+    226|     for (const id of [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-O0CSWC\secret.png', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-home-ztTVsj\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/images.spec.ts > workspace images > refuses paths that leave the workspace, lexically or through a symlink
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-img-fDmbk4\outside\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-img-fDmbk4\ws\figs\link.png'
+ ❯ tests/images.spec.ts:146:5
+    144|
+    145|   it('refuses paths that leave the workspace, lexically or through a s…
+    146|     await symlink(join(outside, 'secret.png'), join(workspace, 'figs',…
+       |     ^
+    147|     await symlink(outside, join(workspace, 'escape'))
+    148|     for (const src of ['../outside/secret.png', join(outside, 'secret.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-img-fDmbk4\outside\secret.png', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-img-fDmbk4\ws\figs\link.png' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+AssertionError: expected '~\AppData\Local\Temp\viz-home-nzlnrV\…' to match /^C:/Users/<user>\AppData\Loc…/visualize\
+
+- Expected:
+/^C:/Users/<user>\AppData\Local\Temp\viz-home-nzlnrV\/visualize\/sessions\/sess-1\/lab-[0-9a-f]{8}\.whale\.html$/
+
++ Received:
+"~\\AppData\\Local\\Temp\\viz-home-nzlnrV\\visualize\\sessions\\sess-1\\lab-2f2b2eea.whale.html"
+
+ ❯ tests/storage.spec.ts:61:26
+     59|     const created = await tool.execute({ fragment: '<p>p99 480ms</p>',…
+     60|
+     61|     expect(created.path).toMatch(new RegExp(`^${home}/visualize/sessio…
+       |                          ^
+     62|     expect(await readFile(created.path, 'utf8')).toBe('<p>p99 480ms</p…
+     63|     expect(seam.resolved).toEqual([])
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+Error: ENOENT ~\AppData\Local\Temp\viz-home-hXauuX\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ❯ Object.readText tests/storage.spec.ts:40:39
+     38|       readText: async (target: { path: string }) => {
+     39|         const text = files[target.path]
+     40|         if (text === undefined) throw new Error(`ENOENT ${target.path}…
+       |                                       ^
+     41|         return text
+     42|       },
+ ❯ Object.read src/storage.ts:457:40
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ tests/storage.spec.ts:106:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-otAHUE\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-otAHUE\visualize\sessions\linked'
+ ❯ tests/storage.spec.ts:140:5
+    138|     await writeFile(join(outside, 'card.html'), '<p>secret</p>')
+    139|     await mkdir(join(home, 'visualize', 'sessions'), { recursive: true…
+    140|     await symlink(outside, join(home, 'visualize', 'sessions', 'linked…
+       |     ^
+    141|
+    142|     const { ctx, seam } = host()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-home-otAHUE\outside', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-home-otAHUE\visualize\sessions\linked' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-a8LMhX\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ❯ tests/storage.spec.ts:168:14
+    166|       const results = await Promise.all(Array.from({ length: 8 }, () =…
+    167|       expect(new Set(results.map(r => r.path)).size).toBe(1)
+    168|       expect(await readFile(results[0]!.path, 'utf8')).toBe('<p>same</…
+       |              ^
+    169|       // No temp file is left behind.
+    170|       expect(await readdir(join(home, 'visualize', 'sessions', 'sess-5…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-a8LMhX\visualize\sessions\sess-5\lab-03ef8274.whale.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path
+Error: ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-UtAXzc\C:/Users/<user>\AppData\Local\Temp\viz-ws-UtAXzc\viz\lab-0badf00d.html'
+ ❯ Object.readText tests/storage.spec.ts:189:55
+    187|           return { displayPath: path, path: absolute }
+    188|         },
+    189|         readText: async (target: { path: string }) => await readFile(t…
+       |                                                       ^
+    190|         writeText: async (target: { path: string }, content: string) =…
+    191|           await writeFile(target.path, content)
+ ❯ Object.read src/storage.ts:457:27
+ ❯ execute src/core/legacy-tool.ts:268:16
+ ❯ tests/storage.spec.ts:226:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-UtAXzc\C:/Users/<user>\AppData\Local\Temp\viz-ws-UtAXzc\viz\lab-0badf00d.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-DJ2YqY\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-alehJp\viz\link.html'
+ ❯ tests/storage.spec.ts:249:5
+    247|
+    248|   it('refuses a symlink inside the workspace that points out of it', a…
+    249|     await symlink(join(secretDir, 'secret.html'), join(workspace, 'viz…
+       |     ^
+    250|     await symlink(secretDir, join(workspace, 'viz', 'dir'))
+    251|     const { tool, resolved } = diskHost()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-secret-DJ2YqY\secret.html', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-alehJp\viz\link.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read src/storage.ts:457:40
+    455|       return {
+    456|         displayPath: target.displayPath,
+    457|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    458|         async write(content) {
+    459|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+
+This error originated in "tests/card-images.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  3 failed (3)
+      Tests  12 failed | 50 passed (62)
+     Errors  1 error
+   Start at  10:27:37
+   Duration  6.71s (transform 513ms, setup 0ms, import 1.91s, tests 6.30s, environment 0ms)
+

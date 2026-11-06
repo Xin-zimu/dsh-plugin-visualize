@@ -17,6 +17,7 @@ import {
   type UrlFetcher,
 } from '../src/images.ts'
 import { inside, realpathOfDeepest, type ImageStore } from '../src/storage.ts'
+import { linkCapability, makeDirLink, whySkipped } from './link-capability.ts'
 
 /** Smallest valid-looking image of each kind, by signature. */
 export const PNG = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52])
@@ -142,16 +143,37 @@ describe('workspace images', () => {
     ])
   })
 
-  it('refuses paths that leave the workspace, lexically or through a symlink', async () => {
-    await symlink(join(outside, 'secret.png'), join(workspace, 'figs', 'link.png'))
-    await symlink(outside, join(workspace, 'escape'))
+  it('refuses paths that leave the workspace lexically', async () => {
     for (const src of ['../outside/secret.png', join(outside, 'secret.png'), 'figs/../../outside/secret.png']) {
       expect(await reasons(src)).toEqual([expect.stringMatching(/^outside the workspace/u)])
     }
-    expect(await reasons('figs/link.png')).toEqual([expect.stringMatching(/through a symlink/u)])
-    expect(await reasons('escape/secret.png')).toEqual([expect.stringMatching(/through a symlink/u)])
     expect(await reasons('~/secret.png')).toEqual([expect.stringMatching(/~ is not expanded/u)])
   })
+
+  // Split out of the test above so the directory-escape half keeps running on a
+  // machine that cannot create a symlink: a junction is a real reparse point and
+  // `realpath` resolves through it, so the assertion is exercised unchanged.
+  it('refuses a directory link that leaves the workspace', async () => {
+    const cap = linkCapability()
+    // A junction stands in for a directory symlink where the privilege is absent:
+    // both are reparse points that `realpath` resolves through, so the assertion
+    // below is the same one. Skip visibly if neither can be created.
+    if (!cap.dirSymlink && !cap.dirJunction) expect.unreachable(whySkipped('dirSymlink'))
+    await makeDirLink(outside, join(workspace, 'escape'), cap)
+    expect(await reasons('escape/secret.png')).toEqual([expect.stringMatching(/through a symlink/u)])
+  })
+
+  // A file symlink cannot be substituted: a hardlink shares an inode, so the file
+  // is not reached *through* anything and the property under test does not exist.
+  // The capability is a property of the machine, so this skips visibly here and
+  // runs on CI Windows and on POSIX. Assertions unchanged.
+  it.skipIf(!linkCapability().fileSymlink)(
+    'refuses a file symlink that leaves the workspace',
+    async () => {
+      await symlink(join(outside, 'secret.png'), join(workspace, 'figs', 'link.png'))
+      expect(await reasons('figs/link.png')).toEqual([expect.stringMatching(/through a symlink/u)])
+    },
+  )
 
   it('names what is wrong with a file inside it', async () => {
     expect(await reasons('figs/missing.png')).toEqual([expect.stringMatching(/^not found in the workspace/u)])
@@ -325,6 +347,29 @@ describe('URL images', () => {
     expect(await within('/endless-404')).toBe('closed')
     expect((await fetchOne(`http://127.0.0.1:${port}/endless-302`)).images).toHaveLength(1)
     expect(await within('/endless-302')).toBe('closed')
+  })
+
+  // Cancellation is not a per-image failure: an aborted call must reach the
+  // caller, and must not do work it cannot use. The tool checks its signal
+  // again on the way out, so a call cancelled before it started would otherwise
+  // read the workspace, fetch, and write images into the store, then discard
+  // them — visible as a store that grows for a call that never rendered.
+  it('does no work for a call cancelled before it starts', async () => {
+    const store = memoryStore()
+    let entered = false
+    const fetchUrl: UrlFetcher = async () => {
+      entered = true
+      return PNG
+    }
+    const cancelled = new AbortController()
+    cancelled.abort(new Error('cancelled before the call'))
+
+    await expect(resolveCardImages(`<img data-viz-src="https://example.com/a.png">`, {
+      readFile: read, fetchUrl, store, signal: cancelled.signal,
+    })).rejects.toThrow('cancelled before the call')
+
+    expect(entered).toBe(false)
+    expect(store.puts).toBe(0)
   })
 
   it('carries a URL image an earlier call fetched instead of fetching it again', async () => {

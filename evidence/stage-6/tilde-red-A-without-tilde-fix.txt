@@ -1,0 +1,125 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ × tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there 25ms
+   → expected undefined to be defined
+ ✓ tests/storage.spec.ts > card storage > keeps conversations apart 16ms
+ ✓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam 7ms
+ × tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed 25ms
+   → ENOENT ~\AppData\Local\Temp\viz-home-3fHkqs\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ✓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting 7ms
+ ✓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path 4ms
+ ✓ tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs 13ms
+ × tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 58ms
+   → The "path" argument must be of type string or an instance of Buffer or URL. Received undefined
+ ✓ tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path 15ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro) 9ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace 9ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a directory link inside the workspace that points out of it 10ms
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a file symlink inside the workspace that points out of it
+ × tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path 15ms
+   → expected '~\.dsh-visualize-spec-absent\ws\viz\a…' to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace 10ms
+ ✓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb 2ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 4ms
+ × tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator 3ms
+   → expected undefined to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+ × tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it 12ms
+   → expected undefined to be defined
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+AssertionError: expected undefined to be defined
+ ❯ tests/storage.spec.ts:68:20
+     66|     // `update` depends on.
+     67|     const stored = await ownedPath(join(home, 'visualize'), created.pa…
+     68|     expect(stored).toBeDefined()
+       |                    ^
+     69|     expect(dirname(stored!)).toBe(join(home, 'visualize', 'sessions', …
+     70|     expect(basename(stored!)).toMatch(/^lab-[0-9a-f]{8}\.whale\.html$/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+Error: ENOENT ~\AppData\Local\Temp\viz-home-3fHkqs\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ❯ Object.readText tests/storage.spec.ts:41:39
+     39|       readText: async (target: { path: string }) => {
+     40|         const text = files[target.path]
+     41|         if (text === undefined) throw new Error(`ENOENT ${target.path}…
+       |                                       ^
+     42|         return text
+     43|       },
+ ❯ Object.read src/storage.ts:457:40
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ tests/storage.spec.ts:115:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+TypeError: The "path" argument must be of type string or an instance of Buffer or URL. Received undefined
+ ❯ tests/storage.spec.ts:184:20
+    182|       expect(new Set(results.map(r => r.path)).size).toBe(1)
+    183|       const stored = await ownedPath(join(home, 'visualize'), results[…
+    184|       expect(await readFile(stored!, 'utf8')).toBe('<p>same</p>')
+       |                    ^
+    185|       // No temp file is left behind.
+    186|       expect(await readdir(join(home, 'visualize', 'sessions', 'sess-5…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'ERR_INVALID_ARG_TYPE' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path
+AssertionError: expected '~\.dsh-visualize-spec-absent\ws\viz\a…' to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+
+Expected: "C:/Users/<user>\.dsh-visualize-spec-absent\ws\viz\a.html"
+Received: "~\.dsh-visualize-spec-absent\ws\viz\a.html"
+
+ ❯ tests/storage.spec.ts:315:52
+    313|     const native = `~${join(underHome, 'viz', 'a.html').slice(home.len…
+    314|     expect(native.slice(0, 2)).toBe(`~${sep}`)
+    315|     expect(await workspacePath(underHome, native)).toBe(join(underHome…
+       |                                                    ^
+    316|     expect(await workspacePath(underHome, '~/.dsh-visualize-spec-absen…
+    317|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator
+AssertionError: expected undefined to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+
+- Expected:
+"C:/Users/<user>\\.dsh-visualize-spec-absent\\visualize\\sessions\\s\\lab-ab12.whale.html"
+
++ Received:
+undefined
+
+ ❯ tests/storage.spec.ts:362:43
+    360|     expect(native.slice(0, 2)).toBe(`~${sep}`)
+    361|
+    362|     expect(await ownedPath(root, native)).toBe(absolute)
+       |                                           ^
+    363|     // A path that crossed a POSIX transcript or a model's own normali…
+    364|     expect(await ownedPath(root, '~/.dsh-visualize-spec-absent/visuali…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it
+AssertionError: expected undefined to be defined
+ ❯ tests/storage.spec.ts:379:22
+    377|       .execute({ fragment: '<p>hi</p>', title: 'Lab' }, exec('sess-9')…
+    378|     const absolute = await ownedPath(join(home, 'visualize'), reported…
+    379|     expect(absolute).toBeDefined()
+       |                      ^
+    380|     expect(await readFile(absolute!, 'utf8')).toBe('<p>hi</p>')
+    381|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 12 passed | 1 skipped (19)
+   Start at  10:58:28
+   Duration  1.43s (transform 302ms, setup 0ms, import 962ms, tests 245ms, environment 0ms)
+

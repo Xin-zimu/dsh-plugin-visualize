@@ -1,0 +1,127 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ❯ tests/tool.spec.ts (7 tests | 1 failed) 37ms
+     ✓ resolves the session policy and forwards it to the workspace write 10ms
+     ✓ patches the workspace copy on update and writes the result beside it 8ms
+     ✓ chains a second patch in the same reply onto the first 6ms
+     ✓ fails loud on the arguments each action cannot run without 5ms
+     ✓ lets creates run in parallel but serialises updates against their base 1ms
+     ✓ still writes without a sandboxPolicy service in the composition 1ms
+     × names an on-disk contract for agents that cannot load skills 5ms
+ ❯ tests/card-images.spec.ts (7 tests | 5 failed) 5606ms
+     × stores the bytes beside the card and keeps them out of the fragment, the result text and the meta 54ms
+     × re-reads workspace files and carries fetched URLs on update 46ms
+     × leaves the card untouched when an update is cancelled while its images resolve 5017ms
+     × renders the card and says why on a host that cannot deliver images 17ms
+     ✓ leaves a card without images exactly as before 19ms
+     ✓ serves a stored image as an opaque, sandboxed download  400ms
+     × opens nothing but a well-formed id of an intact regular file below the store 51ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-sy6iaS\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:92:12
+     90|     // The fragment the model wrote is what the card stores and replay…
+     91|     expect(value.fragment).toBe(FRAGMENT)
+     92|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+     93|     expect(value.images!.map(i => [i.src, i.type, i.bytes])).toEqual([
+     94|       ['./figs/loss.png', 'image/png', FIGURE.byteLength],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read src/storage.ts:457:40
+    455|       return {
+    456|         displayPath: target.displayPath,
+    457|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    458|         async write(content) {
+    459|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ run tests/card-images.spec.ts:74:56
+ ❯ tests/card-images.spec.ts:133:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/card-images.spec.ts:149:3
+    147|   })
+    148|
+    149|   it('leaves the card untouched when an update is cancelled while its …
+       |   ^
+    150|     let started: () => void = () => {}
+    151|     const fetching = new Promise<void>(done => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-KjEv7S\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:185:12
+    183|     const value = await run({ fragment: FRAGMENT, title: 'Lab' })
+    184|     expect(value.images).toBeUndefined()
+    185|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+    186|     expect(text(value)).toContain('3 images could not be embedded')
+    187|     expect(text(value)).toContain('needs dsh 0.1.7 or later')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-ws-nrzLH5\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-FtTZe1\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+ ❯ tests/card-images.spec.ts:224:5
+    222|     const outside = join(workspace, 'secret.png')
+    223|     await writeFile(outside, PNG)
+    224|     await symlink(outside, join(dir, `${digest}.png`))
+       |     ^
+    225|     await writeFile(join(dir, `${'0'.repeat(64)}.png`), PNG)
+    226|     for (const id of [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/tool.spec.ts > visualizeTool description > names an on-disk contract for agents that cannot load skills
+AssertionError: expected undefined to be defined
+ ❯ tests/tool.spec.ts:190:18
+    188|     const tool = visualizeTool({} as Context, 1000)
+    189|     const path = /read the same contract from (\S+\.md)/.exec(tool.des…
+    190|     expect(path).toBeDefined()
+       |                  ^
+    191|     expect(existsSync(path!)).toBe(true)
+    192|     expect(tool.description).toContain('do not search for it anywhere …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read src/storage.ts:457:40
+    455|       return {
+    456|         displayPath: target.displayPath,
+    457|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    458|         async write(content) {
+    459|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+
+This error originated in "tests/card-images.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  2 failed (2)
+      Tests  6 failed | 8 passed (14)
+     Errors  1 error
+   Start at  10:25:51
+   Duration  7.65s (transform 575ms, setup 0ms, import 2.50s, tests 5.64s, environment 0ms)
+

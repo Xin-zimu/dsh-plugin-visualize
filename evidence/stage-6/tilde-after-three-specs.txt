@@ -1,0 +1,77 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ✓ tests/images.spec.ts > sniffImageType > identifies each accepted format by its bytes 2ms
+ ✓ tests/images.spec.ts > sniffImageType > refuses everything else, whatever it is called 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 127.0.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 10.1.2.3 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 172.20.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 192.168.1.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 169.254.169.254 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 100.64.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 0.0.0.0 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 224.0.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 255.255.255.255 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses :: 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses fe80::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses fd00::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ff02::1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:127.0.0.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:7f00:1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:a9fe:a9fe 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > refuses 64:ff9b::a00:1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 93.184.215.14 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 1.1.1.1 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 2606:4700:4700::1111 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits ::ffff:5db8:d70e 0ms
+ ✓ tests/images.spec.ts > isPublicAddress > admits 64:ff9b::101:101 0ms
+ ✓ tests/images.spec.ts > workspace images > reads a workspace file relative to the root 18ms
+ ✓ tests/images.spec.ts > workspace images > refuses paths that leave the workspace lexically 12ms
+ ✓ tests/images.spec.ts > workspace images > refuses a directory link that leaves the workspace 15ms
+ ↓ tests/images.spec.ts > workspace images > refuses a file symlink that leaves the workspace
+ ✓ tests/images.spec.ts > workspace images > names what is wrong with a file inside it 15ms
+ ✓ tests/images.spec.ts > workspace images > caps one image and the whole card 18ms
+ ✓ tests/images.spec.ts > workspace images > charges an image once per reference, since every reference embeds a full copy 17ms
+ ✓ tests/images.spec.ts > workspace images > degrades with a message on a host whose fs cannot read bytes 12ms
+ ✓ tests/images.spec.ts > workspace images > reports every image undeliverable, without reading anything, when the host cannot deliver them 11ms
+ ✓ tests/images.spec.ts > URL images > refuses loopback, private and metadata targets before connecting (default policy) 13ms
+ ✓ tests/images.spec.ts > URL images > connects to a name only through the guarded lookup 11ms
+ ✓ tests/images.spec.ts > URL images > fetches an image and follows a redirect 6ms
+ ✓ tests/images.spec.ts > URL images > checks every redirect hop against the policy and the scheme 13ms
+ ✓ tests/images.spec.ts > URL images > refuses what is not an image, missing, too large, or too slow 211ms
+ ✓ tests/images.spec.ts > URL images > drops an unread redirect or error body at once instead of draining it to the deadline 11ms
+ ✓ tests/images.spec.ts > URL images > carries a URL image an earlier call fetched instead of fetching it again 2ms
+ ✓ tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there 52ms
+ ✓ tests/storage.spec.ts > card storage > keeps conversations apart 25ms
+ ✓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam 9ms
+ ✓ tests/card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta 71ms
+ ✓ tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed 27ms
+ ✓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting 11ms
+ ✓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path 5ms
+ ✓ tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs 22ms
+ ✓ tests/card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update 92ms
+ ✓ tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 57ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path 23ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro) 15ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace 14ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a directory link inside the workspace that points out of it 17ms
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a file symlink inside the workspace that points out of it
+ ✓ tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path 19ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace 16ms
+ ✓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb 4ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 3ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator 4ms
+ ✓ tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it 18ms
+ ✓ tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve 47ms
+ ✓ tests/card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images 27ms
+ ✓ tests/card-images.spec.ts > visualize with data-viz-src images > leaves a card without images exactly as before 23ms
+ ✓ tests/card-images.spec.ts > image route > serves a stored image as an opaque, sandboxed download 494ms
+ ✓ tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store 22ms
+ ↓ tests/card-images.spec.ts > image route > refuses to serve an image reached through a symlink
+
+ Test Files  3 passed (3)
+      Tests  65 passed | 3 skipped (68)
+   Start at  10:58:43
+   Duration  1.85s (transform 621ms, setup 0ms, import 1.99s, tests 1.52s, environment 0ms)
+

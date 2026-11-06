@@ -1,0 +1,133 @@
+# REGRESSION PROOF for the cancellation-test repair (AGENTS.md section 6)
+# Both RED runs use the SAME old product code: tmp/probes/storage-head.ts, a copy of
+# src/storage.ts exactly as committed at HEAD (src/ is owned by tilde-fixer and is not reverted).
+# The only variable between RED 1 and RED 2 is the test body.
+
+===== RED 1: OLD body (git show HEAD) + OLD product code + the real 5 s bound =====
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tmp/probes/card-images-head.probe.spec.ts (7 tests | 1 failed | 6 skipped) 5028ms
+     ↓ stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+     ↓ re-reads workspace files and carries fetched URLs on update
+     × leaves the card untouched when an update is cancelled while its images resolve 5026ms
+     ↓ renders the card and says why on a host that cannot deliver images
+     ↓ leaves a card without images exactly as before
+     ↓ serves a stored image as an opaque, sandboxed download
+     ↓ opens nothing but a well-formed id of an intact regular file below the store
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tmp/probes/card-images-head.probe.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tmp/probes/card-images-head.probe.spec.ts:152:3
+    150|   })
+    151|
+    152|   it('leaves the card untouched when an update is cancelled while its …
+       |   ^
+    153|     let started: () => void = () => {}
+    154|     const fetching = new Promise<void>(done => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: ctx.fs.readText is not a function
+ ❯ Object.read tmp/probes/storage-head.ts:460:40
+    458|       return {
+    459|         displayPath: target.displayPath,
+    460|         read: async () => await ctx.fs.readText(target, exec.signal),
+       |                                        ^
+    461|         async write(content) {
+    462|           await ctx.fs.writeText(target, content, undefined, exec.sign…
+ ❯ execute src/core/legacy-tool.ts:268:29
+
+This error originated in "tmp/probes/card-images-head.probe.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+     Errors  1 error
+   Start at  10:46:45
+   Duration  6.11s (transform 299ms, setup 0ms, import 850ms, tests 5.03s, environment 0ms)
+
+
+===================== RED 2: repaired body + the SAME old product code =====================
+# Bound left at the probe default (800 ms) — an honest failure must not need 5 s to appear.
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tmp/probes/card-images-repaired.probe.spec.ts (7 tests | 1 failed | 6 skipped) 43ms
+     ↓ stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+     ↓ re-reads workspace files and carries fetched URLs on update
+     × leaves the card untouched when an update is cancelled while its images resolve 41ms
+     ↓ renders the card and says why on a host that cannot deliver images
+     ↓ leaves a card without images exactly as before
+     ↓ serves a stored image as an opaque, sandboxed download
+     ↓ opens nothing but a well-formed id of an intact regular file below the store
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tmp/probes/card-images-repaired.probe.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: the reported path ~\AppData\Local\Temp\viz-home-YFAbpl\visualize\sessions\sess-1\lab-a52c3de7.whale.html does not resolve back to a store file
+ ❯ tmp/probes/card-images-repaired.probe.spec.ts:183:39
+    181|     // reported string.
+    182|     const cardPath = await ownedPath(join(home, 'visualize'), created.…
+    183|     if (cardPath === undefined) throw new Error(`the reported path ${c…
+       |                                       ^
+    184|     const manifest = cardPath.replace(/\.html$/u, '.images.json')
+    185|     const patch = { action: 'update', path: created.path, title: 'Lab'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+   Start at  10:46:59
+   Duration  1.13s (transform 291ms, setup 0ms, import 829ms, tests 43ms, environment 0ms)
+
+
+
+===================== GREEN: repaired body + the real working tree =====================
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tests/card-images.spec.ts (7 tests | 1 failed) 641ms
+     ✓ stores the bytes beside the card and keeps them out of the fragment, the result text and the meta 61ms
+     ✓ re-reads workspace files and carries fetched URLs on update 77ms
+     ✓ leaves the card untouched when an update is cancelled while its images resolve 37ms
+     ✓ renders the card and says why on a host that cannot deliver images 20ms
+     ✓ leaves a card without images exactly as before 20ms
+     ✓ serves a stored image as an opaque, sandboxed download  406ms
+     × opens nothing but a well-formed id of an intact regular file below the store 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
+Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-ws-s2613r\secret.png' -> 'C:\Users\86139\AppData\Local\Temp\viz-home-WWVPQe\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+ ❯ tests/card-images.spec.ts:256:5
+    254|     const outside = join(workspace, 'secret.png')
+    255|     await writeFile(outside, PNG)
+    256|     await symlink(outside, join(dir, `${digest}.png`))
+       |     ^
+    257|     await writeFile(join(dir, `${'0'.repeat(64)}.png`), PNG)
+    258|     for (const id of [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  10:47:01
+   Duration  1.65s (transform 269ms, setup 0ms, import 780ms, tests 641ms, environment 0ms)
+
+

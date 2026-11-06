@@ -142,13 +142,13 @@ export function cardStore(ctx: Context, exec: CardExec): CardStore {
  * failed patch quotes the card text back, so an unconfined read would leak
  * any file the host can open.
  * @param root - the session workspace root, undefined when the session has none.
- * @param path - the `update` path as the model passed it (`~/` allowed).
+ * @param path - the `update` path as the model passed it (a `~` display form is allowed).
  * @returns the path to resolve through the seam, or undefined when it is not contained.
  */
 export async function workspacePath(root: string | undefined, path: string): Promise<string | undefined> {
   if (root === undefined || !isAbsolute(root)) return undefined
-  const tilde = path === '~' || path.startsWith('~/')
-  const expanded = tilde ? join(homedir(), path.slice(1)) : path
+  const tilde = isDisplayPath(path)
+  const expanded = expandDisplayPath(path)
   const base = resolve(root)
   const target = resolve(base, expanded)
   if (!inside(base, target) || !target.endsWith('.html')) return undefined
@@ -212,11 +212,11 @@ export function sessionSegment(id: string): string {
  * Accept a model-supplied path as a store file only if it names an `.html`
  * file below the root after normalization and symlink resolution.
  * @param root - absolute store root.
- * @param path - the `update` path as the model passed it (`~/` allowed).
+ * @param path - the `update` path as the model passed it (a `~` display form is allowed).
  * @returns the absolute store path, or undefined when it is not a store file.
  */
 export async function ownedPath(root: string, path: string): Promise<string | undefined> {
-  const expanded = path === '~' || path.startsWith('~/') ? join(homedir(), path.slice(1)) : path
+  const expanded = expandDisplayPath(path)
   if (!isAbsolute(expanded)) return undefined
   const target = resolve(expanded)
   if (!inside(root, target) || !target.endsWith('.html')) return undefined
@@ -407,12 +407,12 @@ export async function writeFileAtomic(path: string, content: string | Uint8Array
   await mkdir(dirname(path), { recursive: true, mode: 0o700 })
   // Unique per write, not per millisecond: concurrent creates of the same
   // content-addressed card would otherwise share one temp file, and the
-  // second rename would find it already moved. With distinct temps both
-  // renames land, and identical bytes make the last one a no-op.
+  // second rename would find it already moved. Distinct temps keep every write
+  // independent, and identical bytes make the last rename a no-op.
   const temp = `${path}.${process.pid}.${randomBytes(6).toString('hex')}.tmp`
   try {
     await writeFile(temp, content, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
-    await rename(temp, path)
+    await renameWithRetry(temp, path)
   } catch (error) {
     // EEXIST means the name was taken and the file is not ours to remove.
     if ((error as NodeJS.ErrnoException).code !== 'EEXIST') await rm(temp, { force: true }).catch(() => {})
@@ -420,15 +420,87 @@ export async function writeFileAtomic(path: string, content: string | Uint8Array
   }
 }
 
+/** How many times a refused rename is tried before the failure is real. */
+const RENAME_ATTEMPTS = 20
+
+/** How long to wait between those attempts. */
+const RENAME_BACKOFF_MS = 5
+
+/**
+ * `rename` with a bounded retry for the transient refusal Windows puts up when
+ * two writes race for one destination.
+ *
+ * Distinct temp files are not enough there: the MoveFileEx behind `rename`
+ * returns `EPERM` when another write holds the destination, measured at 1-3 of
+ * 8 concurrent writes to one content-addressed card name. Those writers are not
+ * in conflict — the bytes are identical by construction — so the refusal is a
+ * scheduling artefact, and retrying it is what makes concurrent creates of the
+ * same card succeed rather than throw. `EBUSY` and `EACCES` are the same shape.
+ *
+ * `EEXIST` is deliberately not retried: for a rename it would mean the
+ * destination is a directory, which no retry fixes, and it is the code
+ * {@link writeFileAtomic} uses to mean "the temp name was taken", so swallowing
+ * it here would leak the temp file the caller then declines to remove.
+ * @param from - the sibling temp file just written.
+ * @param to - the destination to replace.
+ */
+async function renameWithRetry(from: string, to: string): Promise<void> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await rename(from, to)
+      return
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code
+      const transient = code === 'EPERM' || code === 'EBUSY' || code === 'EACCES'
+      if (!transient || attempt >= RENAME_ATTEMPTS) throw error
+      await new Promise(done => setTimeout(done, RENAME_BACKOFF_MS))
+    }
+  }
+}
+
 /**
  * Shorten an absolute store path for display: the OS home becomes `~`, which
- * {@link ownedPath} expands again when the model hands the path back.
+ * {@link ownedPath} and {@link workspacePath} expand again when the model hands
+ * the path back.
+ *
+ * The shortened form keeps the native separator — `~\AppData\…` on Windows,
+ * `~/…` on POSIX — and the readers accept either, rather than this writing a
+ * forward slash everywhere. The same string is both result text the model reads
+ * and a path it pastes straight back into `update` (or into `cat`); on Windows
+ * the native form is the one those commands accept, so changing it would trade
+ * one broken round trip for another. Widening the readers also repairs a path
+ * an older build or a model already handed back in the other separator, which
+ * changing this producer could not.
  * @param path - absolute path.
  * @returns the display path.
  */
 function displayOf(path: string): string {
   const home = homedir()
   return path.startsWith(`${home}${sep}`) ? `~${path.slice(home.length)}` : path
+}
+
+/**
+ * Whether `path` is the `~` display form {@link displayOf} writes.
+ *
+ * Both separators are accepted on every OS: the producer uses the native one,
+ * and a path that crossed a session log, a POSIX transcript or a model's own
+ * normalisation may arrive with `/`. `~` alone means the home directory.
+ * @param path - a path as the model passed it.
+ * @returns true when it starts with `~` and a separator, or is `~`.
+ */
+function isDisplayPath(path: string): boolean {
+  return path === '~' || path.startsWith(`~${sep}`) || path.startsWith('~/')
+}
+
+/**
+ * Expand the `~` display form back to an absolute path, leaving anything else
+ * untouched: a relative path still resolves against the caller's root, and an
+ * absolute one is used as given.
+ * @param path - a path as the model passed it.
+ * @returns the absolute path, or `path` itself when it is not a display form.
+ */
+function expandDisplayPath(path: string): string {
+  return isDisplayPath(path) ? join(homedir(), path.slice(1)) : path
 }
 
 /**

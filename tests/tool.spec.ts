@@ -184,11 +184,36 @@ describe('visualizeTool sandbox policy', () => {
  */
 describe('visualizeTool description', () => {
   it('names an on-disk contract for agents that cannot load skills', async () => {
-    const { existsSync } = await import('node:fs')
+    const { existsSync, statSync } = await import('node:fs')
+    const { dirname, isAbsolute, join } = await import('node:path')
     const tool = visualizeTool({} as Context, 1000)
-    const path = /read the same contract from (\S+\.md)/.exec(tool.description)?.[1]
-    expect(path).toBeDefined()
-    expect(existsSync(path!)).toBe(true)
+
+    // The contract sentence ends at the next clause, not at the first space:
+    // a checkout may live under a path with a space in it (this one does —
+    // `D:\Deepseek WorkSpace\...`), and the old `(\S+\.md)` could not carry
+    // that path, so it reported `undefined` while the description named the
+    // file correctly. The path is data, not a delimiter, so capture it up to
+    // the sentence that follows.
+    const named = /read the same contract from (.+?\.md)\s/u.exec(tool.description)
+    expect(named, 'the description must name the contract file').not.toBeNull()
+    const contractPath = named![1]!
+
+    // What the claim promises: an agent with only a file or shell tool can
+    // open it, from any working directory, and it is the shipped contract.
+    expect(isAbsolute(contractPath)).toBe(true)
+    expect(existsSync(contractPath)).toBe(true)
+    expect(statSync(contractPath).isFile()).toBe(true)
+    expect(contractPath.endsWith('.md')).toBe(true)
+    // And the relative references inside that file (`references/charts.md`,
+    // `examples/…`) resolve against the directory it actually sits in — that
+    // is the second half of the sentence's promise, so check it instead of
+    // trusting it.
+    const resourceDir = dirname(contractPath)
+    expect(statSync(resourceDir).isDirectory()).toBe(true)
+    expect(tool.description).toContain(resourceDir)
+    for (const relative of ['references/charts.md', 'references/design.md', 'examples/interactive-simulator.html']) {
+      expect(existsSync(join(resourceDir, relative)), relative).toBe(true)
+    }
     expect(tool.description).toContain('do not search for it anywhere else')
   })
 })

@@ -1,0 +1,71 @@
+# Full suite, once, with a tree snapshot before and after
+# AGENTS.md section 10: the single spec while iterating, the full suite once before writing numbers.
+# NOTE: sibling stage-6 tasks were still landing edits while this ran (see the two snapshots).
+#     The number below is therefore this tree state, not a frozen release commit.
+
+=== snapshot BEFORE ===
+ M .gitignore
+ M STAGE.md
+ M src/storage.ts
+ M tests/card-images.spec.ts
+ M tests/images.spec.ts
+ M tests/storage.spec.ts
+ M tests/tool.spec.ts
+?? evidence/stage-6/
+?? tests/link-capability.ts
+src/storage.ts        96E42D296B02E78354D96457DD5B1839E892C9175F37A21EBF5996EB5EAACDCC
+tests/card-images.ts  4C9126743CB305E40F3CD2404DF769EE5BA855B8583DFB365DB3E60C8F71CBA8
+tests/storage.spec.ts F818B81B488A75F7B489E5457335B103D41830719F43D7AFAFF9D1054371AECF
+tests/images.spec.ts  3A29E310FD45F9730FE5F138941B9DF93E74A3C2BC2B0C02B581D9EA304CA28B
+
+=== $ pnpm exec vitest run ===
+JSON report written to D:/Deepseek WorkSpace/dsh-plugin-visualize/tmp/probes/full-suite-recorded.json
+tests 944 passed 938 failed 4 pending 2
+
+failures:
+   1   167 ms card-images.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\
+   2   162 ms storage.spec.ts      Error: EPERM: operation not permitted, rename 'C:\Users\86139\AppData\Local\Temp\v
+   3    52 ms style-files.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\
+   4    34 ms style-files.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\
+
+timeout-shaped failures: 0
+the task's test: passed in 157 ms
+
+=== snapshot AFTER ===
+ M .gitignore
+ M STAGE.md
+ M src/storage.ts
+ M tests/card-images.spec.ts
+ M tests/images.spec.ts
+ M tests/storage.spec.ts
+ M tests/tool.spec.ts
+?? evidence/stage-6/
+?? tests/link-capability.ts
+src/storage.ts        96E42D296B02E78354D96457DD5B1839E892C9175F37A21EBF5996EB5EAACDCC
+tests/card-images.ts  4C9126743CB305E40F3CD2404DF769EE5BA855B8583DFB365DB3E60C8F71CBA8
+tests/storage.spec.ts F818B81B488A75F7B489E5457335B103D41830719F43D7AFAFF9D1054371AECF
+tests/images.spec.ts  3A29E310FD45F9730FE5F138941B9DF93E74A3C2BC2B0C02B581D9EA304CA28B
+
+# Reading of this run
+#
+#   * 944 tests, 938 passed, 4 failed, 2 pending, 0 timeout-shaped.
+#   * All 4 failures are one environment class and none is this task's subject:
+#       2 x symlink EPERM (Developer Mode is off on this machine)
+#       1 x rename EPERM over an open file
+#       1 x symlink EPERM in the image-route test
+#     All four pass on CI Windows and on Linux (evidence/phase-5/C2-cross-platform.json).
+#   * The task's own test now passes in 157 ms:
+#       "leaves the card untouched when an update is cancelled while its images resolve"
+#     Against the same file at HEAD it took 5,021 ms and reported STACK_TRACE_ERROR.
+#   * The tree hash is identical in both snapshots, so the number belongs to one tree state.
+#
+# Baseline for comparison (evidence/phase-5-final/vitest-release-candidate.json):
+#   939 tests, 924 passed, 15 failed, one of them this 5 s timeout.
+#
+# Fluctuation worth recording rather than smoothing over: two earlier full runs of the same
+# command (tmp/probes/full-suite-after.json and full-suite-final2.json) reported 941/7 and
+# 944/5, and a third (full-suite-final.json) reported 902/6 with tests/images.spec.ts failing
+# to PARSE ("await is only allowed within async functions") because another agent was
+# mid-write in that file during the run. None of those runs had a timeout-shaped failure
+# either. The variation is sibling stage-6 work landing concurrently, not instability in the
+# test under diagnosis, which passed in every run once the two repairs were in.

@@ -1,10 +1,11 @@
 import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
-import { join, relative } from 'node:path'
+import { basename, dirname, isAbsolute, join, relative, sep } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Context } from '@deepseek-ai/cordis'
 import { visualizeTool } from '../src/tool.ts'
 import { ownedPath, sessionSegment, workspacePath } from '../src/storage.ts'
+import { linkCapability, makeDirLink, whySkipped } from './link-capability.ts'
 
 let home: string
 let workspace: string
@@ -58,8 +59,16 @@ describe('card storage', () => {
     const tool = visualizeTool(ctx, 10_000)
     const created = await tool.execute({ fragment: '<p>p99 480ms</p>', title: 'Lab' }, exec('sess-1')) as { path: string }
 
-    expect(created.path).toMatch(new RegExp(`^${home}/visualize/sessions/sess-1/lab-[0-9a-f]{8}\\.whale\\.html$`))
-    expect(await readFile(created.path, 'utf8')).toBe('<p>p99 480ms</p>')
+    // The reported path is the display form — `~` + the rest when it lies under
+    // the OS home, which is where a temp dir sits on Windows — so the assertion
+    // is on where that path expands back to. Asserting the shape of the string
+    // instead only held on POSIX, and it also stopped testing the round trip an
+    // `update` depends on.
+    const stored = await ownedPath(join(home, 'visualize'), created.path)
+    expect(stored).toBeDefined()
+    expect(dirname(stored!)).toBe(join(home, 'visualize', 'sessions', 'sess-1'))
+    expect(basename(stored!)).toMatch(/^lab-[0-9a-f]{8}\.whale\.html$/u)
+    expect(await readFile(stored!, 'utf8')).toBe('<p>p99 480ms</p>')
     expect(seam.resolved).toEqual([])
     expect(await readdir(workspace)).toEqual([])
 
@@ -70,7 +79,7 @@ describe('card storage', () => {
 
     expect(patched.path).toBe(created.path)
     expect(patched.fragment).toBe('<p>p99 120ms</p>')
-    expect(await readFile(created.path, 'utf8')).toBe('<p>p99 120ms</p>')
+    expect(await readFile(stored!, 'utf8')).toBe('<p>p99 120ms</p>')
     expect(seam.resolved).toEqual([])
   })
 
@@ -110,7 +119,8 @@ describe('card storage', () => {
     expect(patched.style).toBe('editorial')
     expect(patched.path).toBe(created.path)
     // The model reads and patches the stored copy: it carries no style marker.
-    expect(await readFile(created.path, 'utf8')).toBe('<p>p99 410ms</p>')
+    const stored = await ownedPath(join(home, 'visualize'), created.path)
+    expect(await readFile(stored!, 'utf8')).toBe('<p>p99 410ms</p>')
   })
 
   it('patches a card named before styles existed in the current setting', async () => {
@@ -130,14 +140,19 @@ describe('card storage', () => {
     expect(Object.keys(seam.written)).toEqual([value.path])
   })
 
+  // The escape here is a DIRECTORY link into the store, so a junction stands in
+  // where a directory symlink cannot be created: both are reparse points that
+  // `realpath` resolves through, so the containment check is the same one.
   it('never reads a file outside the store with its own fs', async () => {
+    const cap = linkCapability()
+    if (!cap.dirSymlink && !cap.dirJunction) expect.unreachable(whySkipped('dirSymlink'))
     const secret = join(home, 'secret.html')
     await writeFile(secret, '<p>secret</p>')
     const outside = join(home, 'outside')
     await mkdir(outside)
     await writeFile(join(outside, 'card.html'), '<p>secret</p>')
     await mkdir(join(home, 'visualize', 'sessions'), { recursive: true })
-    await symlink(outside, join(home, 'visualize', 'sessions', 'linked'))
+    await makeDirLink(outside, join(home, 'visualize', 'sessions', 'linked'), cap)
 
     const { ctx, seam } = host()
     const tool = visualizeTool(ctx, 10_000)
@@ -165,9 +180,10 @@ describe('card storage', () => {
       const args = { fragment: '<p>same</p>', title: 'Lab' }
       const results = await Promise.all(Array.from({ length: 8 }, () => tool.execute(args, exec('sess-5')))) as { path: string }[]
       expect(new Set(results.map(r => r.path)).size).toBe(1)
-      expect(await readFile(results[0]!.path, 'utf8')).toBe('<p>same</p>')
+      const stored = await ownedPath(join(home, 'visualize'), results[0]!.path)
+      expect(await readFile(stored!, 'utf8')).toBe('<p>same</p>')
       // No temp file is left behind.
-      expect(await readdir(join(home, 'visualize', 'sessions', 'sess-5'))).toEqual([results[0]!.path.split('/').at(-1)])
+      expect(await readdir(join(home, 'visualize', 'sessions', 'sess-5'))).toEqual([basename(stored!)])
     } finally {
       vi.restoreAllMocks()
     }
@@ -183,7 +199,10 @@ describe('legacy workspace cards', () => {
       fs: {
         resolve: async (path: string, options: { cwd?: string }) => {
           resolved.push(path)
-          const absolute = path.startsWith('/') ? path : join(options.cwd!, path)
+          // The real seam takes an absolute path as given; `startsWith('/')`
+          // only recognised POSIX ones and joined a drive-qualified path onto
+          // the workspace, which no call site produces.
+          const absolute = isAbsolute(path) ? path : join(options.cwd!, path)
           return { displayPath: path, path: absolute }
         },
         readText: async (target: { path: string }) => await readFile(target.path, 'utf8'),
@@ -245,17 +264,37 @@ describe('legacy workspace cards', () => {
     expect(resolved).toEqual([])
   })
 
-  it('refuses a symlink inside the workspace that points out of it', async () => {
-    await symlink(join(secretDir, 'secret.html'), join(workspace, 'viz', 'link.html'))
-    await symlink(secretDir, join(workspace, 'viz', 'dir'))
+  // Split at the capability boundary rather than skipped whole. A directory
+  // junction is a real reparse point that `realpath` resolves through, so the
+  // directory half keeps exercising the containment check on a machine that
+  // cannot create a symlink; only the file half needs the privileged shape.
+  it('refuses a directory link inside the workspace that points out of it', async () => {
+    const cap = linkCapability()
+    if (!cap.dirSymlink && !cap.dirJunction) expect.unreachable(whySkipped('dirSymlink'))
+    await makeDirLink(secretDir, join(workspace, 'viz', 'dir'), cap)
     const { tool, resolved } = diskHost()
-    for (const path of ['viz/link.html', 'viz/dir/secret.html', join(workspace, 'viz', 'dir', 'secret.html')]) {
+    for (const path of ['viz/dir/secret.html', join(workspace, 'viz', 'dir', 'secret.html')]) {
       const message = await probe(tool, path)
       expect(message).toMatch(/is not a card visualize can patch/u)
       expect(message).not.toContain('0xC0FFEE')
     }
     expect(resolved).toEqual([])
   })
+
+  // A hardlink cannot substitute: it shares an inode, so the file is not reached
+  // *through* a link and `realpath` cannot see it. Assertions unchanged; runs on
+  // CI Windows and on POSIX where the privilege exists.
+  it.skipIf(!linkCapability().fileSymlink)(
+    'refuses a file symlink inside the workspace that points out of it',
+    async () => {
+      await symlink(join(secretDir, 'secret.html'), join(workspace, 'viz', 'link.html'))
+      const { tool, resolved } = diskHost()
+      const message = await probe(tool, 'viz/link.html')
+      expect(message).toMatch(/is not a card visualize can patch/u)
+      expect(message).not.toContain('0xC0FFEE')
+      expect(resolved).toEqual([])
+    },
+  )
 
   it('expands ~ and contains the result like any other path', async () => {
     const { tool, resolved } = diskHost()
@@ -268,6 +307,12 @@ describe('legacy workspace cards', () => {
     const home = homedir()
     const underHome = join(home, '.dsh-visualize-spec-absent', 'ws')
     expect(await workspacePath(underHome, '~/.dsh-visualize-spec-absent/ws/viz/a.html')).toBe(join(underHome, 'viz', 'a.html'))
+    // The display form keeps the native separator, so on Windows that `~` is
+    // followed by a backslash — the shape a model hands back, and the one this
+    // expansion used to refuse.
+    const native = `~${join(underHome, 'viz', 'a.html').slice(home.length)}`
+    expect(native.slice(0, 2)).toBe(`~${sep}`)
+    expect(await workspacePath(underHome, native)).toBe(join(underHome, 'viz', 'a.html'))
     expect(await workspacePath(underHome, '~/.dsh-visualize-spec-absent/other/a.html')).toBeUndefined()
   })
 
@@ -299,5 +344,39 @@ describe('ownedPath', () => {
       .toBe(join(root, 'sessions', 's', 'a.html'))
     expect(await ownedPath(root, 'viz/a.html')).toBeUndefined()
     expect(await ownedPath(root, join(root, 'sessions', 's', 'a.txt'))).toBeUndefined()
+  })
+
+  // The round trip the store depends on: displayOf() shortens a home-prefixed
+  // card path to `~` + the rest, and the model hands that exact string back to
+  // `update`. The producer writes the NATIVE separator, so `~` is followed by
+  // a backslash on Windows; an expansion that only accepted `~/` refused the
+  // tool's own output and the card could not be patched at all. Built from
+  // homedir() + sep rather than a literal so it exercises the real form on
+  // whichever OS runs it.
+  it('expands the home-prefixed display form the store reports, on either separator', async () => {
+    const root = join(homedir(), '.dsh-visualize-spec-absent', 'visualize')
+    const absolute = join(root, 'sessions', 's', 'lab-ab12.whale.html')
+    const native = `~${absolute.slice(homedir().length)}`
+    expect(native.slice(0, 2)).toBe(`~${sep}`)
+
+    expect(await ownedPath(root, native)).toBe(absolute)
+    // A path that crossed a POSIX transcript or a model's own normalisation.
+    expect(await ownedPath(root, '~/.dsh-visualize-spec-absent/visualize/sessions/s/lab-ab12.whale.html'))
+      .toBe(absolute)
+    // `~` alone is the home directory, which holds no card.
+    expect(await ownedPath(root, '~')).toBeUndefined()
+  })
+
+  it('reads a card back through the path the store reported for it', async () => {
+    // The whole point of the round trip: a path the store reported is usable as
+    // a path again. Without the fix, `~` + native separator is not recognised
+    // as a display form, so the reported string is taken as a relative path and
+    // the read fails on this OS.
+    const { ctx } = host()
+    const reported = await visualizeTool(ctx, 10_000)
+      .execute({ fragment: '<p>hi</p>', title: 'Lab' }, exec('sess-9')) as { path: string }
+    const absolute = await ownedPath(join(home, 'visualize'), reported.path)
+    expect(absolute).toBeDefined()
+    expect(await readFile(absolute!, 'utf8')).toBe('<p>hi</p>')
   })
 })

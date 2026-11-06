@@ -1,0 +1,127 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ × tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there 35ms
+   → expected '~\AppData\Local\Temp\viz-home-cD3Rhk\…' to match /^C:/Users/<user>\AppData\Loc…/visualize\
+ ✓ tests/storage.spec.ts > card storage > keeps conversations apart 21ms
+ ✓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam 7ms
+ × tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed 21ms
+   → ENOENT ~\AppData\Local\Temp\viz-home-UWWuHi\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ✓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting 11ms
+ ✓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path 4ms
+ × tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs 13ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-iCyFOt\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-iCyFOt\visualize\sessions\linked'
+ × tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 43ms
+   → ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-OmbrO3\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ × tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path 15ms
+   → ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-5k6bZ0\C:/Users/<user>\AppData\Local\Temp\viz-ws-5k6bZ0\viz\lab-0badf00d.html'
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro) 12ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace 12ms
+ × tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it 13ms
+   → EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-Yz4x0i\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-vvKIZF\viz\link.html'
+ ✓ tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path 15ms
+ ✓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace 15ms
+ ✓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb 4ms
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+AssertionError: expected '~\AppData\Local\Temp\viz-home-cD3Rhk\…' to match /^C:/Users/<user>\AppData\Loc…/visualize\
+
+- Expected:
+/^C:/Users/<user>\AppData\Local\Temp\viz-home-cD3Rhk\/visualize\/sessions\/sess-1\/lab-[0-9a-f]{8}\.whale\.html$/
+
++ Received:
+"~\\AppData\\Local\\Temp\\viz-home-cD3Rhk\\visualize\\sessions\\sess-1\\lab-2f2b2eea.whale.html"
+
+ ❯ tests/storage.spec.ts:61:26
+     59|     const created = await tool.execute({ fragment: '<p>p99 480ms</p>',…
+     60|
+     61|     expect(created.path).toMatch(new RegExp(`^${home}/visualize/sessio…
+       |                          ^
+     62|     expect(await readFile(created.path, 'utf8')).toBe('<p>p99 480ms</p…
+     63|     expect(seam.resolved).toEqual([])
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+Error: ENOENT ~\AppData\Local\Temp\viz-home-UWWuHi\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
+ ❯ Object.readText tests/storage.spec.ts:40:39
+     38|       readText: async (target: { path: string }) => {
+     39|         const text = files[target.path]
+     40|         if (text === undefined) throw new Error(`ENOENT ${target.path}…
+       |                                       ^
+     41|         return text
+     42|       },
+ ❯ Object.read src/storage.ts:457:40
+ ❯ execute src/core/legacy-tool.ts:268:29
+ ❯ tests/storage.spec.ts:106:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-home-iCyFOt\outside' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-iCyFOt\visualize\sessions\linked'
+ ❯ tests/storage.spec.ts:140:5
+    138|     await writeFile(join(outside, 'card.html'), '<p>secret</p>')
+    139|     await mkdir(join(home, 'visualize', 'sessions'), { recursive: true…
+    140|     await symlink(outside, join(home, 'visualize', 'sessions', 'linked…
+       |     ^
+    141|
+    142|     const { ctx, seam } = host()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-home-iCyFOt\outside', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-home-iCyFOt\visualize\sessions\linked' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-OmbrO3\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ❯ tests/storage.spec.ts:168:14
+    166|       const results = await Promise.all(Array.from({ length: 8 }, () =…
+    167|       expect(new Set(results.map(r => r.path)).size).toBe(1)
+    168|       expect(await readFile(results[0]!.path, 'utf8')).toBe('<p>same</…
+       |              ^
+    169|       // No temp file is left behind.
+    170|       expect(await readdir(join(home, 'visualize', 'sessions', 'sess-5…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-OmbrO3\visualize\sessions\sess-5\lab-03ef8274.whale.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path
+Error: ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-5k6bZ0\C:/Users/<user>\AppData\Local\Temp\viz-ws-5k6bZ0\viz\lab-0badf00d.html'
+ ❯ Object.readText tests/storage.spec.ts:189:55
+    187|           return { displayPath: path, path: absolute }
+    188|         },
+    189|         readText: async (target: { path: string }) => await readFile(t…
+       |                                                       ^
+    190|         writeText: async (target: { path: string }, content: string) =…
+    191|           await writeFile(target.path, content)
+ ❯ Object.read src/storage.ts:457:27
+ ❯ execute src/core/legacy-tool.ts:268:16
+ ❯ tests/storage.spec.ts:226:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-5k6bZ0\C:/Users/<user>\AppData\Local\Temp\viz-ws-5k6bZ0\viz\lab-0badf00d.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-secret-Yz4x0i\secret.html' -> 'C:/Users/<user>\AppData\Local\Temp\viz-ws-vvKIZF\viz\link.html'
+ ❯ tests/storage.spec.ts:249:5
+    247|
+    248|   it('refuses a symlink inside the workspace that points out of it', a…
+    249|     await symlink(join(secretDir, 'secret.html'), join(workspace, 'viz…
+       |     ^
+    250|     await symlink(secretDir, join(workspace, 'viz', 'dir'))
+    251|     const { tool, resolved } = diskHost()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'symlink', path: 'C:/Users/<user>\AppData\Local\Temp\viz-secret-Yz4x0i\secret.html', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-vvKIZF\viz\link.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 10 passed (16)
+   Start at  10:26:42
+   Duration  1.42s (transform 308ms, setup 0ms, import 878ms, tests 246ms, environment 0ms)
+

@@ -1,0 +1,86 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ↓ tests/images.spec.ts > sniffImageType > identifies each accepted format by its bytes
+ ↓ tests/images.spec.ts > sniffImageType > refuses everything else, whatever it is called
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 127.0.0.1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 10.1.2.3
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 172.20.0.1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 192.168.1.1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 169.254.169.254
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 100.64.0.1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 0.0.0.0
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 224.0.0.1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 255.255.255.255
+ ↓ tests/images.spec.ts > isPublicAddress > refuses ::1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses ::
+ ↓ tests/images.spec.ts > isPublicAddress > refuses fe80::1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses fd00::1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses ff02::1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:127.0.0.1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:7f00:1
+ ↓ tests/images.spec.ts > isPublicAddress > refuses ::ffff:a9fe:a9fe
+ ↓ tests/images.spec.ts > isPublicAddress > refuses 64:ff9b::a00:1
+ ↓ tests/images.spec.ts > isPublicAddress > admits 93.184.215.14
+ ↓ tests/images.spec.ts > isPublicAddress > admits 1.1.1.1
+ ↓ tests/images.spec.ts > isPublicAddress > admits 2606:4700:4700::1111
+ ↓ tests/images.spec.ts > isPublicAddress > admits ::ffff:5db8:d70e
+ ↓ tests/images.spec.ts > isPublicAddress > admits 64:ff9b::101:101
+ ↓ tests/images.spec.ts > workspace images > reads a workspace file relative to the root
+ ↓ tests/images.spec.ts > workspace images > refuses paths that leave the workspace lexically
+ ↓ tests/images.spec.ts > workspace images > refuses a directory link that leaves the workspace
+ ↓ tests/images.spec.ts > workspace images > refuses a file symlink that leaves the workspace
+ ↓ tests/images.spec.ts > workspace images > names what is wrong with a file inside it
+ ↓ tests/images.spec.ts > workspace images > caps one image and the whole card
+ ↓ tests/images.spec.ts > workspace images > charges an image once per reference, since every reference embeds a full copy
+ ↓ tests/images.spec.ts > workspace images > degrades with a message on a host whose fs cannot read bytes
+ ↓ tests/images.spec.ts > workspace images > reports every image undeliverable, without reading anything, when the host cannot deliver them
+ ↓ tests/images.spec.ts > URL images > refuses loopback, private and metadata targets before connecting (default policy)
+ ↓ tests/images.spec.ts > URL images > connects to a name only through the guarded lookup
+ ↓ tests/images.spec.ts > URL images > fetches an image and follows a redirect
+ ↓ tests/images.spec.ts > URL images > checks every redirect hop against the policy and the scheme
+ ↓ tests/images.spec.ts > URL images > refuses what is not an image, missing, too large, or too slow
+ ↓ tests/images.spec.ts > URL images > drops an unread redirect or error body at once instead of draining it to the deadline
+ × tests/images.spec.ts > URL images > does no work for a call cancelled before it starts 9ms
+   → promise resolved "{ images: [ { …(5) } ], failures: [] }" instead of rejecting
+ ↓ tests/images.spec.ts > URL images > carries a URL image an earlier call fetched instead of fetching it again
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/images.spec.ts > URL images > does no work for a call cancelled before it starts
+AssertionError: promise resolved "{ images: [ { …(5) } ], failures: [] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "failures": [],
++   "images": [
++     {
++       "bytes": 16,
++       "id": "s/0000000000000000000000000000000000000000000000000000000000000010.png",
++       "origin": "url",
++       "src": "https://example.com/a.png",
++       "type": "image/png",
++     },
++   ],
+  }
+
+ ❯ tests/images.spec.ts:369:8
+    367|     await expect(resolveCardImages(`<img data-viz-src="https://example…
+    368|       readFile: read, fetchUrl, store, signal: cancelled.signal,
+    369|     })).rejects.toThrow('cancelled before the call')
+       |        ^
+    370|
+    371|     expect(entered).toBe(false)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 41 skipped (42)
+   Start at  10:59:57
+   Duration  745ms (transform 149ms, setup 0ms, import 455ms, tests 17ms, environment 0ms)
+

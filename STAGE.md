@@ -19,6 +19,7 @@ this says what the current slice is allowed to do.
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | **PASS — closed 2026-11-05.** `@CopyToClipboard` shipped (ADR-013); the other two Deferred — **reasons corrected 2026-11-06** (4B-2), verdict unchanged |
 | 4B-2 | Re-testing the two deferrals against the real host | **CLOSED 2026-11-06 — investigation only.** Both are EXTENDABLE; neither ships. `docs/reports/PHASE-4B-2-INVESTIGATION.md` |
 | 5 | Unified prompt, security review, release | **DONE — released `v0.1.0` 2026-11-06** at `40b8241`. Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md` |
+| 6 | Test reliability and technical debt | **IN PROGRESS — opened 2026-11-06.** No new components. §"Stage 6" below |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -542,3 +543,103 @@ as NOT VERIFIED rather than inherited from the earlier audit.
 **This stage does not declare the release.** It produces the evidence; the decision
 belongs to the owner.
 
+
+---
+
+## Stage 6 — Test reliability and technical debt
+
+**Opened 2026-11-06**, immediately after `v0.1.0`. No new components, no new actions.
+The release standard was met; this stage exists because it was met with 15 red tests and
+three known caveats, and a suite nobody trusts stops being a safety net.
+
+### The premise this stage corrected on day one
+
+The Stage 5 close-out described the 15 failures as platform-shaped. Investigating them
+found that **one of them is a real product bug that Windows merely exposed**, and that the
+failure list's own framing had been hiding it:
+
+> `displayOf()` (`src/storage.ts:429-432`) shortens a home-prefixed path to `~` plus the
+> remainder. On Windows the remainder starts with a backslash, so it emits
+> `~\AppData\Local\Temp\...`. Both consumers (`:150`, `:219`) only accept `~` or `~/`.
+> **So the tool hands back a path it will refuse when the model returns it.**
+
+Why Linux CI never saw it: `tmpdir()` is `/tmp` on Linux, **outside** `homedir()`, so
+`displayOf()` is a no-op for every temp-based test path. On Windows `tmpdir()` is
+`C:\Users\<u>\AppData\Local\Temp`, **inside** `homedir()`, so every temp path is
+shortened and the bug fires. The tests were right; the product was wrong.
+
+This is the third time in this project that a "known platform failure" turned out to be a
+product defect once someone read it instead of counting it.
+
+### Work items
+
+| Priority | Item | Note |
+| --- | --- | --- |
+| **P0** | fs mock missing `readText` | The fake is incomplete, not the product: `readText` is declared at `dsh-fs/lib/types/index.d.ts:162` |
+| **P0** | `tool.spec.ts` description fixture | No skill provider registered, so the description cannot name a contract. Fix the fixture, not the assertion |
+| **P0** | The 5,020 ms timeout | Carried for two stages as "a timeout is not a diagnosis". Diagnose it |
+| **P1** | `~` round-trip bug | **Product code.** Regression test must be seen red first |
+| **P1** | Symlink containment coverage | See below — the honest answer is not "make it green" |
+| **P2** | `@ToAssistant` runtime probe | Deferred to a later session; not started here |
+| **P2** | `@OpenUrl` upstream request | Deferred; continues as a separate workstream |
+
+### The symlink item, decided rather than dodged
+
+Six failures are symlink-containment tests. On this machine `fs.symlink` fails with
+`EPERM`: creating a symlink needs Developer Mode or elevation. Measured, not assumed:
+
+| Capability | Result |
+| --- | --- |
+| file symlink (`fs.symlink`) | **EPERM** |
+| directory symlink (`type: 'dir'`) | **EPERM** |
+| directory **junction** (`type: 'junction'`) | **OK** |
+| file **hardlink** (`fs.link`) | **OK**, but not a substitute (below) |
+| junction `realpath()` | **resolves through** — the containment logic sees it |
+
+So the directory-escape half of each test **can** run here: replace the directory symlink
+with a junction, a genuine reparse point that `realpath` resolves through. That preserves
+the security assertion instead of skipping it.
+
+A **hardlink is not a substitute** for the file half. A hardlink shares an inode, so the
+file is not "reached through a link that leaves the tree" — `realpath` cannot see it, and
+the containment property under test does not hold at all. Substituting one would test a
+different property while appearing to cover the original. That is the failure mode
+`PLATFORM-FAILURES.md` already warns about: *a skip added to hide a failure keeps hiding
+whatever comes after it.*
+
+**Decision:** split each test at the capability boundary. Directory escapes run everywhere
+using a junction where a directory symlink is unavailable. The file-link escape keeps its
+real symlink, gains a capability guard that is **visible as a skip with a stated reason**,
+and continues to run on CI Windows and Linux, where the privilege exists. No test is
+deleted, no assertion weakened, and the local suite's skip count becomes an honest number
+rather than zero-by-omission.
+
+### Exit criteria — status 2026-11-06
+
+| # | Criterion | Status |
+| --- | --- | --- |
+| 1 | Local Windows green | **MET** — 942 passed / **0 failed** / 4 skipped / 946, counts close, `vitest` exit 0 |
+| 2 | Every skip explicit and capability-stated | **MET** — 4 skips, all `it.skipIf(!linkCapability().fileSymlink)`, reason names `SeCreateSymbolicLinkPrivilege` |
+| 3 | No security test weakened | **MET** — containment assertions unchanged; directory escapes still run here via junctions; traversal re-attacked (16 attempts, 0 escapes) |
+| 4 | Every fix seen red first | **MET** — 35 artefacts under `evidence/stage-6/` |
+| — | CI Windows + CI Linux | **PENDING** — must pass on the pushed commit before this stage closes |
+
+The criteria, as originally written:
+
+1. **Local Windows, CI Windows and CI Linux are all green** — not "fewer red".
+2. **The skip count is explicit and justified**, one line per skip naming the missing OS
+   capability. Zero skips is not the goal where the capability does not exist; an
+   *unexplained* skip is.
+3. **No security test weakened.** The containment assertions keep their exact expectations
+   (`/through a symlink/u`, `/is not a card visualize can patch/u`). If a substitution
+   cannot preserve an assertion, the test skips visibly instead of being reworded.
+4. **Every fix has a regression test seen to fail first** (`AGENTS.md` §6), recorded under
+   `evidence/stage-6/` with the red output kept.
+
+### What this stage will not do
+
+- It will not reopen Stage 5, and it will not touch the released tag.
+- It will not implement `@OpenUrl` or `@ToAssistant`. Their ADRs are settled; the runtime
+  probe and the upstream request are separate workstreams.
+- It will not raise the 5 s test timeout as a fix. If the wait is real work it gets
+  diagnosed; if the bound is simply too low, that is a finding stated with numbers.

@@ -1,0 +1,113 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ❯ tests/card-images.spec.ts (7 tests | 5 failed) 5619ms
+     × stores the bytes beside the card and keeps them out of the fragment, the result text and the meta 67ms
+     × re-reads workspace files and carries fetched URLs on update 56ms
+     × leaves the card untouched when an update is cancelled while its images resolve 5016ms
+     × renders the card and says why on a host that cannot deliver images 23ms
+     ✓ leaves a card without images exactly as before 21ms
+     ✓ serves a stored image as an opaque, sandboxed download  416ms
+     × opens nothing but a well-formed id of an intact regular file below the store 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-eEnmkY\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:100:12
+     98|     // The fragment the model wrote is what the card stores and replay…
+     99|     expect(value.fragment).toBe(FRAGMENT)
+    100|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+    101|     expect(value.images!.map(i => [i.src, i.type, i.bytes])).toEqual([
+    102|       ['./figs/loss.png', 'image/png', FIGURE.byteLength],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > re-reads workspace files and carries fetched URLs on update
+Error: ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-K3wOVS\~\AppData\Local\Temp\viz-home-y6pVe5\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ Object.readText tests/card-images.spec.ts:58:58
+     56|       // `ctx.fs.readText is not a function`, which is a fixture defec…
+     57|       // the behaviour this spec is about.
+     58|       readText: async (target: { targetKey: string }) => await readFil…
+       |                                                          ^
+     59|       readBytes: async (target: { targetKey: string }) => new Uint8Arr…
+     60|     },
+ ❯ Object.read src/storage.ts:457:27
+ ❯ execute src/core/legacy-tool.ts:268:16
+ ❯ run tests/card-images.spec.ts:82:56
+ ❯ tests/card-images.spec.ts:141:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/card-images.spec.ts:157:3
+    155|   })
+    156|
+    157|   it('leaves the card untouched when an update is cancelled while its …
+       |   ^
+    158|     let started: () => void = () => {}
+    159|     const fetching = new Promise<void>(done => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/card-images.spec.ts > visualize with data-viz-src images > renders the card and says why on a host that cannot deliver images
+Error: ENOENT: no such file or directory, open 'D:/work/dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-eqZeDg\visualize\sessions\sess-1\lab-27530d60.whale.html'
+ ❯ tests/card-images.spec.ts:193:12
+    191|     const value = await run({ fragment: FRAGMENT, title: 'Lab' })
+    192|     expect(value.images).toBeUndefined()
+    193|     expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+       |            ^
+    194|     expect(text(value)).toContain('3 images could not be embedded')
+    195|     expect(text(value)).toContain('needs dsh 0.1.7 or later')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
+Error: EPERM: operation not permitted, symlink 'C:/Users/<user>\AppData\Local\Temp\viz-ws-P8Jf4x\secret.png' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-xh6Aty\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+ ❯ tests/card-images.spec.ts:232:5
+    230|     const outside = join(workspace, 'secret.png')
+    231|     await writeFile(outside, PNG)
+    232|     await symlink(outside, join(dir, `${digest}.png`))
+       |     ^
+    233|     await writeFile(join(dir, `${'0'.repeat(64)}.png`), PNG)
+    234|     for (const id of [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+Error: ENOENT: no such file or directory, open 'C:/Users/<user>\AppData\Local\Temp\viz-ws-hPbpzV\~\AppData\Local\Temp\viz-home-61yMPf\visualize\sessions\sess-1\lab-a52c3de7.whale.html'
+ ❯ open node:internal/fs/promises:1345:25
+ ❯ readFile node:internal/fs/promises:2003:14
+ ❯ Object.readText tests/card-images.spec.ts:58:58
+     56|       // `ctx.fs.readText is not a function`, which is a fixture defec…
+     57|       // the behaviour this spec is about.
+     58|       readText: async (target: { targetKey: string }) => await readFil…
+       |                                                          ^
+     59|       readBytes: async (target: { targetKey: string }) => new Uint8Arr…
+     60|     },
+ ❯ Object.read src/storage.ts:457:27
+ ❯ execute src/core/legacy-tool.ts:268:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:/Users/<user>\AppData\Local\Temp\viz-ws-hPbpzV\~\AppData\Local\Temp\viz-home-61yMPf\visualize\sessions\sess-1\lab-a52c3de7.whale.html' }
+This error originated in "tests/card-images.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 2 passed (7)
+     Errors  1 error
+   Start at  10:40:34
+   Duration  6.79s (transform 312ms, setup 0ms, import 916ms, tests 5.62s, environment 0ms)
+

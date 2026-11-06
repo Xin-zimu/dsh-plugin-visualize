@@ -10,6 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { handleStyleFiles, type StyleFilesHost, type StyleFilesView, type StyleFileView } from '../src/style-files.ts'
+import { linkCapability, makeDirLink, whySkipped } from './link-capability.ts'
 import { STYLE_FILES_PATH } from '../src/style.ts'
 
 let home: string
@@ -101,7 +102,10 @@ describe('style files route', () => {
     expect((await post({ scope: 'global', text: '界'.repeat(1365) })).status).toBe(200)
   })
 
-  it('refuses a style file that is a symlink, for reads and writes', async () => {
+  // Needs a FILE symlink, which cannot be substituted: a hardlink shares an inode,
+  // so it is not a link that carries the read elsewhere and `realpath` cannot see
+  // it. Assertions unchanged; runs on CI Windows and on POSIX.
+  it.skipIf(!linkCapability().fileSymlink)('refuses a style file that is a symlink, for reads and writes', async () => {
     await writeFile(join(outside, 'secret.txt'), 'secret')
     await mkdir(join(home, 'visualize'), { recursive: true })
     await symlink(join(outside, 'secret.txt'), globalPath())
@@ -111,8 +115,13 @@ describe('style files route', () => {
     expect(await readFile(join(outside, 'secret.txt'), 'utf8')).toBe('secret')
   })
 
+  // A DIRECTORY link, so a junction stands in where a directory symlink cannot be
+  // created: both are reparse points `realpath` resolves through, so the route's
+  // containment check is the same one being exercised.
   it('refuses a workspace whose .dsh directory links out of it', async () => {
-    await symlink(outside, join(workspace, '.dsh'))
+    const cap = linkCapability()
+    if (!cap.dirSymlink && !cap.dirJunction) expect.unreachable(whySkipped('dirSymlink'))
+    await makeDirLink(outside, join(workspace, '.dsh'), cap)
     const response = await post({ scope: 'workspace', workspaceId: 'ws-1', text: 'x' })
     expect(response.status).toBe(409)
     expect((await response.json() as { error: string }).error).toBe('outside')

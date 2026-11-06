@@ -1,0 +1,32 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ❯ tests/tool.spec.ts (7 tests | 1 failed) 31ms
+     ✓ resolves the session policy and forwards it to the workspace write 9ms
+     ✓ patches the workspace copy on update and writes the result beside it 6ms
+     ✓ chains a second patch in the same reply onto the first 6ms
+     ✓ fails loud on the arguments each action cannot run without 3ms
+     ✓ lets creates run in parallel but serialises updates against their base 1ms
+     ✓ still writes without a sandboxPolicy service in the composition 1ms
+     × names an on-disk contract for agents that cannot load skills 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/tool.spec.ts > visualizeTool description > names an on-disk contract for agents that cannot load skills
+AssertionError: the description must name the contract file: expected null not to be null
+ ❯ tests/tool.spec.ts:198:70
+    196|     // the sentence that follows.
+    197|     const named = /read the same contract from (\S+\.md)/u.exec(tool.d…
+    198|     expect(named, 'the description must name the contract file').not.t…
+       |                                                                      ^
+    199|     const contractPath = named![1]!
+    200|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  10:45:53
+   Duration  1.08s (transform 270ms, setup 0ms, import 815ms, tests 31ms, environment 0ms)
+

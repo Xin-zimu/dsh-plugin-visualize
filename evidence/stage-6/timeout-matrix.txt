@@ -1,0 +1,60 @@
+# The evidence ladder: four rungs, one variable each. Every rung is a real run, recorded here.
+# HEAD = 23b925b. Probe copies live in tmp/probes/; none of them edits tests/ or src/.
+
+# L0  product BROKEN, fs mock WITHOUT readText, body ORIGINAL
+#     Not re-run here: it is the recorded failure, quoted verbatim from
+#     evidence/phase-5-final/vitest-release-candidate.json
+#     duration 5021.155, failureMessages ['Error: STACK_TRACE_ERROR ...']
+#     and, below the headline, in the same run: 'Unhandled Rejection: TypeError: ctx.fs.readText is not a function'
+
+# L1  product BROKEN, fs mock WITH readText, body ORIGINAL   <-- the load-bearing rung
+#     Fixing the mock did NOT remove the timeout; it changed only the message of the error hidden under it.
+#     (see timeout-repro-at-head.txt: 5,020 ms, 'Test timed out in 5000ms', unhandled rejection now ENOENT ~\\AppData)
+
+# L2  product FIXED, fs mock WITH readText, body ORIGINAL
+#     -> no timeout; honest failure in tens of milliseconds at the display-path read.
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tmp/probes/card-images-head.probe.spec.ts (7 tests | 1 failed | 6 skipped) 43ms
+     ↓ stores the bytes beside the card and keeps them out of the fragment, the result text and the meta
+     ↓ re-reads workspace files and carries fetched URLs on update
+     × leaves the card untouched when an update is cancelled while its images resolve 41ms
+     ↓ renders the card and says why on a host that cannot deliver images
+     ↓ leaves a card without images exactly as before
+     ↓ serves a stored image as an opaque, sandboxed download
+     ↓ opens nothing but a well-formed id of an intact regular file below the store
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tmp/probes/card-images-head.probe.spec.ts > visualize with data-viz-src images > leaves the card untouched when an update is cancelled while its images resolve
+Error: ENOENT: no such file or directory, open 'D:\Deepseek WorkSpace\dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-UFqwwv\visualize\sessions\sess-1\lab-a52c3de7.whale.html'
+ ❯ tmp/probes/card-images-head.probe.spec.ts:173:12
+    171|     cancel.abort()
+    172|     await expect(call).rejects.toThrow()
+    173|     expect(await readFile(created.path, 'utf8')).toBe('<div id="lab"><…
+       |            ^
+    174|     await expect(stat(manifest)).rejects.toThrow()
+    175|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+   Start at  10:56:20
+   Duration  1.16s (transform 294ms, setup 0ms, import 891ms, tests 43ms, environment 0ms)
+
+
+# L3  product FIXED, fs mock WITH readText, body REPAIRED (the change in tests/card-images.spec.ts)
+#     -> passes.
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ✓ tests/card-images.spec.ts (7 tests | 6 skipped) 53ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 6 skipped (7)
+   Start at  10:56:22
+   Duration  1.11s (transform 279ms, setup 0ms, import 831ms, tests 53ms, environment 0ms)
+

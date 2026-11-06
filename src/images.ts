@@ -100,12 +100,19 @@ export interface ResolvedImages {
 
 /**
  * Resolve every `<img data-viz-src>` in a fragment. Never throws for one
- * image: each failure is recorded and the rest continue.
+ * image: each failure is recorded and the rest continue — but a cancelled call
+ * throws, and throws at entry: reading the workspace, fetching and writing the
+ * store are all work a cancelled call cannot use, and the caller checks its
+ * signal again on the way out, so the result would be discarded after the cost.
+ * Cancellation is not a per-image failure and is never recorded as one.
+ * The signal is read as optional, as the caller does: a spec drives the tool
+ * without one.
  * @param fragment - the card's markup, as it will be stored.
  * @param options - readers, store, previous images, caps.
  * @returns the embedded images and the failures.
  */
 export async function resolveCardImages(fragment: string, options: ResolveOptions): Promise<ResolvedImages> {
+  options.signal?.throwIfAborted()
   const limits = options.limits ?? DEFAULT_IMAGE_LIMITS
   const all = imageSources(fragment).map(source => source.raw)
   const sources = [...new Set(all)]

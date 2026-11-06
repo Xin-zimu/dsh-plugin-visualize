@@ -1,0 +1,81 @@
+# The decisive control experiment, reproducible with the probes that remain.
+#
+# The question: is the 5,020 ms a property of the MACHINE (slow disk) or of the PATH SHAPE?
+# Method: the same test body, the same product, the same stub, the same abort. One variable:
+#         where the card store lives — outside homedir() (the branch Linux CI takes) or inside
+#         it (the branch this Windows box takes, because tmpdir() is under C:\Users\<u>).
+#
+# The probe arms BOTH and reports each. Bound 800 ms, not 5 s, so neither can be mistaken for slow.
+# $ pnpm exec vitest run --config tmp/probes/vitest.probe.config.ts tmp/probes/cancel-window.probe.spec.ts
+
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tmp/probes/cancel-window.probe.spec.ts (2 tests | 1 failed) 82ms
+     ✓ home-absolute: the reported path is not shortened, and the scenario completes 55ms
+     × home-tilde: the reported path is ~..., and the scenario never reaches the stub 25ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tmp/probes/cancel-window.probe.spec.ts > the cancelled-update scenario, one variable at a time > home-tilde: the reported path is ~..., and the scenario never reaches the stub
+Error: ENOENT: no such file or directory, open 'D:\Deepseek WorkSpace\dsh-plugin-visualize\~\AppData\Local\Temp\vitest-home-2o2zdp\visualize\sessions\sess-1\lab-a52c3de7.whale.html'
+ ❯ scenario tmp/probes/cancel-window.probe.spec.ts:101:10
+     99|   cancel.abort()
+    100|   await expect(call).rejects.toThrow()
+    101|   expect(await readFile(created.path, 'utf8')).toBe('<div id="lab"><h3…
+       |          ^
+    102|   await expect(stat(manifest)).rejects.toThrow()
+    103|
+ ❯ tmp/probes/cancel-window.probe.spec.ts:119:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  10:57:02
+   Duration  1.26s (transform 293ms, setup 0ms, import 874ms, tests 82ms, environment 0ms)
+
+
+# Reading: the identical scenario passes in tens of milliseconds when the reported path is absolute,
+# and never reaches the stub when the reported path is the ~ display form. Machine speed is not a
+# variable in it; the path shape is. This is why Linux CI is green and this machine is not.
+
+# ---- the same probe against the OLD product code, so the hang itself is reproducible ----
+# PROBE_STORAGE=head swaps in tmp/probes/storage-head.ts (src/storage.ts as committed at HEAD).
+# src/storage.ts itself is not touched.
+# $ $env:PROBE_STORAGE='head'; pnpm exec vitest run --config tmp/probes/vitest.probe.config.ts tmp/probes/cancel-window.probe.spec.ts
+
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ❯ tmp/probes/cancel-window.probe.spec.ts (2 tests | 1 failed) 860ms
+     ✓ home-absolute: the reported path is not shortened, and the scenario completes 47ms
+     × home-tilde: the reported path is ~..., and the scenario never reaches the stub 812ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tmp/probes/cancel-window.probe.spec.ts > the cancelled-update scenario, one variable at a time > home-tilde: the reported path is ~..., and the scenario never reaches the stub
+Error: Test timed out in 800ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tmp/probes/cancel-window.probe.spec.ts:117:3
+    115|   })
+    116|
+    117|   it('home-tilde: the reported path is ~\..., and the scenario never r…
+       |   ^
+    118|     await setUp(false)
+    119|     await scenario()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  10:57:12
+   Duration  1.99s (transform 291ms, setup 0ms, import 842ms, tests 860ms, environment 0ms)
+
+
+# Reading of the pair of runs above, which is the whole diagnosis in one place:
+#   OLD product + home under homedir()  -> the test waits out its bound (a hang, not a slow run)
+#   OLD product + home outside homedir() -> passes, because the reported path is absolute
+#   NEW product + either home            -> no hang; at worst an honest ENOENT naming the path

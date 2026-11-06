@@ -1,0 +1,63 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ↓ tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+ ↓ tests/storage.spec.ts > card storage > keeps conversations apart
+ ↓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam
+ ↓ tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+ ↓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting
+ ↓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path
+ ↓ tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs
+ ↓ tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+ ↓ tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro)
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a symlink inside the workspace that points out of it
+ ↓ tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace
+ ↓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb
+ ✓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path 9ms
+ × tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator 7ms
+   → expected undefined to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+ × tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it 24ms
+   → expected undefined to be defined
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator
+AssertionError: expected undefined to be 'C:/Users/<user>\.dsh-visualize-spec-ab…' // Object.is equality
+
+- Expected:
+"C:/Users/<user>\\.dsh-visualize-spec-absent\\visualize\\sessions\\s\\lab-ab12.whale.html"
+
++ Received:
+undefined
+
+ ❯ tests/storage.spec.ts:330:43
+    328|     expect(native.slice(0, 2)).toBe(`~${sep}`)
+    329|
+    330|     expect(await ownedPath(root, native)).toBe(absolute)
+       |                                           ^
+    331|     // A path that crossed a POSIX transcript or a model's own normali…
+    332|     expect(await ownedPath(root, '~/.dsh-visualize-spec-absent/visuali…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it
+AssertionError: expected undefined to be defined
+ ❯ tests/storage.spec.ts:347:22
+    345|       .execute({ fragment: '<p>hi</p>', title: 'Lab' }, exec('sess-9')…
+    346|     const absolute = await ownedPath(join(home, 'visualize'), reported…
+    347|     expect(absolute).toBeDefined()
+       |                      ^
+    348|     expect(await readFile(absolute!, 'utf8')).toBe('<p>hi</p>')
+    349|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed | 15 skipped (18)
+   Start at  10:44:26
+   Duration  1.06s (transform 296ms, setup 0ms, import 788ms, tests 41ms, environment 0ms)
+

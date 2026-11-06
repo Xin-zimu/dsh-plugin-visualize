@@ -1,0 +1,49 @@
+
+ RUN  v4.1.10 D:/work/dsh-plugin-visualize
+
+ ↓ tests/storage.spec.ts > card storage > writes a new card into the session store, not the workspace, and patches it there
+ ↓ tests/storage.spec.ts > card storage > keeps conversations apart
+ ↓ tests/storage.spec.ts > card storage > patches a legacy viz/ workspace copy in place through the sandboxed fs seam
+ ↓ tests/storage.spec.ts > card storage > keeps the style a card was created with when it is patched after the setting changed
+ ↓ tests/storage.spec.ts > card storage > patches a card named before styles existed in the current setting
+ ↓ tests/storage.spec.ts > card storage > falls back to the workspace copy when the host has no home path
+ ↓ tests/storage.spec.ts > card storage > never reads a file outside the store with its own fs
+ × tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro) 53ms
+   → EPERM: operation not permitted, rename 'C:/Users/<user>\AppData\Local\Temp\viz-home-ERQqQH\visualize\sessions\sess-5\lab-03ef8274.whale.html.3992.6abd4862b5f0.tmp' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-ERQqQH\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ↓ tests/storage.spec.ts > legacy workspace cards > patches a legacy card inside the workspace by relative and absolute path
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses an absolute path outside the workspace without reading it (Codex repro)
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses .. traversal out of the workspace
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a directory link inside the workspace that points out of it
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a file symlink inside the workspace that points out of it
+ ↓ tests/storage.spec.ts > legacy workspace cards > expands ~ and contains the result like any other path
+ ↓ tests/storage.spec.ts > legacy workspace cards > refuses a non-.html file and a session without a workspace
+ ↓ tests/storage.spec.ts > sessionSegment > encodes any id as one segment that cannot climb
+ ↓ tests/storage.spec.ts > ownedPath > expands the ~ display form the result reports back to the store path
+ ↓ tests/storage.spec.ts > ownedPath > expands the home-prefixed display form the store reports, on either separator
+ ↓ tests/storage.spec.ts > ownedPath > reads a card back through the path the store reported for it
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/storage.spec.ts > card storage > creates the same card concurrently in the same millisecond (Codex repro)
+Error: EPERM: operation not permitted, rename 'C:/Users/<user>\AppData\Local\Temp\viz-home-ERQqQH\visualize\sessions\sess-5\lab-03ef8274.whale.html.3992.6abd4862b5f0.tmp' -> 'C:/Users/<user>\AppData\Local\Temp\viz-home-ERQqQH\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+ ❯ writeFileAtomic src/storage.ts:415:5
+    413|   try {
+    414|     await writeFile(temp, content, { encoding: 'utf8', mode: 0o600, fl…
+    415|     await rename(temp, path)
+       |     ^
+    416|   } catch (error) {
+    417|     // EEXIST means the name was taken and the file is not ours to rem…
+ ❯ Object.write src/storage.ts:257:29
+ ❯ execute src/core/legacy-tool.ts:340:7
+ ❯ tests/storage.spec.ts:181:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -4048, code: 'EPERM', syscall: 'rename', path: 'C:/Users/<user>\AppData\Local\Temp\viz-home-ERQqQH\visualize\sessions\sess-5\lab-03ef8274.whale.html.3992.6abd4862b5f0.tmp', dest: 'C:/Users/<user>\AppData\Local\Temp\viz-home-ERQqQH\visualize\sessions\sess-5\lab-03ef8274.whale.html' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 skipped (19)
+   Start at  10:56:53
+   Duration  1.13s (transform 267ms, setup 0ms, import 804ms, tests 54ms, environment 0ms)
+

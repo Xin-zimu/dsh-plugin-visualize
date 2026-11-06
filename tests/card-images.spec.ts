@@ -6,8 +6,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Context } from '@deepseek-ai/cordis'
 import { visualizeTool } from '../src/tool.ts'
 import { visualizeMetaFrom } from '../src/fragment.ts'
-import { handleImageRequest, inside, realpathOfDeepest } from '../src/storage.ts'
+import { handleImageRequest, inside, ownedPath, realpathOfDeepest } from '../src/storage.ts'
 import type { UrlFetcher } from '../src/images.ts'
+import { linkCapability } from './link-capability.ts'
 
 const PNG = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52])
 /** A second PNG with different bytes, standing in for a regenerated figure. */
@@ -48,6 +49,14 @@ function host() {
         const info = await stat(target.targetKey).catch(() => undefined)
         return info && { version: 'v', type: info.isFile() ? 'file' : 'directory', size: info.size }
       },
+      // The seam is a fake over the real disk, so it must answer every method
+      // the product calls, not only the ones an earlier spec happened to
+      // reach: `readText` is a real `FsService` method
+      // (@deepseek-ai/dsh-fs, `abstract readText(target, signal?)`) and the
+      // store reads a legacy card through it. Without it the seam throws
+      // `ctx.fs.readText is not a function`, which is a fixture defect, not
+      // the behaviour this spec is about.
+      readText: async (target: { targetKey: string }) => await readFile(target.targetKey, 'utf8'),
       readBytes: async (target: { targetKey: string }) => new Uint8Array(await readFile(target.targetKey)),
     },
   } as unknown as Context
@@ -87,9 +96,13 @@ describe('visualize with data-viz-src images', () => {
     const { run, text, meta } = setup()
     const value = await run({ fragment: FRAGMENT, title: 'Lab' })
 
-    // The fragment the model wrote is what the card stores and replays.
+    // The fragment the model wrote is what the card stores and replays. The
+    // reported `path` is the display form — `~` + the rest when the store sits
+    // under the OS home, which on Windows is where the temp dir is — so the file
+    // behind it is found by expanding it back, the way `update` does. Reading
+    // `value.path` directly only worked where the two forms coincide (POSIX).
     expect(value.fragment).toBe(FRAGMENT)
-    expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+    expect(await readFile((await ownedPath(join(home, 'visualize'), value.path))!, 'utf8')).toBe(FRAGMENT)
     expect(value.images!.map(i => [i.src, i.type, i.bytes])).toEqual([
       ['./figs/loss.png', 'image/png', FIGURE.byteLength],
       ['https://example.com/a.png', 'image/png', PNG.byteLength],
@@ -159,15 +172,35 @@ describe('visualize with data-viz-src images', () => {
     }
     const tool = visualizeTool(host(), 100_000, 'whale', { delivery: () => true, fetchUrl })
     const created = await tool.execute({ fragment: '<div id="lab"><h3>Loss</h3></div>', title: 'Lab' }, exec) as Value
-    const manifest = created.path.replace(/\.html$/u, '.images.json')
+    // `created.path` is the display form the tool reports — `~` plus the rest
+    // when the store sits under the OS home, which on Windows is where the
+    // temp dir lives. Raw node fs does not expand `~`, so the file is resolved
+    // the same way `update` resolves it rather than being read through the
+    // reported string.
+    const cardPath = await ownedPath(join(home, 'visualize'), created.path)
+    if (cardPath === undefined) throw new Error(`the reported path ${created.path} does not resolve back to a store file`)
+    const manifest = cardPath.replace(/\.html$/u, '.images.json')
     const patch = { action: 'update', path: created.path, title: 'Lab', old_str: '<h3>Loss</h3>', new_str: '<img data-viz-src="https://example.com/a.png"><h3>Loss</h3>' }
 
     const cancel = new AbortController()
     const call = tool.execute(patch, { agent: { session: { id: 'sess-1', header: { cwd: '' } } }, signal: cancel.signal } as never)
-    await fetching
+    // Wait for the stub, but fail on the update's own settlement first. Without
+    // that race an update which dies before it fetches leaves this await pending
+    // until the test bound kills the run, and its real error is reported only as
+    // an unhandled rejection: that is how this test spent two stages failing with
+    // `STACK_TRACE_ERROR` and no contradicted assertion, after a 39 ms failure.
+    // Both handlers return, so the raced promise cannot itself go unhandled.
+    const outcome = await Promise.race([
+      fetching.then(() => undefined),
+      call.then(
+        () => 'the update resolved instead of waiting for its image' as const,
+        (error: unknown) => `the update failed before its image was fetched: ${String(error)}` as const,
+      ),
+    ])
+    if (outcome !== undefined) throw new Error(outcome)
     cancel.abort()
     await expect(call).rejects.toThrow()
-    expect(await readFile(created.path, 'utf8')).toBe('<div id="lab"><h3>Loss</h3></div>')
+    expect(await readFile(cardPath, 'utf8')).toBe('<div id="lab"><h3>Loss</h3></div>')
     await expect(stat(manifest)).rejects.toThrow()
 
     // The same patch, retried, still finds its old_str.
@@ -182,7 +215,7 @@ describe('visualize with data-viz-src images', () => {
     const { run, text } = setup(false)
     const value = await run({ fragment: FRAGMENT, title: 'Lab' })
     expect(value.images).toBeUndefined()
-    expect(await readFile(value.path, 'utf8')).toBe(FRAGMENT)
+    expect(await readFile((await ownedPath(join(home, 'visualize'), value.path))!, 'utf8')).toBe(FRAGMENT)
     expect(text(value)).toContain('3 images could not be embedded')
     expect(text(value)).toContain('needs dsh 0.1.7 or later')
   })
@@ -215,16 +248,17 @@ describe('image route', () => {
     expect((await get(value.images![0]!.id, 'HEAD')).status).toBe(200)
   })
 
+  // Split so the six id shapes that need no symlink keep running everywhere. The
+  // symlink id is the one assertion here that needs SeCreateSymbolicLinkPrivilege,
+  // and it cannot be substituted: a hardlink shares an inode, so `realpath` cannot
+  // see it and the "not a link" property under test would not exist. Assertions
+  // unchanged; it runs on CI Windows and on POSIX.
   it('opens nothing but a well-formed id of an intact regular file below the store', async () => {
     const digest = createHash('sha256').update(PNG).digest('hex')
     const dir = join(home, 'visualize', 'sessions', 'sess-1', 'images')
     await mkdir(dir, { recursive: true })
-    const outside = join(workspace, 'secret.png')
-    await writeFile(outside, PNG)
-    await symlink(outside, join(dir, `${digest}.png`))
     await writeFile(join(dir, `${'0'.repeat(64)}.png`), PNG)
     for (const id of [
-      `sess-1/${digest}.png`, // a symlink, even to an image
       `sess-1/${'0'.repeat(64)}.png`, // bytes that no longer match their digest
       `../../${digest}.png`,
       `sess-1/../sess-1/${digest}.png`,
@@ -236,5 +270,17 @@ describe('image route', () => {
     }
     expect((await handleImageRequest(undefined, new Request(`http://dsh.test/x?id=sess-1/${digest}.png`))).status).toBe(404)
     expect((await handleImageRequest(home, new Request('http://dsh.test/x', { method: 'POST', body: '' }))).status).toBe(405)
+  })
+
+  it.skipIf(!linkCapability().fileSymlink)('refuses to serve an image reached through a symlink', async () => {
+    const digest = createHash('sha256').update(PNG).digest('hex')
+    const dir = join(home, 'visualize', 'sessions', 'sess-1', 'images')
+    await mkdir(dir, { recursive: true })
+    const outside = join(workspace, 'secret.png')
+    await writeFile(outside, PNG)
+    await symlink(outside, join(dir, `${digest}.png`))
+    // A symlink to a real image is still not served: the route only opens regular
+    // files below the store, resolved.
+    expect((await get(`sess-1/${digest}.png`)).status).toBe(404)
   })
 })
