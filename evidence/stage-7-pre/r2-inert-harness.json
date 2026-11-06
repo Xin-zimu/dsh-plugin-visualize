@@ -1,0 +1,68 @@
+{
+ "purpose": "Reproduce the broken harness that made \"0 workspace reads in both builds\" look like evidence. The live call must also show 0 reads; that is what makes the aborted rows meaningless.",
+ "harnessDefects": [
+  "ctx.fs has no contains() and no stat(); workspaceImageReader feature-detects all four methods and throws ImageError before reading",
+  "ctx.inject() never invokes its callback; registerImageRoute never runs and imageRoute.ready stays false, so every image is reported undeliverable before resolution"
+ ],
+ "builds": {
+  "real": {
+   "path": "D:/work/dsh-plugin-visualize\\lib\\index.js",
+   "sha256": "d1fd5f84eceb4f30005182b9e972beed80143ae5974583ced1aa1d9cad1628f9"
+  },
+  "mutant": {
+   "path": "D:/work/dsh-plugin-visualize\\tmp\\.r2-inert\\index.js",
+   "sha256": "07bb8db5e64ed8c335eadaa93c9195b602ea29717d08e9d45e82c5b007b2acda"
+  }
+ },
+ "runs": {
+  "realLive": [
+   {
+    "abort": false,
+    "threw": null,
+    "workspaceImageReads": 0,
+    "storeFilesAdded": 1,
+    "imageCount": 0
+   },
+   {
+    "abort": false,
+    "threw": null,
+    "workspaceImageReads": 0,
+    "storeFilesAdded": 1,
+    "imageCount": 0
+   }
+  ],
+  "realAborted": [
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 0,
+    "storeFilesAdded": 0
+   },
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 0,
+    "storeFilesAdded": 0
+   }
+  ],
+  "mutantAborted": [
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 0,
+    "storeFilesAdded": 0
+   },
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 0,
+    "storeFilesAdded": 0
+   }
+  ]
+ },
+ "finding": {
+  "liveCallReachesImageResolution": false,
+  "appendedImageToCard": false
+ },
+ "verdict": "INERT HARNESS, REPRODUCED — even the un-aborted call reads nothing, so the earlier \"0 reads\" rows from this rig were measuring nothing. Every \"it did nothing\" needs a positive control."
+}

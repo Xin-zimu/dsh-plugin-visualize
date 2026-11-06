@@ -378,11 +378,13 @@
    "v011_firstStatement": "options.signal?.throwIfAborted()",
    "v010_checksSignalAtEntry": false,
    "v011_checksSignalAtEntry": true,
-   "verdict": "PASS — the entry check is the difference between the two versions"
+   "behaviouralControl": "r2-mutant-control.json",
+   "downgradedNote": "This record compares two source lines. It answers 'which line comes first', not 'what each version does when aborted' — as written it cannot answer its own question, because legacy-tool.ts:339 throws after image resolution in both versions. It is kept as code-shape evidence only and must not be quoted as a behavioural PASS.",
+   "verdict": "CODE SHAPE ONLY — not behavioural evidence; behavioural control lives in r2-mutant-control.json"
   }
  },
  "verdict": {
   "R3_renameControl": "PASS — old failed, new did not",
-  "R2_entryControl": "PASS — the entry check is the difference between the two versions"
+  "R2_entryControl": "CODE SHAPE ONLY — not behavioural evidence; see r2-mutant-control.json"
  }
 }

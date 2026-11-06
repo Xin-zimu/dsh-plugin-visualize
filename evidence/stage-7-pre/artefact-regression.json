@@ -31,7 +31,36 @@
     }
    ],
    "anyAbortedRoundWroteAnything": false,
-   "allRoundsThrew": true
+   "allRoundsThrew": true,
+   "nonDiscriminatingNote": "This check alone cannot show the entry check earned anything. legacy-tool.ts:339 calls signal?.throwIfAborted() AFTER image resolution in both versions, so any aborted call throws and writes nothing whether or not the entry check exists. It was recorded as a control in this file's first pass and is kept as a regression check, but on its own it is a green light wired to nothing.",
+   "discriminativeControl": {
+    "evidence": "r2-mutant-control.json",
+    "probe": "r2-mutant-control.mjs",
+    "method": "The built lib/index.js (sha256 d1fd5f84…) against a byte copy with exactly one deletion — the resolveCardImages entry `options.signal?.throwIfAborted()` (src/images.ts:115), leaving 1 of 2 throwIfAborted occurrences. That copy is v0.1.0's code shape at the fixed line, with the rest of v0.1.1 intact.",
+    "realAborted": {
+     "workspaceImageReads": 0,
+     "storeFilesAdded": 0,
+     "threw": "AbortError"
+    },
+    "mutantAborted": {
+     "workspaceImageReads": 1,
+     "storeFilesAdded": 1,
+     "addedFile": "sessions/s1/images/4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6.png",
+     "wroteCardHtml": false,
+     "threw": "AbortError"
+    },
+    "liveRealControl": {
+     "workspaceImageReads": 1,
+     "storeFilesAdded": 3,
+     "files": [
+      "sessions/s1/abort-probe-9bb2db43.whale.html",
+      "sessions/s1/abort-probe-9bb2db43.whale.images.json",
+      "sessions/s1/images/4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6.png"
+     ],
+     "why": "connectivity control: without an un-aborted round that reaches image resolution and writes a card, a zero-read aborted round proves only that the harness was inert"
+    },
+    "verdict": "PROVEN for the workspace-image create path — the pre-fix shape reads the workspace image and leaves an orphan image file in the content-addressed store; the shipped build does neither, and the live control shows the rig does reach image resolution. Two runs per condition. Scope: action=create with one workspace image, abort set before the call — the update path and an abort arriving mid-resolution were not exercised. The remote-URL half of the release sentence is unit-evidenced in evidence/stage-6 (the pre-fix test failed having entered its fetcher), not by this control."
+   }
   },
   "R3": {
    "rounds": [
@@ -91,7 +120,7 @@
   }
  },
  "verdict": {
-  "R2_cancellation": "PASS",
+  "R2_cancellation": "PASS — PROVEN for the workspace-image create path by the discriminating mutant control (r2-mutant-control.json); the entry-level check in this file alone is non-discriminating",
   "R3_concurrent": "PASS",
   "R4_historical": "PASS",
   "allPass": true

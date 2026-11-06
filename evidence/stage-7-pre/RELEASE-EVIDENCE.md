@@ -92,14 +92,16 @@ was driven directly through a mock ctx (the same seam `tests/tool.spec.ts` uses)
 
 | Check | Result |
 | --- | --- |
-| **R2** a call aborted at entry does no work | **PASS** — 3/3 rounds threw `AbortError`, full recursive store listing identical before and after (`added: []` each time). Control: the same call with a live signal **did** create its card. |
+| **R2** a call aborted at entry does no image work and adds no store files | **PASS** — 3/3 rounds threw `AbortError`, full recursive store listing identical before and after (`added: []` each time). Control: the same call with a live signal **did** create its card. **That check alone is non-discriminating** — both versions throw after image resolution — so R2 is carried by the mutant control in §5, which does discriminate. |
 | **R3** 8 concurrent creates onto one content-addressed name | **PASS** — 3/3 rounds: 8/8 fulfilled, exactly **1** distinct path (content-addressed, as designed), **0** leftover `.tmp` files |
 | **R4** a historical card is still patchable via `~\` | **PASS** — cards written by earlier builds, copied into a scratch home, patched through the exact `~\` form; replacement on disk, original gone |
 
-## 5. The controls that make R2/R3 mean something (`negative-controls.json`)
+## 5. The controls that make R2/R3 mean something
 
-`AGENTS.md` §6: a guard never seen to go red is a guess. Each guard was run
-against **v0.1.0's own extracted code** on the same inputs.
+`AGENTS.md` §6: a guard never seen to go red is a guess. R3's guard was run
+against **v0.1.0's own extracted code** on the same inputs. R2's code-shape table
+is below as well, but the control that actually discriminates is behavioural: the
+built bundle against itself with one line removed (`r2-mutant-control.json`).
 
 ### R3 — bare `rename` vs retrying `rename`
 
@@ -130,14 +132,67 @@ evidence, and saying so is more useful than implying this covers it.
 | **v0.1.1** | `options.signal?.throwIfAborted()` | **yes** |
 
 The one-line difference is exactly the fix, and the old version's first statement
-shows it went straight to work.
+shows it went straight to work. **Code shape alone is not behaviour**, though, so
+the question was put to both builds directly (`r2-mutant-control.json`,
+`r2-mutant-control.mjs`).
+
+The control is the built `lib/index.js` against a byte copy with exactly that one
+line deleted — the v0.1.0 code shape at the fixed line, with the rest of v0.1.1
+intact. Each shape was driven through the same mock-ctx seam with an
+`<img data-viz-src="figs/probe.png">` fragment, twice per condition:
+
+| | workspace image reads | store files added | outcome |
+| --- | --- | --- | --- |
+| v0.1.1 build, aborted | **0** | **0** | `AbortError` |
+| mutant (entry check removed), aborted | **1** | **1** — `sessions/s1/images/<sha256>.png` | `AbortError`, no card |
+| v0.1.1 build, live signal (**connectivity control**) | **1** | **3** — card, manifest, image | card written, 1 image |
+
+So the fix is behavioural, not just textual: without the entry check the aborted
+call reads the workspace image and **leaves an orphan image file in the
+content-addressed store** before the later abort check (`legacy-tool.ts:339`)
+throws. The live-signal round is what makes the zero-read rows mean something —
+it proves this rig actually reaches image resolution. Without it, the attempt
+before this one reported `0 reads` in *both* builds and looked like a
+pass while measuring nothing: the fake context had neither a complete `ctx.fs`
+(`workspaceImageReader` feature-detects `resolve`+`contains`+`stat`+`readBytes`)
+nor an `inject()` that fires, so `imageRoute.ready` stayed false and every image
+was reported undeliverable before resolution began.
+
+**One half rests on unit evidence, not on this artefact control.** A remote-URL
+image is fetched by the same loop (`fetchUrl` inside `resolveOne`), but this
+control's fragment carries no URL, so no fetch ran. A fetch was deliberately not
+added: the default fetcher needs a public network dependency, and the SSRF policy
+refuses non-public addresses. The pre-fix fetch is recorded by stage-6's
+red-first unit evidence instead — `tests/images.spec.ts` "does no work for a call
+cancelled before it starts" failed before the fix by returning
+`images: [{ origin: 'url', src: 'https://example.com/a.png' }]`
+(`evidence/stage-6/abort-entry-red.txt`), and
+`evidence/stage-6/PRODUCT-DEFECTS.md` records `fetcher was entered: true`. So the
+"fetched images" half is unit-evidenced; what is missing here is an
+artefact-level fetch.
+
+**Scope of the control:** `action: 'create'` with one workspace image, and the
+abort is set before the call. The update path and an abort arriving
+mid-resolution were not exercised.
+
+**The broken harness is reproducible too.** `r2-inert-harness.json` runs the same
+two builds through attempt 1b's incomplete context — no `ctx.fs.contains`/`stat`,
+and an `inject()` that never fires its callback — and records **0 workspace reads
+for the live, un-aborted call as well**. That is the earlier zeros reproduced as
+an artefact rather than asserted from memory: a negative from that harness meant
+nothing.
 
 ## 6. What this does not prove
 
-- **R2's control is a code-shape comparison, not a behavioural one.** The old
-  version was not driven end-to-end under an aborted signal in this round; what is
-  shown is that it had no entry check and that the current one does. The
-  behavioural half (nothing written) is shown for v0.1.1 only.
+- **R2's workspace-image create path is now behaviourally proven — not "every
+  cancelled call".** The earlier gap ("the control is a code-shape comparison,
+  not a behavioural one") is closed for the path measured in §5: the mutant
+  without the entry check reads the workspace image and leaves an orphan image
+  file, the shipped build does neither, and an un-aborted round proves the rig
+  reaches image resolution. Not covered: a remote-URL fetch (unit-evidenced in
+  stage 6 instead), the update path, and an abort arriving mid-resolution. The
+  control also measures *image work and store files*, not every kind of work —
+  argument validation, linting and store-root setup still run before the abort.
 - **The temp-file leak is not reproduced above.** See the note in §5.
 - **One card per check.** The browser run created and patched one card and
   reloaded once. It is not a load test, and not a matrix of card styles.
@@ -156,7 +211,9 @@ shows it went straight to work.
 | `browser-v011-mw4ezoqo.json`, `browser-v011-mw4jk1aw.json` | the two host runs, before and after the pause |
 | `tilde-negative-control.json` | v0.1.0 vs v0.1.1 on identical paths, plus the 16 attacks |
 | `control-v010.mjs`, `control-v011.mjs` | the two extracted path readers actually executed |
-| `artefact-regression.json` | R2, R3, R4 against the built `lib/index.js` |
+| `artefact-regression.json` | R2, R3, R4 against the built `lib/index.js`; R2 points at the discriminating control in §5 |
+| `r2-mutant-control.json`, `r2-mutant-control.mjs` | the built bundle vs itself with the entry abort check deleted: reads, store files, aborted and live rounds, twice each |
+| `r2-inert-harness.json`, `r2-inert-harness.mjs` | the same builds through attempt 1b's broken context: the live call also reads nothing, which is why those zeros were not evidence |
 | `negative-controls.json` | the split-out old code and the side-by-side runs |
 | `control-rename-v010.mjs`, `control-rename-v011.mjs` | the two `writeFileAtomic` bodies actually executed |
 | `v011-full-suite.json`, `v011-full-suite.log` | local suite on the release candidate: 942 passed / 4 skipped / 946 |

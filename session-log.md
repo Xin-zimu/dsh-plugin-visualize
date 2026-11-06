@@ -423,11 +423,23 @@ differential was re-run and still reports **31/31, 0 differences**
 | `Celebration` never fired for a bare-variable condition | `Celebration($done)` passes a binding marker; `boolOf` on that object is constant true, so the transition never happened. Every test used the comparison form, so none touched it | **Fixed in 4A-5** — `fieldOf` unwraps the binding; three regression cases, mutation-verified |
 | An idle bsk session is recycled after 5 minutes | The Agent Window and its browser close with it, which looks like a crashed environment | Recorded in 4A-5; start sessions with a longer `--session-idle` for a long acceptance run |
 | A fresh agent tab is `about:blank` and cannot be synced | `cooperate sync` fails with "Receiving end does not exist" until the tab navigates, because the content script is not injected | Recorded in 4A-5; navigate before the first sync |
+| R2's "an aborted call writes nothing" check did not discriminate | The same assertion passes with the fix absent, because `legacy-tool.ts:339` throws after image resolution in both versions | **Closed 2026-11-07 for the workspace-image create path** — the mutant control shows the pre-fix shape reads the workspace image and leaves an orphan image file; the shipped build does neither (`evidence/stage-7-pre/r2-mutant-control.json`) |
+| Tag `v0.1.1`'s own `CHANGELOG.md` still carries the removed temp-file-leak sentence | Anyone reading the tagged tree sees text that main has corrected | **Deliberate, not a defect to fix by releasing.** The tag was not moved; the corrections are a later commit on main (`cdc9868`) and the GitHub Release page was edited in place. A v0.1.2 would ship byte-identical `lib/` and would not change the v0.1.1 tree |
 
 ## 7. Next step
 
-**v0.1.1 is released** — tag `v0.1.1` at `50b6b54`, GitHub Release published
-2026-11-06. The three Stage-6 product defects are now in a shipped version.
+**v0.1.1 stays the current release; no v0.1.2.** Tag `v0.1.1` at `50b6b54`,
+GitHub Release published 2026-11-06; `main` carries two documentation commits
+after it. The R2 control that was left open at the v0.1.1 close is now
+**discriminating for the workspace-image create path** (Session 28); it required
+no product change, so it also gives no reason to cut a release.
+
+**Why not v0.1.2:** the only outstanding misstatement lives in the *tagged*
+`CHANGELOG.md`, which a new tag cannot edit — the only fix would be moving
+`v0.1.1`, which the owner deliberately declined. A patch release would ship
+byte-identical `lib/` (the version string does not enter the bundle) and would
+announce a change to users while the v0.1.1 tree still reads as before. The
+correction is already on `main` (`cdc9868`) and on the Release page.
 
 **Next is Stage 7 — restoring the two external actions, in this order:**
 
@@ -634,6 +646,106 @@ Six things carried forward:
 
 ## History
 
+### Session 28 — 2026-11-07 (R2 made discriminating; no release)
+
+**The R2 control left open at the v0.1.1 close now discriminates, for the
+workspace-image create path it measures. No product change, no version bump, tag
+untouched.**
+
+Session 27's addendum recorded the problem precisely: `legacy-tool.ts:339` calls
+`signal?.throwIfAborted()` *after* image resolution in **both** versions, so
+"an aborted call throws and writes nothing" would pass with the fix absent. The
+discriminator is the work done before the abort is noticed. The probe written for
+it existed and had never been run. This session ran it — and the probe measured
+nothing twice before it measured anything.
+
+**Attempt 1 (the stored probe) died on import.** The mutant bundle was copied
+under `%TEMP%`, where a bare import (`@deepseek-ai/schemastery`) cannot resolve;
+`ERR_MODULE_NOT_FOUND` before any measurement. Fixed by keeping the copy inside
+the tree (`tmp/`, gitignored).
+
+**Attempt 1b reported `INCONCLUSIVE`, and that was also not evidence.** Both the
+real build and the mutant showed 0 workspace reads. Two independent causes, each
+invisible without asking *"does this rig do anything when nothing is aborted?"*:
+
+- the fake registrant context had no `contains`/`stat` in `ctx.fs`, and
+  `workspaceImageReader` feature-detects all four methods — so it threw before
+  reading a byte;
+- its `inject()` never invoked its callback, so `imageRoute.ready` stayed false
+  and every image was reported undeliverable **before** resolution started.
+
+Both builds were therefore inert, and "0 reads" meant "nothing ran".
+
+**What the control does now** (`evidence/stage-7-pre/r2-mutant-control.{json,mjs}`)
+— the built `lib/index.js` (`d1fd5f84…`) against a byte copy with exactly the
+`resolveCardImages` entry check deleted (`ee2bf825…`, 1 of the 2 `throwIfAborted`
+occurrences left), same mock host, two runs per condition:
+
+| condition | workspace reads | store files added | outcome |
+| --- | --- | --- | --- |
+| v0.1.1 build, aborted | 0 | 0 | `AbortError` |
+| mutant (entry check removed), aborted | 1 | 1 — orphan `sessions/s1/images/<sha256>.png` | `AbortError`, no card |
+| v0.1.1 build, live signal (**connectivity control**) | 1 | 3 — card, manifest, image | card written |
+
+**The finding worth keeping:** the pre-fix shape does not merely throw late — the
+aborted call reads the workspace image and leaves an **orphan image file in the
+content-addressed store**. The CHANGELOG sentence — "still read the workspace,
+fetched images and wrote to the store — then threw the result away" — is accurate
+for the workspace read and the store bytes. Its remote-URL half is **not part of
+this control** (the fragment carries no URL); that half is unit-evidenced in
+stage 6: `tests/images.spec.ts` "does no work for a call cancelled before it
+starts" failed pre-fix returning `origin: 'url'`, and
+`evidence/stage-6/abort-entry-red.txt` records the fetcher being entered. No
+public fetch was added here — it would turn the control into a network test, and
+the SSRF policy refuses non-public addresses.
+
+**What it does not cover:** `action: 'create'` with one workspace image, and an
+abort set before the call. The update path and an abort arriving mid-resolution
+were not exercised; and the measured quantities are image work and store files,
+not argument validation or linting, which still run before the abort.
+
+**The rule this earns.** A negative measured by an inert harness is not
+evidence. Every "it did nothing" needs a positive control showing the same rig
+does something when the condition is removed. This session paid for it twice:
+once when the mutant appeared to do no work, and once when the live control
+showed the harness was doing no image work at all. The failure mode is now a saved
+artefact rather than a recollection — `r2-inert-harness.json` runs the same two
+builds through attempt 1b's broken context and records **0 reads for the live
+call as well**.
+
+**Docs updated:** `artefact-regression.json` (R2 gains `discriminativeControl`;
+its verdict now says the entry-level check is non-discriminating on its own),
+`negative-controls.json` (its R2 code-shape verdict downgraded from `PASS` to
+`CODE SHAPE ONLY`, with a pointer to the behavioural control),
+`RELEASE-EVIDENCE.md` §4/§5/§6/§7, this file §6/§7. The probe was copied into
+`evidence/stage-7-pre/` verbatim and **re-run from there** to produce the
+recorded JSON (committed with this entry; local paths redacted per the Session 27
+convention); the inert-harness script was copied in and re-run the same way.
+
+**Independent review, and what it changed.** A read-only reviewer reproduced the
+run byte-for-byte (normalizing only the two absolute build paths) and confirmed
+the mutant is exactly one deletion. It returned **FIX NEEDED**: the run was
+sound, the prose overreached. Accepted and fixed — "closed"/"PROVEN" narrowed to
+the workspace-image create path; the fetch caveat corrected to point at stage-6
+unit evidence instead of claiming "code path only"; `negative-controls.json`'s
+code-shape `PASS` downgraded; §5's heading no longer attributes R2 to
+`negative-controls.json`; the live round's assertions hardened to require the
+card `.html` and an embedded image; path matching made separator-agnostic; the
+inert-harness failure saved as an artefact. One finding was **narrowed rather
+than accepted**: the reviewer's "the local server used by the unit tests is
+refused by the SSRF policy" — the cancelled test uses an injected stub fetcher,
+not a local server, and the SSRF point holds for the default fetcher only.
+
+**Commands run, and their output:** `node evidence/stage-7-pre/r2-mutant-control.mjs`
+→ exit 0, verdict `PASS`; `node evidence/stage-7-pre/r2-inert-harness.mjs` → exit
+0, verdict `INERT HARNESS, REPRODUCED`; `ConvertFrom-Json` parse check on
+`artefact-regression.json`, `r2-mutant-control.json`, `r2-inert-harness.json` and
+`negative-controls.json` → all OK. No file under `src/` or `tests/` changed, so
+the full suite was not re-run; saying that is cheaper than implying it was.
+
+**Deliberately not done:** the tag was not moved, no v0.1.2 (reasoning in §7),
+and Stage 7 was not started.
+
 ### Session 27 — 2026-11-06 (v0.1.1 released)
 
 **Released `v0.1.1` at `50b6b54`. Tag and GitHub Release published. No force push
@@ -679,7 +791,7 @@ on the wrong host, so this cannot silently regress into a vacuous pass.
 | Both bundle halves match the build | PASS | — |
 | Real host: create then update via the reported `~\` path, both separators | PASS — `alpha 0`, `beta 1` on disk | v0.1.0 **REFUSED** that identical path; v0.1.1 accepts it |
 | Traversal through the widened reader | 16 attempts, **0 escapes** | — |
-| Cancelled-at-entry call writes nothing | PASS, 3/3 rounds, listing identical | live-signal control **did** create its card |
+| Cancelled-at-entry call writes nothing | PASS, 3/3 rounds, listing identical | live-signal control **did** create its card — **historical row: this check is non-discriminating on its own; see the addendum and Session 28** |
 | 8 concurrent creates onto one content-addressed name | PASS, 3/3 rounds, 8/8, 0 temp files | v0.1.0 failed **32 of 200** writes over 22 of 25 rounds, all `EPERM`; v0.1.1 **0 of 200** |
 | A card written by an earlier build is patchable | PASS | — |
 
@@ -741,7 +853,7 @@ JSON files; after redaction the scan is clean).
 
 ### Session 27 — addendum (post-release corrections)
 
-After the tag was pushed, an independent read-only review of vidence/stage-7-pre/ found three defects in the release documents. All three were re-verified here before being acted on; a fourth finding was disproved.
+After the tag was pushed, an independent read-only review of evidence/stage-7-pre/ found three defects in the release documents. All three were re-verified here before being acted on; a fourth finding was disproved.
 
 **1. The temp-file leak claim was false, and is removed.** CHANGELOG.md said the concurrent rename "failed and leaked temporary files", and README.md repeated it. Measured directly: v0.1.0's own writeFileAtomic catch block already runs rm(temp, { force: true }) for any code other than EEXIST, so a forced EPERM (destination made a non-empty directory) left **zero** .tmp files. The claim came from the *text* of the error message — which names a temp path — not from a file left on disk. No artefact anywhere under evidence/ measures a leaked temp file. Corrected in both files.
 
@@ -751,7 +863,12 @@ After the tag was pushed, an independent read-only review of vidence/stage-7-pr
 
 **Disproved:** a finding that the certifying CI run predates the version bump. Run 42170037015 is on 50b6b54, whose package.json already reads 0.1.1.
 
-**Open — the one thing not finished.** R2's control does not discriminate. legacy-tool.ts:339 calls signal?.throwIfAborted() *after* image resolution in **both** versions, so any aborted call throws and writes nothing regardless of the entry check; the recorded R2 evidence would look identical if the fix were absent. The discriminator is the work done *before* the abort is noticed — workspace image reads, and image bytes written into the store. A probe that builds a mutant bundle with the entry check deleted and measures those two exists at 	mp/probes/v011-r2-mutant-control.mjs and **has not been run**. Treat the artefact-level R2 in rtefact-regression.json as NOT PROVEN until it is.
+**Open — the one thing not finished.** R2's control does not discriminate. `legacy-tool.ts:339` calls `signal?.throwIfAborted()` *after* image resolution in **both** versions, so any aborted call throws and writes nothing regardless of the entry check; the recorded R2 evidence would look identical if the fix were absent. The discriminator is the work done *before* the abort is noticed — workspace image reads, and image bytes written into the store. A probe that builds a mutant bundle with the entry check deleted and measures those two exists at `tmp/probes/v011-r2-mutant-control.mjs` and **has not been run**. Treat the artefact-level R2 in `artefact-regression.json` as NOT PROVEN until it is.
+
+**Status 2026-11-07 — closed for the workspace-image create path.** Session 28
+ran it: the mutant reads the workspace image and leaves an orphan image file where
+the shipped build does neither, and an un-aborted round proves the rig reaches
+image resolution. See Session 28 above.
 
 **Carry-forward:** tag v0.1.1 still points at 50b6b54, whose CHANGELOG.md carries the removed leak sentence. The corrections are a later commit on main; the tagged tree's text cannot be changed without moving the tag, which was deliberately not done. The GitHub Release notes were edited in place instead.
 ### Session 26 — 2026-11-06 (Stage 6: three product bugs behind the "platform failures")

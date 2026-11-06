@@ -1,0 +1,114 @@
+{
+ "builds": {
+  "real": {
+   "path": "D:/work/dsh-plugin-visualize\\lib\\index.js",
+   "sha256": "d1fd5f84eceb4f30005182b9e972beed80143ae5974583ced1aa1d9cad1628f9",
+   "throwIfAbortedOccurrences": 2
+  },
+  "mutant": {
+   "path": "D:/work/dsh-plugin-visualize\\tmp\\.r2-mutant\\index.js",
+   "sha256": "ee2bf825624315b2b2b1bc4d908767df61c70fa43d892a2a484413f74e125a0c",
+   "throwIfAbortedOccurrences": 1,
+   "edit": "deleted the resolveCardImages entry `options.signal?.throwIfAborted()` (src/images.ts:115)"
+  }
+ },
+ "runs": {
+  "realAborted": [
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 0,
+    "readPaths": [],
+    "storeWritesViaCtxFs": 0,
+    "storeFilesAdded": 0,
+    "storeFiles": []
+   },
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 0,
+    "readPaths": [],
+    "storeWritesViaCtxFs": 0,
+    "storeFilesAdded": 0,
+    "storeFiles": []
+   }
+  ],
+  "realLive": [
+   {
+    "abort": false,
+    "threw": null,
+    "workspaceImageReads": 1,
+    "readPaths": [
+     "ws/figs/probe.png"
+    ],
+    "storeWritesViaCtxFs": 0,
+    "storeFilesAdded": 3,
+    "storeFiles": [
+     "sessions/s1/abort-probe-9bb2db43.whale.html",
+     "sessions/s1/abort-probe-9bb2db43.whale.images.json",
+     "sessions/s1/images/4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6.png"
+    ],
+    "imageCount": 1
+   },
+   {
+    "abort": false,
+    "threw": null,
+    "workspaceImageReads": 1,
+    "readPaths": [
+     "ws/figs/probe.png"
+    ],
+    "storeWritesViaCtxFs": 0,
+    "storeFilesAdded": 3,
+    "storeFiles": [
+     "sessions/s1/abort-probe-9bb2db43.whale.html",
+     "sessions/s1/abort-probe-9bb2db43.whale.images.json",
+     "sessions/s1/images/4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6.png"
+    ],
+    "imageCount": 1
+   }
+  ],
+  "mutantAborted": [
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 1,
+    "readPaths": [
+     "ws/figs/probe.png"
+    ],
+    "storeWritesViaCtxFs": 0,
+    "storeFilesAdded": 1,
+    "storeFiles": [
+     "sessions/s1/images/4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6.png"
+    ]
+   },
+   {
+    "abort": true,
+    "threw": "AbortError",
+    "workspaceImageReads": 1,
+    "readPaths": [
+     "ws/figs/probe.png"
+    ],
+    "storeWritesViaCtxFs": 0,
+    "storeFilesAdded": 1,
+    "storeFiles": [
+     "sessions/s1/images/4c4b6a3be1314ab86138bef4314dde022e600960d8689a2c8f8631802d20dab6.png"
+    ]
+   }
+  ]
+ },
+ "notes": [
+  "storeWritesViaCtxFs counts only ctx.fs.writeText; a session-store card is written with node:fs at its absolute path, so 0 there beside storeFilesAdded > 0 is expected. storeFilesAdded is the real measurement.",
+  "Scope: action=create with one workspace <img data-viz-src>, and the abort is set before the call. The update path and an abort arriving mid-resolution were not exercised."
+ ],
+ "discriminates": {
+  "abortedRealDoesNoImageWork": true,
+  "abortedRealWritesNothing": true,
+  "liveRealReachesImageResolution": true,
+  "liveRealWritesTheCard": true,
+  "abortedMutantDoesImageWork": true,
+  "abortedMutantLeavesImageBytes": true,
+  "abortedMutantWritesNoCard": true,
+  "mutantStillThrowsAfterWork": true
+ },
+ "verdict": "PASS — the rig reaches image resolution and writes a card; the real build does no image reads and adds no store files before the abort, the pre-fix mutant reads the image and leaves orphan image bytes"
+}
