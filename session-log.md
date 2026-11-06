@@ -429,10 +429,10 @@ differential was re-run and still reports **31/31, 0 differences**
 ## 7. Next step
 
 **v0.1.1 stays the current release; no v0.1.2.** Tag `v0.1.1` at `50b6b54`,
-GitHub Release published 2026-11-06; `main` carries two documentation commits
-after it. The R2 control that was left open at the v0.1.1 close is now
-**discriminating for the workspace-image create path** (Session 28); it required
-no product change, so it also gives no reason to cut a release.
+GitHub Release published 2026-11-06; `main` carries documentation commits after
+it (this session's included). The R2 control that was left open at the v0.1.1
+close is now **discriminating for the workspace-image create path** (Session 28);
+it required no product change, so it also gives no reason to cut a release.
 
 **Why not v0.1.2:** the only outstanding misstatement lives in the *tagged*
 `CHANGELOG.md`, which a new tag cannot edit — the only fix would be moving
