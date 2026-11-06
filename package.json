@@ -2,7 +2,7 @@
   "name": "@dsh-unified/visualize",
   "description": "DSH unified visualization plugin: one visualize tool, a host core that routes to pluggable render backends. Backend A renders sandboxed HTML fragments (from dsh-visualize); Backend B renders openui-lang programs as a component tree (from dsh-intelligent-ui).",
   "icon": "assets/icon.svg",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

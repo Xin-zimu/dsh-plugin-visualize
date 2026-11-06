@@ -1,0 +1,121 @@
+{
+ "verdict": "PASS",
+ "claim": "the native ~\\ display form was REFUSED by v0.1.0 and is accepted by v0.1.1, with containment intact",
+ "home": "C:/Users/<user>",
+ "storeRoot": "C:/Users/<user>\\AppData\\Local\\Temp\\dsh-v011\\visualize",
+ "cases": [
+  {
+   "case": "store card, native ~\\ form (what the tool reported)",
+   "kind": "owned",
+   "v0.1.0": "REFUSED",
+   "v0.1.1": "accepted"
+  },
+  {
+   "case": "store card, posix ~/ form",
+   "kind": "owned",
+   "v0.1.0": "accepted",
+   "v0.1.1": "accepted"
+  },
+  {
+   "case": "store card, absolute",
+   "kind": "owned",
+   "v0.1.0": "accepted",
+   "v0.1.1": "accepted"
+  },
+  {
+   "case": "workspace card, native ~\\ form",
+   "kind": "workspace",
+   "v0.1.0": "accepted",
+   "v0.1.1": "REFUSED"
+  }
+ ],
+ "redOnOldCode": [
+  "store card, native ~\\ form (what the tool reported)"
+ ],
+ "containment": {
+  "attempts": 16,
+  "escapes": 0,
+  "detail": [
+   {
+    "attack": "~/../../../../etc/passwd.html",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~/../../../../etc/passwd.html",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\..\\..\\..\\..\\etc\\passwd.html",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\..\\..\\..\\..\\etc\\passwd.html",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\..\\secret.html",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\..\\secret.html",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~/../secret.html",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~/../secret.html",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~/x/../../../../Windows/win.ini.html",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~/x/../../../../Windows/win.ini.html",
+    "kind": "workspace",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\AppData\\..\\..\\..\\..\\Windows\\win.ini.html",
+    "kind": "owned",
+    "result": "REFUSED"
+   },
+   {
+    "attack": "~\\AppData\\..\\..\\..\\..\\Windows\\win.ini.html",
+    "kind": "workspace",
+    "result": "REFUSED"
+   }
+  ]
+ }
+}

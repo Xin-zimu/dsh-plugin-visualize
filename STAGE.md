@@ -19,7 +19,7 @@ this says what the current slice is allowed to do.
 | 4B | External actions: `@OpenUrl`, `@CopyToClipboard`, `@ToAssistant` | **PASS — closed 2026-11-05.** `@CopyToClipboard` shipped (ADR-013); the other two Deferred — **reasons corrected 2026-11-06** (4B-2), verdict unchanged |
 | 4B-2 | Re-testing the two deferrals against the real host | **CLOSED 2026-11-06 — investigation only.** Both are EXTENDABLE; neither ships. `docs/reports/PHASE-4B-2-INVESTIGATION.md` |
 | 5 | Unified prompt, security review, release | **DONE — released `v0.1.0` 2026-11-06** at `40b8241`. Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md` |
-| 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; 946/946 green locally and on CI. `evidence/stage-6/` |
+| 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; **946/946 green on CI Linux and CI Windows (0 skipped on either)**, and 942 passed / 4 skipped / 946 locally, where the 4 are the tests that need a symlink privilege this machine lacks. `evidence/stage-6/` |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language

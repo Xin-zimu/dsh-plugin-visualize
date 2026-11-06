@@ -1,0 +1,76 @@
+{
+ "checks": {
+  "B1": {
+   "buildSha256": "E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB",
+   "installedSha256": "E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB",
+   "clientMatch": true,
+   "serverMatch": true,
+   "serverBuildSha256": "D1FD5F84ECEB4F30005182B9E972BEED80143AE5974583CED1AA1D9CAD1628F9",
+   "serverInstalledSha256": "D1FD5F84ECEB4F30005182B9E972BEED80143AE5974583CED1AA1D9CAD1628F9"
+  },
+  "B2": {
+   "createdFiles": 1,
+   "createdPaths": [
+    "C:/Users/<user>\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4jk1aw-c17d543c.whale.html"
+   ],
+   "displayFormUnderHome": true,
+   "reportedTildePaths": [
+    "~\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4eymv4-cff49915.whale.html",
+    "~\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4ezoqo-f1a26682.whale.html",
+    "~\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4jk1aw-c17d543c.whale.html"
+   ]
+  },
+  "B3": {
+   "aCardCarriesBeta": true,
+   "anyCardStillCarriesAlpha": false,
+   "patchedFile": "C:/Users/<user>\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4jk1aw-c17d543c.whale.html",
+   "alphaOccurrences": 0,
+   "betaOccurrences": 1
+  },
+  "B5": {
+   "conversationStillReadable": true,
+   "historyErrorBanner": false,
+   "cardsAfterReload": 0,
+   "framesAfterReload": 9,
+   "historicalCardsOnDisk": 1
+  }
+ },
+ "store": {
+  "root": "C:/Users/<user>\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions",
+  "underHomeDirectory": true,
+  "cardsBefore": 2,
+  "cardsAfter": 3,
+  "created": [
+   "C:/Users/<user>\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4jk1aw-c17d543c.whale.html"
+  ]
+ },
+ "notes": [],
+ "page": {
+  "href": "http://127.0.0.1:3094/",
+  "composer": true
+ },
+ "promptSent": 623,
+ "turn": {
+  "settled": true,
+  "pollFailures": 1,
+  "marker": true,
+  "paragraphs": 20,
+  "toolCalls": 0,
+  "cards": 0,
+  "frames": 9
+ },
+ "reportedDisplayPaths": [
+  "~\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4eymv4-cff49915.whale.html",
+  "~\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4ezoqo-f1a26682.whale.html",
+  "~\\AppData\\Local\\Temp\\dsh-v011\\visualize\\sessions\\session-d9788357-06a6-4bac-a508-2b6fc3ed5843\\v011-release-v011-mw4jk1aw-c17d543c.whale.html"
+ ],
+ "reload": {
+  "href": "http://127.0.0.1:3094/",
+  "hasTitle": true,
+  "hasBeta": true,
+  "historyError": false,
+  "cards": 0,
+  "frames": 9,
+  "composer": true
+ }
+}

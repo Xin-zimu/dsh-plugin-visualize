@@ -1,0 +1,99 @@
+{
+ "checks": {
+  "R2": {
+   "control": {
+    "returnedPath": "~\\AppData\\Local\\Temp\\v011-artefact\\r2-home\\visualize\\sessions\\s1\\cancel-control-31277a9b.whale.html",
+    "wroteCard": true,
+    "wroteImageBytes": false,
+    "note": "the control must do the work, or the aborted rounds prove nothing"
+   },
+   "aborted": [
+    {
+     "round": 1,
+     "threw": "AbortError: This operation was aborted",
+     "filesBefore": 1,
+     "filesAfter": 1,
+     "added": []
+    },
+    {
+     "round": 2,
+     "threw": "AbortError: This operation was aborted",
+     "filesBefore": 1,
+     "filesAfter": 1,
+     "added": []
+    },
+    {
+     "round": 3,
+     "threw": "AbortError: This operation was aborted",
+     "filesBefore": 1,
+     "filesAfter": 1,
+     "added": []
+    }
+   ],
+   "anyAbortedRoundWroteAnything": false,
+   "allRoundsThrew": true
+  },
+  "R3": {
+   "rounds": [
+    {
+     "round": 1,
+     "fulfilled": 8,
+     "rejected": 0,
+     "rejectionReasons": [],
+     "distinctPaths": 1,
+     "leftoverTempFiles": 0
+    },
+    {
+     "round": 2,
+     "fulfilled": 8,
+     "rejected": 0,
+     "rejectionReasons": [],
+     "distinctPaths": 1,
+     "leftoverTempFiles": 0
+    },
+    {
+     "round": 3,
+     "fulfilled": 8,
+     "rejected": 0,
+     "rejectionReasons": [],
+     "distinctPaths": 1,
+     "leftoverTempFiles": 0
+    }
+   ],
+   "allRoundsFullyFulfilled": true,
+   "everyRoundOneDestination": true,
+   "noTempFilesLeaked": true
+  },
+  "R4": {
+   "candidatesFound": 23,
+   "tested": 2,
+   "results": [
+    {
+     "file": "session-82ee260c-9ed6-44b5-9909-b9adf7599c3c\\p306-html-control-552c4f56.whale.html",
+     "needle": "HTML control",
+     "displayPathUsed": "~\\AppData\\Local\\Temp\\v011-artefact\\r4-home\\visualize\\sessions\\session-82ee260c-9ed6-44b5-9909-b9adf7599c3c\\p306-html-control-552c4f56.whale.html",
+     "ok": true,
+     "returnedPath": "~\\AppData\\Local\\Temp\\v011-artefact\\r4-home\\visualize\\sessions\\session-82ee260c-9ed6-44b5-9909-b9adf7599c3c\\p306-html-control-552c4f56.whale.html",
+     "replacementPresentOnDisk": true,
+     "originalGoneFromDisk": true
+    },
+    {
+     "file": "session-abcdc0b2-6771-47f6-aef6-2482da2c02e0\\stage5-html-b1c9aee5.whale.html",
+     "needle": "HTML backend renders",
+     "displayPathUsed": "~\\AppData\\Local\\Temp\\v011-artefact\\r4-home\\visualize\\sessions\\session-abcdc0b2-6771-47f6-aef6-2482da2c02e0\\stage5-html-b1c9aee5.whale.html",
+     "ok": true,
+     "returnedPath": "~\\AppData\\Local\\Temp\\v011-artefact\\r4-home\\visualize\\sessions\\session-abcdc0b2-6771-47f6-aef6-2482da2c02e0\\stage5-html-b1c9aee5.whale.html",
+     "replacementPresentOnDisk": true,
+     "originalGoneFromDisk": true
+    }
+   ],
+   "allPatched": true
+  }
+ },
+ "verdict": {
+  "R2_cancellation": "PASS",
+  "R3_concurrent": "PASS",
+  "R4_historical": "PASS",
+  "allPass": true
+ }
+}

@@ -15,8 +15,18 @@ one theme and one replay path.
 
 ## Status
 
-**Version 0.1.0, release candidate. Stages 4A and 4B complete; stage 5 audit in**
-**progress. Not yet tagged.**
+**Version 0.1.1. Stages 4A, 4B, 5 and 6 complete; v0.1.0 is tagged and v0.1.1
+fixes three product defects it shipped.**
+
+The patch release is not a polish pass. Three of the fifteen Windows test
+failures v0.1.0 accepted as platform behaviour turned out to be **product bugs**
+that Windows merely exposed: a `~`-shortened card path the tool reported but
+would refuse when handed back, a cancelled call that still read the workspace,
+fetched images and wrote to the store, and a concurrent `rename` that could fail
+and leak a temporary file. Investigating the rest also found that one filed-off
+"slow test" was a 39 ms failure behind a timeout mask, and that one accused
+fixture was an assertion that had never been able to match. The suite is now
+`946` tests, green on both CI platforms with zero skips.
 
 | Works today | Not yet |
 | --- | --- |
@@ -84,11 +94,12 @@ the tool, not the history.
 - **No `eval`, no `new Function`.** The OpenUI backend walks a fixed vocabulary.
   A name that is not in the component table can never become an element.
 - **Verified on Linux and Windows.** CI runs the full suite on both and compares
-  the results test by test: **939/939 pass on Linux, 932/939 on Windows CI**, zero
-  skips on either, and no test failing on both platforms. The seven Windows
-  failures are documented with their root causes in
-  `docs/testing/PLATFORM-FAILURES.md`. A stock Windows box without Developer Mode
-  sees fifteen rather than seven, because it cannot create symlinks.
+  the results test by test: **946/946 pass on both**, zero skips on either, and
+  no test failing on both platforms. Locally, a stock Windows box without
+  Developer Mode reports `942 passed / 4 skipped`, because it cannot create a
+  file symlink: those four containment tests skip with the missing privilege
+  named, and CI runs them on both platforms. Root causes and what each covers:
+  `docs/testing/PLATFORM-FAILURES.md`.
 - **The build is reproducible across platforms.** `lib/client.js` has the same
   SHA-256 whether it is built on Windows or Linux, and CI asserts that every run.
 

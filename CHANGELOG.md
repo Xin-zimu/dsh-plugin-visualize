@@ -7,13 +7,14 @@ This file is written for people who use the plugin. The reasoning behind each
 decision lives in `docs/decisions/`, and the per-stage evidence in `docs/reports/`;
 neither belongs here.
 
-## [Unreleased]
+## [0.1.1] — 2026-11-06
+
+A patch release. No new components and no new actions: three **product defects**
+that v0.1.0 shipped are fixed, each of which had been classified as a Windows
+platform difference and accepted as one. They were found by investigating the 15
+test failures instead of counting them.
 
 ### Fixed
-
-Three **product defects** that v0.1.0 shipped, each of which had been classified as a
-Windows platform difference and accepted as one. They were found by investigating the
-15 test failures instead of counting them.
 
 - **A card the tool had just created could not be patched on Windows.** The tool reports
   a stored card's path with the home directory shortened to `~`, and on Windows that form
@@ -50,6 +51,23 @@ Windows platform difference and accepted as one. They were found by investigatin
 locally on a Windows machine without symlink privilege, where the four are exactly the
 tests that need it. At v0.1.0 the same suite was `924 passed / 15 failed / 939` on that
 machine.
+
+### Verified in a real host, not only by the suite
+
+The unit suite cannot show that a Windows user can create and then patch a card,
+so the release build was driven through a real DSH host whose harness home sits
+**under** the user's home directory — the condition `displayOf()` shortens a path
+under, and therefore the only condition in which the first defect can fire:
+
+- A model turn created a card and patched it in the same turn by handing back the
+  path the tool had reported, verbatim (`~\AppData\Local\Temp\…`), for both the
+  native `~\` and the POSIX `~/` form. The patched text is on disk.
+- The same `~\` path was **refused** by the v0.1.0 code and accepted by v0.1.1,
+  extracted side by side and run on the identical string — so the pass is not an
+  artefact of the test never having exercised it.
+- 16 traversal attempts through the widened reader still escape nowhere.
+- After a reload the conversation and its cards are still readable.
+
 ## [0.1.0] — 2026-11-06
 
 First release. The plugin is usable for its stated scope: one `visualize` tool,

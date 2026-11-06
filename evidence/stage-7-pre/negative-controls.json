@@ -1,0 +1,388 @@
+{
+ "controls": {
+  "R3_rename": {
+   "question": "does the retry earn the green, or does this machine simply not race?",
+   "oldCodeHasRetry": false,
+   "rounds": 25,
+   "writesPerRound": 8,
+   "oldCode": {
+    "failedWrites": 32,
+    "roundsWithAFailure": 22,
+    "errorCodes": [
+     "EPERM"
+    ],
+    "leakedTempFiles": 0
+   },
+   "newCode": {
+    "failedWrites": 0,
+    "roundsWithAFailure": 0,
+    "errorCodes": [],
+    "leakedTempFiles": 0
+   },
+   "perRound": {
+    "old": [
+     {
+      "round": 1,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 2,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 3,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 4,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 5,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 6,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 7,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 8,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 9,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 10,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 11,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 12,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 13,
+      "rejected": 3,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 14,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 15,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 16,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 17,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 18,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 19,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 20,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 21,
+      "rejected": 2,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 22,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 23,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 24,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 25,
+      "rejected": 1,
+      "codes": [
+       "EPERM"
+      ],
+      "leftoverTemps": 0
+     }
+    ],
+    "new": [
+     {
+      "round": 1,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 2,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 3,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 4,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 5,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 6,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 7,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 8,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 9,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 10,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 11,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 12,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 13,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 14,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 15,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 16,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 17,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 18,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 19,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 20,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 21,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 22,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 23,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 24,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     },
+     {
+      "round": 25,
+      "rejected": 0,
+      "codes": [],
+      "leftoverTemps": 0
+     }
+    ]
+   },
+   "controlValid": true,
+   "verdict": "PASS — old failed, new did not"
+  },
+  "R2_entryCheck": {
+   "question": "did the old code notice an aborted signal at entry, or only after doing the work?",
+   "v010_firstStatement": "const limits = options.limits ?? DEFAULT_IMAGE_LIMITS",
+   "v011_firstStatement": "options.signal?.throwIfAborted()",
+   "v010_checksSignalAtEntry": false,
+   "v011_checksSignalAtEntry": true,
+   "verdict": "PASS — the entry check is the difference between the two versions"
+  }
+ },
+ "verdict": {
+  "R3_renameControl": "PASS — old failed, new did not",
+  "R2_entryControl": "PASS — the entry check is the difference between the two versions"
+ }
+}
