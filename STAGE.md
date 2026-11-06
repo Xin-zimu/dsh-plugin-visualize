@@ -20,6 +20,8 @@ this says what the current slice is allowed to do.
 | 4B-2 | Re-testing the two deferrals against the real host | **CLOSED 2026-11-06 — investigation only.** Both are EXTENDABLE; neither ships. `docs/reports/PHASE-4B-2-INVESTIGATION.md` |
 | 5 | Unified prompt, security review, release | **DONE — released `v0.1.0` 2026-11-06** at `40b8241`. Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md` |
 | 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; **946/946 green on CI Linux and CI Windows (0 skipped on either)**, and 942 passed / 4 skipped / 946 locally, where the 4 are the tests that need a symlink privilege this machine lacks. `evidence/stage-6/` |
+| 7A | Host capability investigation + `@ToAssistant` ADR | **CLOSED 2026-11-07 — investigation only, no product code.** Installed host is **0.2.2-rc.1** (4B-2 read stale 0.2.1-rc.5). Confirmation now exists; **one** host change left (message attribution). `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md` |
+| 7B | `@ToAssistant` implementation | **Not started — blocked on the owner's decision on ADR-016 and on the upstream attribution change.** |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -643,3 +645,69 @@ The criteria, as originally written:
   probe and the upstream request are separate workstreams.
 - It will not raise the 5 s test timeout as a fix. If the wait is real work it gets
   diagnosed; if the bound is simply too low, that is a finding stated with numbers.
+
+---
+
+## Stage 7A — Host capability investigation and the `@ToAssistant` ADR
+
+**Closed 2026-11-07 — investigation only.** Scope set by the owner: find out what the
+installed DSH host actually offers, design `@ToAssistant`'s two preconditions as an ADR,
+record `@OpenUrl`, and answer one question: **does this require changing the DSH host?**
+No product code, no tag move, no release.
+
+### The premise this stage corrected on day one
+
+The Stage 4B-2 investigation read `tmp/dsh-host-src`, which is **0.2.1-rc.5**. The host
+installed here is **0.2.2-rc.1** (`@deepseek-ai/dsh-desktop`; 331 `@deepseek-ai` entries, 321 `dsh-*` at 0.2.2-rc.1;
+the app launches `app.asar/.../dsh-desktop-host/lib/cli.js`). Every 4B-2 `file:line` was
+therefore stale, `dsh-client-ui-slots` no longer exists as a package, and `dsh-action-cards`
+/ `dsh-client-ui-action-cards` are new. Provenance: `evidence/stage-7a/host-provenance.md`.
+
+### The answer
+
+| Question | Answer |
+| --- | --- |
+| Does `@ToAssistant` require a host change? | **Yes — one.** Host-validated, rendered **message attribution**. Submission, role enforcement and a host-rendered confirmation the card cannot fake already exist. |
+| Does `@OpenUrl` require a host change? | **Yes, unchanged** — no plugin-callable external open exists in 0.2.2-rc.1. |
+
+The confirmation no longer needs asking for: `ctx.userQuestions.ask()` is a host service with
+**no turn check**, renders in the host composer outside the card iframe, and returns the
+answer. The approval panel is a second, audited surface but is turn-bound (it throws outside
+an open turn), so it cannot serve a card click between turns. Message attribution is the
+remaining gap: the prompt wire has no source field, the host hardcodes `kind:'user'`, and
+the transcript renders it as an unattributed bubble.
+
+### Three-way classification (full table in the report)
+
+| Capability | State |
+| --- | --- |
+| Message submission from plugin code | **exists and is usable** (`inputActions`, `session.prompt`, `agent.steer`) |
+| Session + tool-call identity, frame cannot forge it | **exists and is usable** (slot props; opaque-origin iframe) |
+| Host-rendered confirmation (plugin-callable) | **exists and is usable** (`userQuestions.ask`; approval panel in-turn only) |
+| Verifiable submission result | **partial** — admission at plugin level; nothing at card level; delivery not observable per submission; archived sessions accept then block |
+| Message-level card attribution | **absent** |
+| Plugin-callable external open (`@OpenUrl`) | **absent** |
+
+### Exit criteria — all met
+
+| Criterion | Evidence |
+| --- | --- |
+| Host surface read from the installed host, not inferred | `evidence/stage-7a/host-provenance.{md,json}`, `asar-tool.mjs` (per-file SHA-256 against the asar) |
+| Every conclusion carries source path / interface / call chain, graded Read/Type/Ran | `submit-capability.md`, `attribution-capability.md`, `confirmation-and-openurl.md` |
+| Three-way classification (usable / internal-only / absent) | report §2 |
+| At least two comparable design options, responsibilities, minimal interfaces, trust boundary, failure/cancel/timeout, security and compatibility cost, test methods | `ADR-016` §3–§8 |
+| `@OpenUrl` recorded, not re-pointed at an unequal semantic | report §5; ADR-014 unchanged |
+| **The exit question answered explicitly** | report §6: one host change (`@ToAssistant` attribution), one for `@OpenUrl` |
+| No product code, no tag, no release | `git diff --stat` for this stage: docs + evidence only |
+
+### Stage 7B — planned, not authorised
+
+**Gate 1: the owner's decision on ADR-016.** Recommended Option B (request the attribution
+change upstream); Option A (plugin-only) is rejected under ADR-015's unchanged requirements;
+Option C adds a dedicated confirmation API if upstream wants the full surface.
+
+**Gate 2: the upstream change landing** — a host-validated `origin` claim on the prompt
+admission path plus a rendered marker on the delivered user turn (contract in ADR-016 §3).
+
+Then implementation under ADR-016 §6, against the acceptance criteria in §8 and the 12 new
+security cases in §7. `@OpenUrl` continues as a separate upstream request (ADR-014).

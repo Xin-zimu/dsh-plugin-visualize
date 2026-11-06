@@ -14,14 +14,16 @@ to the history. If you are an agent starting work, read this first.
 | Branch | `main` |
 | HEAD | see `git log -1` |
 | Upstream baseline | dsh-visualize `cf6b3a3`, dsh-intelligent-ui `0b08749`, open-intelligent-ui `16ef264` |
+| **Installed DSH host** | **0.2.2-rc.1** (`@deepseek-ai/dsh-desktop`; asar header; 331 `@deepseek-ai` entries, 321 `dsh-*` at 0.2.2-rc.1) |
+| **Plugin compile baseline** | 0.2.1-rc.5 (`node_modules/@deepseek-ai/*` devDeps) — a recorded skew, see §6 |
 
 ## 2. Current stage
 
 | Field | Value |
 | --- | --- |
-| Stage | 4A-4 **ACCEPTED 2026-11-04** — Table, Chart, Icon and Image render in a real DSH host (34 of 48); 4A-5 remains |
-| Goal | Stage 4A: turn the 48 signatures the language understands into components the browser draws, five batches |
-| Status | **4A-4 ACCEPTED** (34 of 48 render), on a **cleaned history**: the unpublished commits were rebuilt on 2026-11-04 to remove a leaked session token and username from `b73bd6a` (see §traps and Session 17). Tree `4d50897…` is byte-identical before and after; `origin/main` is unchanged and unpushed. 4A-3 was accepted earlier the same day after its browser run (V1–V5, all eleven input components). 4A-4 added Table, Chart, Icon and Image, with two ADRs deciding the security shape before the code: ADR-009 (Image source allowlist) and ADR-010 (Chart row contract). Both batches have browser evidence with the §9 hash gate passing first. **4A-1, 4A-2 PASS** (19 of 48 at the time), **infra-1 COMPLETE** — 2026-11-03/04. The three accepted phases are **committed** (`5d2a3e9` → rewritten as `014dc9b`). **The repository was published to GitHub on 2026-11-04 after a history rewrite; see §2a.** |
+| Stage | **7A CLOSED 2026-11-07** — host capability investigation + `@ToAssistant` ADR, investigation only. **7B not started**, blocked on the owner's ADR-016 decision and an upstream change. |
+| Goal | Restore the two deferred external actions honestly: `@ToAssistant` first, then `@OpenUrl`. |
+| Status | **`@ToAssistant` needs exactly one host change** (host-validated message attribution); submission, role enforcement and a host-rendered, card-unforgeable confirmation already exist in 0.2.2-rc.1. **`@OpenUrl` is unchanged**: still no plugin-callable external open. Deliverables: `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md`, `evidence/stage-7a/`. **No product code was changed; the action stays refused.** Earlier stages: 6 closed (946/946 CI), v0.1.1 released 2026-11-06, 4B-2 closed 2026-11-06. |
 
 ## 2a. Published, and what publishing cost
 
@@ -425,6 +427,10 @@ differential was re-run and still reports **31/31, 0 differences**
 | A fresh agent tab is `about:blank` and cannot be synced | `cooperate sync` fails with "Receiving end does not exist" until the tab navigates, because the content script is not injected | Recorded in 4A-5; navigate before the first sync |
 | R2's "an aborted call writes nothing" check did not discriminate | The same assertion passes with the fix absent, because `legacy-tool.ts:339` throws after image resolution in both versions | **Closed 2026-11-07 for the workspace-image create path** — the mutant control shows the pre-fix shape reads the workspace image and leaves an orphan image file; the shipped build does neither (`evidence/stage-7-pre/r2-mutant-control.json`) |
 | Tag `v0.1.1`'s own `CHANGELOG.md` still carries the removed temp-file-leak sentence | Anyone reading the tagged tree sees text that main has corrected | **Deliberate, not a defect to fix by releasing.** The tag was not moved; the corrections are a later commit on main (`cdc9868`) and the GitHub Release page was edited in place. A v0.1.2 would ship byte-identical `lib/` and would not change the v0.1.1 tree |
+| **Host version skew** | The plugin compiles against 0.2.1-rc.5 types but runs on the installed **0.2.2-rc.1** desktop host; 0.2.2 ships no `.d.ts`, and `peerDependencies: ^0.2.1-0` does not admit `0.2.2-rc.1` under strict semver | **Recorded 2026-11-07 (Stage 7A).** Runtime compatibility is unverified; the v0.1.1 browser evidence ran on the 0.2.1-rc.5 host. Needs its own stage before claiming 0.2.2 support |
+| **`@ToAssistant` still refused** | Needs one upstream host change: host-validated message attribution | **ADR-016 Proposed, awaiting owner.** No implementation authorised |
+| **No host-read bytes in the confirmation** | `userQuestions.ask` renders caller-supplied `detail`; the host does not verify it equals a durable message | Accepted residual in ADR-016 §10; the plugin must show the same string it submits, and a test must pin byte equality |
+| **`@OpenUrl` still refused** | No plugin-callable external open in 0.2.2-rc.1 | Unchanged; upstream ask stands (ADR-014 §10.4) |
 
 ## 7. Next step
 
@@ -441,25 +447,23 @@ byte-identical `lib/` (the version string does not enter the bundle) and would
 announce a change to users while the v0.1.1 tree still reads as before. The
 correction is already on `main` (`cdc9868`) and on the Release page.
 
-**Next is Stage 7 — restoring the two external actions, in this order:**
+**Stage 7A is CLOSED (2026-11-07). The decision now needed is ADR-016's.**
+The host investigation is done against the installed **0.2.2-rc.1** — not the stale
+0.2.1-rc.5 tree that 4B-2 read — and it narrows `@ToAssistant` from two host gaps to one:
 
-1. **`@ToAssistant` first.** The contract already gives every session-scope card
-   `inputActions`, and role escalation is structurally impossible because the
-   host builds the message source (ADR-015 §10, verified by a type probe in
-   `evidence/4b2/`). What is missing is the two properties that decide it: a
-   card-attributed source the transcript renders, and a confirmation the card
-   cannot fake. The first is an upstream host change; the second is a
-   consent-surface design problem this side owns.
-2. **`@OpenUrl` second.** It waits on a plugin-callable open-external API. The
-   host's own link gesture is `ctx.sidebarRight.openTab('browser', { params: { url } })`,
-   and it is still not this action: it docks a tab inside the DSH window rather
-   than opening the reader's browser, and an iframe refusal there is
-   unobservable — the silent failure ADR-014 exists to prevent. Do not re-point
-   the action at the sidebar to make it "work".
+1. **`@ToAssistant`** — submission (three plugin paths), role enforcement (the host builds
+   `kind:'user'`) and a host-rendered confirmation the card cannot fake
+   (`ctx.userQuestions.ask`; no turn check in the service, but the between-turn live-root
+   gate is unverified) all exist. **The one missing piece is
+   message attribution**: the prompt wire has no provenance field, the host hardcodes the
+   source, and the transcript renders an unattributed user bubble. `ADR-016` proposes
+   **Option B** — request that one upstream change, then implement. It is **Proposed,
+   awaiting the owner**; the action stays refused until a decision is recorded.
+2. **`@OpenUrl`** — unchanged: still no plugin-callable external open in 0.2.2-rc.1. The
+   sidebar tab is not this action, and the upstream ask stands (ADR-014 §10.4).
 
-Both are recorded as deferred **with their conditions written down**, so they are
-evaluated rather than rediscovered. Neither should ride along with a patch
-release; that is why they are not in v0.1.1.
+No implementation is authorised by Stage 7A. Stage 7B begins only after (a) the owner's
+ADR-016 decision and (b) the upstream attribution change, if Option B is chosen.
 
 ~~Stage 4A is closed at 48 / 48.~~ — historical, kept for the shape of the note.
 ~~4A-4 is accepted. Next is 4A-5~~ — the fourteen that remain: the ten SVG
@@ -645,6 +649,87 @@ Six things carried forward:
 ---
 
 ## History
+
+### Session 29 — 2026-11-07 (Stage 7A: host capability evidence + `@ToAssistant` ADR)
+
+**Closed Stage 7A. No product code, no version bump, tag untouched.** Deliverables:
+`docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md`,
+`evidence/stage-7a/` (six files), this file's §1/§2/§6/§7.
+
+### The premise this session had to correct before it could answer anything
+
+Stage 4B-2 read `tmp/dsh-host-src` and cited it as "the installed asar". It is
+**0.2.1-rc.5**. The installed desktop host is **0.2.2-rc.1**: the asar header names
+`@deepseek-ai/dsh-desktop` 0.2.2-rc.1, its bundled runtime is 0.2.2-rc.1; of the **331**
+`@deepseek-ai` entries, **321** `dsh-*` packages are 0.2.2-rc.1 (10 others carry their own
+versions), and `resources/runtime/cli/bin/dsh.cmd` launches
+`app.asar/.../dsh-desktop-host/lib/cli.js`. The stale tree's files differ by hash from the
+installed ones (`evidence/stage-7a/host-provenance.json`).
+
+Consequences that changed the stage's answer: `dsh-client-ui-slots` no longer exists as a
+package (its `SlotCore` is a web-shell builtin), 0.2.2 packages ship no `.d.ts`, and
+`dsh-action-cards` / `dsh-client-ui-action-cards` are new. Every old `file:line` is
+therefore unusable, and the whole capability question had to be re-derived.
+
+`tmp/dsh-host-0.2.2-rc.1/` was extracted with a small asar reader that verifies each file
+against the archive's own SHA-256 before writing it (`evidence/stage-7a/asar-tool.mjs`);
+the reader's first parse was wrong (nested pickle sizes) and was corrected against a
+hexdump before any evidence was recorded.
+
+### What the three investigations found (Lead verified the decisive lines)
+
+| Question | Result |
+| --- | --- |
+| Card-initiated submission | **Yes** — `inputActions.setDraft/submit` (slot prop), `session.prompt` Remote via a retained session, `agent.steer`. `submit()` is `(): void` and forces queue mode (`conversation:15392-15394`, Lead-verified). |
+| Verifiable result | **No at card level; partial at plugin level.** Acceptance `{accepted:true}` only; delivery goes to the composer via `onRetire("observed")`; an archived session accepts then blocks the turn silently. |
+| Trusted identity | `sessionId` + tool `callId` are host-supplied and the opaque-origin iframe cannot forge them; turn is only in start-stage blocks / durable events / turn-tail. |
+| Confirmation the card cannot fake | **Exists in source and is plugin-callable**: `ctx.userQuestions.ask()` (no turn check in the service; host-rendered; the browser answerer needs the live root agent — between-turn liveness unverified). The approval panel is a second audited surface but **throws outside an open turn**. Neither shows host-read message bytes; `detail` is re-rendered as Markdown |
+| Message attribution | **Absent.** The prompt wire has no source field; the host builds `{kind:'user', rpcId, clientTimeZone, principal}` (`session-controller/index.js:4048-4061`, Lead-verified); `MessageSourceMap` has no card kind; `'user'` renders as a plain bubble. |
+| `@OpenUrl` | **Absent, unchanged** — `shell.openExternal` is Electron-main policy only; the sidebar tab is the only mediated open; `open-in-app` is directory-only. |
+
+### The answer the stage was asked for
+
+**`@ToAssistant` requires exactly one host change** — host-validated, rendered message
+attribution. The confirmation requirement no longer needs requesting: it is available via
+`userQuestions.ask`, which changes ADR-015's premise without relaxing any of its
+requirements. **`@OpenUrl` requires a separate host change** (plugin-callable external open),
+as ADR-014 already recorded.
+
+`ADR-016` lays out three options and recommends **Option B** (request only the attribution
+change, then implement). Option A (plugin-only, notice-row attribution) is rejected under
+ADR-015's unchanged requirements; Option C (dedicated message-bound confirmation API) is the
+larger ask if upstream prefers a complete surface. The ADR is **Proposed**; no decision is
+recorded, and the action stays refused.
+
+### Method, and what it cost
+
+Three read-only investigators worked in parallel on disjoint evidence files
+(`submit-capability.md`, `attribution-capability.md`, `confirmation-and-openurl.md`), each
+claiming a shared task; the Lead independently verified the load-bearing lines (`submit`,
+prompt source construction, `ask()`'s missing turn check, approval's turn check, no card
+source kind, action-cards composition) rather than trusting the summaries. Every claim is
+graded **Read** / **Type** / **Ran**; nothing was executed against the host, so nothing is
+claimed as verified behaviour.
+
+Two version-skew residuals were found and recorded rather than hidden: the plugin's compile
+baseline is 0.2.1-rc.5, and `peerDependencies: ^0.2.1-0` does not admit `0.2.2-rc.1` under
+strict semver.
+
+### Commands run, and their output
+
+`node tmp/probes/asar-provenance.mjs` → exit 0 (0.2.2-rc.1 vs 0.2.1-rc.5, hashes differ);
+`node tmp/probes/asar-tool.mjs extract …` → exit 0 (every file SHA-256-verified);
+`node tmp/probes/asar-inventory.mjs` → 331 entries, 321 `dsh-*` at 0.2.2-rc.1, 10 independently versioned; plus the `Select-String`
+searches recorded inside the three evidence files. No test suite run: no file under `src/`
+or `tests/` changed.
+
+**Deliberately not done:** no dispatcher change, no card↔host channel, no tag move, no
+release, no browser run. Stage 7B starts only after the owner's decision.
+
+**Push pending:** the docs/evidence commit is local (`ef897a6`); `git push origin main`
+failed because the configured proxy `http://127.0.0.1:7890` was not listening. No CI run was
+triggered. Retry the push (and let CI run) when the proxy is back; nothing in the commit
+depends on it.
 
 ### Session 28 — 2026-11-07 (R2 made discriminating; no release)
 

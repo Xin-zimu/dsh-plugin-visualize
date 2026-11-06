@@ -1,12 +1,15 @@
 # ADR-015 — `@ToAssistant`: sending content to the assistant
 
-- **Status:** **Deferred — two required properties have no host capability.** The
-  action stays refused, and no interim implementation is written.
+- **Status:** **Deferred — one required property has no host capability.**
+  **Amended 2026-11-07 — see §11.** §10.3's claim that no plugin-callable confirmation
+  exists is superseded: the installed host is 0.2.2-rc.1 (not the 0.2.1-rc.5 tree §10 read),
+  and it provides, in source, a host-rendered confirmation a card cannot fake — with the
+  between-turn live-root condition left to verify. The missing property is
+  **attribution**. Requirements unchanged; the action stays refused. Decision now tracked in
+  `ADR-016-TO-ASSISTANT-STAGE-7A.md` (Proposed).
   **Amended 2026-11-06.** The original stated reason — "trusted host submission
-  capability unavailable" — is **false** and is corrected in §10. A turn-submit
-  path exists and is reachable from this plugin; what does *not* exist is card
-  attribution and a host-rendered confirmation the card cannot fake. The status is
-  unchanged and **no requirement was relaxed**.
+  capability unavailable" — is **false** and was corrected in §10. A turn-submit
+  path exists and is reachable from this plugin.
 - **Date:** 2026-11-05 (amended 2026-11-06)
 - **Relates to:** `ADR-4B-THREAT-MODEL.md`, ADR-004 (boundaries), ADR-006
   (`$state` persistence), `src/client/openui-actions.ts`
@@ -370,4 +373,29 @@ probe, a satisfied `@ts-expect-error` negative control, and a mutation that fail
 with `TS2339 … does not exist on type 'InputActions'`
 (`evidence/4b2/inputactions-type-probe.*`). **No runtime submission was
 performed**, and nothing here is claimed as verified behaviour.
+
+---
+
+## 11. Amendment 2026-11-07 — Stage 7A re-read the **installed** host
+
+Appended, not substituted. §10 read `tmp/dsh-host-src`, which is DSH **0.2.1-rc.5**; the
+installed desktop host is **0.2.2-rc.1** (asar header; 331 `@deepseek-ai` entries, 321 `dsh-*` at 0.2.2-rc.1). Every
+`file:line` in §10 is therefore from a tree that is not running. Stage 7A re-derived the
+§10.3/§10.4 blockers against the installed host:
+
+| §5 property | §10 said | Against 0.2.2-rc.1 |
+| --- | --- | --- |
+| A host-rendered confirmation the card cannot fake | no plugin-callable surface | **available in source** — `ctx.userQuestions.ask()` is a host service with no turn check, rendered in the host composer outside the card iframe (`evidence/stage-7a/confirmation-and-openurl.md`); the browser answerer requires the live root agent, so between-turn availability is a Stage 7B gate. The approval panel is a second, audited surface but throws outside an open turn, so it cannot serve a card click between turns |
+| Attribution visible on the delivered turn | no host capability | **still absent** — the prompt wire has no provenance field and the host builds `kind:'user'` (`dsh-api-session-controller/lib/index.js:4048-4061`); the transcript renders no marker |
+| Role is not an argument | host-enforced | still host-enforced |
+
+**One of the two stated blockers is superseded; no requirement is relaxed and the action
+stays refused.** The open decision — including the recommended shape of the remaining
+upstream attribution change — is `ADR-016-TO-ASSISTANT-STAGE-7A.md` (Proposed, awaiting the
+owner); the full investigation is `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`.
+
+Also superseded by the version change: `dsh-client-ui-slots` no longer exists as a package
+(its `SlotCore` is a web-shell builtin), 0.2.2 packages ship no `.d.ts`, and
+`dsh-action-cards` is a new host mechanism (post-turn, model-proposed — not a general
+confirmation channel).
 

@@ -1,0 +1,51 @@
+{
+ "asar": {
+  "path": "C:/Users/<user>\\AppData\\Local/Programs/DeepSeek Harness/resources/app.asar",
+  "bytes": 213202918,
+  "mtimeNote": "see Get-Item"
+ },
+ "headerBytes": 5748124,
+ "dataStart": 5748140,
+ "rootPackage": {
+  "name": "@deepseek-ai/dsh-desktop",
+  "version": "0.2.2-rc.1"
+ },
+ "dshPackage": {
+  "name": "@deepseek-ai/dsh-desktop-runtime",
+  "version": "0.2.2-rc.1"
+ },
+ "probe": [
+  {
+   "file": "dsh-client-ui-conversation/lib/client.js",
+   "inAsar": true,
+   "inExtractedTree": true,
+   "identical": false,
+   "asarSha256": "210640100a1431a31a307f31d8258801d0042bec60b4c4a18576b6775487d73e",
+   "treeSha256": "fd8ee6c74845d017c2d0e2e6fb62fc655c42b084b1b014da08e1ef7355e3e984"
+  },
+  {
+   "file": "dsh-client-ui-slots/lib/types/index.d.ts",
+   "inAsar": false,
+   "inExtractedTree": false,
+   "identical": false,
+   "asarSha256": null,
+   "treeSha256": null
+  },
+  {
+   "file": "dsh-api-session-controller/lib/index.js",
+   "inAsar": true,
+   "inExtractedTree": true,
+   "identical": false,
+   "asarSha256": "4cf6c66e65cce865d270fa89405b96d048ffa62e493e4ffbd1a826be2207a4cd",
+   "treeSha256": "a9801acb577b03053c5d5a3191ff555c5f1d791d0acddec113bea4511e33b386"
+  },
+  {
+   "file": "dsh-client-ui-approval/lib/client.js",
+   "inAsar": true,
+   "inExtractedTree": true,
+   "identical": false,
+   "asarSha256": "45978b9dd4fc623dc34e3de0f031a73b265456dd723743f7f987ddca1b93f38c",
+   "treeSha256": "6149f7ae714c84e8d91fda2c6905390526e22ea61dba2bb58b68f0d633566538"
+  }
+ ]
+}
