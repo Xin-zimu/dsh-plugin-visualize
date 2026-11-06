@@ -28,9 +28,10 @@ test failures instead of counting them.
   threw the result away.
 - **Creating the same card concurrently could fail on Windows.** The atomic-write helper
   assumed distinct temporary names were enough for concurrent renames to both land. On
-  Windows a second rename onto a live destination can return `EPERM`; under contention
-  1–3 of 8 concurrent writes failed and leaked temporary files. The rename is now retried
-  briefly.
+  Windows a second rename onto a live destination can return `EPERM`; under contention 1–3
+  of 8 concurrent writes failed. The rename is now retried briefly, with `EEXIST`
+  deliberately excluded — for a rename it means the destination is a directory, and no
+  retry fixes that.
 
 ### Changed
 
@@ -60,13 +61,18 @@ so the release build was driven through a real DSH host whose harness home sits
 under, and therefore the only condition in which the first defect can fire:
 
 - A model turn created a card and patched it in the same turn by handing back the
-  path the tool had reported, verbatim (`~\AppData\Local\Temp\…`), for both the
-  native `~\` and the POSIX `~/` form. The patched text is on disk.
+  path the tool had reported, verbatim (`~\AppData\Local\Temp\…`) — the native
+  Windows form, which is the form that was broken. The patched text is on disk.
+- The POSIX `~/` form is covered at reader level rather than in that run: the same
+  two functions accept it (it was never broken), and the unit tests pin it.
 - The same `~\` path was **refused** by the v0.1.0 code and accepted by v0.1.1,
   extracted side by side and run on the identical string — so the pass is not an
   artefact of the test never having exercised it.
 - 16 traversal attempts through the widened reader still escape nowhere.
-- After a reload the conversation and its cards are still readable.
+- After a reload the conversation is still readable and no history-error banner
+  appears. (The cards themselves are drawn in the conversation's frames, not as
+  elements the probe counts, so this run speaks to the conversation, not to a
+  card count.)
 
 ## [0.1.0] — 2026-11-06
 

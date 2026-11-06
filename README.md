@@ -23,7 +23,7 @@ failures v0.1.0 accepted as platform behaviour turned out to be **product bugs**
 that Windows merely exposed: a `~`-shortened card path the tool reported but
 would refuse when handed back, a cancelled call that still read the workspace,
 fetched images and wrote to the store, and a concurrent `rename` that could fail
-and leak a temporary file. Investigating the rest also found that one filed-off
+and make creating the same card fail with `EPERM`. Investigating the rest also found that one filed-off
 "slow test" was a 39 ms failure behind a timeout mask, and that one accused
 fixture was an assertion that had never been able to match. The suite is now
 `946` tests, green on both CI platforms with zero skips.

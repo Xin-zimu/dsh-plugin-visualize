@@ -739,6 +739,21 @@ Evidence under `evidence/stage-7-pre/`, home paths redacted with
 `evidence/lib/redact.mjs` before committing (this session's first scan hit three
 JSON files; after redaction the scan is clean).
 
+### Session 27 — addendum (post-release corrections)
+
+After the tag was pushed, an independent read-only review of vidence/stage-7-pre/ found three defects in the release documents. All three were re-verified here before being acted on; a fourth finding was disproved.
+
+**1. The temp-file leak claim was false, and is removed.** CHANGELOG.md said the concurrent rename "failed and leaked temporary files", and README.md repeated it. Measured directly: v0.1.0's own writeFileAtomic catch block already runs rm(temp, { force: true }) for any code other than EEXIST, so a forced EPERM (destination made a non-empty directory) left **zero** .tmp files. The claim came from the *text* of the error message — which names a temp path — not from a file left on disk. No artefact anywhere under evidence/ measures a leaked temp file. Corrected in both files.
+
+**2. The host run proved the native form only.** The changelog said the turn patched the card "for both the native ~\ and the POSIX ~/ form". Both browser JSONs contain **zero** ~/ occurrences. The POSIX form is covered at reader level and by unit tests, not by that run. Reworded so each claim names the evidence that carries it.
+
+**3. "After a reload the conversation and its cards are still readable" overstated.** The probes record cardsAfterReload: 0 with framesAfterReload: 6/9. Readability of the conversation is supported; a card count is not. Reworded.
+
+**Disproved:** a finding that the certifying CI run predates the version bump. Run 42170037015 is on 50b6b54, whose package.json already reads 0.1.1.
+
+**Open — the one thing not finished.** R2's control does not discriminate. legacy-tool.ts:339 calls signal?.throwIfAborted() *after* image resolution in **both** versions, so any aborted call throws and writes nothing regardless of the entry check; the recorded R2 evidence would look identical if the fix were absent. The discriminator is the work done *before* the abort is noticed — workspace image reads, and image bytes written into the store. A probe that builds a mutant bundle with the entry check deleted and measures those two exists at 	mp/probes/v011-r2-mutant-control.mjs and **has not been run**. Treat the artefact-level R2 in rtefact-regression.json as NOT PROVEN until it is.
+
+**Carry-forward:** tag v0.1.1 still points at 50b6b54, whose CHANGELOG.md carries the removed leak sentence. The corrections are a later commit on main; the tagged tree's text cannot be changed without moving the tag, which was deliberately not done. The GitHub Release notes were edited in place instead.
 ### Session 26 — 2026-11-06 (Stage 6: three product bugs behind the "platform failures")
 
 **Stage 6 closed. The suite is green on every platform: 946/946 on CI Linux and CI
