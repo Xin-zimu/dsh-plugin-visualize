@@ -124,7 +124,18 @@ machine would not tell you. The CI Windows runner would. The release therefore d
 for that class of defect, not on the local suite. That is a real dependency and it is why the
 CI workflow is load-bearing rather than decorative.
 
-### C2 — one timeout has no diagnosis
+### C2 — one timeout had no diagnosis *(resolved in stage 6; see below)*
+
+> **CORRECTED 2026-11-06.** This caveat was right to refuse the label "slow machine",
+> and the diagnosis it asked for has now been made. It was **not** a timeout at all:
+> the update failed in ~39 ms, the test awaited a promise only the un-called fetch stub
+> could resolve, and vitest reported the bound as `STACK_TRACE_ERROR`. The root cause was
+> the `~` round-trip bug — a **product defect**, not an environment one. Raising the bound
+> would have hidden it permanently. `evidence/stage-6/timeout-diagnosis.md`.
+>
+> The original text is kept below because the reasoning was sound even though the
+> conclusion it pointed at was wrong.
+
 
 `leaves the card untouched when an update is cancelled…` fails at **5020.7 ms** with
 `STACK_TRACE_ERROR`. That is the 5-second bound, and no assertion was contradicted. It is
@@ -156,7 +167,7 @@ figure is **13 platform-shaped, 2 fixture-shaped**. Recommendations R2 and R3.
 
 | # | Action | Class |
 | --- | --- | --- |
-| R1 | Investigate the 5020 ms timeout — raise the bound or find what stalls. A timeout is not a diagnosis | NON-BLOCKER |
+| ~~R1~~ | Investigate the 5020 ms timeout | **CLOSED 2026-11-06 (stage 6)** — diagnosed, and it was neither slowness nor a need to raise the bound. See the C2 correction below. 
 | R2 | Give the image test's `ctx.fs` mock a `readText`, so #2 stops failing for a reason unrelated to what it checks | NON-BLOCKER |
 | R3 | Register a skill provider in the `tool.spec.ts` fixture, or read the generator directly as `capability-consistency.spec.ts` does | NON-BLOCKER |
 | R4 | Fix the `~` fixtures to use `os.homedir()`, which is what the product already does | NON-BLOCKER |

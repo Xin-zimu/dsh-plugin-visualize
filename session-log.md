@@ -614,6 +614,121 @@ Six things carried forward:
 
 ## History
 
+### Session 26 — 2026-11-06 (Stage 6: three product bugs behind the "platform failures")
+
+**Stage 6 closed. The suite is green on every platform: 946/946 on CI Linux and CI
+Windows, 942 passed / 4 skipped locally.**
+
+The headline is not the green. It is that **three of the five causes v0.1.0 classified as
+platform behaviour were product bugs**, and the classification is what kept them alive:
+an error message naming an OS mechanism reads as environmental even when the product put
+it in that position.
+
+| v0.1.0 label | Reality |
+| --- | --- |
+| 6 symlink tests, platform | platform, confirmed — capability genuinely absent |
+| 4 `~` path failures, platform | **product bug 1** |
+| 1 timeout, platform | **product bug 2**, and the *mask* was a test shape |
+| 1 rename EPERM, platform | **product bug 3** |
+| 1 fs mock, fixture | fixture, confirmed — `readText` is a real API |
+| 1 description fixture, fixture | **false accusation** — the assertion was mis-written |
+
+### The three product bugs
+
+1. **`~` round trip broken on Windows.** `displayOf()` emits `~` + the native separator,
+   so `~\AppData\…`; both readers accepted only `~/`. **The tool handed back a path it
+   would refuse.** Linux CI could not see it because `tmpdir()` is `/tmp` there — outside
+   `homedir()` — so `displayOf()` is a no-op for every temp path. On Windows `tmpdir()` is
+   inside `homedir()`, so every temp path is shortened and the bug fires. Fixed by widening
+   the readers, not the producer: the same string is pasted into `update` *and* into a
+   shell, and on Windows the native form is what those accept.
+
+2. **The 5,020 ms "timeout" was a 39 ms failure wearing a mask.** `created.path` is the
+   display form, the test handed it back, `ownedPath()` refused it and `workspacePath()`
+   then *accepted* it as workspace-relative (the literal `~` directory exists inside the
+   workspace). The update was misrouted and died before `resolveCardImages`, so the test's
+   `fetchUrl` stub never ran, so the promise it awaited could never settle. The update had
+   already rejected — nothing awaited it until after the gate — and `STACK_TRACE_ERROR` is
+   vitest's sentinel for a timeout, which overwrote the useful message. **The real error was
+   printed in the same output, under Unhandled Errors, for two stages.** Stage 5's note
+   "a timeout is not a diagnosis" was right, and the diagnosis was already there.
+
+3. **Concurrent rename returns EPERM on Windows.** `writeFileAtomic`'s comment asserted
+   distinct temp names were enough. Measured: 1–3 of 8 concurrent renames failed and leaked
+   `.tmp` files. Bounded retry added (20 attempts, 5 ms, EPERM/EBUSY/EACCES). `EEXIST` is
+   deliberately *not* retried: for a rename it means the destination is a directory, and it
+   is also the code used for "temp name taken", so retrying would leak the temp file.
+
+Plus a fourth, smaller one: `resolveCardImages()` never checked the signal at entry, so a
+call cancelled before it started still did workspace reads, fetched images and **wrote to
+the store**, then discarded the result. One line at the entry point.
+
+### The false accusation
+
+`tool.spec.ts` was recorded as a fixture defect: "no skill provider registered, so the
+description cannot name the contract". Both halves were wrong. `SKILL_BODY_PATH` is a
+compile-time constant, so no provider affects it, and the description *does* name the file —
+the assertion's `(\S+\.md)` cannot match a path containing a space, and this checkout is
+`D:\Deepseek WorkSpace\…`. **The test only ever passed on space-free checkouts.**
+I replaced it with a stronger assertion (absolute, exists, regular `.md`, and the three
+relative references the sentence promises). Nothing was relaxed.
+
+### The symlink item, decided rather than dodged
+
+Measured the machine's real capability: file symlink EPERM, directory symlink EPERM,
+directory **junction** OK, file hardlink OK, junction `realpath` resolves through.
+
+Six containment tests needed a symlink. Each was **split at the capability boundary**:
+
+- The directory-escape halves now run everywhere using a junction — a real reparse point,
+  so the same containment check executes. **Four security assertions kept live locally**
+  that would otherwise have been deferred.
+- The four file-symlink halves keep their real symlink and skip visibly, naming
+  `SeCreateSymbolicLinkPrivilege`. A hardlink was rejected as a substitute: it shares an
+  inode, so the file is not reached *through* a link, `realpath` cannot see it, and the
+  property would not exist — a test that looked green while checking something else.
+
+**The skips are proven not to be a hiding place:** CI runs the same commit with **0
+skips** on both platforms and 946 passed. Locally 4 skip; there 0 do.
+
+### Process failure worth recording
+
+Two of my own measurements were wrong because agents were writing while I ran the suite:
+one read 902 tests with a transform error, another showed a `TypeError` from a half-written
+file. I added a quiet-tree guard (no `src/`/`tests/` write in the last 30–60 s, verified
+again after) before trusting any number. **In a shared writable tree a test count is
+meaningless without an mtime guard attached to it** — the same conclusion the tilde agent
+reached independently.
+
+### Verification
+
+| Command | Result |
+| --- | --- |
+| `npx tsc -p tsconfig.json` | exit 0 |
+| `npx tsc -p tsconfig.client.json` | exit 0 |
+| `npx vitest run` (local, quiet tree) | **942 passed / 0 failed / 4 skipped / 946**, exit 0 |
+| CI `42154196690` Linux | **946 / 0 / 0** |
+| CI `42154196690` Windows | **946 / 0 / 0**, `baseline 15, found 0, new 0` |
+| Bundle hash, both CI legs | `e1bf4a82…31456ceb`, `BUILDS IDENTICAL` |
+
+35 evidence artefacts under `evidence/stage-6/`, every fix red-then-green:
+`tilde-red-A-without-tilde-fix.txt`, `tilde-red-B-without-rename-retry.txt`,
+`abort-entry-red.txt`, `fixtures-d2-mutation-red-raw.txt`,
+`timeout-regression-proof.txt`.
+
+### Docs corrected
+
+`tools/classify-failures.mjs` no longer calls the `timeout` cause a slow machine.
+`PLATFORM-FAILURES.md`, `FAILURE-ADJUDICATION.md` (R1/C2), `PHASE-5-AUDIT.md` (N3) and
+`PHASE-5-FINAL-GATE.md` (C2) are annotated as resolved rather than rewritten; the original
+reasoning is kept because it was sound even where its conclusion was wrong.
+
+### Not done
+
+No new tag. `v0.1.0` remains the released version; the stage-6 fixes sit on `main` under
+`[Unreleased]` and a 0.1.1 release is the owner's decision.
+
+---
 ### Session 25 — 2026-11-06 (v0.1.0 released)
 
 **Stage 5 closed. Released `v0.1.0` at `40b8241`, tag and GitHub Release both

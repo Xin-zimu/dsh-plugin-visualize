@@ -182,7 +182,7 @@ Two things, stated plainly:
 | ~~NON-BLOCKER~~ | Run the suite once on POSIX and record it | **DONE** — 939/939, `evidence/phase-5/C2-cross-platform.json` |
 | ~~DEFERRED~~ | Add CI with a Windows job and a Linux job | **DONE** — `.github/workflows/verify.yml`, run `42003251408` green |
 | **NON-BLOCKER** | Fix the `~` fixtures to use `os.homedir()` instead of a literal `~`, which is what the product already does | open |
-| **NON-BLOCKER** | Investigate the 5 s timeout: it is a slow-machine timeout, not a contradicted assertion, and raising the bound may be the whole fix | open |
+| ~~NON-BLOCKER~~ | Investigate the 5 s timeout | **CLOSED 2026-11-06 (stage 6)** — it was not a slow-machine timeout. It was a ~39 ms failure behind a test that awaited a promise nothing could resolve, masked because vitest reports a timeout as `STACK_TRACE_ERROR`. **Raising the bound would have hidden it permanently.** Root cause: the `~` round-trip bug in `src/storage.ts`. `evidence/stage-6/timeout-diagnosis.md` |
 | **NON-BLOCKER** | Give the fixture mock a `readText`, so one image re-read test stops failing for a reason unrelated to what it checks | open |
 
 Note what is **not** on this list any more: skipping the symlink tests on Windows.

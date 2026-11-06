@@ -160,7 +160,7 @@ GATE PASSED
 | # | Caveat |
 | --- | --- |
 | **C1** | Six symlink-containment tests cannot run on this machine (`EPERM` creating the symlink in setup). They pass on CI Windows and Linux. **The release therefore depends on CI for that class of defect**, not on the local suite. |
-| **C2** | One 5,020 ms timeout has no diagnosis. Admissible under all four criteria, but "it is a timeout, not a bug" is close to an assertion about intent. Weakest of the fifteen. |
+| **C2** | *(RESOLVED in stage 6, 2026-11-06: it was a product bug, not a timeout — see evidence/stage-6/timeout-diagnosis.md.)* One 5,020 ms timeout has no diagnosis. Admissible under all four criteria, but "it is a timeout, not a bug" is close to an assertion about intent. Weakest of the fifteen. |
 | **C3** | Two of the fifteen are **fixture defects**, not platform behaviour. `ctx.fs.readText` is a real API (`dsh-fs/lib/types/index.d.ts:162`); the test mock at `tests/card-images.spec.ts:40-51` provides `readBytes` but not `readText`. The product's call is correct. The honest split is **13 platform + 2 fixture**. |
 
 **A note the adjudication insists on.** Twelve of the fifteen are in modules this release

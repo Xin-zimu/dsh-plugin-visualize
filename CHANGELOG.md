@@ -7,6 +7,49 @@ This file is written for people who use the plugin. The reasoning behind each
 decision lives in `docs/decisions/`, and the per-stage evidence in `docs/reports/`;
 neither belongs here.
 
+## [Unreleased]
+
+### Fixed
+
+Three **product defects** that v0.1.0 shipped, each of which had been classified as a
+Windows platform difference and accepted as one. They were found by investigating the
+15 test failures instead of counting them.
+
+- **A card the tool had just created could not be patched on Windows.** The tool reports
+  a stored card's path with the home directory shortened to `~`, and on Windows that form
+  is `~\AppData\…` — but the code that accepts a path back only understood `~` or `~/`.
+  So the model was handed a path that would be refused when it returned it. Any Windows
+  user whose DSH home or workspace sits under their home directory was affected, which is
+  the normal case. Both path readers now accept either separator.
+- **A cancelled call still did all of its work.** The abort check ran after image
+  resolution returned, and image resolution never checked at entry, so a call cancelled
+  before it started still read the workspace, fetched images and wrote to the store — then
+  threw the result away.
+- **Creating the same card concurrently could fail on Windows.** The atomic-write helper
+  assumed distinct temporary names were enough for concurrent renames to both land. On
+  Windows a second rename onto a live destination can return `EPERM`; under contention
+  1–3 of 8 concurrent writes failed and leaked temporary files. The rename is now retried
+  briefly.
+
+### Changed
+
+- **Four containment tests no longer run on a Windows machine without Developer Mode.**
+  They need to create a file symlink, which needs a privilege the test cannot grant
+  itself. They are not deleted and their assertions are unchanged: they skip with the
+  missing privilege named, and they run on CI on both platforms. Six other containment
+  tests used to fail for the same reason and now run everywhere, because a directory
+  junction is a real reparse point that needs no privilege and exercises the same check.
+- **The test-only `timeout` cause classification no longer calls itself a slow machine.**
+  The one instance this project had was an unawaited rejection behind a test that waited
+  on a promise nothing could resolve; calling it "slow" would have been permanently
+  wrong.
+
+### Test results
+
+`946` tests, **946 passed, 0 failed** on Linux and on Windows CI; `942 passed / 4 skipped`
+locally on a Windows machine without symlink privilege, where the four are exactly the
+tests that need it. At v0.1.0 the same suite was `924 passed / 15 failed / 939` on that
+machine.
 ## [0.1.0] — 2026-11-06
 
 First release. The plugin is usable for its stated scope: one `visualize` tool,
@@ -103,8 +146,10 @@ rediscovered.
 
 ### Known issues
 
-- **15 test failures on Windows**, every one a filesystem or path behaviour of
-  that host: `EPERM` creating symlinks (6), a literal `~` in a path (4), a
+- ~~**15 test failures on Windows**~~ — **RESOLVED after 0.1.0, in stage 6.** Three of
+  them turned out to be product bugs, not platform behaviour; see "Unreleased" below.
+  The original entry is kept for the record: **15 test failures on Windows**, every one a
+  filesystem or path behaviour of that host: `EPERM` creating symlinks (6), a literal `~` in a path (4), a
   drive-qualified path joined onto another (1), `EPERM` renaming over an open
   file (1), a fixture mock that predates a call site (1), a 5 s timeout (1), and
   a description fixture with no skill provider registered (1). Root causes and

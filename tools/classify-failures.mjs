@@ -48,7 +48,7 @@ const CAUSES = [
     // reporter but as a bare STACK_TRACE_ERROR in some runs, so both are matched.
     match: m => /Test timed out in \d+ms|STACK_TRACE_ERROR/.test(m),
     cause: 'The test exceeds its 5 s budget waiting for an image-resolution promise',
-    impact: 'The cancellation path of image resolution is unverified on this host. It is a slow-machine timeout, not an assertion failure: no expectation was contradicted, the test simply did not finish.',
+    impact: 'A test did not finish within its bound. This classifier cannot tell WHY, and that distinction matters: the one instance this project had (stage 5) turned out not to be slowness at all but an unawaited rejection behind a test that waited on a promise nothing could resolve — see evidence/stage-6/timeout-diagnosis.md. Treat `timeout` as "undiagnosed", never as "slow machine". Diagnose it before accepting it.',
     blocking: false,
   },
   {
