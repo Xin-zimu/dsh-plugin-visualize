@@ -10,7 +10,7 @@ to the history. If you are an agent starting work, read this first.
 | Field | Value |
 | --- | --- |
 | Package | `@dsh-unified/visualize` |
-| Version | `0.1.0` (unreleased) |
+| Version | `0.1.1` — **released 2026-11-06**, tag `v0.1.1` at `50b6b54` |
 | Branch | `main` |
 | HEAD | see `git log -1` |
 | Upstream baseline | dsh-visualize `cf6b3a3`, dsh-intelligent-ui `0b08749`, open-intelligent-ui `16ef264` |
@@ -426,10 +426,30 @@ differential was re-run and still reports **31/31, 0 differences**
 
 ## 7. Next step
 
-**Stage 4A is closed at 48 / 48.** Next is **Stage 4B** — the three refused
-actions (`@OpenUrl`, `@CopyToClipboard`, `@ToAssistant`), each with its own
-security review, then Stage 5 (unified prompt, security review, release).
+**v0.1.1 is released** — tag `v0.1.1` at `50b6b54`, GitHub Release published
+2026-11-06. The three Stage-6 product defects are now in a shipped version.
 
+**Next is Stage 7 — restoring the two external actions, in this order:**
+
+1. **`@ToAssistant` first.** The contract already gives every session-scope card
+   `inputActions`, and role escalation is structurally impossible because the
+   host builds the message source (ADR-015 §10, verified by a type probe in
+   `evidence/4b2/`). What is missing is the two properties that decide it: a
+   card-attributed source the transcript renders, and a confirmation the card
+   cannot fake. The first is an upstream host change; the second is a
+   consent-surface design problem this side owns.
+2. **`@OpenUrl` second.** It waits on a plugin-callable open-external API. The
+   host's own link gesture is `ctx.sidebarRight.openTab('browser', { params: { url } })`,
+   and it is still not this action: it docks a tab inside the DSH window rather
+   than opening the reader's browser, and an iframe refusal there is
+   unobservable — the silent failure ADR-014 exists to prevent. Do not re-point
+   the action at the sidebar to make it "work".
+
+Both are recorded as deferred **with their conditions written down**, so they are
+evaluated rather than rediscovered. Neither should ride along with a patch
+release; that is why they are not in v0.1.1.
+
+~~Stage 4A is closed at 48 / 48.~~ — historical, kept for the shape of the note.
 ~~4A-4 is accepted. Next is 4A-5~~ — the fourteen that remain: the ten SVG
 drawing primitives plus `Flashcard`, `Celebration`, `Carousel` and `Popover`.
 Three things carry forward:
@@ -613,6 +633,111 @@ Six things carried forward:
 ---
 
 ## History
+
+### Session 27 — 2026-11-06 (v0.1.1 released)
+
+**Released `v0.1.1` at `50b6b54`. Tag and GitHub Release published. No force push
+at any point.** Release: https://github.com/Xin-zimu/dsh-plugin-visualize/releases/tag/v0.1.1
+
+Stage 6 had already fixed the three product defects and left them under
+`[Unreleased]`, with the decision to release explicitly deferred to the owner.
+This session was that release.
+
+### The thing that nearly made the whole verification worthless
+
+Rebuilding `lib/` before tagging reproduced both CI hashes exactly — and in doing
+so revealed that the **pre-existing** `lib/index.js` was `8d4bc669…`, containing
+**zero** occurrences of `expandDisplayPath`. That is the *pre-fix* server half.
+The installed profile agreed with it: its `client.js` was current, its
+`index.js` was pre-fix.
+
+All three Stage-6 fixes are **server-side**. So a browser run against that
+profile would have been green while exercising none of them, and the green would
+have been read as verification.
+
+This is `AGENTS.md` §9's failure mode exactly — "the browser is not running this
+tree, and no product code may be judged FAIL on that run" — except it happened on
+the server half, where the §9 procedure had never been applied. §9 says to hash
+the installed `lib/client.js` against the build; the asymmetry between the two
+halves was invisible because only one half was ever checked. **The rule is now
+"both halves", and this is why.**
+
+### The environment had to be rebuilt before the test could mean anything
+
+`displayOf()` only shortens a path that starts with `homedir()`. The existing
+isolated profile lives at `tmp/dsh-p3` — outside `C:\Users\<user>` — so the `~`
+round-trip bug **cannot fire there**. A second harness home was created under the
+user profile (`…\AppData\Local\Temp\dsh-v011`), the rebuilt plugin installed into
+it, and the host run on `:3094` while `:3093` was left untouched. The probe
+refuses to run (exit 2) if the store is not under the home directory or the tab is
+on the wrong host, so this cannot silently regress into a vacuous pass.
+
+### What was verified, and the controls that make it mean something
+
+| Check | Result | Control |
+| --- | --- | --- |
+| Both bundle halves match the build | PASS | — |
+| Real host: create then update via the reported `~\` path, both separators | PASS — `alpha 0`, `beta 1` on disk | v0.1.0 **REFUSED** that identical path; v0.1.1 accepts it |
+| Traversal through the widened reader | 16 attempts, **0 escapes** | — |
+| Cancelled-at-entry call writes nothing | PASS, 3/3 rounds, listing identical | live-signal control **did** create its card |
+| 8 concurrent creates onto one content-addressed name | PASS, 3/3 rounds, 8/8, 0 temp files | v0.1.0 failed **32 of 200** writes over 22 of 25 rounds, all `EPERM`; v0.1.1 **0 of 200** |
+| A card written by an earlier build is patchable | PASS | — |
+
+The rename control is the most valuable line in that table: it reproduces the
+"1–3 of 8" the fix was written against, on this machine, from v0.1.0's own code
+extracted with `git show`. Without it, "8/8 succeeded" would only show that this
+machine was not racing today.
+
+**One caveat stated rather than smoothed over:** the old code's 0 leaked temp
+files in that harness does *not* contradict the original leak finding. The
+store-level leak is a consequence of an abandoned temp file; the helper harness's
+failure path still ran `rm(temp)`. The rename failures are what this control
+proves, and `RELEASE-EVIDENCE.md` §5 says so.
+
+### Derived numbers, and the two that were wrong
+
+- `946` tests: **946 passed / 0 failed / 0 skipped on CI Ubuntu and CI Windows**,
+  `942 passed / 4 skipped` locally.
+  CI gate lines read directly from run `42170037015`: `windows: baseline 15,
+  found 0, new 0`, `failsOnBoth: []`, `BUILDS IDENTICAL`.
+- `STAGE.md` said "946/946 green locally". The local figure is 942 + 4 skips;
+  946/946 is CI. Now stated as two numbers, because they are two facts.
+
+### Process failure, recorded
+
+A first full-suite run was made with `NODE_ENV=production` and reported 118
+failures across 15 files. The cause was the environment variable breaking React's
+`act()`, not the code — the run was discarded and re-made. The lesson is the
+standing one: a red number is only information once you know what produced it.
+
+### Pushing, when `git push` was not available
+
+`git push` failed: the configured proxy on `:7890` was not running, a direct
+connection was reset, and the SSH key on the machine is not authorised on the
+account — while `api.github.com` was reachable and `gh` was authenticated with
+repo write scope. The commit was therefore reconstructed through the Git Data
+API. **The check was not "the API returned 201"**: every blob's remote id was
+compared to the local id, and the assembled tree had to equal the local commit's
+tree `e00ead43…`, which is only possible if every byte matches. The first attempt
+**failed that check and refused to move the ref** — `core.autocrlf=true` means the
+worktree holds CRLF while the object store holds LF, and reading the files instead
+of the blobs produced 5 differing blobs. Reading `git cat-file blob` instead made
+the trees identical. `git reset --hard origin/main` then aligned the local branch
+onto the remote commit (zero content difference, different SHA), and CI ran on
+that commit.
+
+Network access was restored afterwards; the tag and Release were pushed with
+ordinary `git push` / `gh release create`.
+
+### Docs updated
+
+`README.md` Status (was "release candidate… not yet tagged") and the
+compatibility bullet (was 939/932); `STAGE.md` stage-6 row and its misleading
+"green locally"; `CHANGELOG.md` `[Unreleased]` → `## [0.1.1]`, with a "Verified in
+a real host" section; `package.json` → `0.1.1`; this file's §1 and §7.
+Evidence under `evidence/stage-7-pre/`, home paths redacted with
+`evidence/lib/redact.mjs` before committing (this session's first scan hit three
+JSON files; after redaction the scan is clean).
 
 ### Session 26 — 2026-11-06 (Stage 6: three product bugs behind the "platform failures")
 
