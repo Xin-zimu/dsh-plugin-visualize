@@ -43,6 +43,37 @@ build in this session is `lib/client.js` SHA-256
 risks locked files on Windows. Do not kill PID 21788 from a script; quit it from
 its own UI (or the tray). The plan below assumes it is closed.
 
+**One-command path (recommended).** `tools/daily-profile-switch.ps1` implements
+the steps below and adds the guards: it refuses to run while the app is up, backs
+up `package.json` + `pnpm-lock.yaml` + an inventory to
+`<profile>\.plugin-backups\<timestamp>\`, replaces the dependency and the bundle
+entry, runs the desktop CLI install, verifies old-absent / new-present /
+bundle-hash-equal, records the peer check before and after, and `-Rollback`
+restores the newest backup.
+
+```powershell
+# 1. quit the DSH desktop app from its own UI
+# 2. in a normal PowerShell window (pwsh):
+pwsh -File "<repo>\tools\daily-profile-switch.ps1" -DryRun   # prints the exact plan, writes nothing
+pwsh -File "<repo>\tools\daily-profile-switch.ps1"            # performs the swap
+# 3. start the app, run the smoke test in Step 5
+# rollback (quit the app first):
+pwsh -File "<repo>\tools\daily-profile-switch.ps1" -Rollback
+```
+
+**What is closed and what changes.** Nothing else is touched.
+
+| Item | Action |
+| --- | --- |
+| DSH desktop app (PID 21788, `127.0.0.1:50270`) | quit it yourself; the script refuses to run while it is up |
+| `<profile>\package.json` | `@nagi-ovo/dsh-visualize` → `@dsh-unified/visualize` in `dependencies` and in `dsh.profile.bundles` (same index) |
+| `<profile>\pnpm-lock.yaml` | updated by pnpm |
+| `<profile>\node_modules\` | upstream plugin removed, this fork installed; the unused `dsh-workbuddy-connect` junction is pruned because it is not in `package.json` |
+| `<profile>\.plugin-backups\` | **new** — `package.json`, `pnpm-lock.yaml`, `inventory.json`, `peers-before.txt`, `peers-after.txt` |
+| `<profile>\.plugin-manager\logs\` | CLI diagnostics |
+| `~/.dsh/sessions`, `~/.dsh/storages` | **not touched** — chat history and session data are unchanged |
+| other plugins (`browser-skill`, `dsh-pet`, `dsh-context`, `dsh-qoder-connect`) | not modified; verified by the smoke test |
+
 **Step 1 — back up the profile's two state files.**
 
 ```powershell
@@ -64,8 +95,17 @@ Copy-Item "$p\pnpm-lock.yaml" "$p\pnpm-lock.yaml.bak-$(Get-Date -Format yyyyMMdd
 ```powershell
 $desk = Join-Path $env:LOCALAPPDATA 'Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd'
 & $desk plugin --profile desktop install
-& $desk plugin --profile desktop peers check     # must print: No peer dependency issues found
+& $desk plugin --profile desktop peers check
 ```
+
+`peers check` is **informational on this profile, not a gate.** It sets
+`autoInstallPeers: false` + `nodeLinker: hoisted` in `pnpm-workspace.yaml`, so
+pnpm deliberately does not install the host's peer packages; the host supplies
+them at runtime. Measured on 2026-11-07: **18 missing-peer entries before the
+swap and 18 after** (same peer classes, the replaced plugin swaps places in the
+list), so the check exits 1 both ways. The swap's gates are: `install` exit 0,
+old plugin absent, new plugin present, installed bundle hash == build hash, and
+the Step 5 smoke test.
 
 **Step 4 — start the app** and accept the plugin-manager prompt if one appears.
 `patchReload: live` may pick the change up, but a profile-level bundle swap
@@ -85,6 +125,11 @@ Get-Content (Join-Path $env:APPDATA 'DeepSeek Harness\logs\main.log') -Tail 50  
 ```
 
 ## 3. Rollback procedure (restores today's state exactly)
+
+**Fast path:** quit the app, then run
+`pwsh -File "<repo>\tools\daily-profile-switch.ps1" -Rollback`. It restores the
+newest backup from `<profile>\.plugin-backups\`, reinstalls with the desktop CLI,
+and verifies the upstream plugin is back. Manual equivalent:
 
 1. Quit the app.
 2. Restore the two backup files (or reverse Step 2: remove
@@ -148,7 +193,8 @@ Notes and honesty:
 
 | Item | Status |
 | --- | --- |
-| Daily-profile install | **not performed** (owner gate). Steps above are derived from the isolated profile that was installed and verified identically. |
+| Daily-profile install | **not performed — owner step.** Procedure below; the swap was **simulated on a clone** of the daily profile on 2026-11-07: install exit 0, fork 0.1.1 installed, upstream absent, installed bundle hash == build hash. |
+| Daily-profile `peers check` | **fails by design, before and after**: the desktop profile sets `autoInstallPeers:false` + `hoisted`, so 18 missing-host-peer entries are reported on both sides. Not a gate, not a regression. |
 | HTML backend (`backend: "html"`) cards in daily use | **NOT VERIFIED this run** — the acceptance turns produced OpenUI cards. HTML rendering was verified in earlier stages (B04 etc.) and the build is byte-identical to v0.1.1. |
 | Model calling `visualize` without an explicit instruction (e.g. "画个图解释一下") | **NOT VERIFIED** — every acceptance prompt named the tool. The plugin's skill is installed and this is how earlier stages drove the model; a few real daily prompts will settle it. |
 | Two-surface live sync | known limitation, see §4. |
@@ -158,10 +204,13 @@ Notes and honesty:
 
 ## 6. What the owner should do next
 
-1. Decide the daily swap (it is a **replacement** of `@nagi-ovo/dsh-visualize`).
-2. Follow §2 after quitting the app; keep the two backups.
-3. Run the one-prompt smoke test from Step 5.
-4. Use it normally for a day; if anything looks wrong, §3 restores today's state.
+1. Quit the DSH desktop app (this also ends the current agent session).
+2. In a normal PowerShell window: `pwsh -File "<repo>\tools\daily-profile-switch.ps1"`
+   — run `-DryRun` first to see the exact plan; §2 lists every file it touches.
+   Keep the `.plugin-backups\<timestamp>\` directory.
+3. Start the app and run the one-prompt smoke test from Step 5.
+4. Use it normally for a day; if anything looks wrong, quit the app and run
+   `... -Rollback` (§3), or restore the backup by hand.
 5. Do not expect `@ToAssistant` until the upstream provenance change of Gate 3
    ships; the action stays safely refused.
 

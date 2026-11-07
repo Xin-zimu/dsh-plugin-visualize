@@ -18,6 +18,14 @@ Design evidence: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md` and
 `evidence/stage-7c/gate3/`. Everything below is written against the public
 release tag `dsh-v0.2.2-rc.1` (`66491b05e3`), which is also the installed host.
 
+**Where to post (owner action — this file is not published):**
+
+- Discussions home: https://github.com/deepseek-ai/deepseek-harness/discussions
+- New post: https://github.com/deepseek-ai/deepseek-harness/discussions/new
+- A signed-in GitHub account is required (signed-out visitors are redirected to
+  login). Choose the closest category (e.g. *Ideas* or *General*).
+- Do **not** open an Issue or a PR: both are disabled on that repository.
+
 ---
 
 ## Part A — ready-to-send Discussion post
@@ -44,6 +52,15 @@ release tag `dsh-v0.2.2-rc.1` (`66491b05e3`), which is also the installed host.
 > (`packages/api/session-controller/src/index.ts:480-488`). A later reader
 > (including the model's own transcript) cannot tell a card-submitted message
 > from typed text.
+>
+> **This is a general capability, not a privilege request.** The field grants no
+> authority and carries no session, role or principal. Any plugin that submits a
+> message on the user's behalf — action cards, automation/workflow plugins,
+> collaboration tools that post a delegated turn — has the same problem: the
+> delivered message cannot say where it came from. The host already validates
+> identity and role; this change only records a fact the host itself checked.
+> Nothing here is specific to this plugin, and no extra confirmation API is
+> requested — the existing `userQuestions.ask()` covers consent.
 >
 > **Proposed change (one item).**
 >

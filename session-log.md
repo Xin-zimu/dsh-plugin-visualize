@@ -12,6 +12,7 @@ to the history. If you are an agent starting work, read this first.
 | Package | `@dsh-unified/visualize` |
 | Version | `0.1.1` — **released 2026-11-06**, tag `v0.1.1` at `50b6b54` (not moved) |
 | Branch | `main` |
+| **Pushed** | `origin/main` = `dd9affb` (Stage 7C, 2026-11-07, fast-forward). Tag `v0.1.1` = `50b6b54`, not moved; no release. |
 | HEAD | see `git log -1` |
 | Upstream baseline | dsh-visualize `cf6b3a3`, dsh-intelligent-ui `0b08749`, open-intelligent-ui `16ef264` |
 | **Installed DSH host** | **0.2.2-rc.1** (`@deepseek-ai/dsh-desktop`). The desktop CLI reports 0.2.2-rc.1; the **global `dsh` on PATH is 0.2.1-rc.5** and is not the host under test |
@@ -106,6 +107,32 @@ run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
 - **A. Gate 3 — upstream provenance request.** Narrowed from ADR-016's four items to one: `origin?: {kind:'tool-call', callId}` on `SessionPromptRequest`, validated by the host against a committed `tool/call`, recorded as an optional field on the existing `'user-rpc'` source. No host UI change (the existing `conversation.chat.user.before` slot renders it plugin-side), no new source kind, no new confirmation API. Repo does not accept external PRs; reports go to Discussions — the draft was **not** sent. `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`, `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`, `evidence/stage-7c/gate3/`.
 - **B. 0.2.2-rc.1 compatibility.** The Gate-2 "peer + cordis" pair was one range-selection bug; devDeps moved to 0.2.2-rc.1 and six `dsh-*` peer ranges gain `|| ^0.2.2-rc.1`. Verified: peers check, both tsc projects, build, full suite, clean isolated-profile resolve (`dsh-*@0.2.2-rc.1` + cordis 4.1.0), real-host load. `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`, `evidence/stage-7c/compat/`.
 - **C. Daily-use baseline.** Daily profile confirmed as `~/.dsh/profiles/desktop` (PID 21788 on :50270), currently loading `@nagi-ovo/dsh-visualize ^0.1.7`; the fork is a **replacement**, and install/rollback steps are written but **not executed**. Isolated real-use acceptance (8/8, 0 failures) covers knowledge, math/slider, sorting/button, refresh restore, session switch, stability, real drag and persistence. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/`.
+
+## 2c. Daily-use handoff — 2026-11-07 (after Stage 7C)
+
+- **Pushed:** `origin/main = dd9affb` (fast-forward from `cda6346`, the three
+  Stage 7C commits). No tag moved (`v0.1.1` = `50b6b54`), no release, no force.
+- **Upstream request:** final Discussion draft ready, **not sent**:
+  `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` (posting
+  entry and channel are at the top of the file). The owner must approve sending.
+- **Daily swap:** the owner approved replacing `@nagi-ovo/dsh-visualize` in
+  `~/.dsh/profiles/desktop`, but the swap must run **after the owner quits the
+  app**, so this session prepared and verified it instead of executing it:
+  `tools/daily-profile-switch.ps1` (`-DryRun` / `-Rollback`), plus a clone
+  simulation with the daily profile's own `hoisted` / `autoInstallPeers:false`
+  settings (`evidence/stage-7c-daily/03-swap-simulation.txt`). The daily profile
+  was not modified; the GUI on `:50270` was not restarted. Note for the operator:
+  `peers check` fails on this profile by design (18 missing-host-peer entries
+  before and after), so it is diagnostics, not a gate; the gates are install
+  exit 0, old-absent / new-present, bundle hash equal, and the smoke test.
+- **Privacy:** `docs/reports/PRIVACY-2026-11-07.md` records the historical
+  profile-path exposure (15 files in HEAD, all pre-7C), distinguishes HEAD from
+  history (including the Stage 7C intermediate commit `96e7c9a`, whose raw event
+  dump was sanitised by `dd9affb` in HEAD), confirms no credential or private-
+  conversation content was found, and proposes minimal cleanup A (sanitise HEAD),
+  B (history rewrite) and C (repository recreate). **No rewrite, no force push.**
+- **Not doing:** no new test frameworks, probes or documentation system. The
+  completion criterion is a stable daily DSH with a clear rollback path.
 
 ## 3. Current progress
 

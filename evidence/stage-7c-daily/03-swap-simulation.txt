@@ -1,0 +1,41 @@
+# Daily-profile swap — simulation on a clone, 2026-11-07
+
+Why a clone: the daily profile cannot be mutated while the DSH desktop app
+(PID 21788, `127.0.0.1:50270`) is serving the owner's session, and the owner
+required the swap to run only after the app is quit. This record proves the
+exact transform + install path against a copy of the **daily** profile, using its
+own `pnpm-workspace.yaml` (`nodeLinker: hoisted`, `autoInstallPeers: false`).
+
+Clone: `tmp/swap-sim/profiles/desktop` (gitignored, deleted after this record).
+
+## Input
+
+- `package.json` copied from `~/.dsh/profiles/desktop`, then exactly one transform:
+  - `dependencies`: `@nagi-ovo/dsh-visualize` (`^0.1.7`) →
+    `@dsh-unified/visualize` (`file:<repo>`, forward slashes)
+  - `dsh.profile.bundles[4]`: `@nagi-ovo/dsh-visualize` → `@dsh-unified/visualize`
+  - every other dependency and bundle preserved; bundles count 8 → 8
+- `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `cordis.yml`, `cordis.patch.yml`
+  copied unchanged.
+- `DSH_HOME=tmp/swap-sim`; desktop host CLI **0.2.2-rc.1**
+  (`%LOCALAPPDATA%\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd`).
+
+## Result
+
+| Check | Result |
+| --- | --- |
+| `dsh plugin --profile desktop install` | **exit 0**, 13 packages, 57 s |
+| `@nagi-ovo/dsh-visualize` installed afterwards | **False** |
+| `@dsh-unified/visualize` installed afterwards | **True**, version `0.1.1` |
+| installed `lib/client.js` SHA-256 | `E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB` = build |
+| `peers check` | exit 1, **18 missing-peer entries** — the same count the real daily profile reports before the swap; expected with `autoInstallPeers:false`, not a gate |
+
+## Limits
+
+- The clone starts without `node_modules` (fresh resolve). This proves
+  resolution/installation of the `file:` dependency in a hoisted,
+  no-auto-peers profile; it does not prove an in-place prune of the real
+  profile's 73 MB `node_modules` (the script's install step is the same command).
+- GUI boot after the swap was **not** observed here. That is the owner's smoke
+  test after the real swap.
+- Not performed: the real swap. It is gated on the owner quitting the app.
