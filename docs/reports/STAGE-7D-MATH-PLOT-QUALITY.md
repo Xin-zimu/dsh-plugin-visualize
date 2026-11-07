@@ -141,3 +141,50 @@ pnpm install; pnpm run build
 
 Then restart the app and re-ask the original prompt. The daily profile was not
 touched in this stage; the GUI on `:55142` was never navigated or restarted.
+
+## 6. Close-out round (2026-11-07, after review)
+
+The first review found three gaps; this round closes or honestly records them.
+
+**Axis direction letters.** The skill now states the requirement as a graded
+checklist and gives the two SVG lines verbatim (classes `axis-label-x` /
+`axis-label-y`); `charts.md` says the same. Result on the second regeneration
+(fresh session): the model card carries **both** labels —
+`<text class="axis-label axis-label-x">x</text>` and
+``axis-label-y`` — visible in `tmp/quad-issue/after2-inchat-light.png`
+(sha256 `DC80DFDA…`) and `after2-inchat-dark.png` (sha256 `E3C239CC…`), and in
+the scenario shots `after3-*.png` (owner scenario exact values 1.1/−6.8/10,
+vertex (3.1,−0.5), roots 2.41/3.77, 0 tick overlaps).
+
+**Tick legibility.** The reference example now uses `fill: var(--foreground)`
+for ticks and vertex/root labels; measured contrast **18.08:1** light /
+**16.47:1** dark; grid vs axis guide contrast 3.4:1. The model's regenerated card
+still uses the caption tier for ticks (`rgb(173,178,184)`, **2.04:1** light) —
+so tick legibility in a *model-generated* card is **NOT VERIFIED**; the template
+that the model copies meets the requirement. The skill/charts text says
+`--foreground` at 11px, but the model's output ignored that one detail in this
+run.
+
+**Reference example hardened** (from review): tick-label collision thinning
+(~6.2px/glyph + 8px gap, drop rather than overlap), a `clipPath` on the plot rect
+for curve and symmetry axis, symmetric `[-4,4]` window for the linear branch, and
+bold 13px axis letters with the named classes. Measured on the real frame
+document opened as a tab: owner case equation `y = 1.1x² − 6.8x + 10`, vertex
+(3.1,-0.5), symmetry x=3.1, roots 2.41/3.77, 7 x-ticks, 0 overlaps, curve fills
+~98% of the plot height (`example-owner.png`, sha256 `9F35235B…`); default case
+`example-default.png` sha256 `55ADB25B…`.
+
+**Dark theme.** Produced through the host's own mechanism:
+`document.body.setAttribute('data-ds-dark-theme','')` on the isolated host page,
+then cards re-rendered by switching sessions so `resolveTheme` bakes the dark
+tokens. Body corner changes `rgb(249,250,251)` → `rgb(27,27,28)`; the dark frame
+document carries `--dsh-viz-foreground: #f9fafb`, `--dsh-viz-card: #232324`,
+`--dsh-viz-grid: #ffffff0f`, `--dsh-viz-axis: #adb2b8` and both axis labels.
+Capture: `after2-inchat-dark.png` (sha256 `E3C239CC…`). This is a host-mechanism
+capture, **not** a settings-UI toggle — the 深色 control is not in the
+accessibility tree in this build.
+
+**Still NOT VERIFIED.** (a) tick colour in model-generated cards (2.04:1 in this
+run; the example is 18:1); (b) deterministic generation — two attempts needed for
+the axis letters, and the model can still copy only part of the recipe;
+(c) the dark capture used the attribute mechanism above, published as such.

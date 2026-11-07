@@ -23,6 +23,16 @@
       "sha256": "2c545e19e1577bc883a837a3eebbe1ed2cca8e4f61bac743d366a6cbeaeb41de",
       "bytes": 63659
     },
+    "after-inchat-dark.png": {
+      "path": "tmp/quad-issue/after-inchat-dark.png",
+      "sha256": "e205b7d49c69eb8b4ddb44c00a5bbcf9120fa97b5b66eb606373ac62991df12a",
+      "bytes": 74028
+    },
+    "after-inchat-light.png": {
+      "path": "tmp/quad-issue/after-inchat-light.png",
+      "sha256": "14adcac03c9ed47afa91540a6161a45c928425b14dab7d508b39dc95f56e1861",
+      "bytes": 73707
+    },
     "after-initial.png": {
       "path": "tmp/quad-issue/after-initial.png",
       "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
@@ -48,10 +58,50 @@
       "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
       "bytes": 63700
     },
+    "after2-inchat-dark.png": {
+      "path": "tmp/quad-issue/after2-inchat-dark.png",
+      "sha256": "e3c239cc545bffc384a4c838b23d05e636bce6cc4b007cfe3eafa77159ab52e3",
+      "bytes": 72450
+    },
+    "after2-inchat-light.png": {
+      "path": "tmp/quad-issue/after2-inchat-light.png",
+      "sha256": "dc80dfda26c12afc333197c02c8b674e5f26cd50f041cb1a4b8bf85f7cf56110",
+      "bytes": 72635
+    },
+    "after3-default.png": {
+      "path": "tmp/quad-issue/after3-default.png",
+      "sha256": "31191b320a4794a4fde9e93fea6966af9feeda83eec1ca9f50b1d80b8995623b",
+      "bytes": 28565
+    },
+    "after3-linear.png": {
+      "path": "tmp/quad-issue/after3-linear.png",
+      "sha256": "8a4cd711ac618ad1933223813ad549bf9c826d8a4cb816236974d4c1595eaa56",
+      "bytes": 26047
+    },
+    "after3-neg-a.png": {
+      "path": "tmp/quad-issue/after3-neg-a.png",
+      "sha256": "4bcce6caba934fb498e595c6dbbe7cdf20f2d1151d2ccaa67fcdb2f72b19e831",
+      "bytes": 32988
+    },
+    "after3-owner.png": {
+      "path": "tmp/quad-issue/after3-owner.png",
+      "sha256": "674d63fbc4e31e6e6d4dd46ed3c96dc8cd253ba2c6e19dadedce8321342cdb1e",
+      "bytes": 31911
+    },
     "before-initial.png": {
       "path": "tmp/quad-issue/before-initial.png",
       "sha256": "917930120d9a043a8a92c60422e95ca4744c03be5b69899173edade372752677",
       "bytes": 73970
+    },
+    "example-default.png": {
+      "path": "tmp/quad-issue/example-default.png",
+      "sha256": "55adb25bcb5ce0d8551101b4e8f1ace75e7d870e3b4ee8c6b27ef377919faa96",
+      "bytes": 24023
+    },
+    "example-owner.png": {
+      "path": "tmp/quad-issue/example-owner.png",
+      "sha256": "9f35235b4c857ff547aa3b41450ebf3993aa9d86d5e97acdc315c5d09b31938d",
+      "bytes": 22223
     },
     "frame-after-default.png": {
       "path": "tmp/quad-issue/frame-after-default.png",
@@ -532,16 +582,16 @@
       "guide_row_count": 19,
       "guide_col_count": 8,
       "guide_values": [
-        178.0,
-        228.0,
-        229.0,
-        236.0,
-        239.0,
-        249.0,
-        250.0
+        178,
+        228,
+        229,
+        236,
+        239,
+        249,
+        250
       ],
       "lighter_median": 237.5,
-      "darker_median": 178.0,
+      "darker_median": 178,
       "grid_vs_axis_gap": 59.5,
       "curve_pixels": 5211,
       "curve_bbox": {
@@ -563,15 +613,15 @@
       "guide_row_count": 17,
       "guide_col_count": 7,
       "guide_values": [
-        178.0,
+        178,
         224.3,
-        229.0,
-        236.0,
-        239.0,
-        245.0,
-        250.0
+        229,
+        236,
+        239,
+        245,
+        250
       ],
-      "lighter_median": 245.0,
+      "lighter_median": 245,
       "darker_median": 224.3,
       "grid_vs_axis_gap": 20.7,
       "curve_pixels": 4787,
@@ -618,6 +668,106 @@
     "tests": "npx vitest run -> 942 passed / 4 skipped (946), 48 files, exit 0",
     "probe_smoke": "node evidence/lib/probe.mjs --what=smoke -> G0-G3 pass (exit 0)",
     "bundle_hash_gate": "installed profile client.js sha256 == repo build sha256 (B03974D7...)",
-    "theme_dark": "NOT VERIFIED - probe --what=theme --want=dark returned BLOCKED (\"the host's 深色 control is not in the accessibility tree\"); the 更多 menu exposed no theme entry in this build, so no host-authored dark capture was taken"
+    "theme_dark": "VERIFIED via the host data-ds-dark-theme mechanism (not a settings UI toggle): body corner rgb(249,250,251) -> rgb(27,27,28), dark frame tokens foreground #f9fafb / grid #ffffff0f / axis #adb2b8, in-chat dark capture after2-inchat-dark.png"
+  },
+  "final_round": {
+    "capturedAt": "2026-11-07",
+    "modelCardSecondRegeneration": {
+      "sessionTitle": "二次函数交互演示",
+      "axisLabels": [
+        {
+          "text": "x",
+          "cls": "axis-label axis-label-x"
+        },
+        {
+          "text": "y",
+          "cls": "axis-label axis-label-y"
+        }
+      ],
+      "axisLabelCount": 2,
+      "tickCount": 6,
+      "tickOverlaps": 0,
+      "tickColor": "rgb(173, 178, 184)",
+      "tickContrastOnLightBg": 2.04,
+      "grid": "rgba(0, 0, 0, 0.04)",
+      "axis": "rgb(129, 133, 140)",
+      "ownerScenario": {
+        "requested": {
+          "a": 1.1,
+          "b": -6.8,
+          "c": 10
+        },
+        "equation": "y = 1.1x² − 6.8x + 10",
+        "vertex": "(3.1, −0.5)",
+        "symmetry": "x = 3.1",
+        "roots": "x₁ = 2.41, x₂ = 3.77",
+        "delta": "2.2"
+      },
+      "verdict": "axis letters PRESENT after the tightened instruction; tick colour is still the muted/caption tier (2.04:1) — tick legibility in the MODEL card is NOT verified"
+    },
+    "referenceExample": {
+      "ownerScenario": {
+        "requested": {
+          "a": 1.1,
+          "b": -6.8,
+          "c": 10
+        },
+        "equation": "y = 1.1x² − 6.8x + 10",
+        "vertex": "(3.1, -0.5)",
+        "symmetry": "x = 3.1",
+        "roots": "2.41 / 3.77",
+        "tickCount": 7,
+        "tickOverlaps": 0
+      },
+      "axisLabels": [
+        {
+          "text": "x",
+          "cls": "axis-label axis-label-x"
+        },
+        {
+          "text": "y",
+          "cls": "axis-label axis-label-y"
+        }
+      ],
+      "tickColor": "rgb(15, 17, 21)",
+      "tickContrastOnLightBg": 18.08,
+      "tickContrastOnDarkBg": 16.47,
+      "grid": "rgba(0, 0, 0, 0.04)",
+      "axis": "rgb(129, 133, 140)",
+      "gridAxisContrast": 3.4,
+      "curveHeightRatioOwner": 0.98,
+      "verdict": "reference example meets every requirement at the owner's exact coefficients (window auto-fits, labels, legible foreground ticks, 0 overlaps)"
+    },
+    "darkTheme": {
+      "method": "document.body.setAttribute('data-ds-dark-theme', '') on the isolated host page; cards re-rendered by switching sessions so resolveTheme bakes dark tokens; settings control not reachable in the accessibility tree",
+      "bodyCornerLight": [
+        249,
+        250,
+        251
+      ],
+      "bodyCornerDark": [
+        27,
+        27,
+        28
+      ],
+      "frameTokens": {
+        "foreground": "#f9fafb",
+        "card": "#232324",
+        "grid": "#ffffff0f",
+        "axis": "#adb2b8"
+      },
+      "axisLabelCountInDark": 2,
+      "verdict": "VERIFIED as a host-mechanism capture (not a settings-UI toggle)"
+    },
+    "screenshots": [
+      "after2-inchat-light.png",
+      "after2-inchat-dark.png",
+      "after3-default.png",
+      "after3-owner.png",
+      "after3-neg-a.png",
+      "after3-linear.png",
+      "example-owner.png",
+      "example-default.png"
+    ]
   }
 }

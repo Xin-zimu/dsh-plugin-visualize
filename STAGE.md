@@ -788,7 +788,9 @@ Report: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. Draft:
 | Renderer tokens (grid/axis/context) | **DONE** — 3 bridge entries + axis fallback; verified grid 1px `rgba(0,0,0,.04)` vs axis 1.5px `rgb(129,133,140)` in the real frame doc |
 | Math plot recipe + reference example | **DONE** — `assets/references/charts.md` §Math function plots, `assets/examples/quadratic-explorer.html`, skill pointers |
 | Real-host before/after | **DONE** — owner prompt re-generated in an isolated DSH 0.2.2-rc.1 host; six scenarios measured (0 tick overlaps, curve 0.62-0.79 of plot height); original card at the owner's slider values was clipped (curve bbox 5203px in a 300px plot, 15 ticks) |
-| Dark theme | **NOT VERIFIED** — probe theme gate BLOCKED (host 深色 control not in the accessibility tree) |
+| Axis direction letters | **VERIFIED** — after tightening the instruction into a graded checklist with verbatim SVG lines, the second fresh-session regeneration carries `axis-label-x`/`axis-label-y` and both letters (verified in the in-chat card and the frame DOM) |
+| Tick legibility | **PARTIAL** — reference example uses `--foreground` ticks (18.08:1 light / 16.47:1 dark, 0 collisions); the model's regenerated card still used the caption tier (2.04:1) → tick legibility in model cards NOT VERIFIED |
+| Dark theme | **VERIFIED via the host mechanism** — `body[data-ds-dark-theme]` applied on the isolated host + session switch re-baked the frames (foreground #f9fafb, grid #ffffff0f, axis #adb2b8; body bg 249,250,251 → 27,27,28). Not a settings-UI toggle (the control is not in the accessibility tree). |
 
 Report: `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md`. Evidence:
 `evidence/stage-7d/manifest.json` (screenshot sha256 + measurements; PNGs in

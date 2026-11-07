@@ -174,10 +174,15 @@ overlaps; curve 0.62-0.79 of plot height; vertex/roots/symmetry correct); the
 owner's original card at `1.1/-6.8/10` was clipped (curve bbox 5203px vs 300px
 plot, 15 ticks).
 
-**Not verified** — dark host theme (probe BLOCKED: 深色 control not in the
-accessibility tree; no forced attribute); deterministic future generation (one
-model run; the docs gap is closed, not instrumented); scenario frames are the
-plugin's real frame documents opened as a tab, not the in-chat iframe.
+**Not verified** — tick colour in model-generated cards (the regenerated card still
+uses the caption tier, measured 2.04:1 on white, although the reference example
+uses `--foreground` at 18.08:1); deterministic generation (two attempts were needed
+before the model emitted the x/y axis letters; the instruction is now graded and
+verbatim). Dark theme **is verified** through the host's own
+`data-ds-dark-theme` mechanism (body corner rgb(249,250,251) → rgb(27,27,28);
+dark frame tokens foreground #f9fafb / grid #ffffff0f / axis #adb2b8), captured as
+`tmp/quad-issue/after2-inchat-dark.png`; not a settings-UI toggle because that
+control is not in the accessibility tree.
 ### Stage 7C — 2026-11-07 (this session)
 
 **Discussed** — ADR-016 Option B; owner's three workstreams; the narrowed upstream ask (no host UI, no new source kind) and the Discussions-only channel; the daily-profile swap vs add distinction.
@@ -661,16 +666,28 @@ curve 0.62–0.79 of plot height, correct vertex/roots/symmetry each time. The
 owner's original card re-run at `1.1/-6.8/10` showed the clipping (curve bbox
 5203px on a 300px plot).
 
-**Honest limits.** Dark theme NOT VERIFIED — the theme probe is BLOCKED because
-the host's 深色 control is not in the accessibility tree and the probe refuses to
-force the attribute; no dark host capture was taken. Generation improvement is a
-single model run, not a guarantee. Scenario captures use the frame document as a
-tab (the chat iframe is cross-origin), while the primary evidence is the in-chat
-before/after pair. Evidence: `evidence/stage-7d/manifest.json`; PNGs remain in
-gitignored `tmp/quad-issue/`.
+**Honest limits.** Tick colour in model-generated cards is NOT VERIFIED (this run
+used the caption tier, 2.04:1 on white; the reference example is 18.08:1). Dark
+theme is verified through the host's own `data-ds-dark-theme` attribute plus a
+session switch so frames re-bake with dark tokens (`after2-inchat-dark.png`,
+sha256 E3C239CC…), not through the settings UI (that control is not in the
+accessibility tree). Generation is not deterministic — two attempts were needed
+for the axis letters; the template now carries them verbatim. Scenario captures
+use the frame document as a tab while the primary evidence is in-chat. Evidence:
+`evidence/stage-7d/manifest.json`; PNGs remain in gitignored `tmp/quad-issue/`.
 
 **Commits:** one for code+example, one for docs/evidence. No push; no tag move; no
 release; the daily profile and the :55142 app were never touched.
+
+**Close-out round (after review).** Fixed the axis-letter instruction into a graded
+checklist with the two SVG `<text>` lines verbatim; the second fresh-session
+regeneration carries `axis-label-x`/`axis-label-y` and both letters, exact owner
+values (1.1/−6.8/10, vertex (3.1,−0.5), roots 2.41/3.77, 0 overlaps). Hardened the
+reference example per review (foreground ticks 18.08:1, collision thinning, curve
+clipPath, symmetric linear window) and rendered it at the owner's coefficients
+(`example-owner.png` sha256 9F35235B…). Captured dark via the host mechanism; the
+only remaining gap is tick colour in *model-generated* cards (caption tier in this
+run). Two more commits record this round.
 ### Session 31 — 2026-11-07 (Stage 7C: Gate 3 request, 0.2.2 compatibility, daily baseline)
 
 **Scope:** the owner's three workstreams, executed in order. No product code changed; the

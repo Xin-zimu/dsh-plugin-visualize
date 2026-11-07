@@ -110,11 +110,17 @@ Choose the window from the function and the parameters:
 **Axes.** Draw the x-axis only when `y = 0` is in the window, the y-axis only
 when `x = 0` is in it — never draw a fake origin at the plot edge. When both
 are visible they meet at the origin and `0` is labelled once. Arrowheads and
-`x`/`y` labels at the positive ends. Nice ticks 1-2-5×10ᵏ: at most ~9 x
+`x`/`y` labels at the positive ends, emitted as SVG `<text>` elements carrying
+the classes `axis-label-x` / `axis-label-y` (a plot without them is an
+incomplete card). Nice ticks 1-2-5×10ᵏ: at most ~9 x
 labels and ~7 y labels; skip colliding labels rather than shrinking the text.
 Grid `--viz-grid` at 1px; axes `--viz-axis` at 1.5px so the axes are visibly
-stronger; tick text 11px; every colour from tokens, so light and dark both
-work.
+stronger; **tick numbers 11px in `--foreground`** (never caption grey — they must
+stay legible), axis letters 13px bold in `--viz-axis`, and a plot clip so a steep
+branch cannot paint into the header. Estimate a tick label at ~6.2px per glyph
+and skip labels whose projected spacing is tighter than the label + 8px;
+collisions are dropped, never overlapped. Every colour from tokens, so light and
+dark both work.
 
 **Marks.** Vertex dot + `顶点 (h, k)` label at 1 decimal. Dashed symmetry axis
 `x = h` in `--viz-axis` (a dash pattern, not a colour). Real roots only when

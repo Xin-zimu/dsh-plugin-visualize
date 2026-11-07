@@ -41,6 +41,22 @@ its categorical x-axis cannot express an origin, and a hard-coded domain
 clips the curve. Axes, ticks and the auto-fitted window are mandatory, not
 finishing touches.
 
+**Axis direction letters are mandatory and are graded.** Every function plot
+ends its axes with an arrowhead and a bold `x` at the right end of the x-axis
+and a bold `y` at the top end of the y-axis. Emit them as two real SVG `<text>`
+elements; copy these two lines verbatim into the SVG (adjust coordinates to your
+plot area), then give them these exact classes:
+
+```html
+<text class="axis-label axis-label-x" x="PLOT_RIGHT" y="AXIS_Y - 10" text-anchor="end">x</text>
+<text class="axis-label axis-label-y" x="AXIS_X + 10" y="PLOT_TOP + 14">y</text>
+```
+
+A plot without them is an incomplete card — do not return it. Before returning,
+check: window fits the curve; tick numbers do not collide; the `x` and `y`
+letters are present at the axis ends; vertex / symmetry / roots match the
+equation.
+
 ## Calling the tool
 
 Pass the markup directly as the `fragment` argument, with an optional `title`
