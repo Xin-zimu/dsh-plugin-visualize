@@ -1,0 +1,21 @@
+{
+  "asked": "PARITY **bold** `code` <b>tag</b> & amp 中文😀\n第二行 line two",
+  "titleText": "PARITY **bold** `code` <b>tag</b> & amp 中文😀\n第二行 line two",
+  "titleEqualsAsked": true,
+  "titleInnerTextEqualsAsked": true,
+  "clamp": {
+    "lineClamp": "none",
+    "overflow": "hidden",
+    "maxHeight": "68px",
+    "clientHeight": 46,
+    "scrollHeight": 46
+  },
+  "storedContent": [
+    {
+      "type": "text",
+      "text": "PARITY **bold** `code` <b>tag</b> & amp 中文😀\n第二行 line two"
+    }
+  ],
+  "storedContainsAsked": true,
+  "storedEqualsAsked": false
+}

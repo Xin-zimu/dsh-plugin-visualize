@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "value": {
+    "roots": [
+      {
+        "agentId": "session-6746e34d-6cae-422d-b68c-d863d056b34a",
+        "sessionId": "session-6746e34d-6cae-422d-b68c-d863d056b34a",
+        "status": "idle"
+      },
+      {
+        "agentId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+        "sessionId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+        "status": "idle"
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+Issues with peer dependencies found
+
+✕ unmet peer @deepseek-ai/cordis
+  Installed: 4.1.0
+  Wanted:
+    ~4.0.5:
+      @deepseek-ai/dsh-fs@0.2.1-rc.5
+      @deepseek-ai/dsh-brand@0.2.1-rc.5
+      @deepseek-ai/dsh-sandbox@0.2.1-rc.5
+      @deepseek-ai/dsh-util-values@0.2.1-rc.5
+      @deepseek-ai/dsh-llm@0.2.1-rc.5
+      @deepseek-ai/dsh-timeout@0.2.1-rc.5
+      @deepseek-ai/dsh-typert-protocol@0.2.1-rc.5
+      @deepseek-ai/dsh-util-crypto@0.2.1-rc.5
+      @deepseek-ai/dsh-sandbox-policy@0.2.1-rc.5
+      @deepseek-ai/dsh-agent@0.2.1-rc.5
+      @deepseek-ai/dsh-scope@0.2.1-rc.5
+      @deepseek-ai/dsh-session-projection@0.2.1-rc.5
+      @deepseek-ai/dsh-system-prompt@0.2.1-rc.5
+      @deepseek-ai/dsh-session@0.2.1-rc.5
+      @deepseek-ai/dsh-skill@0.2.1-rc.5
+      @deepseek-ai/dsh-tools@0.2.1-rc.5
+      @deepseek-ai/dsh-ptc-runtime@0.2.1-rc.5
+      @deepseek-ai/dsh-user-approval@0.2.1-rc.5
+      @deepseek-ai/dsh-working-directory@0.2.1-rc.5
+Command failed with exit code 1: "C:/Users/<user>\AppData\Local\Programs\DeepSeek Harness\DeepSeek Harness.exe" --expose-internals "C:/Users/<user>\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.mjs" peers checkdsh: plugin command failed; diagnostics: D:/work/dsh-plugin-visualize\tmp\dsh-022\profiles\p22web\.plugin-manager\logs\operation-U2znnj\pnpm.log

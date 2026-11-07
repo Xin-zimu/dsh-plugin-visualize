@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "value": {
+    "sessionId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+    "agentLive": true,
+    "agentStatus": "idle",
+    "agentId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+    "archived": true
+  }
+}

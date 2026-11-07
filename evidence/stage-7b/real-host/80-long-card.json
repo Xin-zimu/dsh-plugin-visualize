@@ -1,0 +1,19 @@
+{
+  "open": true,
+  "key": "question:bb4bfeb853e92272d39f4009cef253ec:2",
+  "titleText": "line 1 of a long message: 中文内容 with **markdown** and `code`\nline 2 of a long message: 中文内容 with **markdown** and `code`\nline 3 of a long message: 中文内容 with **markdown** and `code`\nline 4 of a long message: 中文内容 with **markdown** and `code`\nline 5 of a long message: 中文内容 with **markdown** and `code`\nline 6 of a long message: 中文内容 with **markdown** and `code`\nline 7 of a long message: 中文内容 with **markdown** and `code`\nline 8 of a long message: 中文内容 with **markdown** and `code`\nline 9 of a long message: 中文内容 with **markdown** and `code`\nline 10 of a long message: 中文内容 with **markdown** and `code`",
+  "titleInnerText": "line 1 of a long message: 中文内容 with **markdown** and `code`\nline 2 of a long message: 中文内容 with **markdown** and `code`\nline 3 of a long message: 中文内容 with **markdown** and `code`\nline 4 of a long message: 中文内容 with **markdown** and `code`\nline 5 of a long message: 中文内容 with **markdown** and `code`\nline 6 of a long message: 中文内容 with **markdown** and `code`\nline 7 of a long message: 中文内容 with **markdown** and `code`\nline 8 of a long message: 中文内容 with **markdown** and `code`\nline 9 of a long message: 中文内容 with **markdown** and `code`\nline 10 of a long message: 中文内容 with **markdown** and `code`",
+  "clamp": {
+    "lineClamp": "none",
+    "overflow": "hidden",
+    "maxHeight": "68px",
+    "clientHeight": 68,
+    "scrollHeight": 222
+  },
+  "frameText": "line 1 of a long message: 中文内容 with **markdown** and `code`\nline 2 of a long message: 中文内容 with **markdown** and `code`\nline 3 of a long message: 中文内容 with **markdown** and `code`\nline 4 of a long message: 中文内容 with **markdown** and `code`\nline 5 of a long message: 中文内容 with **markdown** and `code`\nline 6 of a long message: 中文内容 with **markdown** and `code`\nline 7 of a long message: 中文内容 with **markdown** and `code`\nline 8 of a long message: 中文内容 with **markdown** and `code`\nline 9 of a long message: 中文内容 with **markdown** and `code`\nline 10 of a long message: 中文内容 with **markdown** and `code`\n1\nSend\n2\nCancel\n1 / 1\n跳过\n提交",
+  "optionLabels": [
+    "Send",
+    "Cancel"
+  ],
+  "expandToggle": true
+}

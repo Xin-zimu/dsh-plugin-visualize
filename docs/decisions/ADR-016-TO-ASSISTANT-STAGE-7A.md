@@ -1,8 +1,10 @@
 # ADR-016 — `@ToAssistant`: one host change left, and what it must be
 
-- **Status:** **Proposed — awaiting the owner. No implementation is authorised by this
-  ADR.** `@ToAssistant` stays in `UNSUPPORTED_STEPS` and stays refused until the decision
-  below is made.
+- **Status:** **Accepted — Option B (owner, 2026-11-07).** Gate 2 (real-host
+  pre-validation on DSH 0.2.2-rc.1) is **done** and passed for B's confirmation half, with
+  three measured limits recorded in §12. Gate 3 (upstream provenance change) has not
+  happened; **no product implementation is authorised until it lands**, and the action stays
+  refused in the meantime.
 - **Date:** 2026-11-07 (Stage 7A)
 - **Supersedes:** ADR-015's *stated blockers*, not its requirements. ADR-015 remains the
   normative list of mandatory properties; this ADR re-derives the capability status against
@@ -56,8 +58,8 @@ residual limits.
 | 7 | Length cap | plugin-side; must also fit the confirmation UI at long lengths | no |
 | 8 | Generic failures | plugin-side | no |
 | 9 | Withdrawable | one line back into `UNSUPPORTED_STEPS` | no |
-| C1 | Confirmation host-rendered, card cannot fake | **available in source** via `userQuestions.ask` (host chrome, outside the iframe); the between-turn live-root condition is unverified | no, if 7B verifies it |
-| C2 | Shows the whole message | caller-supplied `detail`; the plugin submits the same string, but the host re-renders it as Markdown — preview/submit byte-equality must be tested | no (verify) |
+| C1 | Confirmation host-rendered, card cannot fake | **verified in Gate 2** (real host, before and after a turn) via `userQuestions.ask`; host chrome outside the iframe | no |
+| C2 | Shows the whole message | **byte-equal on the title path** (Gate 2); long text is visually clipped at 68 px by default, so the length cap must fit that preview or accept one expand click | no (measured cap) |
 | C3 | Names the sender | the question text is plugin-authored ("from card…"); host does not know the card | no |
 | C4 | Cancellable without side effects | the answer returns to the caller; nothing is sent until the plugin acts | no |
 
@@ -216,17 +218,13 @@ other actions.
 
 ## 10. Open questions
 
-1. **Live agent during an idle session.** `userQuestions.ask` requires the live root agent
-   when an agent is supplied, and the browser answerer only answers a scoped request —
-   `ctx.sessions.scopeOf(owner)`; an unscoped ask ends `NO_PROVIDER`. A card click happens
-   between turns. Stage 7B must prove the session's agent is live (and therefore scoped)
-   while the conversation sits idle; if it is not, this path needs a host change too.
-2. **Confirmation layout and Markdown re-render at long text.** `question.detail` is
-   rendered through `MarkdownText`, so the displayed bytes may differ from the submitted
-   string (whitespace, emphasis, entity decoding) even though the plugin sends exactly what
-   it passed. Stage 7B must show preview equals submission for the message class used, and
-   pick a cap that provably fits; no truncation was found in source, but no length cap was
-   found either.
+1. **Live agent during an idle session — RESOLVED in Gate 2.** On the real host an open
+   session keeps a live idle root between turns: ask returned in 1,340 ms before any turn
+   and 2,030 ms after a turn ended.
+2. **Confirmation layout and Markdown re-render at long text — MEASURED in Gate 2.** The
+   title is rendered as plain text (byte-equal), but long text is visually clamped at
+   68 px with an `展开` toggle; the length cap must be chosen against that limit.
+   (`detail` is not used by this design.)
 3. **What the host renders as attribution.** The card's file path is plugin meta and cannot
    be host-verified. Decide whether the host shows "sent from a card" + tool call id and the
    plugin carries the path in the approved text.
@@ -241,4 +239,36 @@ other actions.
 
 It does not change `UNSUPPORTED_STEPS`, does not add a card↔host channel, does not touch
 the dispatcher, and does not move the tag or release anything. Implementation starts in
-**Stage 7B**, only after the owner records a decision here.
+**Stage 7B Gate 4**, only after the owner's decision here **and** the upstream provenance
+change of §3.
+
+---
+
+## 12. Gate 2 — real-host pre-validation (executed 2026-11-07)
+
+Owner decision: "先验证现有确认机制在真实 DSH 中能否正常工作，再向上游提出修改请求."
+Evidence: `evidence/stage-7b/real-host/` (isolated DSH 0.2.2-rc.1 host, `tmp/dsh-022`,
+profile `p22web`, real model turns, bsk/CDP). The probe (`tmp/v7b-probe/`) is test-only.
+
+| Gate 2 question | Verdict |
+| --- | --- |
+| Can `userQuestions.ask()` run **outside a turn**? | **Yes.** Before any turn (idle agent, no turn ever run) it returned in 1,340 ms; after a real turn ended it returned in 2,030 ms. Host-rendered card, options, and 提交 button all present. C1 is now **verified**, not merely source-read. |
+| Confirmation bytes vs submitted bytes | **Byte-equal on the question-title path**, including `**bold**`, backticks, `<b>`, `&`, emoji and newlines — the title is rendered as text, not Markdown. The durable `user/message` after submitting the same string is byte-equal too. **Limit:** long text is visually **clipped at 68 px** by default (`scrollHeight` 222 px for 10 lines) with an `展开` toggle; the 7B length cap must fit the measured preview or accept one expansion click. |
+| Cancelled confirmation | Returns the answer to the caller; nothing is submitted. Verified with the Cancel option. |
+| Archived session | **Trap confirmed.** The prompt returns `{accepted:true}` in 13 ms, then `turn/start` and `turn/end {kind:'blocked'}` with **no `user/message` appended and no error**. `{accepted:true}` must never be reported as delivery. Archiving the open session also removes its composer/view. |
+| Duplicate submission | **No content dedupe.** Two identical prompts with different `requestId`s produced two `user/message` events (host idempotency is `rpcId`-keyed only). The one-in-flight latch must be plugin-side. |
+| Result observability | Admission only from the call. A **plugin** can verify delivery from the durable log: `user/message` with its `rpcId`, `turn/start`, `turn/end.reason`. The card itself has no channel. |
+
+**Design consequence (new, binding on 7B Gate 4):** the plugin must report
+"sent, delivered/unconfirmed" from a durable observation, never from `{accepted:true}`:
+after submission, watch for the caller's `rpcId` in `user/message` and a `turn/start`; a
+`turn/end {blocked}` without the message is "not delivered". Generic failure text otherwise.
+
+**Compatibility finding (independent issue, owner-prioritised).** This repo's plugin
+**runs** on 0.2.2-rc.1: `visualize` was called and its OpenUI card rendered end to end
+(`compat-card.png`, `compat-15-events-turn4.json`), the style route answered 200, and the
+installed bundle equals the build (`E1BF4A82…`, 450,559 B). But `pnpm peers check` **fails**
+(unmet peer `@deepseek-ai/cordis`: installed 4.1.0 vs `~4.0.5` wanted by 0.2.1-rc.5 copies
+pnpm resolved into the profile), and `peerDependencies: ^0.2.1-0` does not admit
+`0.2.2-rc.1` under strict semver. Runtime compatibility is proven; **declared**
+compatibility is not, and the ranges must be updated before support is claimed.

@@ -1,0 +1,59 @@
+{
+  "sessionId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+  "state": {
+    "status": 200,
+    "value": {
+      "sessionId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+      "agentLive": true,
+      "agentStatus": "idle",
+      "agentId": "session-85984948-9db0-4b8e-bf48-4b80cb296426",
+      "archived": false
+    }
+  },
+  "card": {
+    "open": true,
+    "key": "question:80942fa4ace8f56581bfba6415db0534:3",
+    "titleText": "STAGE7B between-turns question: the previous turn has ENDED. Press Cancel.",
+    "titleInnerText": "STAGE7B between-turns question: the previous turn has ENDED. Press Cancel.",
+    "clamp": {
+      "lineClamp": "none",
+      "overflow": "hidden",
+      "maxHeight": "68px",
+      "clientHeight": 24,
+      "scrollHeight": 24
+    },
+    "frameText": "STAGE7B between-turns question: the previous turn has ENDED. Press Cancel.\n1\nSend\n2\nCancel\n1 / 1\n跳过\n提交",
+    "optionLabels": [
+      "Send",
+      "Cancel"
+    ],
+    "expandToggle": true
+  },
+  "answerClicks": {
+    "selected": {
+      "selected": true
+    },
+    "submitted": {
+      "submitted": true,
+      "disabled": false
+    }
+  },
+  "answer": {
+    "status": 200,
+    "value": {
+      "scoped": true,
+      "answer": {
+        "answers": [
+          {
+            "id": "v7b-q",
+            "selected": [
+              "Cancel"
+            ]
+          }
+        ]
+      },
+      "ms": 2030,
+      "agentStatus": "idle"
+    }
+  }
+}

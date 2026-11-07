@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "value": {
+    "roots": [
+      {
+        "agentId": "session-6746e34d-6cae-422d-b68c-d863d056b34a",
+        "sessionId": "session-6746e34d-6cae-422d-b68c-d863d056b34a",
+        "status": "idle"
+      }
+    ]
+  }
+}

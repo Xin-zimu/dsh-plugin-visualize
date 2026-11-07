@@ -1,0 +1,19 @@
+{
+  "open": true,
+  "key": "question:80942fa4ace8f56581bfba6415db0534:4",
+  "titleText": "PARITY **bold** `code` <b>tag</b> & amp 中文😀\n第二行 line two",
+  "titleInnerText": "PARITY **bold** `code` <b>tag</b> & amp 中文😀\n第二行 line two",
+  "clamp": {
+    "lineClamp": "none",
+    "overflow": "hidden",
+    "maxHeight": "68px",
+    "clientHeight": 46,
+    "scrollHeight": 46
+  },
+  "frameText": "PARITY **bold** `code` <b>tag</b> & amp 中文😀\n第二行 line two\n1\nSend\n2\nCancel\n1 / 1\n跳过\n提交",
+  "optionLabels": [
+    "Send",
+    "Cancel"
+  ],
+  "expandToggle": true
+}

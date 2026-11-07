@@ -1,0 +1,18 @@
+{
+  "status": 200,
+  "value": {
+    "scoped": true,
+    "answer": {
+      "answers": [
+        {
+          "id": "v7b-q",
+          "selected": [
+            "Cancel"
+          ]
+        }
+      ]
+    },
+    "ms": 1495,
+    "agentStatus": "idle"
+  }
+}

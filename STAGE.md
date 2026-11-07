@@ -21,7 +21,7 @@ this says what the current slice is allowed to do.
 | 5 | Unified prompt, security review, release | **DONE — released `v0.1.0` 2026-11-06** at `40b8241`. Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md` |
 | 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; **946/946 green on CI Linux and CI Windows (0 skipped on either)**, and 942 passed / 4 skipped / 946 locally, where the 4 are the tests that need a symlink privilege this machine lacks. `evidence/stage-6/` |
 | 7A | Host capability investigation + `@ToAssistant` ADR | **CLOSED 2026-11-07 — investigation only, no product code.** Installed host is **0.2.2-rc.1** (4B-2 read stale 0.2.1-rc.5). Confirmation now exists; **one** host change left (message attribution). `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md` |
-| 7B | `@ToAssistant` implementation | **Not started — blocked on the owner's decision on ADR-016 and on the upstream attribution change.** |
+| 7B | `@ToAssistant` implementation | **Gate 1 done (owner: Option B). Gate 2 done: real-host pre-validation PASSED** for the confirmation half, with three measured limits (`evidence/stage-7b/real-host/`). **Gate 3 (upstream provenance) not started; no product code yet.** |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -700,14 +700,42 @@ the transcript renders it as an unattributed bubble.
 | **The exit question answered explicitly** | report §6: one host change (`@ToAssistant` attribution), one for `@OpenUrl` |
 | No product code, no tag, no release | `git diff --stat` for this stage: docs + evidence only |
 
-### Stage 7B — planned, not authorised
+### Stage 7B — Gate 2 done, Gates 3–4 pending
 
-**Gate 1: the owner's decision on ADR-016.** Recommended Option B (request the attribution
-change upstream); Option A (plugin-only) is rejected under ADR-015's unchanged requirements;
-Option C adds a dedicated confirmation API if upstream wants the full surface.
+Owner decision (2026-11-07): **ADR-016 Option B**, but validate the existing confirmation
+mechanism on a real host **before** asking upstream, and do not pre-emptively add a second
+host API (Option C).
 
-**Gate 2: the upstream change landing** — a host-validated `origin` claim on the prompt
-admission path plus a rendered marker on the delivered user turn (contract in ADR-016 §3).
+| Gate | State |
+| --- | --- |
+| **1. Decision recorded** | **DONE** — Option B accepted in ADR-016; no implementation authorised by the decision alone |
+| **2. Real-host pre-validation** | **DONE — PASSED** on an isolated DSH 0.2.2-rc.1 host (`evidence/stage-7b/real-host/`) |
+| **3. Upstream provenance change** | **Not started** — one host-validated `origin` claim on the prompt admission path + rendered marker (ADR-016 §3) |
+| **4. Implementation + security acceptance** | Not started; blocked on Gate 3; ADR-016 §7 cases + §8 criteria |
 
-Then implementation under ADR-016 §6, against the acceptance criteria in §8 and the 12 new
-security cases in §7. `@OpenUrl` continues as a separate upstream request (ADR-014).
+**What Gate 2 measured, and what it changes:**
+
+1. `userQuestions.ask()` works **outside a turn** — before any turn (1,340 ms) and after a
+   real turn ended (2,030 ms), with the host-rendered card and a returned answer. B's
+   confirmation half is **verified**, not just source-read.
+2. The confirmation title is **byte-equal** to the submitted string (markdown markers,
+   backticks, `&`, emoji, newline all preserved as text) and the durable message is
+   byte-equal too. **New constraint:** long text is visually clamped at **68 px** by default
+   (`scrollHeight` 222 px for 10 lines, `展开` toggle), so the length cap must be chosen to
+   fit the measured preview, or the design accepts one expand click.
+3. **Archived session: the trap is real.** The prompt returns `{accepted:true}` in 13 ms,
+   then `turn/start` + `turn/end {kind:'blocked'}` with **no `user/message` and no error**.
+   Consequence: the plugin must verify delivery from the durable log (`rpcId` in
+   `user/message` + `turn/start`) and otherwise report "unconfirmed"; `{accepted:true}` is
+   never delivery. Archiving the open session also removes its composer/view.
+4. **Duplicate submission has no content dedupe** (two identical prompts, different
+   `requestId` → two messages), so the one-in-flight latch is plugin-side.
+5. **Plugin runtime compatibility on 0.2.2-rc.1: works** — `visualize` called, OpenUI card
+   rendered end to end (`compat-card.png`), style route 200, installed bundle hash = build
+   hash. But `pnpm peers check` fails (unmet peer `cordis`, 4.1.0 vs `~4.0.5` from
+   0.2.1-rc.5 copies) and `peerDependencies: ^0.2.1-0` does not admit `0.2.2-rc.1`; the
+   declared ranges must be updated before support is claimed.
+
+**Gate 3's ask is unchanged and still one item** — host-validated, persisted, rendered
+message provenance bound to the actual delivered message. `@OpenUrl` continues as a separate
+upstream request (ADR-014).

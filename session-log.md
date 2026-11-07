@@ -21,7 +21,7 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | **7A CLOSED 2026-11-07** — host capability investigation + `@ToAssistant` ADR, investigation only. **7B not started**, blocked on the owner's ADR-016 decision and an upstream change. |
+| Stage | **7B Gate 2 DONE 2026-11-07** — owner chose ADR-016 Option B; real-host pre-validation on DSH 0.2.2-rc.1 passed (confirmation works outside a turn; three limits measured). Gate 3 (upstream provenance) not started; no product code. 7A closed earlier the same day. |
 | Goal | Restore the two deferred external actions honestly: `@ToAssistant` first, then `@OpenUrl`. |
 | Status | **`@ToAssistant` needs exactly one host change** (host-validated message attribution); submission, role enforcement and a host-rendered, card-unforgeable confirmation already exist in 0.2.2-rc.1. **`@OpenUrl` is unchanged**: still no plugin-callable external open. Deliverables: `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md`, `evidence/stage-7a/`. **No product code was changed; the action stays refused.** Earlier stages: 6 closed (946/946 CI), v0.1.1 released 2026-11-06, 4B-2 closed 2026-11-06. |
 
@@ -431,6 +431,10 @@ differential was re-run and still reports **31/31, 0 differences**
 | **`@ToAssistant` still refused** | Needs one upstream host change: host-validated message attribution | **ADR-016 Proposed, awaiting owner.** No implementation authorised |
 | **No host-read bytes in the confirmation** | `userQuestions.ask` renders caller-supplied `detail`; the host does not verify it equals a durable message | Accepted residual in ADR-016 §10; the plugin must show the same string it submits, and a test must pin byte equality |
 | **`@OpenUrl` still refused** | No plugin-callable external open in 0.2.2-rc.1 | Unchanged; upstream ask stands (ADR-014 §10.4) |
+| **Confirmation preview clamps long text** | Gate 2 measured: the host question title is visually clipped at **68 px** by default (`scrollHeight` 222 px for 10 lines) with an `展开` toggle; byte parity itself is verified (title text = submitted text) | **New 7B constraint:** the message cap must be chosen to fit the measured preview, or the design accepts one expand click |
+| **`{accepted:true}` is not delivery (verified)** | Gate 2: an archived session accepts the prompt in 13 ms, then `turn/start` + `turn/end {blocked}` with no `user/message` and no error | The plugin must verify delivery from the durable log (`rpcId` in `user/message` + `turn/start`) and otherwise say unconfirmed |
+| **No content-level submission dedupe** | Gate 2: two identical prompts with different `requestId` → two messages | The one-in-flight latch must be plugin-side |
+| **Declared peer range does not admit 0.2.2** | Runtime works (card rendered end to end), but `pnpm peers check` fails: unmet `cordis` 4.1.0 vs `~4.0.5`, and `^0.2.1-0` excludes `0.2.2-rc.1` under strict semver | Manifest update is its own work item before 0.2.2 support is claimed |
 
 ## 7. Next step
 
@@ -447,23 +451,29 @@ byte-identical `lib/` (the version string does not enter the bundle) and would
 announce a change to users while the v0.1.1 tree still reads as before. The
 correction is already on `main` (`cdc9868`) and on the Release page.
 
-**Stage 7A is CLOSED (2026-11-07). The decision now needed is ADR-016's.**
-The host investigation is done against the installed **0.2.2-rc.1** — not the stale
-0.2.1-rc.5 tree that 4B-2 read — and it narrows `@ToAssistant` from two host gaps to one:
+**Stage 7B Gate 2 is DONE (2026-11-07). The next step is Gate 3 (upstream ask).**
+The owner chose **ADR-016 Option B** and required the existing confirmation mechanism to be
+validated on a real host *before* asking upstream. That validation passed:
 
-1. **`@ToAssistant`** — submission (three plugin paths), role enforcement (the host builds
-   `kind:'user'`) and a host-rendered confirmation the card cannot fake
-   (`ctx.userQuestions.ask`; no turn check in the service, but the between-turn live-root
-   gate is unverified) all exist. **The one missing piece is
-   message attribution**: the prompt wire has no provenance field, the host hardcodes the
-   source, and the transcript renders an unattributed user bubble. `ADR-016` proposes
-   **Option B** — request that one upstream change, then implement. It is **Proposed,
-   awaiting the owner**; the action stays refused until a decision is recorded.
-2. **`@OpenUrl`** — unchanged: still no plugin-callable external open in 0.2.2-rc.1. The
-   sidebar tab is not this action, and the upstream ask stands (ADR-014 §10.4).
+1. **`userQuestions.ask()` works outside a turn** — before any turn (1,340 ms) and after a
+   real turn ended (2,030 ms) on an isolated DSH 0.2.2-rc.1 host, with the host-rendered
+   card and a returned answer. The confirmation half of B is verified, not source-read.
+2. **The confirmation title is byte-equal to the submitted string** (markdown markers,
+   backticks, emoji, newlines preserved as text), and the durable message is byte-equal.
+   New constraint: long text is visually clipped at 68 px by default (expand toggle exists).
+3. **`{accepted:true}` is not delivery** — verified on an archived session: accepted in
+   13 ms, then a blocked turn with no message and no error. The plugin must verify delivery
+   from the durable log before telling the reader "sent".
+4. **No content dedupe** — two identical prompts with different ids produced two messages.
+5. **This plugin runs on 0.2.2-rc.1** — `visualize` called, OpenUI card rendered end to end,
+   style route 200, installed hash = build hash. But the declared peer range still excludes
+   0.2.2-rc.1 and `pnpm peers check` fails; that is its own work item.
 
-No implementation is authorised by Stage 7A. Stage 7B begins only after (a) the owner's
-ADR-016 decision and (b) the upstream attribution change, if Option B is chosen.
+**What is left for `@ToAssistant`:** Gate 3, the single upstream provenance change
+(host-validated, persisted, rendered attribution bound to the delivered message), then Gate 4
+implementation against ADR-016 §7/§8. The action stays refused meanwhile.
+**`@OpenUrl`** is unchanged: still no plugin-callable external open in 0.2.2-rc.1, and the
+upstream ask stands (ADR-014 §10.4).
 
 ~~Stage 4A is closed at 48 / 48.~~ — historical, kept for the shape of the note.
 ~~4A-4 is accepted. Next is 4A-5~~ — the fourteen that remain: the ten SVG
@@ -649,6 +659,57 @@ Six things carried forward:
 ---
 
 ## History
+
+### Session 30 — 2026-11-07 (Stage 7B Gate 2: real-host pre-validation)
+
+**Owner decision recorded first:** ADR-016 **Option B** (minimal upstream change), with the
+order changed — validate the existing confirmation mechanism on a real host **before**
+asking upstream, and do not add a second host API (Option C) without evidence. Also two
+independent issues: real 0.2.2-rc.1 peer compatibility (not typecheck), and push the pending
+commit.
+
+**Push:** proxy `127.0.0.1:7890` was back; `git push origin main` sent `39a434c`
+(`20de67e..39a434c`). No force, no tag move; `v0.1.1` still `50b6b54`.
+
+### The isolated host (no product code, no live GUI)
+
+- `tmp/dsh-022` as `DSH_HOME`; profile `p22web` = `dsh-base` + `dsh-web-app` + a
+  **test-only probe** (`tmp/v7b-probe/`) + this repo's plugin.
+- Probe = a cordis plugin with one authenticated route on the host's `/api` channel
+  (`/api/visualize-probe/op`): `roots`, `session`, `ask`, `prompt`, `archive`, `events`.
+  It is never shipped; `prompt`/`events` reach host-internal APIs **for measurement only**
+  and say so in the file.
+- Host: installed asar 0.2.2-rc.1, `--profile p22web --no-open --port 3094`; browser: bsk
+  daemon started as a managed `--foreground` background job (the daemon's own advice), Edge
+  agent window driven through `evidence/lib/cdp.mjs`.
+
+### Measurements (evidence/stage-7b/real-host/)
+
+| Question | Result |
+| --- | --- |
+| ask outside a turn | **works**: idle session 1,340 ms; after a real turn 2,030 ms; host-rendered card + answer returned; agent `idle` |
+| confirmation vs submitted bytes | **byte-equal** on the title path (`**bold**`, backticks, `<b>`, `&`, emoji, newline preserved); durable message byte-equal. **Long text visually clipped at 68 px** (10 lines → `scrollHeight` 222 px, `展开` toggle) |
+| archived session | **trap confirmed**: `{accepted:true}` in 13 ms → `turn/start` → `turn/end {blocked}`, **no `user/message`, no error**; archiving an open session also removes its composer |
+| duplicate submission | two identical prompts, different `requestId` → **two** `user/message`; no content dedupe |
+| result observability | admission only from the call; a plugin can verify delivery from the durable log (`rpcId` in `user/message` + `turn/start`); the card has no channel |
+| plugin on 0.2.2-rc.1 | **runs**: `visualize` called, OpenUI card rendered end to end (`compat-card.png`), style route 200, installed hash = build `E1BF4A82…` (450,559 B). Declared peer range still excludes 0.2.2-rc.1; `pnpm peers check` fails (unmet `cordis`, 4.1.0 vs `~4.0.5`) |
+
+**Setbacks recorded rather than hidden.** UI `fill` kept failing with `fill_target_changed`
+on a stopped/streaming conversation (untargeted `press` also hit `observation_changed`), so
+the compatibility prompt was injected through the same admission command the Remote uses —
+labelled as measurement. The probe gained `prompt`/`events` mid-session, and because host
+modules are cached each probe change meant reinstall + host restart (new token → re-navigate);
+that cost is visible in the transcript, not a product finding.
+
+**Not done, deliberately:** no dispatcher change, no card↔host channel, no upstream request
+yet, no tag/release. Stage 7B Gate 3 (the provenance ask) and Gate 4 (implementation +
+security acceptance) remain.
+
+**Commands that produced the verdicts:** `node tmp/v7b/run.mjs {boot,askidle,turn,askafter,parity,longclamp,archived2,dup2}`,
+`node tmp/v7b/compat2.mjs`, plus `dsh plugin --profile p22web add file:…`,
+`dsh plugin --profile p22web peers check`, `bsk session start/navigate/cooperate sync`,
+and `Select-String` reads of the extracted 0.2.2-rc.1 tree. Raw outputs are the JSON files
+under `evidence/stage-7b/real-host/`; the trimmed evidence tree is 129 KB, 42 files.
 
 ### Session 29 — 2026-11-07 (Stage 7A: host capability evidence + `@ToAssistant` ADR)
 

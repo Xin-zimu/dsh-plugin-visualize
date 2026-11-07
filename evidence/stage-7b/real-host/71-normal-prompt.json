@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "value": {
+    "requestId": "d9f2c4cf-8bba-4c1a-ad9b-2235d2fa2147",
+    "result": {
+      "accepted": true
+    },
+    "ms": 39
+  }
+}

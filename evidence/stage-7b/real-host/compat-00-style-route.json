@@ -1,0 +1,5 @@
+{
+  "status": 200,
+  "contentType": "application/json; charset=utf-8",
+  "head": "{\"maxBytes\":4096,\"files\":[{\"scope\":\"global\",\"path\":\"D:/work/dsh-plugin-visualize\\\\tmp\\\\dsh-022\\\\visualize\\\\style.md\",\"exists\":false,\"text\":\"\",\"bytes\":0},{\"scope\":\"workspace\",\"path\":\"C:/Users/<user>\\\\Documents\\\\deepseek-harness\\\\default-workspace\\\\.dsh\\\\visualize-style.md\",\"workspace"
+}

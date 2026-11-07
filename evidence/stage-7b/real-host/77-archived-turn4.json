@@ -1,0 +1,533 @@
+{
+  "sessionSeq": 47,
+  "fromSeq": 33,
+  "events": [
+    {
+      "seq": 34,
+      "type": "turn/start",
+      "data": {
+        "turn": 3
+      }
+    },
+    {
+      "seq": 37,
+      "type": "user/message",
+      "data": {
+        "content": [
+          {
+            "type": "text",
+            "text": "STAGE7B headless prompt 1 (unarchived session)"
+          }
+        ],
+        "source": {
+          "kind": "user",
+          "rpcId": "d9f2c4cf-8bba-4c1a-ad9b-2235d2fa2147",
+          "clientTimeZone": "UTC"
+        },
+        "role": "user",
+        "id": "e27effa5-5d3f-4ae1-ad0a-fb33e0d8c772"
+      }
+    },
+    {
+      "seq": 40,
+      "type": "assistant/message",
+      "data": {
+        "turn": 3,
+        "step": 1,
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "reasoning",
+              "text": "The user is sending what looks like a test harness message: \"STAGE7B headless prompt 1 (unarchived session)\". This seems to be part of some staging/parity test. There's no actual task. Previous pattern: first prompt asked for PONG, then a parity test string, now this.\n\nI should respond concisely. Perhaps acknowledge receipt. There's no actionable request. Best to just say something minimal like \"Received.\" Or maybe they expect an echo? Given \"headless prompt 1\", it's a probe to verify the session works.\n\nI'll respond briefly confirming receipt of Stage 7B headless prompt 1."
+            },
+            {
+              "type": "text",
+              "text": "Received: STAGE7B headless prompt 1 (unarchived session). No task specified — ready for the next instruction."
+            }
+          ],
+          "source": {
+            "kind": "model",
+            "provider": "deepseek-official",
+            "model": "deepseek-flash",
+            "replayState": {
+              "response": {
+                "kind": "deepseek-messages",
+                "version": 1,
+                "model": "deepseek-flash"
+              },
+              "blocks": [
+                {
+                  "type": "reasoning",
+                  "signature": "ffd99caf-34a7-42a1-a62f-48fb03360979"
+                },
+                {
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "id": "b40f4866-f652-4219-8e8b-37562507091f"
+        },
+        "usage": {
+          "inputTokens": 174,
+          "outputTokens": 163,
+          "cacheReadTokens": 9600,
+          "cacheWriteTokens": 0,
+          "totalTokens": 9937
+        },
+        "stream": [
+          {
+            "type": "chunk",
+            "time": 1794033863084,
+            "chunk": {
+              "type": "block-start",
+              "index": 0,
+              "blockType": "reasoning"
+            }
+          },
+          {
+            "type": "reasoning-chunks",
+            "time0": 1794033863529,
+            "index": 0,
+            "dt": [
+              67,
+              17,
+              0,
+              0,
+              25,
+              0,
+              1,
+              0,
+              0,
+              19,
+              0,
+              1,
+              0,
+              0,
+              0,
+              12,
+              0,
+              0,
+              1,
+              0,
+              0,
+              17,
+              0,
+              0,
+              0,
+              0,
+              1,
+              18,
+              0,
+              0,
+              1,
+              17,
+              20,
+              0,
+              28,
+              11,
+              0,
+              0,
+              90,
+              0,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              9,
+              0,
+              14,
+              14,
+              19,
+              0,
+              0,
+              0,
+              15,
+              0,
+              24,
+              0,
+              1,
+              12,
+              0,
+              18,
+              19,
+              0,
+              0,
+              0,
+              17,
+              20,
+              0,
+              0,
+              0,
+              0,
+              19,
+              19,
+              0,
+              0,
+              19,
+              0,
+              21,
+              19,
+              0,
+              0,
+              0,
+              28,
+              0,
+              11,
+              0,
+              20,
+              0,
+              0,
+              18,
+              0,
+              0,
+              14,
+              0,
+              21,
+              0,
+              0,
+              26,
+              0,
+              12,
+              0,
+              0,
+              0,
+              0,
+              0,
+              17,
+              0,
+              1,
+              24,
+              0,
+              12,
+              20,
+              0,
+              18,
+              1,
+              0,
+              0,
+              0,
+              19,
+              18,
+              0,
+              20,
+              20,
+              1,
+              0,
+              0,
+              19,
+              0,
+              0,
+              0,
+              0
+            ],
+            "texts": [
+              "The",
+              " user",
+              " is",
+              " sending",
+              " what",
+              " looks",
+              " like",
+              " a",
+              " test",
+              " harness",
+              " message",
+              ":",
+              " \"",
+              "ST",
+              "AGE",
+              "7",
+              "B",
+              " head",
+              "less",
+              " prompt",
+              " ",
+              "1",
+              " (",
+              "un",
+              "arch",
+              "ived",
+              " session",
+              ")\".",
+              " This",
+              " seems",
+              " to",
+              " be",
+              " part",
+              " of",
+              " some",
+              " staging",
+              "/",
+              "par",
+              "ity",
+              " test",
+              ".",
+              " There",
+              "'s",
+              " no",
+              " actual",
+              " task",
+              ".",
+              " Previous",
+              " pattern",
+              ":",
+              " first",
+              " prompt",
+              " asked",
+              " for",
+              " P",
+              "ONG",
+              ",",
+              " then",
+              " a",
+              " parity",
+              " test",
+              " string",
+              ",",
+              " now",
+              " this",
+              ".\n\n",
+              "I",
+              " should",
+              " respond",
+              " conc",
+              "is",
+              "ely",
+              ".",
+              " Perhaps",
+              " acknowledge",
+              " receipt",
+              ".",
+              " There",
+              "'s",
+              " no",
+              " actionable",
+              " request",
+              ".",
+              " Best",
+              " to",
+              " just",
+              " say",
+              " something",
+              " minimal",
+              " like",
+              " \"",
+              "Received",
+              ".\"",
+              " Or",
+              " maybe",
+              " they",
+              " expect",
+              " an",
+              " echo",
+              "?",
+              " Given",
+              " \"",
+              "head",
+              "less",
+              " prompt",
+              " ",
+              "1",
+              "\",",
+              " it",
+              "'s",
+              " a",
+              " probe",
+              " to",
+              " verify",
+              " the",
+              " session",
+              " works",
+              ".\n\n",
+              "I",
+              "'ll",
+              " respond",
+              " briefly",
+              " confirming",
+              " receipt",
+              " of",
+              " Stage",
+              " ",
+              "7",
+              "B",
+              " head",
+              "less",
+              " prompt",
+              " ",
+              "1",
+              "."
+            ]
+          },
+          {
+            "type": "chunk",
+            "time": 1794033864514,
+            "chunk": {
+              "type": "block-end",
+              "index": 0,
+              "block": {
+                "type": "reasoning",
+                "text": "The user is sending what looks like a test harness message: \"STAGE7B headless prompt 1 (unarchived session)\". This seems to be part of some staging/parity test. There's no actual task. Previous pattern: first prompt asked for PONG, then a parity test string, now this.\n\nI should respond concisely. Perhaps acknowledge receipt. There's no actionable request. Best to just say something minimal like \"Received.\" Or maybe they expect an echo? Given \"headless prompt 1\", it's a probe to verify the session works.\n\nI'll respond briefly confirming receipt of Stage 7B headless prompt 1."
+              }
+            }
+          },
+          {
+            "type": "chunk",
+            "time": 1794033864514,
+            "chunk": {
+              "type": "block-start",
+              "index": 1,
+              "blockType": "text"
+            }
+          },
+          {
+            "type": "text-chunks",
+            "time0": 1794033864514,
+            "index": 1,
+            "dt": [
+              0,
+              18,
+              1,
+              0,
+              0,
+              0,
+              0,
+              17,
+              0,
+              0,
+              0,
+              21,
+              0,
+              0,
+              0,
+              0,
+              18,
+              0,
+              17,
+              18,
+              1,
+              19,
+              0,
+              25,
+              0,
+              0
+            ],
+            "texts": [
+              "Received",
+              ":",
+              " ST",
+              "AGE",
+              "7",
+              "B",
+              " head",
+              "less",
+              " prompt",
+              " ",
+              "1",
+              " (",
+              "un",
+              "arch",
+              "ived",
+              " session",
+              ").",
+              " No",
+              " task",
+              " specified",
+              " —",
+              " ready",
+              " for",
+              " the",
+              " next",
+              " instruction",
+              "."
+            ]
+          },
+          {
+            "type": "chunk",
+            "time": 1794033864669,
+            "chunk": {
+              "type": "block-end",
+              "index": 1,
+              "block": {
+                "type": "text",
+                "text": "Received: STAGE7B headless prompt 1 (unarchived session). No task specified — ready for the next instruction."
+              }
+            }
+          },
+          {
+            "type": "chunk",
+            "time": 1794033864670,
+            "chunk": {
+              "type": "usage",
+              "usage": {
+                "inputTokens": 174,
+                "outputTokens": 163,
+                "cacheReadTokens": 9600,
+                "cacheWriteTokens": 0,
+                "totalTokens": 9937
+              }
+            }
+          },
+          {
+            "type": "chunk",
+            "time": 1794033864670,
+            "chunk": {
+              "type": "finish",
+              "reason": {
+                "kind": "stop"
+              },
+              "replayState": {
+                "response": {
+                  "kind": "deepseek-messages",
+                  "version": 1,
+                  "model": "deepseek-flash"
+                },
+                "blocks": [
+                  {
+                    "type": "reasoning",
+                    "signature": "ffd99caf-34a7-42a1-a62f-48fb03360979"
+                  },
+                  {
+                    "type": "text"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "seq": 42,
+      "type": "turn/end",
+      "data": {
+        "turn": 3,
+        "reason": {
+          "kind": "completed"
+        }
+      }
+    },
+    {
+      "seq": 44,
+      "type": "turn/start",
+      "data": {
+        "turn": 4
+      }
+    },
+    {
+      "seq": 46,
+      "type": "turn/end",
+      "data": {
+        "turn": 4,
+        "reason": {
+          "kind": "blocked"
+        }
+      }
+    }
+  ]
+}
