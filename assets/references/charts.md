@@ -83,6 +83,13 @@ x and owns the axes, which is exactly what a function needs to control itself.
 For any card that plots `y = f(x)` — polynomials, roots, trig, exponentials —
 hand-roll the SVG and start from `../examples/quadratic-explorer.html`.
 
+The rules below are **composition rules**, not a test suite: apply them while
+writing the fragment, in one pass. Do not build scripts, harnesses or Node/DOM
+stubs to measure or simulate them; do not sweep parameter grids to prove them.
+The `visualize` tool's lint/render reply is the only runtime check — once it says
+the card rendered, the task is done and you reply to the user. A static re-read
+of your own SVG while composing is enough.
+
 **The window is the plot.** A fixed `x ∈ [-10, 10]` as a constant is the
 standard way to ship a clipped parabola or one tiny arc in a sea of margin.
 Choose the window from the function and the parameters:

@@ -16,6 +16,32 @@ something to work in rather than glance at, as a full page in its own tab.
   story, emit a fenced Mermaid block and skip the tool. The card earns its
   place through motion, interaction, or adjustable inputs.
 
+## Scope
+
+A chat visualization request is **one-shot authoring, not software development**.
+Read **at most one** reference file, then call `visualize` with your best fragment
+— that call is the deliverable. Aim to finish the whole request in a single quick
+pass, in about a minute of work.
+
+- Do **not** create or modify workspace files, scratch scripts, harnesses,
+  fixtures or test data. Do **not** run Node, DOM stubs, headless browsers,
+  window sweeps, render loops or any test of the card outside the app.
+- Call `visualize` once. A single in-place patch is acceptable **only if the
+  tool's reply reports an error or missing render**; never patch to polish.
+- The tool's lint/render reply is the only runtime check. When it says the card
+  rendered, it is done: stop there, even if you could keep polishing. Do not
+  audit, measure or re-verify the render; do not inspect the plugin's `lib/`
+  internals or simulate the card yourself.
+- Correctness is checked **while composing**: compute the vertex, roots and
+  window from the formula in your head or on paper, then write the fragment.
+  No exhaustive sweeps — the numbers in `references/charts.md` are composition
+  rules, not a test suite to satisfy.
+- Full test suites, harnesses and renderer debugging belong to plugin
+  development, not to answering one chat request.
+- After the render, reply in the user's language with one or two sentences.
+  No English step-by-step engineering log, no "I verified…" narration, no
+  interim progress messages.
+
 ## Resources
 
 Read from this skill's resource directory as the task demands — before your
@@ -41,7 +67,7 @@ its categorical x-axis cannot express an origin, and a hard-coded domain
 clips the curve. Axes, ticks and the auto-fitted window are mandatory, not
 finishing touches.
 
-**Axis direction letters are mandatory and are graded.** Every function plot
+**Axis direction letters are required.** Every function plot
 ends its axes with an arrowhead and a bold `x` at the right end of the x-axis
 and a bold `y` at the top end of the y-axis. Emit them as two real SVG `<text>`
 elements; copy these two lines verbatim into the SVG (adjust coordinates to your
@@ -52,10 +78,11 @@ plot area), then give them these exact classes:
 <text class="axis-label axis-label-y" x="AXIS_X + 10" y="PLOT_TOP + 14">y</text>
 ```
 
-A plot without them is an incomplete card — do not return it. Before returning,
-check: window fits the curve; tick numbers do not collide; the `x` and `y`
-letters are present at the axis ends; vertex / symmetry / roots match the
-equation.
+A plot without them is an incomplete card — do not return it. While composing,
+read your own SVG once and eyeball it: window fits the curve, tick numbers do
+not collide, the `x` and `y` letters sit at the axis ends, vertex / symmetry /
+roots match the equation. This is a static glance at your fragment, **not a test
+to run** — do not build anything to prove it.
 
 ## Calling the tool
 
