@@ -22,7 +22,7 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | **7C DONE 2026-11-07** — Gate 3 request **published upstream** (Discussion #12542); 0.2.2-rc.1 compatibility fixed and verified; daily-trial baseline written and acceptance run on an isolated profile; privacy plan A executed (HEAD sanitised). The owner's daily profile was **not** modified. |
+| Stage | **7D DONE 2026-11-07** — math-function plot quality fix: grid/axis/context token bridge, a math-plot recipe and a worked quadratic example; real-host before/after with six measured scenarios. Dark-theme capture NOT VERIFIED (probe blocked). 7C closed earlier the same day. |
 | Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
 | Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
 | Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
@@ -155,6 +155,29 @@ run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
 
 ## 3. Current progress
 
+### Stage 7D — 2026-11-07 (math-function plot quality)
+
+**Discussed** — why a function plot is not a Chart.js chart; the owner's fixed
+`XMIN=-10` card as the defect; the auto-window / axis / mark rules; the
+sandboxed-iframe measurement limitation and the srcdoc-as-tab workaround.
+
+**Implemented** — `src/client/theme.ts` +3 token bridges (grid→border-l1,
+axis→label-tertiary, context→label-caption); `src/frame-css.ts` axis fallback now
+`color-mix(in oklab, var(--foreground) 55%, transparent)`; `charts.md` gains
+§Math function plots; new `assets/examples/quadratic-explorer.html`; skill
+Resources + 5 mandatory lines. No other source/test file changed.
+
+**Verified** — typecheck 0; build 0 (`lib/client.js` sha256 `B03974D7…`);
+full suite **942 passed / 4 skipped (946)**; §9 build == installed; probe
+smoke G0–G3 pass; real host re-generation and six scenario measurements (0 tick
+overlaps; curve 0.62-0.79 of plot height; vertex/roots/symmetry correct); the
+owner's original card at `1.1/-6.8/10` was clipped (curve bbox 5203px vs 300px
+plot, 15 ticks).
+
+**Not verified** — dark host theme (probe BLOCKED: 深色 control not in the
+accessibility tree; no forced attribute); deterministic future generation (one
+model run; the docs gap is closed, not instrumented); scenario frames are the
+plugin's real frame documents opened as a tab, not the in-chat iframe.
 ### Stage 7C — 2026-11-07 (this session)
 
 **Discussed** — ADR-016 Option B; owner's three workstreams; the narrowed upstream ask (no host UI, no new source kind) and the Discussions-only channel; the daily-profile swap vs add distinction.
@@ -611,6 +634,43 @@ Six things carried forward:
 
 ## History
 
+### Session 32 — 2026-11-07 (Stage 7D: math-function plot quality)
+
+**Trigger:** the owner's first daily-use quality complaint on the quadratic card
+("图像显示效果不理想"). Task-4 brief: one renderer token bug, one recipe, one
+example; no refactors.
+
+**Root causes.** (1) The generated card hard-coded `XMIN=-10, XMAX=10` and derived
+Y from the canvas aspect — at the owner's `a=1.1,b=-6.8,c=10` the visible plot was
+a short clipped arc with huge margins and 15 ticks. (2) `charts.md` had no math
+function recipe and framed charts as "Chart.js first". (3) `TOKEN_BRIDGE` never
+bridged grid/axis/context, so in whale style `--viz-grid == --viz-axis` (both the
+host border-l2) — measured `rgb(229,229,229)` rows in the before screenshot.
+
+**Fix.** +3 bridge entries (grid→border-l1, axis→label-tertiary, context→
+label-caption; all tokens re-measured on 0.2.2-rc.1), one frame-css fallback
+line, a new charts.md section with the quadratic auto-window + hysteresis +
+axis/tick/mark rules, and a working `quadratic-explorer.html` example referenced
+from the skill. No other product files changed.
+
+**Verification.** typecheck/build/tests green (946: 942/4), §9 hash gate, probe
+smoke, real host on isolated p7c (:3096). In-chat before/after screenshots; the
+after card's frame document (extracted from the live iframe srcdoc and opened as a
+tab at card width) was driven through six parameter scenarios: 0 tick overlaps,
+curve 0.62–0.79 of plot height, correct vertex/roots/symmetry each time. The
+owner's original card re-run at `1.1/-6.8/10` showed the clipping (curve bbox
+5203px on a 300px plot).
+
+**Honest limits.** Dark theme NOT VERIFIED — the theme probe is BLOCKED because
+the host's 深色 control is not in the accessibility tree and the probe refuses to
+force the attribute; no dark host capture was taken. Generation improvement is a
+single model run, not a guarantee. Scenario captures use the frame document as a
+tab (the chat iframe is cross-origin), while the primary evidence is the in-chat
+before/after pair. Evidence: `evidence/stage-7d/manifest.json`; PNGs remain in
+gitignored `tmp/quad-issue/`.
+
+**Commits:** one for code+example, one for docs/evidence. No push; no tag move; no
+release; the daily profile and the :55142 app were never touched.
 ### Session 31 — 2026-11-07 (Stage 7C: Gate 3 request, 0.2.2 compatibility, daily baseline)
 
 **Scope:** the owner's three workstreams, executed in order. No product code changed; the

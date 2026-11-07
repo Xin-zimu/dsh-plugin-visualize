@@ -1,0 +1,623 @@
+{
+  "stage": "7D",
+  "capturedAt": "2026-11-07",
+  "host": "DSH 0.2.2-rc.1 desktop CLI, isolated profile p7c (tmp/dsh-7c), port 3096",
+  "bundle": {
+    "before_build_sha256": "E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB",
+    "after_build_sha256": "B03974D7B7FCF5DDE9DF0CAA0C5039A13245A85E3820202893C27A73A5DBC756",
+    "note": "installed profile lib/client.js is hard-linked to the repo build; after build the installed hash equalled the build hash (copied check)."
+  },
+  "screenshots": {
+    "after-dark.png": {
+      "path": "tmp/quad-issue/after-dark.png",
+      "sha256": "2d9657be97545ee26f598415603824d33d061066ba02883283d0515916491b11",
+      "bytes": 70589
+    },
+    "after-default.png": {
+      "path": "tmp/quad-issue/after-default.png",
+      "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
+      "bytes": 63700
+    },
+    "after-far-vertex.png": {
+      "path": "tmp/quad-issue/after-far-vertex.png",
+      "sha256": "2c545e19e1577bc883a837a3eebbe1ed2cca8e4f61bac743d366a6cbeaeb41de",
+      "bytes": 63659
+    },
+    "after-initial.png": {
+      "path": "tmp/quad-issue/after-initial.png",
+      "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
+      "bytes": 63700
+    },
+    "after-linear.png": {
+      "path": "tmp/quad-issue/after-linear.png",
+      "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
+      "bytes": 63700
+    },
+    "after-near-zero-a.png": {
+      "path": "tmp/quad-issue/after-near-zero-a.png",
+      "sha256": "2c545e19e1577bc883a837a3eebbe1ed2cca8e4f61bac743d366a6cbeaeb41de",
+      "bytes": 63659
+    },
+    "after-neg-a.png": {
+      "path": "tmp/quad-issue/after-neg-a.png",
+      "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
+      "bytes": 63700
+    },
+    "after-owner.png": {
+      "path": "tmp/quad-issue/after-owner.png",
+      "sha256": "db245bea1ba6339698974adcac1bb817bc7a666828c92a20736c7aab443ce10f",
+      "bytes": 63700
+    },
+    "before-initial.png": {
+      "path": "tmp/quad-issue/before-initial.png",
+      "sha256": "917930120d9a043a8a92c60422e95ca4744c03be5b69899173edade372752677",
+      "bytes": 73970
+    },
+    "frame-after-default.png": {
+      "path": "tmp/quad-issue/frame-after-default.png",
+      "sha256": "ec6b5642c89f3835aa71f5e6fe7be287a22cbc4fe15cadcc1d85c1ae6247c4f3",
+      "bytes": 21642
+    },
+    "frame-after-far-vertex.png": {
+      "path": "tmp/quad-issue/frame-after-far-vertex.png",
+      "sha256": "dc7dad969ed99984310e5f4e10844a4c993d5cdbbb751be238ae9edd9bfb1345",
+      "bytes": 23093
+    },
+    "frame-after-linear.png": {
+      "path": "tmp/quad-issue/frame-after-linear.png",
+      "sha256": "c143e0f41c37f56d1e7a5ba8a8d38e5241c2ce03522dcfacb52ffc5156e1d400",
+      "bytes": 16692
+    },
+    "frame-after-near-zero-a.png": {
+      "path": "tmp/quad-issue/frame-after-near-zero-a.png",
+      "sha256": "f95bd0ab6efad855389b04d1b2df40dcf01d8f575214e714986e6834d47f0bca",
+      "bytes": 21856
+    },
+    "frame-after-neg-a.png": {
+      "path": "tmp/quad-issue/frame-after-neg-a.png",
+      "sha256": "03ea6ab67de5fa84bbe0fab5c131805d6dbd0eb1545c8f235e3fa36cbe7b448b",
+      "bytes": 22622
+    },
+    "frame-after-owner.png": {
+      "path": "tmp/quad-issue/frame-after-owner.png",
+      "sha256": "35394683875525d0f906f3234f146ebd00bf731b1504d4dfba9de744fb630acb",
+      "bytes": 22139
+    },
+    "frame-before-generated-default.png": {
+      "path": "tmp/quad-issue/frame-before-generated-default.png",
+      "sha256": "ec6b5642c89f3835aa71f5e6fe7be287a22cbc4fe15cadcc1d85c1ae6247c4f3",
+      "bytes": 21642
+    },
+    "frame-before-generated-owner.png": {
+      "path": "tmp/quad-issue/frame-before-generated-owner.png",
+      "sha256": "35394683875525d0f906f3234f146ebd00bf731b1504d4dfba9de744fb630acb",
+      "bytes": 22139
+    },
+    "frame-before-owner-default.png": {
+      "path": "tmp/quad-issue/frame-before-owner-default.png",
+      "sha256": "46d7ff356d6844d234d50176c5d864ee2815b6bac09ad73b1469105fdfbb3d76",
+      "bytes": 15474
+    },
+    "frame-before-owner-owner.png": {
+      "path": "tmp/quad-issue/frame-before-owner-owner.png",
+      "sha256": "c1c2d8fad70cc32f2e3ae4f8eb50072ade0e4bb522451dbbf5cc170781516819",
+      "bytes": 17405
+    }
+  },
+  "scenarios": {
+    "after_card": {
+      "default": {
+        "params_requested": {
+          "id": "default",
+          "a": 1,
+          "b": 0,
+          "c": 0
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "1"
+          },
+          {
+            "name": "b",
+            "value": "0"
+          },
+          {
+            "name": "c",
+            "value": "0"
+          }
+        ],
+        "equation": "y = x²",
+        "ticks": 8,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": -28.200000762939453,
+          "w": 552,
+          "h": 241.1999969482422
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      },
+      "owner": {
+        "params_requested": {
+          "id": "owner",
+          "a": 1.1,
+          "b": -6.8,
+          "c": 10
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "1.1"
+          },
+          {
+            "name": "b",
+            "value": "-6"
+          },
+          {
+            "name": "c",
+            "value": "6"
+          }
+        ],
+        "equation": "y = 1.1x² − 6x + 6",
+        "ticks": 10,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": 37.5,
+          "w": 552,
+          "h": 204.6999969482422
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      },
+      "neg-a": {
+        "params_requested": {
+          "id": "neg-a",
+          "a": -1,
+          "b": 0,
+          "c": 2
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "-1"
+          },
+          {
+            "name": "b",
+            "value": "0"
+          },
+          {
+            "name": "c",
+            "value": "2"
+          }
+        ],
+        "equation": "y = −x² + 2",
+        "ticks": 7,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": 76.30000305175781,
+          "w": 552,
+          "h": 192.99998474121094
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      },
+      "linear": {
+        "params_requested": {
+          "id": "linear",
+          "a": 0,
+          "b": 1,
+          "c": 0
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "0"
+          },
+          {
+            "name": "b",
+            "value": "1"
+          },
+          {
+            "name": "c",
+            "value": "0"
+          }
+        ],
+        "equation": "y = x",
+        "ticks": 7,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": 45.5,
+          "w": 552,
+          "h": 201
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      },
+      "far-vertex": {
+        "params_requested": {
+          "id": "far-vertex",
+          "a": 0.5,
+          "b": -10,
+          "c": 10
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "0.5"
+          },
+          {
+            "name": "b",
+            "value": "-6"
+          },
+          {
+            "name": "c",
+            "value": "6"
+          }
+        ],
+        "equation": "y = 0.5x² − 6x + 6",
+        "ticks": 9,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": -15.600000381469727,
+          "w": 552,
+          "h": 242
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      },
+      "near-zero-a": {
+        "params_requested": {
+          "id": "near-zero-a",
+          "a": 0.1,
+          "b": 1,
+          "c": 0
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "0.1"
+          },
+          {
+            "name": "b",
+            "value": "1"
+          },
+          {
+            "name": "c",
+            "value": "0"
+          }
+        ],
+        "equation": "y = 0.1x² + x",
+        "ticks": 5,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": 41.29999923706055,
+          "w": 552,
+          "h": 188.5
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      }
+    },
+    "before_owner_original_card": {
+      "default": {
+        "params_requested": {
+          "id": "default",
+          "a": 1,
+          "b": 0,
+          "c": 0
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "1"
+          },
+          {
+            "name": "b",
+            "value": "0"
+          },
+          {
+            "name": "c",
+            "value": "0"
+          }
+        ],
+        "equation": "y = x²",
+        "ticks": 15,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 300
+        },
+        "curve_box": {
+          "x": 42,
+          "y": -2618,
+          "w": 552,
+          "h": 2760
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1px"
+        }
+      },
+      "owner": {
+        "params_requested": {
+          "id": "owner",
+          "a": 1.1,
+          "b": -6.8,
+          "c": 10
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "1.1"
+          },
+          {
+            "name": "b",
+            "value": "-6.8"
+          },
+          {
+            "name": "c",
+            "value": "10"
+          }
+        ],
+        "equation": "y = 1.1x² − 6.8x + 10",
+        "ticks": 15,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 300
+        },
+        "curve_box": {
+          "x": 42,
+          "y": -5046.7998046875,
+          "w": 552,
+          "h": 5202.85009765625
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1px"
+        }
+      }
+    },
+    "before_regenerated_card": {
+      "default": {
+        "params_requested": {
+          "id": "default",
+          "a": 1,
+          "b": 0,
+          "c": 0
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "1"
+          },
+          {
+            "name": "b",
+            "value": "0"
+          },
+          {
+            "name": "c",
+            "value": "0"
+          }
+        ],
+        "equation": "y = x²",
+        "ticks": 8,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": -28.200000762939453,
+          "w": 552,
+          "h": 241.1999969482422
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      },
+      "owner": {
+        "params_requested": {
+          "id": "owner",
+          "a": 1.1,
+          "b": -6.8,
+          "c": 10
+        },
+        "sliders_applied": [
+          {
+            "name": "a",
+            "value": "1.1"
+          },
+          {
+            "name": "b",
+            "value": "-6"
+          },
+          {
+            "name": "c",
+            "value": "6"
+          }
+        ],
+        "equation": "y = 1.1x² − 6x + 6",
+        "ticks": 10,
+        "tick_overlaps": 0,
+        "svg": {
+          "w": 612,
+          "h": 306
+        },
+        "curve_box": {
+          "x": 44,
+          "y": 37.5,
+          "w": 552,
+          "h": 204.6999969482422
+        },
+        "colors": {
+          "grid": "rgba(0, 0, 0, 0.04)",
+          "axis": "rgb(129, 133, 140)",
+          "gridWidth": "1px",
+          "axisWidth": "1.5px"
+        }
+      }
+    }
+  },
+  "pixel_analysis": {
+    "before-initial": {
+      "image": "tmp/quad-issue/before-initial.png",
+      "size": [
+        1261,
+        744
+      ],
+      "guide_row_count": 19,
+      "guide_col_count": 8,
+      "guide_values": [
+        178.0,
+        228.0,
+        229.0,
+        236.0,
+        239.0,
+        249.0,
+        250.0
+      ],
+      "lighter_median": 237.5,
+      "darker_median": 178.0,
+      "grid_vs_axis_gap": 59.5,
+      "curve_pixels": 5211,
+      "curve_bbox": {
+        "x": 430,
+        "y": 178,
+        "w": 651,
+        "h": 409
+      },
+      "curve_bbox_height_ratio": 0.836,
+      "curve_touches_top": false,
+      "curve_touches_bottom": false
+    },
+    "after-default": {
+      "image": "tmp/quad-issue/after-default.png",
+      "size": [
+        1261,
+        744
+      ],
+      "guide_row_count": 17,
+      "guide_col_count": 7,
+      "guide_values": [
+        178.0,
+        224.3,
+        229.0,
+        236.0,
+        239.0,
+        245.0,
+        250.0
+      ],
+      "lighter_median": 245.0,
+      "darker_median": 224.3,
+      "grid_vs_axis_gap": 20.7,
+      "curve_pixels": 4787,
+      "curve_bbox": {
+        "x": 430,
+        "y": 165,
+        "w": 611,
+        "h": 426
+      },
+      "curve_bbox_height_ratio": 0.871,
+      "curve_touches_top": true,
+      "curve_touches_bottom": false
+    }
+  },
+  "notes": [
+    "Screenshots tmp/quad-issue/*.png are gitignored; hashes above are the durable record.",
+    "frame-*.png are the plugin frame documents opened in a real browser tab at ~640px width and driven with synthetic input events; the in-DSH before-initial/after-default are the primary host-rendered evidence."
+  ],
+  "axis_grid_evidence": {
+    "before_in_dsh_screenshot": {
+      "horizontal_guide_line_colors": {
+        "(229,229,229)": 6
+      },
+      "conclusion": "every full-width guide row is the same colour (#e5e5e5 = host border-l2 #0000001a over white): grid and axis are indistinguishable before the fix"
+    },
+    "after_in_dsh_screenshot": {
+      "horizontal_guide_line_colors": {
+        "(245,245,245)": 3,
+        "(223,224,226)": 2
+      },
+      "conclusion": "grid rows resolve to #f5f5f5 (border-l1 #0000000a = 4% black) while the axis row is visibly darker/blended (1.5px); DOM measurement of the same frame document: grid stroke rgba(0,0,0,0.04) 1px, axis rgb(129,133,140) 1.5px"
+    },
+    "host_token_values_measured_on_0_2_2_rc1": {
+      "--dsw-alias-border-l2": "#0000001a",
+      "--dsw-alias-border-l1": "#0000000a",
+      "--dsw-alias-label-tertiary": "#81858c",
+      "--dsw-alias-label-caption": "#adb2b8",
+      "--dsw-alias-label-secondary": "#61666b"
+    }
+  },
+  "checks": {
+    "typecheck": "pnpm run typecheck -> exit 0",
+    "build": "pnpm run build -> exit 0, lib/client.js 450.73 kB, sha256 B03974D7B7FCF5DDE9DF0CAA0C5039A13245A85E3820202893C27A73A5DBC756",
+    "tests": "npx vitest run -> 942 passed / 4 skipped (946), 48 files, exit 0",
+    "probe_smoke": "node evidence/lib/probe.mjs --what=smoke -> G0-G3 pass (exit 0)",
+    "bundle_hash_gate": "installed profile client.js sha256 == repo build sha256 (B03974D7...)",
+    "theme_dark": "NOT VERIFIED - probe --what=theme --want=dark returned BLOCKED (\"the host's 深色 control is not in the accessibility tree\"); the 更多 menu exposed no theme entry in this build, so no host-authored dark capture was taken"
+  }
+}

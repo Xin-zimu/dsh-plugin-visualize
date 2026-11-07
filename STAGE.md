@@ -776,3 +776,20 @@ check + source kind + bubble badge" of ADR-016 §3:
 Report: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. Draft:
 `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`. Evidence:
 `evidence/stage-7c/gate3/` (15/15 source anchors verified; durable-source proof).
+
+
+## Stage 7D — math-function plot quality
+
+**Owner report:** the first daily-use quality complaint — "二次函数交互卡片的图像显示
+效果不理想". Scope: one renderer token bug, one reference recipe, one worked example.
+
+| Item | State |
+| --- | --- |
+| Renderer tokens (grid/axis/context) | **DONE** — 3 bridge entries + axis fallback; verified grid 1px `rgba(0,0,0,.04)` vs axis 1.5px `rgb(129,133,140)` in the real frame doc |
+| Math plot recipe + reference example | **DONE** — `assets/references/charts.md` §Math function plots, `assets/examples/quadratic-explorer.html`, skill pointers |
+| Real-host before/after | **DONE** — owner prompt re-generated in an isolated DSH 0.2.2-rc.1 host; six scenarios measured (0 tick overlaps, curve 0.62-0.79 of plot height); original card at the owner's slider values was clipped (curve bbox 5203px in a 300px plot, 15 ticks) |
+| Dark theme | **NOT VERIFIED** — probe theme gate BLOCKED (host 深色 control not in the accessibility tree) |
+
+Report: `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md`. Evidence:
+`evidence/stage-7d/manifest.json` (screenshot sha256 + measurements; PNGs in
+gitignored `tmp/quad-issue/`).
