@@ -1,0 +1,302 @@
+{
+  "stage": "token-efficiency investigation (post Stage 7D)",
+  "capturedAt": "2026-11-07",
+  "route": "qwen/deepseek-v4.1-flash (parity verified: request/context + request/header.config = qwen/deepseek-v4.1-flash; reasoningEffort high per adapter/UI, field omitted from header in this build)",
+  "host": "DSH_HOME=tmp/dsh-7c profile p7c, 127.0.0.1:3096, fresh tab + 新会话 per trial, exactly one prompt",
+  "baseline_daily": {
+    "session": "session-7c398e01-76d5-43b5-84b0-892ca55a132a",
+    "model": "qwen/deepseek-v4.1-flash",
+    "reasoning": "high",
+    "uncachedInput": 75560,
+    "cacheRead": 139776,
+    "output": 45731,
+    "total": 261067,
+    "cacheHitPct": 64.9,
+    "requests": 5,
+    "steps": 5,
+    "wallSec": 258,
+    "breakdown": {
+      "system": 1958,
+      "tools": 9937,
+      "message": 60556
+    }
+  },
+  "trials": {
+    "A-t1": {
+      "variant": "A",
+      "trial": "1",
+      "wallSec": 309.6,
+      "sessionId": "2187e1cf-713d-4b93-96af-0d8c742438af",
+      "turns": 1,
+      "toolCalls": 5,
+      "counts": {
+        "skill": 1,
+        "read": 3,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "steps": 5,
+      "promptTokens": 173932,
+      "outputTokens": 50627,
+      "totalTokens": 224559,
+      "cacheHitPct": 58.9,
+      "llmMs": 307610,
+      "decodeMs": 303899,
+      "toolMs": 104,
+      "breakdown": {
+        "system": 1495,
+        "tools": 8796,
+        "message": 57521
+      },
+      "headerConfig": {
+        "provider": "qwen",
+        "model": "deepseek-v4.1-flash",
+        "maxTokens": 256000
+      },
+      "quality": {
+        "docLen": 43975,
+        "axisX": 2,
+        "axisY": 2,
+        "axisGeneric": 7,
+        "tickClass": 16,
+        "hasVertex": true,
+        "hasSym": true,
+        "hasRoots": true,
+        "hasCanvas": false,
+        "cacheHit": "59",
+        "uiLine": "缓存命中 59%"
+      }
+    },
+    "A-t2": {
+      "variant": "A",
+      "trial": "2",
+      "wallSec": 192.6,
+      "sessionId": "924534a4-07e5-4ba8-85ff-d4589ac61de8",
+      "turns": 1,
+      "toolCalls": 5,
+      "counts": {
+        "skill": 1,
+        "read": 3,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "steps": 5,
+      "promptTokens": 156579,
+      "outputTokens": 33375,
+      "totalTokens": 189954,
+      "cacheHitPct": 65.2,
+      "llmMs": 190731,
+      "decodeMs": 187103,
+      "toolMs": null,
+      "breakdown": {},
+      "headerConfig": null,
+      "quality": {
+        "docLen": 40419,
+        "axisX": 2,
+        "axisY": 2,
+        "axisGeneric": 7,
+        "tickClass": 5,
+        "hasVertex": true,
+        "hasSym": true,
+        "hasRoots": true,
+        "hasCanvas": false,
+        "cacheHit": "65",
+        "uiLine": "缓存命中 65%"
+      }
+    },
+    "B-t1": {
+      "variant": "B",
+      "trial": "1",
+      "wallSec": 217.9,
+      "sessionId": "dfa1f5a6-24b0-439d-bf96-f72d19c8d63e",
+      "turns": 1,
+      "toolCalls": 4,
+      "counts": {
+        "skill": 1,
+        "read": 2,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "steps": 5,
+      "promptTokens": 144223,
+      "outputTokens": 35721,
+      "totalTokens": 179944,
+      "cacheHitPct": 62.8,
+      "llmMs": 215037,
+      "decodeMs": 211122,
+      "toolMs": 91,
+      "breakdown": {
+        "system": 1495,
+        "tools": 8796,
+        "message": 41733
+      },
+      "headerConfig": {
+        "provider": "qwen",
+        "model": "deepseek-v4.1-flash",
+        "maxTokens": 256000
+      },
+      "quality": {
+        "docLen": 39118,
+        "axisX": 2,
+        "axisY": 2,
+        "axisGeneric": 7,
+        "tickClass": 5,
+        "hasVertex": true,
+        "hasSym": true,
+        "hasRoots": true,
+        "hasCanvas": false,
+        "cacheHit": "63",
+        "uiLine": "缓存命中 63%"
+      }
+    },
+    "C-t1": {
+      "variant": "C",
+      "trial": "1",
+      "wallSec": 177.8,
+      "sessionId": "61b55680-9ff3-4106-87dc-336a6d67374e",
+      "turns": 1,
+      "toolCalls": 3,
+      "counts": {
+        "skill": 1,
+        "read": 1,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "visualize"
+      ],
+      "steps": 4,
+      "promptTokens": 112895,
+      "outputTokens": 28430,
+      "totalTokens": 141325,
+      "cacheHitPct": 60.1,
+      "llmMs": 174681,
+      "decodeMs": 171050,
+      "toolMs": 78,
+      "breakdown": {
+        "system": 1495,
+        "tools": 8796,
+        "message": 35704
+      },
+      "headerConfig": {
+        "provider": "qwen",
+        "model": "deepseek-v4.1-flash",
+        "maxTokens": 256000
+      },
+      "quality": {
+        "docLen": 41077,
+        "axisX": 2,
+        "axisY": 2,
+        "axisGeneric": 7,
+        "tickClass": 5,
+        "hasVertex": true,
+        "hasSym": true,
+        "hasRoots": true,
+        "hasCanvas": false,
+        "cacheHit": "60",
+        "uiLine": "缓存命中 60%"
+      }
+    },
+    "C-t2": {
+      "variant": "C",
+      "trial": "2",
+      "wallSec": 110.5,
+      "sessionId": "434eaa50-205a-4dab-9602-780c4c1cb4e8",
+      "turns": 1,
+      "toolCalls": 3,
+      "counts": {
+        "skill": 1,
+        "read": 1,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "visualize"
+      ],
+      "steps": 4,
+      "promptTokens": 102157,
+      "outputTokens": 17781,
+      "totalTokens": 119938,
+      "cacheHitPct": 66.4,
+      "llmMs": 107877,
+      "decodeMs": 103673,
+      "toolMs": 59,
+      "breakdown": {
+        "system": 1495,
+        "tools": 8796,
+        "message": 27696
+      },
+      "headerConfig": {
+        "provider": "qwen",
+        "model": "deepseek-v4.1-flash",
+        "maxTokens": 256000
+      },
+      "quality": {
+        "docLen": 39381,
+        "axisX": 2,
+        "axisY": 2,
+        "axisGeneric": 7,
+        "tickClass": 6,
+        "hasVertex": true,
+        "hasSym": true,
+        "hasRoots": true,
+        "hasCanvas": false,
+        "cacheHit": "66",
+        "uiLine": "缓存命中 66%"
+      }
+    }
+  },
+  "screenshots": {
+    "A-t1.png": {
+      "path": "tmp/token-variants/results/A-t1.png",
+      "sha256": "3185356e58db514a858a3fa1efac6f45edf416d71d1af58a7bc9ab997e9148cf",
+      "bytes": 70966
+    },
+    "A-t2.png": {
+      "path": "tmp/token-variants/results/A-t2.png",
+      "sha256": "8523999e9cc8b39f0331dd09ab6a94e377fa1197af83275d0d45fe38f6f7bcb1",
+      "bytes": 77059
+    },
+    "B-t1.png": {
+      "path": "tmp/token-variants/results/B-t1.png",
+      "sha256": "3990f2b5851daf5f7e23f98669efad4b517447dd09d70f45a71e70f9a379bb4b",
+      "bytes": 73095
+    },
+    "C-t1.png": {
+      "path": "tmp/token-variants/results/C-t1.png",
+      "sha256": "deb53f396bb2186488bd2c9498746275751fa76bb55f7bc6779ae872554dd10d",
+      "bytes": 76475
+    },
+    "C-t2.png": {
+      "path": "tmp/token-variants/results/C-t2.png",
+      "sha256": "3cca3c01ed55140c9cd25f844178b184bdafd1b92a1b4b684d6f45e9b1c104d6",
+      "bytes": 79166
+    }
+  },
+  "notes": [
+    "B-t2 aborted: the bsk browser session stopped mid-trial (\"session is stopping\"); B has 1 valid trial only.",
+    "A-t2 token numbers recovered from its projcache (tokenUsage) after the harness schema fix; A-t1/A-t2 and all B/C trials are single-turn sessions.",
+    "Raw session transcripts are machine-local (tmp/token-variants/results/*.jsonl, contain local paths) and are not committed.",
+    "C variant assets: skill points only to examples/quadratic-explorer.html; reference example read 1x; no charts/design reads (C calls: skill, read, visualize).",
+    "Variant B assets include a new references/math-plot.md (2,752 B); B calls: skill, read, read, visualize (math-plot + example)."
+  ]
+}

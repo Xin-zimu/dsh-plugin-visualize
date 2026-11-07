@@ -1,0 +1,50 @@
+{
+  "variant": "B",
+  "trial": "1",
+  "wallSec": 217.9,
+  "sessionId": "dfa1f5a6-24b0-439d-bf96-f72d19c8d63e",
+  "turns": 1,
+  "toolCalls": 4,
+  "counts": {
+    "skill": 1,
+    "read": 2,
+    "visualize": 1
+  },
+  "calls": [
+    "skill",
+    "read",
+    "read",
+    "visualize"
+  ],
+  "steps": 5,
+  "promptTokens": 144223,
+  "outputTokens": 35721,
+  "totalTokens": 179944,
+  "cacheHitPct": 62.8,
+  "llmMs": 215037,
+  "decodeMs": 211122,
+  "toolMs": 91,
+  "breakdown": {
+    "system": 1495,
+    "tools": 8796,
+    "message": 41733
+  },
+  "headerConfig": {
+    "provider": "qwen",
+    "model": "deepseek-v4.1-flash",
+    "maxTokens": 256000
+  },
+  "quality": {
+    "docLen": 39118,
+    "axisX": 2,
+    "axisY": 2,
+    "axisGeneric": 7,
+    "tickClass": 5,
+    "hasVertex": true,
+    "hasSym": true,
+    "hasRoots": true,
+    "hasCanvas": false,
+    "cacheHit": "63",
+    "uiLine": "缓存命中 63%"
+  }
+}

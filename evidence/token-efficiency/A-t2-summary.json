@@ -1,0 +1,43 @@
+{
+  "variant": "A",
+  "trial": "2",
+  "wallSec": 192.6,
+  "sessionId": "924534a4-07e5-4ba8-85ff-d4589ac61de8",
+  "turns": 1,
+  "toolCalls": 5,
+  "counts": {
+    "skill": 1,
+    "read": 3,
+    "visualize": 1
+  },
+  "calls": [
+    "skill",
+    "read",
+    "read",
+    "read",
+    "visualize"
+  ],
+  "steps": 5,
+  "promptTokens": 156579,
+  "outputTokens": 33375,
+  "totalTokens": 189954,
+  "cacheHitPct": 65.2,
+  "llmMs": 190731,
+  "decodeMs": 187103,
+  "toolMs": null,
+  "breakdown": {},
+  "headerConfig": null,
+  "quality": {
+    "docLen": 40419,
+    "axisX": 2,
+    "axisY": 2,
+    "axisGeneric": 7,
+    "tickClass": 5,
+    "hasVertex": true,
+    "hasSym": true,
+    "hasRoots": true,
+    "hasCanvas": false,
+    "cacheHit": "65",
+    "uiLine": "缓存命中 65%"
+  }
+}

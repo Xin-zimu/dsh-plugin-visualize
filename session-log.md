@@ -22,7 +22,7 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | **7D DONE 2026-11-07** + follow-up **over-execution scope limit DONE 2026-11-07** — assets-only wording fix; five isolated-host trials, final two pass (4-6 tool calls, zero pwsh/write/edit, rendered card, 1m23s/2m36s). |
+| Stage | **7D DONE 2026-11-07** + follow-ups done: over-execution scope limit; token-efficiency investigation (A/B/C: reference-copy variant C ~130.6K vs current ~207.3K avg, ~35-40% saving; host overhead remains). |
 | Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
 | Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
 | Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
@@ -197,6 +197,30 @@ or `dsh.profile.bundles`; the refresh recipe in
 `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md` §5 was corrected accordingly. Also
 replaced the one absolute `C:\Users\<name>` host path in that report (privacy
 plan-A rule). The remaining model-card gaps above are unchanged and honest.
+### Token-efficiency investigation — 2026-11-07
+
+**Discussed** — the accepted daily quadratic run is 261,067 tokens (uncached
+75,560 + cacheRead 139,776 + output 45,731; cache 64.9%); 98% of 4m18s is
+decoding, one step-4 reasoning block is 30,566 tokens and is re-sent into the
+final prompt. Host overhead is ~15.7K/request (system 1,958 + tools 9,937 +
+AGENTS.md 2,992); the visualize skill is only ~8.3K once.
+
+**Implemented (investigation only, no committed asset edits)** — qwen parity for
+the isolated p7c profile; three variants under `tmp/token-variants/`: A current,
+B layered (2.75 KB math-plot sheet + read-only-that rule + axis/example-audit
+wording + skip-AGENTS line), C reference-copy (read only the example). Five
+valid 1-turn trials under qwen/deepseek-v4.1-flash.
+
+**Verified** — A: 224.6K/190.0K total, 5 calls, 310/193 s. B: 179.9K (1 valid
+trial; B2 aborted), 4 calls. **C: 141.3K/119.9K, 3 calls, 178/110 s — ~37%
+below A, no quality regression** (screenshot: axes, x/y letters, ticks,
+auto-window, vertex). Evidence `evidence/token-efficiency/`; report
+`docs/reports/TOKEN-EFFICIENCY-2026-11-07.md`.
+
+**Not verified / caveats** — B has one valid trial (bsk session stopped);
+n=2 per variant; cache% varies 48.7-66.4%; reasoningEffort is inferred (not in
+request header); per-request breakdown only for the daily baseline. Host costs
+(repeated overhead + reasoning step) cannot be removed by skill wording.
 ### Stage 7D follow-up — 2026-11-07 (over-execution scope limit)
 
 **Discussed** — one daily request turned into 60 steps / 62 tool calls / 16.7 min
@@ -681,6 +705,31 @@ Six things carried forward:
 
 ## History
 
+### Session 34 — 2026-11-07 (token-efficiency 261K investigation + A/B/C)
+
+**Trigger:** the accepted daily run showed 261K tokens / 4m18s; decomposition
+showed 98% decode time, one 30.6K-token reasoning step re-sent into the final
+prompt, ~15.7K/request host overhead, and only ~8.3K of visualize skill. Task:
+measure whether layered/reference-copy skill wording reduces tokens without
+quality loss.
+
+**Work** — restored qwen/deepseek-v4.1-flash parity on the isolated p7c host
+(provider + default-model entries + daily credentials; verified in
+request/context and request/header.config); built variants A/B/C under
+`tmp/token-variants/`; ran five valid fresh 1-turn sessions; measured
+`tokenUsage` totals, cache %, steps, calls, wall time and card quality.
+
+**Results** — A 207.3K avg (224.6K/190.0K), B 179.9K (1 trial), **C 130.6K avg
+(141.3K/119.9K, 3 calls/4 steps, 110-178 s)** → C ~37% below A and ~50% below
+the owner baseline, quality preserved. Recommendation: use C for standard
+y=f(x) cards, hybrid full rules for complex cards; host-side overhead and
+reasoning effort are separate (non-plugin) levers.
+
+**Caveats** — B2 aborted (browser session stopped), n=2, cache% 48.7-66.4,
+reasoningEffort inferred; raw transcripts kept machine-local, only summaries
+committed. No push; daily app (:64369) and daily profile untouched. Report
+`docs/reports/TOKEN-EFFICIENCY-2026-11-07.md`; evidence
+`evidence/token-efficiency/manifest.json`.
 ### Session 33 — 2026-11-07 (over-execution scope limit for the visualize skill)
 
 **Trigger:** the first over-execution incident in daily use — one quadratic-card
