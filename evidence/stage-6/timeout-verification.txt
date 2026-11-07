@@ -21,7 +21,7 @@ $ pnpm exec vitest run tests/card-images.spec.ts
 ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
 
  FAIL  tests/card-images.spec.ts > image route > opens nothing but a well-formed id of an intact regular file below the store
-Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-ws-reVDMU\secret.png' -> 'C:\Users\86139\AppData\Local\Temp\viz-home-28yWPS\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-ws-reVDMU\secret.png' -> 'C:\Users\<user>\AppData\Local\Temp\viz-home-28yWPS\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
  ❯ tests/card-images.spec.ts:256:5
     254|     const outside = join(workspace, 'secret.png')
     255|     await writeFile(outside, PNG)

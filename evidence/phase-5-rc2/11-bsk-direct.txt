@@ -1,7 +1,7 @@
 === bsk status --json (direct) ===
 {
   "code": null,
-  "message": "ensure daemon is running: automatic daemon startup failed: cannot start an independent Windows daemon; the Job Object of this process does not allow breakaway; use `bsk daemon start --foreground` in a persistent host task: create daemon process C:\\Users\\86139\\.local\\bin\\bsk.exe: 拒绝访问。 (os error 5)",
+  "message": "ensure daemon is running: automatic daemon startup failed: cannot start an independent Windows daemon; the Job Object of this process does not allow breakaway; use `bsk daemon start --foreground` in a persistent host task: create daemon process C:\\Users\\<user>\\.local\\bin\\bsk.exe: 拒绝访问。 (os error 5)",
   "hint": "The Job Object of this process does not allow breakaway, so a detached daemon cannot leave it. Do not retry detached startup in this host. Run `bsk daemon start --foreground` in a persistent host task that outlives client commands, or run `bsk daemon start` from an independent terminal that is not inside this Job. Use the same BSK_HOME and OS user as the clients. Then set BSK_AUTO_START=0 for client commands and verify `bsk status --json` in a separate invocation.",
   "exit_code": 2
 }

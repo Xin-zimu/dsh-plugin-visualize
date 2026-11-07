@@ -43,7 +43,7 @@ Vitest caught 1 unhandled error during the test run.
 This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
 
 ⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
-Error: ENOENT: no such file or directory, open 'C:\Users\86139\AppData\Local\Temp\viz-ws-HvFwwD\~\AppData\Local\Temp\viz-home-PHhg3P\visualize\sessions\sess-1\lab-a52c3de7.whale.html'
+Error: ENOENT: no such file or directory, open 'C:\Users\<user>\AppData\Local\Temp\viz-ws-HvFwwD\~\AppData\Local\Temp\viz-home-PHhg3P\visualize\sessions\sess-1\lab-a52c3de7.whale.html'
  ❯ open node:internal/fs/promises:1345:25
  ❯ readFile node:internal/fs/promises:2003:14
  ❯ Object.readText tests/card-images.spec.ts:58:58
@@ -57,7 +57,7 @@ Error: ENOENT: no such file or directory, open 'C:\Users\86139\AppData\Local\Tem
  ❯ execute src/core/legacy-tool.ts:268:16
 
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:\Users\86139\AppData\Local\Temp\viz-ws-HvFwwD\~\AppData\Local\Temp\viz-home-PHhg3P\visualize\sessions\sess-1\lab-a52c3de7.whale.html' }
+Serialized Error: { errno: -4058, code: 'ENOENT', syscall: 'open', path: 'C:\Users\<user>\AppData\Local\Temp\viz-ws-HvFwwD\~\AppData\Local\Temp\viz-home-PHhg3P\visualize\sessions\sess-1\lab-a52c3de7.whale.html' }
 This error originated in "tests/card-images.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
 The latest test that might've caused the error is "leaves the card untouched when an update is cancelled while its images resolve". It might mean one of the following:
 - The error was thrown, while Vitest was running this test.

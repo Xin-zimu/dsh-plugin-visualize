@@ -1,8 +1,10 @@
 # Upstream request draft — host-validated message provenance
 
-Date: 2026-11-07 · **STATUS: DRAFT, NOT SUBMITTED.** The owner must approve
-sending. This file contains (a) the ready-to-send post and (b) a reference patch
-plan for maintainers.
+Date: 2026-11-07 · **STATUS: SENT 2026-11-07** — published as a Discussion
+(category: Ideas):
+https://github.com/deepseek-ai/deepseek-harness/discussions/12542
+This file is the canonical copy of what was posted; Part B is the reference
+patch plan for maintainers. No issue or PR was opened.
 
 Why a **Discussion** and not an issue/PR:
 
@@ -18,13 +20,9 @@ Design evidence: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md` and
 `evidence/stage-7c/gate3/`. Everything below is written against the public
 release tag `dsh-v0.2.2-rc.1` (`66491b05e3`), which is also the installed host.
 
-**Where to post (owner action — this file is not published):**
-
-- Discussions home: https://github.com/deepseek-ai/deepseek-harness/discussions
-- New post: https://github.com/deepseek-ai/deepseek-harness/discussions/new
-- A signed-in GitHub account is required (signed-out visitors are redirected to
-  login). Choose the closest category (e.g. *Ideas* or *General*).
-- Do **not** open an Issue or a PR: both are disabled on that repository.
+**Published at:** https://github.com/deepseek-ai/deepseek-harness/discussions/12542
+(category *Ideas*; 2026-11-07). No Issue or PR was opened; the repository
+disables both.
 
 ---
 
@@ -120,10 +118,14 @@ release tag `dsh-v0.2.2-rc.1` (`66491b05e3`), which is also the installed host.
 > - The host only accepts ids its own log contains and derives the recorded tool
 >   name/turn itself, following the same "validate the locator against the log"
 >   discipline as `dsh-action-cards`' `act()`.
-> - Residual, stated: an already-authorised prompt caller could point at a
->   different real call in the same session. That is misattribution among real
->   calls within one user/session, display-only. It cannot invent a call, change
->   the session, or gain authority.
+> - **What the validation proves, and what it does not.** The host can prove
+>   that the named `callId` is a committed `tool/call` in the target session, and
+>   it derives `tool`/`turn` from that event. That is **membership, not
+>   authorship**: it does **not** prove that the submitting caller is the card
+>   that made that call. A caller already authorised to submit prompts could name
+>   another real call in the same session, so the recorded origin is
+>   **display/trace data only — never an authorisation or identity claim**.
+>   Consumers must treat it as a hint to read, not a permission to act on.
 >
 > **Behaviour on the existing traps.** Provenance is recorded on the message, so
 > an archived session (prompt accepted, turn blocked, no `user/message`) records
@@ -190,10 +192,10 @@ Open implementation choices for upstream:
 - **Rate cost:** one log observation per prompt carrying a claim. Prompts without
   the field pay nothing.
 
-Preconditions before this draft is sent (owner gate):
+Publication record (all conditions met):
 
-1. Owner approval of the wording and of the repo identity being named.
-2. Re-check the release: if a newer DSH release exists, re-run
-   `fetch-anchors.ps1` + `verify-anchors.mjs`; do not send stale line numbers.
-3. Do not open an issue or PR; post under Discussions and link the evidence
-   summary, not the private session logs.
+1. Owner approved the wording and the repo identity on 2026-11-07.
+2. Release re-checked before posting: npm `next` = `0.2.2-rc.1`, no newer
+   release; the post cites tag `dsh-v0.2.2-rc.1` = `66491b05e3`.
+3. Posted under Discussions only; no issue, no PR. The posted body links the
+   evidence summary, not private session logs.

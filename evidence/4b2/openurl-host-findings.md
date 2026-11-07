@@ -4,8 +4,8 @@
   open exists".
 - **Date:** 2026-11-05
 - **Host:** DSH 0.2.1-rc.5, Electron desktop app, profile `desktop`
-  (`C:\Users\86139\.dsh\profiles\desktop`, confirmed from the live process
-  command line: `dsh-desktop-host/lib/index.js … dsh C:\Users\86139\.dsh\profiles\desktop`).
+  (`C:\Users\<user>\.dsh\profiles\desktop`, confirmed from the live process
+  command line: `dsh-desktop-host/lib/index.js … dsh C:\Users\<user>\.dsh\profiles\desktop`).
 - **Sources read:** asar-extracted packages under `tmp/dsh-host-src/`
   (extraction helper `tmp/asar-extract-pkgs.mjs`), the Electron `lib/main.js`
   and `lib/preload-app.cjs` extracted with `tmp/asar-tool.mjs`, and the live
@@ -234,7 +234,7 @@ with the comment at line 295: "Web profiles opt in; Desktop retains sandboxed
 HTTP(S) Browser tabs." `profileContext.name` is the profile name
 (`dsh/lib/profile-boot-C14i-8IN.js:290-291`: `const profileContext = { name:
 options.profile, … }`, provided at `:304`). The live host process runs
-`… dsh C:\Users\86139\.dsh\profiles\desktop` and `dsh-desktop-host` passes
+`… dsh C:\Users\<user>\.dsh\profiles\desktop` and `dsh-desktop-host` passes
 `profile: "desktop"` (`dsh-desktop-host/lib/index.js:228-230`). **So the
 expression is `'desktop' !== 'desktop'` = `false` = enabled.**
 
@@ -386,7 +386,7 @@ node evidence/4b2/openurl-probe.mjs        # exit 0 = routes classified as expec
 Source extraction used (all read-only, asar never modified):
 
 ```powershell
-node tmp/asar-extract-pkgs.mjs "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\app.asar" tmp/dsh-host-src dsh-client-ui-deliverables dsh-desktop-host dsh-host-frontend-static dsh-web-app dsh-api-workspace-files dsh-host-directory-picker dsh-client-ui-directory-picker-native dsh-client-ui-sidebar-files dsh-client-ui-sidebar-documentpreview dsh-api-gateway dsh-typert-loader dsh-api-remotes dsh-api-remote-access dsh-tool-present dsh-client-ui-sidebar-browser dsh-client-ui-sidebar-right dsh-client-ui-layout dsh-client-locale dsh-app-boot
+node tmp/asar-extract-pkgs.mjs "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\resources\app.asar" tmp/dsh-host-src dsh-client-ui-deliverables dsh-desktop-host dsh-host-frontend-static dsh-web-app dsh-api-workspace-files dsh-host-directory-picker dsh-client-ui-directory-picker-native dsh-client-ui-sidebar-files dsh-client-ui-sidebar-documentpreview dsh-api-gateway dsh-typert-loader dsh-api-remotes dsh-api-remote-access dsh-tool-present dsh-client-ui-sidebar-browser dsh-client-ui-sidebar-right dsh-client-ui-layout dsh-client-locale dsh-app-boot
 node tmp/asar-tool.mjs save "<app.asar>" "/lib/main.js" tmp/4b2-electron-main.js
 node tmp/asar-tool.mjs save "<app.asar>" "/lib/preload-app.cjs" tmp/4b2-preload-app.cjs
 node tmp/asar-tool.mjs save "<app.asar>" "/dsh/node_modules/@deepseek-ai/dsh-web-app/cordis.patch.yml" tmp/4b2-web-app.cordis.patch.yml
@@ -401,5 +401,5 @@ node tmp/asar-tool.mjs save "<app.asar>" "/dsh/node_modules/@deepseek-ai/dsh-web
    not been reproduced on a hostile site here.
 3. **Cell-level facts of the live profile.** The bundle patch is read from the
    asar, and the profile's own patch
-   (`C:\Users\86139\.dsh\profiles\desktop\cordis.patch.yml`) does not touch
+   (`C:\Users\<user>\.dsh\profiles\desktop\cordis.patch.yml`) does not touch
    `ui-sidebar-browser` — verified by reading that file, 124 lines, no such id.

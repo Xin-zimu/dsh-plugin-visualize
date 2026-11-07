@@ -265,10 +265,14 @@ Plugin side (Gate 4, after an upstream release ships it):
   `session.prompt`; only trusted page/plugin code can set a claim.
 - The host only accepts a `callId` that its own log contains, and derives the
   recorded `tool` and `turn` itself.
-- **Residual, stated honestly:** a caller already authorised to submit prompts
-  can still point at a *different real* call in the same session. The badge then
-  misattributes within the same user/session; it cannot invent a call, cannot
-  redirect the session, and cannot gain authority. This is the same discipline
+- **Residual, stated honestly:** host validation proves **membership, not
+  authorship** — that the `callId` is a committed `tool/call` in the target
+  session, *not* that the submitting caller is the card that made that call. A
+  caller already authorised to submit prompts can still point at a *different
+  real* call in the same session. The badge then misattributes within the same
+  user/session; it cannot invent a call, cannot redirect the session, and cannot
+  gain authority. The recorded origin is **display/trace data only, never an
+  authorisation or identity claim**. This is the same discipline
   as `dsh-action-cards` (`act()` validates a locator against the log, never
   trusts it as a credential).
 
@@ -307,10 +311,15 @@ Plugin side (Gate 4, after an upstream release ships it):
   upstream acceptance test 6 and Gate 4 case 9.
 - Any end-to-end card→prompt-with-origin flow: impossible on 0.2.2-rc.1 because
   the strict codec rejects the field.
-- That upstream accepts the shape: the Discussion is a draft, not sent, per the
-  owner's instruction.
+- That upstream accepts the shape: the Discussion was **sent** on 2026-11-07
+  (https://github.com/deepseek-ai/deepseek-harness/discussions/12542); whether
+  upstream adopts it is now their call.
 
 ## 11. Where the draft lives
 
-`docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` — a ready-to-
-send GitHub **Discussion** post plus a reference patch plan. It is **not** sent.
+`docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` — canonical
+copy of the post. **Published** 2026-11-07 as
+https://github.com/deepseek-ai/deepseek-harness/discussions/12542 (category
+*Ideas*; no issue, no PR). The trust statement was tightened immediately before
+posting: host validation proves **membership, not authorship** — the field is
+display/trace only, never authorisation.

@@ -21,7 +21,7 @@ this says what the current slice is allowed to do.
 | 5 | Unified prompt, security review, release | **DONE — released `v0.1.0` 2026-11-06** at `40b8241`. Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md` |
 | 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; **946/946 green on CI Linux and CI Windows (0 skipped on either)**, and 942 passed / 4 skipped / 946 locally, where the 4 are the tests that need a symlink privilege this machine lacks. `evidence/stage-6/` |
 | 7A | Host capability investigation + `@ToAssistant` ADR | **CLOSED 2026-11-07 — investigation only, no product code.** Installed host is **0.2.2-rc.1** (4B-2 read stale 0.2.1-rc.5). Confirmation now exists; **one** host change left (message attribution). `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md` |
-| 7B | `@ToAssistant` implementation | **Gate 1 done (owner: Option B). Gate 2 done: real-host pre-validation PASSED** for the confirmation half, with three measured limits (`evidence/stage-7b/real-host/`). **Gate 3 done as a request (not sent):** upstream ask narrowed to one wire+validation item; `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. **No product code yet.** |
+| 7B | `@ToAssistant` implementation | **Gate 1 done (owner: Option B). Gate 2 done: real-host pre-validation PASSED** for the confirmation half, with three measured limits (`evidence/stage-7b/real-host/`). **Gate 3 request published upstream (Discussion #12542, 2026-11-07):** upstream ask narrowed to one wire+validation item; `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. **No product code yet.** |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -710,7 +710,7 @@ host API (Option C).
 | --- | --- |
 | **1. Decision recorded** | **DONE** — Option B accepted in ADR-016; no implementation authorised by the decision alone |
 | **2. Real-host pre-validation** | **DONE — PASSED** on an isolated DSH 0.2.2-rc.1 host (`evidence/stage-7b/real-host/`) |
-| **3. Upstream provenance change** | **DONE as a request — not sent** (owner gate). One wire+validation item: optional `origin` claim on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source; no host UI change (the existing `conversation.chat.user.before` slot renders it plugin-side). `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`, `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`, `evidence/stage-7c/gate3/` |
+| **3. Upstream provenance change** | **DONE — published as Discussion #12542** (owner approved 2026-11-07). One wire+validation item: optional `origin` claim on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source; no host UI change (the existing `conversation.chat.user.before` slot renders it plugin-side). `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`, `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`, `evidence/stage-7c/gate3/` |
 | **4. Implementation + security acceptance** | Not started; blocked on Gate 3; ADR-016 §7 cases + §8 criteria |
 
 **What Gate 2 measured, and what it changes:**
@@ -752,7 +752,7 @@ profile.
 
 | Workstream | State |
 | --- | --- |
-| A. Gate 3 — upstream provenance request | **DONE — request prepared, not sent.** Report + Discussion draft + line-anchor evidence. |
+| A. Gate 3 — upstream provenance request | **DONE — request published: Discussion #12542 (2026-11-07).** Report + post + line-anchor evidence. |
 | B. DSH 0.2.2-rc.1 compatibility (peer ranges, cordis skew) | **DONE — fixed in this repo; product JS unchanged.** devDeps → 0.2.2-rc.1, cordis → 4.1.0, six `dsh-*` peer ranges gain `\|\| ^0.2.2-rc.1`. `pnpm peers check`/typecheck/build/tests green; clean isolated-profile resolve picks 0.2.2-rc.1 + cordis 4.1.0 and passes; real-host load on 0.2.2-rc.1 passes. `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`, `evidence/stage-7c/compat/` |
 | C. Daily-trial baseline (install/rollback steps + isolated acceptance run) | **DONE — daily profile untouched.** Daily profile confirmed `~/.dsh/profiles/desktop` (PID 21788/:50270, currently `@nagi-ovo/dsh-visualize ^0.1.7` — the swap is a replacement). Install/rollback written, not executed. Isolated-profile real-use acceptance: **8/8 scenarios, 0 failures, 0 console errors**, cards restored across refresh + session switch, real slider drag writes state. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/` |
 
@@ -771,7 +771,7 @@ check + source kind + bubble badge" of ADR-016 §3:
 - Evidence that the plugin cannot self-serve this: the prompt codec is strict
   (`additionalProperties:false`).
 - Channel: upstream accepts reports in Discussions and does not accept external
-  PRs; the draft is a Discussion post, **not submitted**.
+  PRs; the request was posted as a Discussion (**#12542**) on 2026-11-07.
 
 Report: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. Draft:
 `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`. Evidence:

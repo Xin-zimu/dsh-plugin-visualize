@@ -312,9 +312,13 @@ What changed:
    mechanisms.
 5. **Channel constraint:** upstream does not accept external PRs and directs
    reports to GitHub Discussions (`CONTRIBUTING.md` at the tag; repo API reports
-   issues/PRs disabled). The ready-to-send Discussion draft is
-   `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` — **not
-   sent**, as the owner required.
+   issues/PRs disabled). The request was **published** 2026-11-07 as
+   https://github.com/deepseek-ai/deepseek-harness/discussions/12542 after owner
+   approval (canonical copy:
+   `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`). Before
+   posting, the trust statement was tightened: host validation proves
+   **membership in the session log, not authorship of the submission**; the field
+   is display/trace data only, never an authorisation or identity claim.
 
 Status of this ADR is unchanged: **Accepted — Option B**, implementation still
 blocked on the upstream change landing.

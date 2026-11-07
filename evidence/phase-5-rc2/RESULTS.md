@@ -370,7 +370,7 @@ current bundle**, which is a real strength of that evidence — it survives the 
 
 ```
 listener on 56091 : PID 26452, "DeepSeek Harness.exe"
-cmdline profile   : C:\Users\86139\.dsh\profiles\desktop
+cmdline profile   : C:\Users\<user>\.dsh\profiles\desktop
 HTTP GET /        : 401 Unauthorized  (auth-fenced)
 HTTP GET /plugins/@nagi-ovo/dsh-visualize/client.js : 404
 ```

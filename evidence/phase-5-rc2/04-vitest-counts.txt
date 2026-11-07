@@ -31,34 +31,34 @@ suite files walked: 48
    msg:  Error: ENOENT: no such file or directory, open 'D:\Deepseek WorkSpace\dsh-plugin-visualize\~\AppData\Local\Temp\viz-home-mNyjTD\visualize\sessions\sess-1\lab-27530d60.whale.html'
 5. image route opens nothing but a well-formed id of an intact regular file below the store
    file: tests/card-images.spec.ts
-   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-ws-VmKIZo\secret.png' -> 'C:\Users\86139\AppData\Local\Temp\viz-home-IDkTfP\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
+   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-ws-VmKIZo\secret.png' -> 'C:\Users\<user>\AppData\Local\Temp\viz-home-IDkTfP\visualize\sessions\sess-1\images\02a3e298f1533f62558c58e4c70edcab9af5a50d62d925fd5390942020fb0fb8.png'
 6. workspace images refuses paths that leave the workspace, lexically or through a symlink
    file: tests/images.spec.ts
-   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-img-M1h29T\outside\secret.png' -> 'C:\Users\86139\AppData\Local\Temp\viz-img-M1h29T\ws\figs\link.png'
+   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-img-M1h29T\outside\secret.png' -> 'C:\Users\<user>\AppData\Local\Temp\viz-img-M1h29T\ws\figs\link.png'
 7. card storage writes a new card into the session store, not the workspace, and patches it there
    file: tests/storage.spec.ts
-   msg:  AssertionError: expected '~\AppData\Local\Temp\viz-home-mNhj4M\…' to match /^C:\Users\86139\AppData\Loc…/visualize\
+   msg:  AssertionError: expected '~\AppData\Local\Temp\viz-home-mNhj4M\…' to match /^C:\Users\<user>\AppData\Loc…/visualize\
 8. card storage keeps the style a card was created with when it is patched after the setting changed
    file: tests/storage.spec.ts
    msg:  Error: ENOENT ~\AppData\Local\Temp\viz-home-ePJkcs\visualize\sessions\sess-7\lab-2f2b2eea.editorial.html
 9. card storage never reads a file outside the store with its own fs
    file: tests/storage.spec.ts
-   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-home-WqP8gM\outside' -> 'C:\Users\86139\AppData\Local\Temp\viz-home-WqP8gM\visualize\sessions\linked'
+   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-home-WqP8gM\outside' -> 'C:\Users\<user>\AppData\Local\Temp\viz-home-WqP8gM\visualize\sessions\linked'
 10. card storage creates the same card concurrently in the same millisecond (Codex repro)
    file: tests/storage.spec.ts
-   msg:  Error: EPERM: operation not permitted, rename 'C:\Users\86139\AppData\Local\Temp\viz-home-qyd9k8\visualize\sessions\sess-5\lab-03ef8274.whale.html.25596.d6c1815af521.tmp' -> 'C:\Users\86139\AppData\Local\Temp\viz-home-qyd9k8\visualize\sessions\sess-5\lab-03ef8274.whale.html'
+   msg:  Error: EPERM: operation not permitted, rename 'C:\Users\<user>\AppData\Local\Temp\viz-home-qyd9k8\visualize\sessions\sess-5\lab-03ef8274.whale.html.25596.d6c1815af521.tmp' -> 'C:\Users\<user>\AppData\Local\Temp\viz-home-qyd9k8\visualize\sessions\sess-5\lab-03ef8274.whale.html'
 11. legacy workspace cards patches a legacy card inside the workspace by relative and absolute path
    file: tests/storage.spec.ts
-   msg:  Error: ENOENT: no such file or directory, open 'C:\Users\86139\AppData\Local\Temp\viz-ws-VegRUP\C:\Users\86139\AppData\Local\Temp\viz-ws-VegRUP\viz\lab-0badf00d.html'
+   msg:  Error: ENOENT: no such file or directory, open 'C:\Users\<user>\AppData\Local\Temp\viz-ws-VegRUP\C:\Users\<user>\AppData\Local\Temp\viz-ws-VegRUP\viz\lab-0badf00d.html'
 12. legacy workspace cards refuses a symlink inside the workspace that points out of it
    file: tests/storage.spec.ts
-   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-secret-sO4Xvk\secret.html' -> 'C:\Users\86139\AppData\Local\Temp\viz-ws-vd3W5v\viz\link.html'
+   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-secret-sO4Xvk\secret.html' -> 'C:\Users\<user>\AppData\Local\Temp\viz-ws-vd3W5v\viz\link.html'
 13. style files route refuses a style file that is a symlink, for reads and writes
    file: tests/style-files.spec.ts
-   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-files-out-QQNQQT\secret.txt' -> 'C:\Users\86139\AppData\Local\Temp\viz-files-home-OFVWMK\visualize\style.md'
+   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-files-out-QQNQQT\secret.txt' -> 'C:\Users\<user>\AppData\Local\Temp\viz-files-home-OFVWMK\visualize\style.md'
 14. style files route refuses a workspace whose .dsh directory links out of it
    file: tests/style-files.spec.ts
-   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\viz-files-out-gy8jBb' -> 'C:\Users\86139\AppData\Local\Temp\viz-files-ws-DtkD40\.dsh'
+   msg:  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\viz-files-out-gy8jBb' -> 'C:\Users\<user>\AppData\Local\Temp\viz-files-ws-DtkD40\.dsh'
 15. visualizeTool description names an on-disk contract for agents that cannot load skills
    file: tests/tool.spec.ts
    msg:  AssertionError: expected undefined to be defined

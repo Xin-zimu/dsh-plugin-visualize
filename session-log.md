@@ -22,7 +22,7 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | **7C DONE 2026-11-07** — Gate 3 request prepared (not sent); 0.2.2-rc.1 compatibility fixed and verified; daily-trial baseline written and acceptance run on an isolated profile. The owner's daily profile was **not** modified. |
+| Stage | **7C DONE 2026-11-07** — Gate 3 request **published upstream** (Discussion #12542); 0.2.2-rc.1 compatibility fixed and verified; daily-trial baseline written and acceptance run on an isolated profile; privacy plan A executed (HEAD sanitised). The owner's daily profile was **not** modified. |
 | Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
 | Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
 | Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
@@ -112,27 +112,46 @@ run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
 
 - **Pushed:** `origin/main = dd9affb` (fast-forward from `cda6346`, the three
   Stage 7C commits). No tag moved (`v0.1.1` = `50b6b54`), no release, no force.
-- **Upstream request:** final Discussion draft ready, **not sent**:
-  `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` (posting
-  entry and channel are at the top of the file). The owner must approve sending.
+- **Upstream request:** **published** 2026-11-07 as
+  https://github.com/deepseek-ai/deepseek-harness/discussions/12542 (category
+  *Ideas*; no Issue, no PR). Canonical copy:
+  `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`. The trust
+  statement was tightened before posting: host validation proves **membership,
+  not authorship**; the field is display/trace only, never authorisation.
 - **Daily swap:** the owner approved replacing `@nagi-ovo/dsh-visualize` in
   `~/.dsh/profiles/desktop`, but the swap must run **after the owner quits the
   app**, so this session prepared and verified it instead of executing it:
   `tools/daily-profile-switch.ps1` (`-DryRun` / `-Rollback`), plus a clone
   simulation with the daily profile's own `hoisted` / `autoInstallPeers:false`
   settings (`evidence/stage-7c-daily/03-swap-simulation.txt`). The daily profile
-  was not modified; the GUI on `:50270` was not restarted. Note for the operator:
+  was not modified; the GUI on `:50270` was not restarted. **Preflight re-run and
+  passed 2026-11-07** (`evidence/stage-7c-daily/04-preflight.txt`); the swap now
+  waits only on the owner quitting the app. Note for the operator:
   `peers check` fails on this profile by design (18 missing-host-peer entries
   before and after), so it is diagnostics, not a gate; the gates are install
   exit 0, old-absent / new-present, bundle hash equal, and the smoke test.
 - **Privacy:** `docs/reports/PRIVACY-2026-11-07.md` records the historical
-  profile-path exposure (15 files in HEAD, all pre-7C), distinguishes HEAD from
-  history (including the Stage 7C intermediate commit `96e7c9a`, whose raw event
-  dump was sanitised by `dd9affb` in HEAD), confirms no credential or private-
-  conversation content was found, and proposes minimal cleanup A (sanitise HEAD),
-  B (history rewrite) and C (repository recreate). **No rewrite, no force push.**
+  profile-path exposure and distinguishes HEAD from history. **Plan A was
+  executed 2026-11-07** on the owner's instruction: the 15 HEAD files now use
+  `C:\Users\<user>` (single- and double-escaped forms preserved; every changed
+  JSON re-parsed). History is unchanged and still accessible (adding commits,
+  Stage 7C intermediate `96e7c9a`, pre-rewrite objects served by SHA); the
+  report does **not** claim the historical exposure is eliminated. No rewrite,
+  no force push.
 - **Not doing:** no new test frameworks, probes or documentation system. The
   completion criterion is a stable daily DSH with a clear rollback path.
+
+## 2d. Owner directive — 2026-11-07 (after Stage 7C close)
+
+- **Daily use is the priority.** The owner approved the daily-profile swap but
+  requires quitting the app first. This session re-ran the preflight only
+  (`evidence/stage-7c-daily/04-preflight.txt`) and **waits** for the explicit
+  "DSH 已退出" signal. The swap is **not** performed yet.
+- **Upstream Discussion:** published (see §2c). `@ToAssistant` stays Deferred
+  until the provenance interface lands; `@OpenUrl` stays deferred.
+- **Privacy plan A:** executed (see §2c); history not rewritten, no force push.
+- **Scope:** no new test frameworks, probes or refactors; no release; `v0.1.1`
+  not moved.
 
 ## 3. Current progress
 
@@ -343,7 +362,7 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | `pnpm-lock.yaml` | refreshed by `pnpm install` | the 12 packages + closure |
 | `docs/decisions/ADR-016…` | §13 supplement; corrected the "0.2.2 ships no `.d.ts`" compatibility row | Gate 3 narrowed the upstream ask; the type claim was an asar artifact |
 | `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md` | **new** | design, file:line anchors, interfaces, acceptance criteria, trust boundary, VERIFIED/NOT VERIFIED |
-| `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` | **new** | ready-to-send Discussion draft + reference patch plan, **not submitted** |
+| `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` | **new** | Discussion post + reference patch plan, **published** as https://github.com/deepseek-ai/deepseek-harness/discussions/12542 |
 | `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md` | **new** | diagnosis, minimal diff, verification table, verified-vs-theoretical split |
 | `docs/reports/STAGE-7C-DAILY-BASELINE.md` | **new** | daily profile identity, install/upgrade + rollback steps, isolated acceptance, residual risks |
 | `STAGE.md` | 7B Gate 3 row + a Stage 7C section with all three workstreams | AGENTS §8 |
@@ -351,7 +370,7 @@ This is the host's own pairing (its send button and "1017" badge use the same
 | `evidence/stage-7c/compat/` | install/peers/typecheck/build/tests transcripts, profile resolve, bundle hash, real-host check + JSON | every compat claim has a runnable artifact |
 | `evidence/stage-7c-daily/` | install, smoke note, bundle hash, acceptance script/run + per-scenario JSON | every daily-baseline claim has a runnable artifact |
 
-Commits: `f49fdf5` (Gate 3), `96e7c9a` (compat), plus the final docs/evidence commit for this workstream. Nothing pushed; no tag moved; no release.
+Commits: `f49fdf5` (Gate 3), `96e7c9a` (compat), `dd9affb` (daily baseline), `be97d8c` (handoff: published upstream, switch tooling, privacy review), plus the plan-A sanitisation commit. Pushed to `origin/main`; CI green; no tag moved; no release.
 
 ## 5. Test results
 
@@ -372,9 +391,9 @@ Commits: `f49fdf5` (Gate 3), `96e7c9a` (compat), plus the final docs/evidence co
 
 | Issue | Impact | Status |
 | --- | --- | --- |
-| **`@ToAssistant` needs one upstream host change** | No card→assistant message can carry host-validated provenance | **Gate 3 request prepared, not sent.** Upstream does not accept external PRs; the draft is a Discussion post. Until it ships the action stays refused |
+| **`@ToAssistant` needs one upstream host change** | No card→assistant message can carry host-validated provenance | **Gate 3 request published** 2026-11-07 as Discussion #12542 (Ideas); awaiting upstream. Until it ships the action stays refused |
 | **`@OpenUrl`** | A card cannot open an external URL | Unchanged; no plugin-callable external open in 0.2.2-rc.1 (ADR-014) |
-| **Daily-profile swap not performed** | The owner still runs `@nagi-ovo/dsh-visualize ^0.1.7` | Steps + rollback written in `docs/reports/STAGE-7C-DAILY-BASELINE.md`; the installer must quit the app first. Not executed by this agent |
+| **Daily-profile swap approved, not yet executed** | The owner still runs `@nagi-ovo/dsh-visualize ^0.1.7` | Preflight passed (`evidence/stage-7c-daily/04-preflight.txt`); `tools/daily-profile-switch.ps1` + rollback are ready. Blocked only on the owner quitting the app and saying so |
 | **Two surfaces of one card can diverge live** | While interacting, the non-dragged copy may show the old slider value until reload | **Observed 2026-11-07** (daily acceptance; converges after reload). Pre-existing presentation behaviour; fixing it needs its own decision, not a side effect of 7C |
 | **Model-initiated visualization** | An implicit request ("画个图") might not call the tool | NOT VERIFIED; acceptance prompts named the tool. A few real daily prompts will settle it |
 | **HTML backend in daily acceptance** | 7C acceptance exercised OpenUI cards only | NOT re-run; HTML was verified in earlier stages and the build is byte-identical to v0.1.1 |
@@ -387,8 +406,8 @@ Commits: `f49fdf5` (Gate 3), `96e7c9a` (compat), plus the final docs/evidence co
 
 **Immediate next steps (Stage 7C close, 2026-11-07):**
 
-1. **Owner decision on Gate 3:** read `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` and either approve sending the Discussion post (it is not sent) or leave it parked. Nothing else in `@ToAssistant` can start before the host change ships.
-2. **Owner decision on the daily swap:** follow `docs/reports/STAGE-7C-DAILY-BASELINE.md` §2 (quit the app first; back up `package.json` + `pnpm-lock.yaml`; replace `@nagi-ovo/dsh-visualize` with this fork; install; peers check; smoke test). Rollback is §3.
+1. **Gate 3 is published:** no owner action; monitor https://github.com/deepseek-ai/deepseek-harness/discussions/12542 for an upstream response. Nothing in `@ToAssistant` can start before the host change ships.
+2. **Daily swap (owner):** quit the DSH desktop app, then run `pwsh tools/daily-profile-switch.ps1` (`-DryRun` first; §2 of the daily-baseline report). Restart, run the smoke test; rollback is `-Rollback`. The swap is not executed by this agent while the app is running.
 3. **After the upstream change ships:** Stage 7B Gate 4 implementation + the ADR-016 §7 security cases and §8 acceptance, including the `userQuestions.ask` 68 px preview cap and durable `rpcId` delivery check.
 4. **Do not** cut a release for the 7C changes: product code is byte-identical to v0.1.1; only the manifest compile/peer metadata changed.
 

@@ -1,0 +1,55 @@
+# Daily-profile swap — preflight, 2026-11-07
+
+Read-only check before the owner-approved swap. **Nothing was changed** by this
+check; the swap itself is gated on the owner quitting the DSH desktop app.
+Profile: `%USERPROFILE%\.dsh\profiles\desktop` (the owner's daily profile).
+
+## Current state
+
+| Item | Value |
+| --- | --- |
+| dependency in the profile | `@nagi-ovo/dsh-visualize ^0.1.7` (installed `0.1.7`) |
+| this fork in the profile | absent (dependency and `node_modules`) |
+| existing `.plugin-backups` entries | 0 (first run will create one) |
+| profile `package.json` | SHA-256 `4F2C7A98C93084202EC281E1F2C55D1B908783E2B817F37EB7ED33403329FA32` |
+| profile `pnpm-lock.yaml` | SHA-256 `2BD11DA8854BBB7E0DD4A8D8DFA98FB3107455EC18D865D8A3ACAA3642817DBB` |
+| GUI | **running** on `127.0.0.1:50270` → the swap must wait for it to quit |
+| repo HEAD | `be97d8c`, worktree clean |
+| build `lib/client.js` | `E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB` = verified hash |
+| free space on D: | 21.9 GB |
+| profile directory writable | yes |
+
+## Script dry-run
+
+`pwsh tools/daily-profile-switch.ps1 -DryRun` → **exit 0**. Planned change:
+
+- `dependencies`: `@nagi-ovo/dsh-visualize ^0.1.7` → `@dsh-unified/visualize`
+  `file:<repo>` (forward slashes);
+- `dsh.profile.bundles[4]`: `@nagi-ovo/dsh-visualize` → `@dsh-unified/visualize`,
+  in place (8 bundles before, 8 after);
+- files written: `package.json`, `pnpm-lock.yaml`, `node_modules/` (pnpm),
+  `.plugin-manager/logs/`;
+- backup (new): `<profile>\.plugin-backups\<timestamp>\` containing
+  `package.json`, `pnpm-lock.yaml`, `inventory.json`, `peers-before.txt`,
+  `peers-after.txt`;
+- not touched: `%USERPROFILE%\.dsh\sessions`, `%USERPROFILE%\.dsh\storages`.
+
+## Backup and rollback readiness
+
+- The script writes the backup **before** it changes `package.json`, and aborts if
+  the profile or the desktop CLI is missing.
+- `-Rollback` restores the newest backup, runs the same desktop-CLI install, and
+  verifies the upstream plugin is installed again.
+- Manual fallback: copy the two files back from the backup directory, then
+  `dsh plugin --profile desktop install`.
+- The install path itself was proven against a **clone** of this profile
+  (`evidence/stage-7c-daily/03-swap-simulation.txt`): install exit 0, fork
+  installed, upstream absent, bundle hash equal.
+- `peers check` is expected to fail in this profile before and after
+  (`autoInstallPeers: false`, 18 missing-peer entries); it is diagnostics, not a
+  gate.
+
+## Gate
+
+Execute only after the owner quits the DSH desktop app and says so. The script
+refuses to run while the app process or the `:50270` listener is present.

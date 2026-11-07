@@ -23,10 +23,10 @@ JSON report written to D:/Deepseek WorkSpace/dsh-plugin-visualize/tmp/probes/ful
 tests 944 passed 938 failed 4 pending 2
 
 failures:
-   1   167 ms card-images.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\
-   2   162 ms storage.spec.ts      Error: EPERM: operation not permitted, rename 'C:\Users\86139\AppData\Local\Temp\v
-   3    52 ms style-files.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\
-   4    34 ms style-files.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\86139\AppData\Local\Temp\
+   1   167 ms card-images.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\
+   2   162 ms storage.spec.ts      Error: EPERM: operation not permitted, rename 'C:\Users\<user>\AppData\Local\Temp\v
+   3    52 ms style-files.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\
+   4    34 ms style-files.spec.ts  Error: EPERM: operation not permitted, symlink 'C:\Users\<user>\AppData\Local\Temp\
 
 timeout-shaped failures: 0
 the task's test: passed in 157 ms

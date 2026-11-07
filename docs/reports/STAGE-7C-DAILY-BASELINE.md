@@ -193,7 +193,7 @@ Notes and honesty:
 
 | Item | Status |
 | --- | --- |
-| Daily-profile install | **not performed — owner step.** Procedure below; the swap was **simulated on a clone** of the daily profile on 2026-11-07: install exit 0, fork 0.1.1 installed, upstream absent, installed bundle hash == build hash. |
+| Daily-profile install | **preflight passed 2026-11-07; waiting for the owner to quit the app** (`evidence/stage-7c-daily/04-preflight.txt`) — not executed. Procedure in §2; the swap was **simulated on a clone**: install exit 0, fork 0.1.1, upstream absent, hash equal. |
 | Daily-profile `peers check` | **fails by design, before and after**: the desktop profile sets `autoInstallPeers:false` + `hoisted`, so 18 missing-host-peer entries are reported on both sides. Not a gate, not a regression. |
 | HTML backend (`backend: "html"`) cards in daily use | **NOT VERIFIED this run** — the acceptance turns produced OpenUI cards. HTML rendering was verified in earlier stages (B04 etc.) and the build is byte-identical to v0.1.1. |
 | Model calling `visualize` without an explicit instruction (e.g. "画个图解释一下") | **NOT VERIFIED** — every acceptance prompt named the tool. The plugin's skill is installed and this is how earlier stages drove the model; a few real daily prompts will settle it. |
@@ -220,5 +220,26 @@ Notes and honesty:
 - `evidence/stage-7c-daily/01-smoke.txt` — shared probe attempt (environment note)
 - `evidence/stage-7c-daily/02-bundle-hash.txt` — §9 build == installed
 - `evidence/stage-7c-daily/02-acceptance-run.txt` — full run output
+- `evidence/stage-7c-daily/03-swap-simulation.txt` — clone simulation of the swap
+- `evidence/stage-7c-daily/04-preflight.txt` — preflight for the real daily profile
 - `evidence/stage-7c-daily/real-use/*.json` — per-scenario measurements
 - `evidence/stage-7c-daily/acceptance.mjs` — reproducibility
+
+## 8. Post-swap acceptance checklist (owner runs after restart)
+
+One pass; stop and roll back on the first product-level failure.
+
+| # | Check | Pass looks like |
+| --- | --- | --- |
+| 1 | existing chat history | open a pre-swap conversation: messages render normally, no error banner |
+| 2 | other plugins | `browser-skill`, settings page, `dsh-pet`, `dsh-context`, `dsh-qoder-connect` still load |
+| 3 | model calls the tool | ask for a card; the model calls `visualize` and one card appears in the answer |
+| 4 | OpenUI card + interaction | card renders; a slider moves and its `$state` value changes |
+| 5 | refresh restore | reload: same cards/titles/state, no model call |
+| 6 | HTML backend | one card created with `backend:"html"` renders in its sandboxed frame |
+| 7 | one `visualize` tool | only this fork owns the name; no duplicate-tool error in the logs |
+| 8 | stability | no console errors, no crash, no duplicate cards |
+
+**Rollback on any failure:** quit the app, run
+`pwsh -File "<repo>\tools\daily-profile-switch.ps1" -Rollback`, restart. Chat
+and session data are never touched.

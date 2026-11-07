@@ -15,8 +15,8 @@ Independent check (tmp/probes/verify-tilde.mts):
 
     native display form : ~\AppData\Local\Temp\viz-home-X\visualize\sessions\s1\lab-ab12.whale.html
     posix display form  : ~/AppData\Local\Temp\...
-    ownedPath(native)   : C:\Users\86139\AppData\Local\Temp\...\lab-ab12.whale.html
-    ownedPath(posix)    : C:\Users\86139\AppData\Local\Temp\...\lab-ab12.whale.html
+    ownedPath(native)   : C:\Users\<user>\AppData\Local\Temp\...\lab-ab12.whale.html
+    ownedPath(posix)    : C:\Users\<user>\AppData\Local\Temp\...\lab-ab12.whale.html
     NATIVE ROUND TRIP   : OK
     POSIX  ROUND TRIP   : OK
     ownedPath('~')      : REFUSED  (correct: home itself is not a card file)

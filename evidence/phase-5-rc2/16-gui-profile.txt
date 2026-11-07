@@ -7,7 +7,7 @@ LocalAddress LocalPort OwningProcess
 
 owning PID = 26452
 name: DeepSeek Harness.exe
-cmdline: "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\DeepSeek Harness.exe" --expose-internals "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\app.asar\dsh\node_modules\@deepseek-ai\dsh-desktop-host\lib\index.js" "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\app.asar\dsh" C:\Users\86139\.dsh\profiles\desktop "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime" "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.mjs" "C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\bin"
+cmdline: "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\DeepSeek Harness.exe" --expose-internals "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\resources\app.asar\dsh\node_modules\@deepseek-ai\dsh-desktop-host\lib\index.js" "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\resources\app.asar\dsh" C:\Users\<user>\.dsh\profiles\desktop "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime" "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\resources\runtime\primary-runtime\dependencies\pnpm\bin\pnpm.mjs" "C:\Users\<user>\AppData\Local\Programs\DeepSeek Harness\resources\runtime\bin"
 --- HTTP probe ---
 HTTP 401 (auth-fenced)
 --- a plugin route ---
