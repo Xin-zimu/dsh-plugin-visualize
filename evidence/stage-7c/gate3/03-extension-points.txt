@@ -1,0 +1,41 @@
+# Gate 3 — existing extension points that make the host ask smaller
+
+## 1. A source-aware decoration slot ABOVE the user bubble already exists (installed 0.2.2-rc.1)
+file: dsh-client-ui-chat/lib/client.js:3128-3170 (installed build; source package client/ui-chat)
+  slot: conversation.chat.user.before  kind: chain  scope: session
+  ownerProps: { source: unknown; kind: 'user' | 'steering' }
+  doc: 'Message-source decoration owned and rendered by the user Node entry. Selectors elect
+        one component from the durable source and row kind.'
+  example registration (same declaration):
+    ctx.slots.inject('conversation.chat.user.before', () => ctx.slots.register(
+      { name: 'conversation.chat.user.before', select: owner => null }, () => ...)),
+  shipped occupant: experimental-liveshare SharedSessionOrigin
+
+## 2. Chat passes the DURABLE message source to that slot
+file: packages/client/ui-chat/src/client/chat/MessageItem.tsx:226
+  {renderSlotChain('conversation.chat.user.before', { source: node.data.source, kind: node.kind }, { fallback: null })}
+file: packages/client/ui-chat/src/client/contract/slots.ts:230-236, 457
+file: packages/client/ui-chat/src/client/conversation-nodes/message.ts:127-134
+  the rendered user node copies source from the durable user/message event
+=> restore/replay after reload and session switch passes through the same object
+
+## 3. The plugin side already uses this exact client extension mechanism
+file: src/client/index.tsx:27  'export const inject = [\\'slots\\']'
+file: src/client/index.tsx:80-124 registers toolview / dock / turnTail entries
+=> a user-bubble badge needs no new host UI; only a new register on the declared slot.
+
+## 4. Compile-baseline gap (input to workstream B, not to the upstream ask)
+installed devDeps are 0.2.1-rc.5; their client-ui-chat typings declare these chat slots:
+  'conversation.chat.user.content': {
+  'conversation.chat.user.images': {
+  'conversation.chat.reasoning.content': {
+  'conversation.chat.flow': {
+  'conversation.chat.node': {
+  'conversation.chat.message.images': {
+  'conversation.chat.user.images': {
+  'conversation.chat.commandview': {
+  'conversation.chat.reasoning.body': {
+  'conversation.chat.turnTail': {
+  => 'conversation.chat.user.before' / UserBeforeOwnerProps are ABSENT in 0.2.1-rc.5 types.
+  Gate 4 can still implement it via a local module augmentation, but moving the compile
+  baseline to 0.2.2-rc.1 (workstream B) is the honest fix.

@@ -1,0 +1,117 @@
+# Gate 3 — the prompt wire today, and where host validation can run
+# All excerpts are Read from upstream commit 66491b05e3 (tag dsh-v0.2.2-rc.1);
+# anchors are asserted by verify-anchors.mjs (anchors-verified.json: 15/15).
+
+## A. SessionPromptRequest — no origin today
+file: packages/api/session-controller/src/types.ts:322-330
+  export interface SessionPromptRequest {
+    /** Client-minted identity persisted on the exact accepted user message. */
+    readonly requestId: SessionRequestId
+    readonly sessionId: SessionId
+    readonly mode: 'queue' | 'steer'
+    /** At least one non-whitespace text part or attachment. */
+    readonly content: readonly PromptContentPart[]
+    readonly clientTimeZone?: string
+  }
+
+## B. Durable source type — merge-extensible, kind fixed to user
+file: packages/api/session-controller/src/types.ts:391-400
+  declare module '@deepseek-ai/dsh-llm' {
+    interface MessageSourceMap {
+      /**
+       * Browser prompt correlation, optional Host-validated time zone, and the
+       * caller that submitted the prompt. `principal` is written only for a
+       * caller other than the owner, so an absent `principal` means the owner.
+       */
+      'user-rpc': { kind: 'user'; rpcId: SessionRequestId; clientTimeZone?: string; principal?: Principal }
+    }
+  }
+
+## C. Remote admission builds the source the client cannot name
+file: packages/api/session-controller/src/index.ts:464-489
+    @Remote('prompt')
+    async prompt(request: SessionPromptRequest, signal: AbortSignal): Promise<SessionPromptValue> {
+      signal.throwIfAborted()
+      if (!hasPromptContent(request.content)) {
+        throw new RemoteError('gateway/bad-request', 'prompt content must include non-whitespace text or an attachment', {})
+      }
+      const clientTimeZone = request.clientTimeZone === undefined
+        ? undefined
+        : canonicalClientTimeZone(request.clientTimeZone)
+      if (request.clientTimeZone !== undefined && clientTimeZone === undefined) {
+        throw new RemoteError(
+          'session/invalid-time-zone',
+          'clientTimeZone must be UTC or a valid IANA Area/Location name',
+          { value: request.clientTimeZone },
+        )
+      }
+      // The caller is recorded only when it is not the owner, so owner messages keep their exact source.
+      const principal = principalOf(this.ctx.invocation)
+      const source: MessageSource = {
+        kind: 'user',
+        rpcId: request.requestId,
+        ...(clientTimeZone === undefined ? {} : { clientTimeZone }),
+        ...(principal === undefined ? {} : { principal }),
+      }
+      return this.commands.prompt(request, source)
+    }
+
+## D. Command layer resolves the Agent, then binds message+source
+file: packages/api/session-controller/src/commands.ts:304-350 (head)
+    async prompt(request: SessionPromptRequest, source: MessageSource): Promise<SessionPromptValue> {
+      const agent = await this.resolveAgent(request.sessionId)
+      if (hasPromptRequest(agent, request.requestId)) return { accepted: true }
+      const admission = resolvePromptFileReceipts(
+        request.content,
+        receiptId => this.ctx.fileUploads.resolve(agent, receiptId),
+      )
+      // Encoded images and image upload receipts both make an image prompt.
+      const hasImage = admission.content.some(part => part.type === 'image')
+      const admit = async (): Promise<SessionPromptValue> => {
+        try {
+          if (hasImage) {
+            const current = agent.model.current()
+            if (current !== undefined) {
+              const model = await this.ctx.llm.resolveModelInfo(current.provider, current.model)
+              if (model.inputModalities !== undefined && !model.inputModalities.includes('image')) {
+                throw new RemoteError(
+                  'session/attachment-invalid',
+                  `Model "${current.model}" does not support image input.`,
+                  { reason: 'MODEL_DOES_NOT_SUPPORT_IMAGES' },
+                )
+              }
+  ...
+  (line 329: const message: UserMessage = createUserMessage({ content, source }))
+
+## E. Dedupe/echo matching depends on kind 'user' + rpcId — do not change kind
+file: packages/api/session-controller/src/commands.ts:542-552
+  function hasPromptRequest(agent: Agent, requestId: SessionRequestId): boolean {
+    const matches = (message: UserMessage): boolean => {
+      const source = message.source
+      return source.kind === 'user' && 'rpcId' in source && source.rpcId === requestId
+    }
+    if (agent.inbox.nextTurn.some(matches) || agent.inbox.nextStep.some(matches)) return true
+    // oxlint-disable-next-line typescript/no-deprecated -- Existing Session history read; migration deferred.
+    return agent.session.snapshotEvents().some((event) => {
+      if (event.type !== 'user/message') return false
+      const source = event.data.source
+      return source.kind === 'user' && 'rpcId' in source && source.rpcId === requestId
+
+## F. Why an unknown extra field cannot carry provenance today (installed build)
+file: dsh-api-session-controller/lib/typert.host.js:2382-2414 (installed 0.2.2-rc.1)
+  'session/prompt' parameter codec is strict and generated from SessionPromptRequest:
+  line 2395 (codec) jsonSchema tail: ...s":true}]},"description":"At least one non-whitespace text part or attachment."},"clientTimeZone":{"type":"string"}},"required":["requestId","sessionId","mode","content"],"additionalProperties":true},
+  line 2401 (strictCodec) jsonSchema tail: ...:false}]},"description":"At least one non-whitespace text part or attachment."},"clientTimeZone":{"type":"string"}},"required":["requestId","sessionId","mode","content"],"additionalProperties":false},
+  line 2413 sourceLocation: packages/api/session-controller/src/index.ts:465:9
+  => a client sending an undeclared origin field is rejected by the strict codec; the host must declare it.
+
+## G. The durable tool-call record a claim can be validated against
+file: packages/core/session/src/types.ts:369
+    'tool/call': { turn: number; step: number; callId: ToolCallId; name: string; arguments: string }
+
+## H. Sanctioned log read already used by the same command class
+file: packages/api/session-controller/src/commands.ts:221-222 (fork path)
+      try {
+        observed = await this.ctx.sessionQuery.observeSession(request.sessionId)
+  ctx.sessionQuery.observeSession(...) is the current read API (dsh-session-query README:
+  'Use ctx.sessionQuery from application code when you need to read or search session history').

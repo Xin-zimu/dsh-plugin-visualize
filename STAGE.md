@@ -21,7 +21,7 @@ this says what the current slice is allowed to do.
 | 5 | Unified prompt, security review, release | **DONE — released `v0.1.0` 2026-11-06** at `40b8241`. Browser gates verified on a real host running this build; 15 failures adjudicated. `docs/reports/PHASE-5-FINAL-GATE.md` |
 | 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; **946/946 green on CI Linux and CI Windows (0 skipped on either)**, and 942 passed / 4 skipped / 946 locally, where the 4 are the tests that need a symlink privilege this machine lacks. `evidence/stage-6/` |
 | 7A | Host capability investigation + `@ToAssistant` ADR | **CLOSED 2026-11-07 — investigation only, no product code.** Installed host is **0.2.2-rc.1** (4B-2 read stale 0.2.1-rc.5). Confirmation now exists; **one** host change left (message attribution). `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md` |
-| 7B | `@ToAssistant` implementation | **Gate 1 done (owner: Option B). Gate 2 done: real-host pre-validation PASSED** for the confirmation half, with three measured limits (`evidence/stage-7b/real-host/`). **Gate 3 (upstream provenance) not started; no product code yet.** |
+| 7B | `@ToAssistant` implementation | **Gate 1 done (owner: Option B). Gate 2 done: real-host pre-validation PASSED** for the confirmation half, with three measured limits (`evidence/stage-7b/real-host/`). **Gate 3 done as a request (not sent):** upstream ask narrowed to one wire+validation item; `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. **No product code yet.** |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -710,7 +710,7 @@ host API (Option C).
 | --- | --- |
 | **1. Decision recorded** | **DONE** — Option B accepted in ADR-016; no implementation authorised by the decision alone |
 | **2. Real-host pre-validation** | **DONE — PASSED** on an isolated DSH 0.2.2-rc.1 host (`evidence/stage-7b/real-host/`) |
-| **3. Upstream provenance change** | **Not started** — one host-validated `origin` claim on the prompt admission path + rendered marker (ADR-016 §3) |
+| **3. Upstream provenance change** | **DONE as a request — not sent** (owner gate). One wire+validation item: optional `origin` claim on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source; no host UI change (the existing `conversation.chat.user.before` slot renders it plugin-side). `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`, `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`, `evidence/stage-7c/gate3/` |
 | **4. Implementation + security acceptance** | Not started; blocked on Gate 3; ADR-016 §7 cases + §8 criteria |
 
 **What Gate 2 measured, and what it changes:**
@@ -739,3 +739,40 @@ host API (Option C).
 **Gate 3's ask is unchanged and still one item** — host-validated, persisted, rendered
 message provenance bound to the actual delivered message. `@OpenUrl` continues as a separate
 upstream request (ADR-014).
+
+---
+
+## Stage 7C — Gate 3 request, 0.2.2-rc.1 compatibility, daily baseline
+
+**Owner-ordered workstreams (2026-11-07), executed in this order.** Goal: get the
+plugin into real daily use instead of extending infrastructure indefinitely.
+Boundaries: no DSH source edit, no issue/PR submission, no tag move, no release,
+no @ToAssistant/@OpenUrl implementation, no modification of the owner's daily
+profile.
+
+| Workstream | State |
+| --- | --- |
+| A. Gate 3 — upstream provenance request | **DONE — request prepared, not sent.** Report + Discussion draft + line-anchor evidence. |
+| B. DSH 0.2.2-rc.1 compatibility (peer ranges, cordis skew) | **see below** |
+| C. Daily-trial baseline (install/rollback steps + isolated acceptance run) | **see below** |
+
+### A. Gate 3 result
+
+The upstream ask is **one additive host change**, not the "schema field + log
+check + source kind + bubble badge" of ADR-016 §3:
+
+- `SessionPromptRequest` gains `origin?: {kind:'tool-call', callId}`.
+- `commands.prompt` validates the id against a committed `tool/call` in the
+  resolved session, derives `tool`/`turn` itself, records
+  `origin:{kind,callId,tool,turn}` on the durable `'user-rpc'` source, and
+  rejects unknown ids.
+- No host UI work: `conversation.chat.user.before` already lets a plugin render a
+  source-driven badge; no new source kind (keeps dedupe/echo matching).
+- Evidence that the plugin cannot self-serve this: the prompt codec is strict
+  (`additionalProperties:false`).
+- Channel: upstream accepts reports in Discussions and does not accept external
+  PRs; the draft is a Discussion post, **not submitted**.
+
+Report: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. Draft:
+`docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`. Evidence:
+`evidence/stage-7c/gate3/` (15/15 source anchors verified; durable-source proof).

@@ -1,0 +1,55 @@
+{
+ "file": "session.v4.jsonl.zstd",
+ "bytes": 71413,
+ "events": 104,
+ "userMessages": 8,
+ "sourceKinds": [
+  "user",
+  "runtime-context",
+  "skill-catalog",
+  "time-context"
+ ],
+ "promptMessages": [
+  {
+   "seq": 8,
+   "sourceKind": "user",
+   "rpcIdIsString": true,
+   "sourceKeys": [
+    "clientTimeZone",
+    "kind",
+    "rpcId"
+   ]
+  },
+  {
+   "seq": 59,
+   "sourceKind": "user",
+   "rpcIdIsString": true,
+   "sourceKeys": [
+    "clientTimeZone",
+    "kind",
+    "rpcId"
+   ]
+  },
+  {
+   "seq": 78,
+   "sourceKind": "user",
+   "rpcIdIsString": true,
+   "sourceKeys": [
+    "clientTimeZone",
+    "kind",
+    "rpcId"
+   ]
+  },
+  {
+   "seq": 86,
+   "sourceKind": "user",
+   "rpcIdIsString": true,
+   "sourceKeys": [
+    "clientTimeZone",
+    "kind",
+    "rpcId"
+   ]
+  }
+ ],
+ "note": "Only source metadata is printed; message content is deliberately omitted."
+}

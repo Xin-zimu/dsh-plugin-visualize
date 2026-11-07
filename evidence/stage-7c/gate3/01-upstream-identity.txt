@@ -1,0 +1,44 @@
+# Gate 3 — which upstream source this request is based on
+# captured: 2026-11-07 15:18:52 +08:00  repo HEAD: cda6346731f2f8177ddab6cad791ff964081424a Stage 7B Gate 2: real-host pre-validation of confirmation and submission
+# commands: see README.md in this directory
+
+## npm registry: @deepseek-ai/dsh-session
+dist-tags:
+  latest: 0.0.1-rc.1
+  next: 0.2.2-rc.1
+  alpha: 0.2.2-alpha.3
+newest published versions (tail of version list):
+  0.2.2-alpha.2, 0.2.1-rc.5, 0.2.2-alpha.3, 0.2.2-rc.1
+  0.2.2-rc.1 published: 11/04/2026 08:58:55
+=> newest published release is 0.2.2-rc.1; 'latest' tag oddly points at 0.0.1-rc.1, 'next' is the release channel
+
+## GitHub: deepseek-ai/deepseek-harness (public, MIT)
+default_branch: master   pushed_at: 11/04/2026 13:06:39
+has_issues: False   has_pull_requests: False   has_discussions: True
+open_issues_count: 0   license: MIT
+
+## Latest release
+  v0.2.2-rc.1  tag=dsh-v0.2.2-rc.1  published=2026/11/4 13:07:14
+  v0.2.2-alpha.3  tag=dsh-v0.2.2-alpha.3  published=2026/11/3 7:56:48
+  v0.2.1-rc.5  tag=dsh-v0.2.1-rc.5  published=2026/10/30 2:12:26
+
+## Tags (head)
+  dsh-v0.2.2-rc.1  commit=66491b05e3f05ad35bcdd4f6cd7ed26041d9e3db
+  dsh-v0.2.2-alpha.3  commit=05b1cae8db6e674c5685101494d4eec24652424a
+  dsh-v0.2.2-alpha.2  commit=f3803c96974ad4a94195fb97e5c637e9c2a3afe3
+
+## Source commit used for every file:line citation in this directory
+  tag dsh-v0.2.2-rc.1 = commit 66491b05e3
+  https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/66491b05e3/<path>
+  installed host ships the same release: @deepseek-ai/dsh-* 0.2.2-rc.1 in app.asar
+
+## Contribution channel (decides issue vs discussion vs PR)
+CONTRIBUTING.md @ 66491b05e3:
+  "We are sorry that we cannot accept external pull requests at the moment."
+  "Identify and report issues or bugs in GitHub Discussions:"
+  => the ready-to-send draft is a Discussion post; do not open an issue/PR.
+  (the repo still carries .github/ISSUE_TEMPLATE files, but issues/PRs are disabled by API flags above)
+
+## Environment note for reproduction
+  node fetch and curl.exe cannot reach raw.githubusercontent.com from this box (ECONNRESET);
+  PowerShell Invoke-WebRequest does. fetch-anchors.ps1 uses PowerShell for that reason.

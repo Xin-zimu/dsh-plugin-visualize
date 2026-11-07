@@ -272,3 +272,49 @@ installed bundle equals the build (`E1BF4A82…`, 450,559 B). But `pnpm peers ch
 pnpm resolved into the profile), and `peerDependencies: ^0.2.1-0` does not admit
 `0.2.2-rc.1` under strict semver. Runtime compatibility is proven; **declared**
 compatibility is not, and the ranges must be updated before support is claimed.
+
+---
+
+## 13. Gate 3 supplement — 2026-11-07: the upstream ask is now one wire+validation item
+
+Gate 3 (Stage 7C) re-read the **public release source** of the installed host
+(`dsh-v0.2.2-rc.1` = `66491b05e3`; npm `next` = 0.2.2-rc.1, no newer release) and
+found that §3 Option B's "one schema field + one server-side log check + **a
+source kind** + **one bubble badge**" overstates it. The report is
+`docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`; evidence is
+`evidence/stage-7c/gate3/` (15/15 line anchors re-verified mechanically).
+
+What changed:
+
+1. **No upstream UI change.** A source-aware decoration slot already exists
+   above the user bubble: `conversation.chat.user.before` (chain, session scope,
+   owner props `{source, kind}`), declared by Chat and already used by
+   `experimental-liveshare` (`packages/client/ui-chat/src/client/contract/slots.ts:230,457`;
+   rendered at `chat/MessageItem.tsx:226`). The plugin already registers other
+   Chat slots (`src/client/index.tsx`). The badge is plugin-side, driven by the
+   host-recorded source.
+2. **No new source kind.** The source map is merge-extensible and the existing
+   `'user-rpc'` entry can carry an optional `origin` field. Keeping
+   `kind:'user'` + `rpcId` keeps `hasPromptRequest` dedupe and the composer's
+   submission-echo matching (`commands.ts:542-552`) untouched; a new kind would
+   instead classify the row as injected **context** (`conversation-nodes/message.ts:96-111`).
+3. **The plugin cannot smuggle the field itself.** The prompt parameter codec is
+   strict with `additionalProperties:false` (installed
+   `dsh-api-session-controller/lib/typert.host.js:2401`), so the host must declare
+   and validate it — which is exactly the "host-validated, not plugin-forged"
+   requirement.
+4. **The ask, restated:** `SessionPromptRequest` gains
+   `origin?: {kind:'tool-call', callId}`; `commands.prompt` validates the id
+   against a committed `tool/call` event in the resolved session (sanctioned read:
+   `ctx.sessionQuery.observeSession`, already used in the same class) and records
+   the host-derived `{callId, tool, turn}` on the durable `'user-rpc'` source;
+   reject unknown ids. Persist/restore/display then follow from existing
+   mechanisms.
+5. **Channel constraint:** upstream does not accept external PRs and directs
+   reports to GitHub Discussions (`CONTRIBUTING.md` at the tag; repo API reports
+   issues/PRs disabled). The ready-to-send Discussion draft is
+   `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` — **not
+   sent**, as the owner required.
+
+Status of this ADR is unchanged: **Accepted — Option B**, implementation still
+blocked on the upstream change landing.
