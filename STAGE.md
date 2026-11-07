@@ -796,3 +796,4 @@ Report: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. Draft:
 Report: `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md`. Evidence:
 `evidence/stage-7d/manifest.json` (screenshot sha256 + measurements; PNGs in
 gitignored `tmp/quad-issue/`).
+| Over-execution scope limit | **DONE** — assets-only `## Scope` block (one-shot authoring, no files/scripts/harnesses/Node/browser, one visualize call, render = done) + de-graded axis wording + composition-rules sentences in charts/example. Two fresh isolated-host trials pass: 4/6 tool calls, zero pwsh/write/edit, one visualize, rendered card, 1m23s/2m36s, one Chinese sentence. Report `docs/reports/OVEREXEC-2026-11-07.md`; evidence `evidence/overexec/`. Wall-clock remains model-latency dependent (one intermediate trial 4m01s). |

@@ -22,7 +22,7 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | **7D DONE 2026-11-07** — math-function plot quality fix: grid/axis/context token bridge, a math-plot recipe and a worked quadratic example; real-host before/after with six measured scenarios. Dark-theme capture NOT VERIFIED (probe blocked). 7C closed earlier the same day. |
+| Stage | **7D DONE 2026-11-07** + follow-up **over-execution scope limit DONE 2026-11-07** — assets-only wording fix; five isolated-host trials, final two pass (4-6 tool calls, zero pwsh/write/edit, rendered card, 1m23s/2m36s). |
 | Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
 | Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
 | Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
@@ -197,6 +197,34 @@ or `dsh.profile.bundles`; the refresh recipe in
 `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md` §5 was corrected accordingly. Also
 replaced the one absolute `C:\Users\<name>` host path in that report (privacy
 plan-A rule). The remaining model-card gaps above are unchanged and honest.
+### Stage 7D follow-up — 2026-11-07 (over-execution scope limit)
+
+**Discussed** — one daily request turned into 60 steps / 62 tool calls / 16.7 min
+(39 pwsh, 11 visualize, 4 write, 3 edit, 3 read, 1 skill, 1 read_image) with the
+card already rendered on call 3; classification: model autonomy primary, Stage 7D
+skill wording contributing ("graded", "before returning, check", numeric
+thresholds, no one-shot/no-scripts/no-stop boundary), DSH host enabling, renderer
+not at fault.
+
+**Implemented** — assets only: new `## Scope` block in `assets/visualize-skill.md`
+(one-shot authoring; no workspace files/scripts/harnesses/Node/DOM/browser/tests;
+one visualize call, patch only on error; render = done; static compose-time check;
+Chinese 1-2 sentence reply, no process narration; no plugin `lib/` inspection);
+"graded" removed from the axis-letter paragraph; composition-rules sentences in
+`charts.md` §Math function plots; composition-reference header in the example.
+No `src/`, tests or renderer changes.
+
+**Verified** — isolated host p7c (reinstalled; installed skill byte-identical to
+repo) and five fresh sessions: trials 1-2 pre-tightening (5-6 calls, 3m03s/5m25s),
+trial 3 post-tightening 4 calls/4m01s, **trials 4-5 PASS** (4/6 calls, zero
+pwsh/write/edit, one visualize, rendered card, 1m23s/2m36s, one Chinese
+sentence); workspace clean. Evidence: `evidence/overexec/`
+(transcripts + manifest, screenshots in `tmp/overexec/`); report:
+`docs/reports/OVEREXEC-2026-11-07.md`.
+
+**Not verified** — the <3 min wall-clock budget is model-latency dependent
+(trial 3 missed at 4m01s despite identical wording); "at most one reference" is
+often 2-4 reads; the full 62-call failure mode is not reproducible on demand.
 ### Stage 7C — 2026-11-07 (this session)
 
 **Discussed** — ADR-016 Option B; owner's three workstreams; the narrowed upstream ask (no host UI, no new source kind) and the Discussions-only channel; the daily-profile swap vs add distinction.
@@ -653,6 +681,36 @@ Six things carried forward:
 
 ## History
 
+### Session 33 — 2026-11-07 (over-execution scope limit for the visualize skill)
+
+**Trigger:** the first over-execution incident in daily use — one quadratic-card
+request consumed 62 tool calls and 16.7 min, built its own verification harnesses
+in `%TEMP%`, read the installed plugin internals and was still patching after the
+card had rendered on call 3.
+
+**Classification (kept in the report):** model autonomy primary; Stage 7D skill
+wording contributing (graded/test-suite tone, thresholds and "before returning,
+check", no one-shot or no-scripts boundary); DSH host enabling (coding agent with
+pwsh/write/edit, repo cwd); plugin renderer not at fault.
+
+**Fix (assets only):** `## Scope` block in `assets/visualize-skill.md` with
+one-shot authoring, no workspace files/scripts/harnesses/Node/DOM/browser tests,
+one visualize call (patch only on tool error), render = done, compose-time static
+check, Chinese 1-2 sentence reply and no process narration; "graded" removed from
+the axis paragraph; composition-rules sentences in `charts.md`; composition
+reference header in the example. No src/tests/renderer change.
+
+**Verification:** isolated p7c host (profile plugin reinstalled; installed skill
+byte-identical to repo) and five fresh sessions. Pre-tightening: 5 calls/3m03s and
+6 calls/5m25s (time fail). After one allowed tightening: 4 calls/4m01s (time
+miss), then **4 calls/2m36s and 6 calls/1m23s — both PASS** (zero pwsh/write/edit,
+one visualize, rendered card, one Chinese sentence, workspace clean). Compared to
+the baseline: 15-29x fewer tool calls, 6-12x faster. Evidence
+`evidence/overexec/`; report `docs/reports/OVEREXEC-2026-11-07.md`.
+
+**Residual risk:** wall-clock is model-latency dependent (trial 3 missed despite
+identical text); reference reads run 2-4 not 1; model autonomy remains primary.
+No push; no tag/release; daily app (:61828) and profile untouched.
 ### Session 32 — 2026-11-07 (Stage 7D: math-function plot quality)
 
 **Trigger:** the owner's first daily-use quality complaint on the quadratic card

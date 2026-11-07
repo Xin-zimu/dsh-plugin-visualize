@@ -1,0 +1,152 @@
+{
+  "stage": "7D follow-up (over-execution)",
+  "capturedAt": "2026-11-07",
+  "host": "isolated DSH_HOME tmp/dsh-7c profile p7c on 127.0.0.1:3096, reinstall via dsh plugin --profile p7c install (installed skill 18,284 B == repo)",
+  "baseline": {
+    "session": "session-6ebab31e-6d40-4ca7-b2ad-6ef2b48cf143",
+    "decompressed": "tmp/session-overexec.jsonl",
+    "userMessages": 1,
+    "toolCalls": 62,
+    "counts": {
+      "pwsh": 39,
+      "visualize": 11,
+      "write": 4,
+      "edit": 3,
+      "skill": 1,
+      "read": 3,
+      "read_image": 1
+    },
+    "durationMin": 16.68,
+    "windowValidations": 26901,
+    "renderChecks": 6051,
+    "cardRenderedAtCall": 3,
+    "patchCalls": 9,
+    "workspaceSourceTouched": false,
+    "englishProcessNarration": true
+  },
+  "trials": {
+    "1": {
+      "log": "evidence/overexec/trial-1-session.jsonl",
+      "toolCalls": 5,
+      "counts": {
+        "skill": 1,
+        "read": 3,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "durationMs": 183232,
+      "durationMin": 3.05
+    },
+    "2": {
+      "log": "evidence/overexec/trial-2-session.jsonl",
+      "toolCalls": 6,
+      "counts": {
+        "skill": 1,
+        "read": 3,
+        "visualize": 2
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "read",
+        "visualize",
+        "visualize"
+      ],
+      "durationMs": 330247,
+      "durationMin": 5.5
+    },
+    "3": {
+      "log": "evidence/overexec/trial-3-session.jsonl",
+      "toolCalls": 4,
+      "counts": {
+        "skill": 1,
+        "read": 2,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "durationMs": 245463,
+      "durationMin": 4.09
+    },
+    "4": {
+      "log": "evidence/overexec/trial-4-session.jsonl",
+      "toolCalls": 4,
+      "counts": {
+        "skill": 1,
+        "read": 2,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "durationMs": 156758,
+      "durationMin": 2.61
+    },
+    "5": {
+      "log": "evidence/overexec/trial-5-session.jsonl",
+      "toolCalls": 6,
+      "counts": {
+        "skill": 1,
+        "read": 4,
+        "visualize": 1
+      },
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "durationMs": 88869,
+      "durationMin": 1.48
+    }
+  },
+  "screenshots": {
+    "trial-1-card.png": {
+      "path": "tmp/overexec/trial-1-card.png",
+      "sha256": "218bdab83a769a357cae8883d4a4325dcbb49063a6966c08f65f99dba870d514",
+      "bytes": 70847
+    },
+    "trial-2-card.png": {
+      "path": "tmp/overexec/trial-2-card.png",
+      "sha256": "85982c482f1b486fdcb71326af6b7dff64d7ed9f25e6261ba8fc700c249c0b46",
+      "bytes": 81587
+    },
+    "trial-3-card.png": {
+      "path": "tmp/overexec/trial-3-card.png",
+      "sha256": "97f9854f56bcb1326bf6a54ecf80e4ff63c6f4b3b8de3e553546f4af3086673d",
+      "bytes": 75649
+    },
+    "trial-4-card.png": {
+      "path": "tmp/overexec/trial-4-card.png",
+      "sha256": "68f6e6b17ba45bb07ef59975de935d5ca8feaf11d2d39a3c8e33ef82dbf8446a",
+      "bytes": 71215
+    },
+    "trial-5-card.png": {
+      "path": "tmp/overexec/trial-5-card.png",
+      "sha256": "c1b89a5be3e44f5a56c16c3b7e1e58b6740ac9873208b03aee4086c02e5c6dee",
+      "bytes": 85473
+    }
+  },
+  "workspaceCleanAfterTrials": true,
+  "finalTwo": [
+    4,
+    5
+  ],
+  "verdict": "trials 4 and 5 PASS all criteria (<=6 calls, zero pwsh/write/edit, one visualize, rendered, one-sentence Chinese reply, <3 min). Trial 3 (first run after the one allowed wording tightening) passed calls/writes but took 4m01s. Trials 1-2 were run before the tightening; trial 2 also exceeded the time budget (5m25s)."
+}
