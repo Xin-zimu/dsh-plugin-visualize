@@ -679,6 +679,16 @@ use the frame document as a tab while the primary evidence is in-chat. Evidence:
 **Commits:** one for code+example, one for docs/evidence. No push; no tag move; no
 release; the daily profile and the :55142 app were never touched.
 
+**Second close-out (stale window).** `holds()` now re-fits when the span drifts
+>1.4×/0.75× from a fresh target or the vertex leaves its 10-40% band, so the
+sequential drag a→b→c no longer keeps an intermediate loose window; the y
+tick-label thinning bug was removed. The example at 1.1/−6.8/10 now measures x
+[0.44,5.74], y [−2.02,4.85], 11 labels/0 overlaps, vertex 22% above bottom,
+coverage 0.98 (`example-owner2.png`, sha256 3C8DB12D…). The model's third
+regeneration still had a loose window and generic-class labels, so the model card
+stays NOT VERIFIED for this quality bar; the template is the verified artifact.
+`charts.md` carries the quality condition so the model is told the rule.
+
 **Close-out round (after review).** Fixed the axis-letter instruction into a graded
 checklist with the two SVG `<text>` lines verbatim; the second fresh-session
 regeneration carries `axis-label-x`/`axis-label-y` and both letters, exact owner

@@ -769,5 +769,106 @@
       "example-owner.png",
       "example-default.png"
     ]
+  },
+  "hardening_round": {
+    "capturedAt": "2026-11-07",
+    "bug": "holds() kept an intermediate slider window because containment passed; sequential a→b→c left x≈[-2.6,8.8], y≈[-17.6,14.4] on screen for the final 1.1/-6.8/10 state",
+    "fix": "holds() now also requires span within 0.75x-1.4x of a freshly computed targetWindow on both axes, and the vertex in its 10-40% band (mirrored for a<0); y tick labels also lost their over-aggressive thinning",
+    "exampleOwnerSequential": {
+      "applied": [
+        "a=1.1",
+        "b=-6.8",
+        "c=10 (sequential input/change events)"
+      ],
+      "equation": "y = 1.1x² − 6.8x + 10",
+      "readout": "顶点 (3.1, -0.5) · 对称轴 x = 3.1",
+      "targetWindow": {
+        "x": [
+          0.44,
+          5.74
+        ],
+        "y": [
+          -2.02,
+          4.85
+        ]
+      },
+      "measuredTicks": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "-2",
+        "-1",
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "tickOverlaps": 0,
+      "axisLabels": [
+        {
+          "text": "x",
+          "cls": "axis-label axis-label-x"
+        }
+      ],
+      "note": "no y-axis/label because x=0 is outside this window (no fake origin, by design)",
+      "vertexBand": "22% above the bottom",
+      "coverage": 0.98
+    },
+    "exampleDefaultSequential": {
+      "equation": "y = x²",
+      "ticks": 12,
+      "tickOverlaps": 0,
+      "labels": [
+        "x",
+        "y"
+      ],
+      "coverage": 0.98
+    },
+    "modelCardOwnerSequential": {
+      "source": "frame-after4.html (third regeneration, fresh session)",
+      "axisLabels": [
+        {
+          "text": "x",
+          "cls": "axis-label"
+        },
+        {
+          "text": "y",
+          "cls": "axis-label"
+        }
+      ],
+      "tickTexts": [
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+        "0"
+      ],
+      "windowVerdict": "LOOSE — x ticks to 10 and y ticks to ±10: the model card still shows the stale/loose window at the owner state; the docs fix does not constrain the model-generated implementation",
+      "missingNamedClasses": true,
+      "tickColor": "rgb(173, 178, 184)",
+      "tickContrastOnLightBg": 2.04,
+      "verdict": "NOT VERIFIED for the model card: named classes absent and window loose; reference example is the verified template"
+    },
+    "screenshots": {
+      "example-owner2.png": {
+        "sha256": "3c8db12d789edde4bd252ded41d68e97545805eccb1ac1fb95074abec0832595",
+        "bytes": 26582
+      },
+      "example-default2.png": {
+        "sha256": "f5b4f5c4df206b092a9372ccecfb73cee2008441e35108799a6117991a57c26a",
+        "bytes": 24227
+      },
+      "after4-owner.png": {
+        "sha256": "5691da6a1f0ca946b752ff0d8a0dfffe4cd462115ea491d3597b72d719da34a3",
+        "bytes": 31990
+      },
+      "after4-inchat-light.png": {
+        "sha256": "6f93b37ac46909d49ba66f5bcbd05980adb9f5e260d23a764b052d3193d3f72c",
+        "bytes": 68284
+      }
+    }
   }
 }

@@ -100,9 +100,14 @@ Choose the window from the function and the parameters:
   margins: every part of the plot area should carry either curve, grid or
   axis, and the curve should reach the top/bottom edge where it leaves.
 - **Stability while dragging.** Do not recompute the window on every slider
-  frame — it twitches. Keep the current window while it still holds the new
-  vertex and both branch-exit points with ≥8% margin; replace it only when it
-  cannot, and fade ~200ms on a genuine change. Do not add a "fit" button
+  frame — it twitches. Keep the current window only while it still **fits well**:
+  it must contain the new vertex and both branch-exit points with ≥8% margin,
+  **and** its span must stay within ~1.4× (not smaller than ~0.75×) of a freshly
+  computed ideal window on both axes, **and** the vertex must remain in its
+  intended vertical band (roughly 10-40% above the bottom for `a > 0`, mirrored
+  for `a < 0`). A window inherited from an intermediate slider state can contain
+  the final curve and still waste half the plot — containment alone is not a
+  reason to keep it. Fade ~200ms on a genuine change. Do not add a "fit" button
   unless the card would otherwise clutter; the auto-window should be enough.
 - **Label the numbers, not a claim.** Ticks state the window; do not write
   "constant aspect" or a hard-coded range in prose.

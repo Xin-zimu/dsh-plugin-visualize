@@ -188,3 +188,36 @@ accessibility tree in this build.
 run; the example is 18:1); (b) deterministic generation — two attempts needed for
 the axis letters, and the model can still copy only part of the recipe;
 (c) the dark capture used the attribute mechanism above, published as such.
+
+## 7. Stale-window hardening (review round 2)
+
+Review found the real UX bug behind the owner's screenshot: `holds()` tested only
+containment, so after dragging **a → b → c** the intermediate window (e.g.
+`c=0`: x≈[-2.6,8.8], y≈[-17.6,14.4]) was kept for the final `1.1/-6.8/10` state
+— the curve sat in a band with a large empty region.
+
+**Fix.** `holds()` now also rejects a window whose span is >1.4× (or <0.75×) a
+freshly computed `targetWindow` on either axis, and whose vertex is outside its
+10-40% band (mirrored for `a<0`), so a loose inherited window re-fits while small
+drag changes still keep hysteresis. The y tick-label thinning (which was dropping
+almost all y labels) was removed; `niceStep` already caps labels at ~7.
+`charts.md` states the quality condition explicitly so the model cannot
+reproduce "containment only".
+
+**Measured (sequential slider events, the way a user drags).** Example at
+`1.1/-6.8/10`: equation `y = 1.1x² − 6.8x + 10`, target window x [0.44,5.74],
+y [-2.02,4.85], measured x ticks 1..5 and y ticks -2..4 (11 labels, **0
+overlaps**), vertex band **22% above the bottom**, curve coverage **0.98** of the
+plot height. `example-owner2.png` sha256
+`3C8DB12D789EDDE4BD252DED41D68E97545805ECCB1AC1FB95074ABEC0832595`. Default:
+12 labels, 0 overlaps, coverage 0.98, both axis letters
+(`example-default2.png`, sha256 `F5B4F5C4…`). The y-axis is deliberately absent
+at the owner window because x=0 is outside it — no fake origin.
+
+**Model card at the same owner state (third regeneration, fresh session):** it
+carries x/y letters (generic class, not the named ones) but its window is still
+loose — x ticks 2,4,6,8,10 and y ticks to ±10 — and its ticks stay caption-grey
+(2.04:1). So the **reference example is verified; the model-generated card is
+NOT VERIFIED** for stale-window quality, named labels and tick legibility. This
+is a generation-control limit, not a renderer limit: the frame tokens measured in
+the same document are correct.

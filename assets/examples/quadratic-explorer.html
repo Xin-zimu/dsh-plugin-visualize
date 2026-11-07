@@ -142,13 +142,26 @@
   function holds(win, a, b, c) {
     var h = -b / (2 * a), k = c - b * b / (4 * a);
     var up = a > 0;
-    var xPad = (win.xmax - win.xmin) * 0.08, yPad = (win.ymax - win.ymin) * 0.08;
+    var spanY0 = win.ymax - win.ymin;
+    var xPad = (win.xmax - win.xmin) * 0.08, yPad = spanY0 * 0.08;
     if (h < win.xmin + xPad || h > win.xmax - xPad) return false;
     if (k < win.ymin + yPad || k > win.ymax - yPad) return false;
     // Both branch exit points must be inside.
     var yTop = up ? win.ymax - yPad : win.ymin + yPad;
     var xEdge = Math.sqrt(Math.abs((yTop - k) / a));
-    return h - xEdge >= win.xmin + xPad && h + xEdge <= win.xmax - xPad;
+    if (!(h - xEdge >= win.xmin + xPad && h + xEdge <= win.xmax - xPad)) return false;
+    // Containment alone is not enough: a window kept from an intermediate slider
+    // state can contain the new curve and still waste half the plot. Re-fit when
+    // the span drifted >1.4x (or shrank below 0.75x) the freshly computed ideal,
+    // or when the vertex left its intended band (10-40% above the bottom for a>0,
+    // mirrored for a<0).
+    var ideal = targetWindow(a, b, c);
+    var rx = (win.xmax - win.xmin) / (ideal.xmax - ideal.xmin);
+    var ry = spanY0 / (ideal.ymax - ideal.ymin);
+    if (rx > 1.4 || rx < 0.75 || ry > 1.4 || ry < 0.75) return false;
+    var vf = (k - win.ymin) / spanY0;
+    if (a > 0 ? (vf < 0.10 || vf > 0.40) : (vf < 0.60 || vf > 0.90)) return false;
+    return true;
   }
 
   function chooseWindow(a, b, c, prev) {
@@ -218,13 +231,11 @@
       lastXRight = px + labelWidth(label) / 2;
       g.appendChild(el('text', { x: px, y: (xVisible ? xAxisY + 15 : padT + ih + 15), 'text-anchor': 'middle', class: 'tick-text' }, label));
     });
-    var lastYBottom = -Infinity;
+    // y labels: niceStep already caps them at ~7; drop the label on the x-axis
+    // line (0 is labelled once at the origin) and let the axis label own the top.
     yTicks.forEach(function (ty) {
       if (Math.abs(ty) < 1e-9) return;
-      var label = fmt(ty, 1), py = sy(ty) + 3.5;
-      if (py - 6 < lastYBottom + 4) return;
-      lastYBottom = py + 6;
-      g.appendChild(el('text', { x: padL - 7, y: py, 'text-anchor': 'end', class: 'tick-text' }, label));
+      g.appendChild(el('text', { x: padL - 7, y: sy(ty) + 3.5, 'text-anchor': 'end', class: 'tick-text' }, fmt(ty, 1)));
     });
     if (xVisible && yVisible) {
       g.appendChild(el('text', { x: yAxisX - 6, y: xAxisY + 14, 'text-anchor': 'end', class: 'tick-text' }, '0'));
