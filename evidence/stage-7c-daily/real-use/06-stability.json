@@ -1,0 +1,21 @@
+{
+  "state": {
+    "href": "http://127.0.0.1:3095/",
+    "title": "SMOKE-mw63k7hj — DeepSeek Harness",
+    "composer": true,
+    "cards": 6,
+    "errors": []
+  },
+  "stableCardCount": true,
+  "a": {
+    "cards": 6,
+    "unrendered": 0,
+    "crashes": 0
+  },
+  "b": {
+    "cards": 6,
+    "unrendered": 0,
+    "crashes": 0
+  },
+  "errors": []
+}

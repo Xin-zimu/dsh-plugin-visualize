@@ -1,0 +1,18 @@
+== probe smoke @ 15:43:41 (installed=p7c) ==
+== exit: 1 ==
+ERROR: bsk evaluate failed:
+{
+  "code": "permission_denied",
+  "message": "The strict observation changed before this action",
+  "hint": "Synchronize and reconsider this untargeted action, or use a DOM target with explicit business preconditions.",
+  "exit_code": 1,
+  "data": {
+    "effect_state": "none",
+    "observation_id": "be98407e-f62f-48b5-a83c-d9857c2fb967",
+    "phase": "observation",
+    "reason": "observation_changed",
+    "recovery": "Synchronize and reconsider this untargeted action, or use a DOM target with explicit business preconditions."
+  }
+}
+
+

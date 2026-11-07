@@ -1,0 +1,49 @@
+{
+  "capturedAt": "2026-11-07T07:53:20.558Z",
+  "target": "速度 slider of the sorting card",
+  "drag": {
+    "ok": true,
+    "raw": "{\"action\":{\"result\":{\"source\":{\"x\":616.5,\"y\":489},\"tab_id\":1517568946,\"target\":{\"x\":676.5,\"y\":489}}},\"action_replayed\":false,\"ok\":true,\"phase\":\"observed\",\"post\":{\"activity\":[],\"context_id\":\"e50d410d-b"
+  },
+  "before": {
+    "sliders": [
+      {
+        "label": "a",
+        "value": "5"
+      },
+      {
+        "label": "a",
+        "value": "5"
+      },
+      {
+        "label": "速度",
+        "value": "1"
+      },
+      {
+        "label": "速度",
+        "value": "1"
+      }
+    ]
+  },
+  "after": {
+    "sliders": [
+      {
+        "label": "a",
+        "value": "5"
+      },
+      {
+        "label": "a",
+        "value": "5"
+      },
+      {
+        "label": "速度",
+        "value": "1"
+      },
+      {
+        "label": "速度",
+        "value": "5"
+      }
+    ]
+  },
+  "bodyTail": "演示卡片：标题「冒泡排序演示」，用 Bar 组件画出数组 [5, 3, 8, 1, 9, 2]，加一个 Button 标签「下一步」用于推进一步，再加一个 Slider 控制动画速度。完成后只回答 DONE。\n\n(acceptance marker ACCEPT-mw63rz5d; this is a test of the visualization plugin)\n15:49\n已完成\n已完成，用时 1分4秒\n\nDONE\n\n冒泡排序演示\n冒泡排序演示\n3\n5\n8\n1\n9\n2\n下一步\n速度\n5\n当前第 2 步，共 15 步；速度越大，每次点「下一步」推进得越多。\n用量 83.5K tok\n15:50\n发消息或创建任务, / 调用指令, @ 文件或对话\n工作区内修改\nDeepSeek-V4.1-Flash\nHigh\n6 轮 11 步·46 tok/s\n209K tok·缓存命中 93%\n3%"
+}

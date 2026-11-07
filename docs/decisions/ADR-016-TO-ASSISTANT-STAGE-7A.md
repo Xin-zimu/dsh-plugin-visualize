@@ -133,7 +133,7 @@ Cost: a new host surface; more upstream goodwill; not needed to satisfy ADR-015 
 | Decision audit event | no | no | yes |
 | Meets ADR-015 §5 unchanged | **no** | **yes** | yes |
 | Fits a patch release | — | yes (after host work) | no |
-| **Compatibility cost** | none today; must note the host is 0.2.2-rc.1 while the plugin compiles against 0.2.1-rc.5 (`peerDependencies: ^0.2.1-0` does not admit `0.2.2-rc.1` under strict semver; 0.2.2 ships no `.d.ts`) | same skew, plus a new wire field the plugin can only type via its own declaration until upstream types exist | same, plus a new confirmation contract to type and version |
+| **Compatibility cost** | none today; must note the host is 0.2.2-rc.1 while the plugin compiles against 0.2.1-rc.5 (`peerDependencies: ^0.2.1-0` does not admit `0.2.2-rc.1` under strict semver). **Corrected in Stage 7C:** 0.2.2-rc.1 **npm** packages do ship `.d.ts` (the asar extraction that suggested otherwise omitted them), and the compile baseline + peer ranges were moved to 0.2.2-rc.1 in this repo — see `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`. The host change still needs a wire declaration the published types do not contain yet | same skew, plus a new wire field the plugin can only type via its own declaration until upstream types exist | same, plus a new confirmation contract to type and version |
 
 ## 5. Recommendation
 

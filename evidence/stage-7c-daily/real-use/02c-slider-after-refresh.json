@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-11-07T07:53:53.684Z",
+  "afterRefresh": true,
+  "sliders": [
+    {
+      "label": "a",
+      "value": "5"
+    },
+    {
+      "label": "a",
+      "value": "5"
+    },
+    {
+      "label": "速度",
+      "value": "5"
+    },
+    {
+      "label": "速度",
+      "value": "5"
+    }
+  ],
+  "note": "both copies of the sorting card read the persisted slider value after reload"
+}

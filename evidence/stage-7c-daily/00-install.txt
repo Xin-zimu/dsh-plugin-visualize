@@ -1,0 +1,23 @@
+== isolated daily-like profile install @ 15:32:56 ==
+[WARN] The store at C:/Users/<user>\AppData\Local\pnpm\store\v11 is not used because packages cannot be hard linked from it into this project. Using the store at D:\.pnpm-store\v11 instead. Set storeDir to choose the store.
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +28
+++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: D:\.pnpm-store\v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 28, reused 28, downloaded 0, added 18
+Progress: resolved 28, reused 28, downloaded 0, added 26
+Progress: resolved 28, reused 28, downloaded 0, added 27
+Progress: resolved 28, reused 28, downloaded 0, added 28, done
+
+dependencies:
++ @dsh-unified/visualize 0.1.1
+
+Done in 4.8s using pnpm v11.28.5
+
+== install exit: 0 ==
+
+== peers check exit: 0 ==
+No peer dependency issues found
+

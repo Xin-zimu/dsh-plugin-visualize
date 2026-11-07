@@ -10,20 +10,21 @@ to the history. If you are an agent starting work, read this first.
 | Field | Value |
 | --- | --- |
 | Package | `@dsh-unified/visualize` |
-| Version | `0.1.1` — **released 2026-11-06**, tag `v0.1.1` at `50b6b54` |
+| Version | `0.1.1` — **released 2026-11-06**, tag `v0.1.1` at `50b6b54` (not moved) |
 | Branch | `main` |
 | HEAD | see `git log -1` |
 | Upstream baseline | dsh-visualize `cf6b3a3`, dsh-intelligent-ui `0b08749`, open-intelligent-ui `16ef264` |
-| **Installed DSH host** | **0.2.2-rc.1** (`@deepseek-ai/dsh-desktop`; asar header; 331 `@deepseek-ai` entries, 321 `dsh-*` at 0.2.2-rc.1) |
-| **Plugin compile baseline** | 0.2.1-rc.5 (`node_modules/@deepseek-ai/*` devDeps) — a recorded skew, see §6 |
+| **Installed DSH host** | **0.2.2-rc.1** (`@deepseek-ai/dsh-desktop`). The desktop CLI reports 0.2.2-rc.1; the **global `dsh` on PATH is 0.2.1-rc.5** and is not the host under test |
+| **Plugin compile baseline** | **0.2.2-rc.1** (devDeps + cordis 4.1.0), bumped in Stage 7C. The 0.2.2-rc.1 npm packages do ship `.d.ts`; the earlier "no types" claim came from an asar extraction that omits them |
 
 ## 2. Current stage
 
 | Field | Value |
 | --- | --- |
-| Stage | **7B Gate 2 DONE 2026-11-07** — owner chose ADR-016 Option B; real-host pre-validation on DSH 0.2.2-rc.1 passed (confirmation works outside a turn; three limits measured). Gate 3 (upstream provenance) not started; no product code. 7A closed earlier the same day. |
-| Goal | Restore the two deferred external actions honestly: `@ToAssistant` first, then `@OpenUrl`. |
-| Status | **`@ToAssistant` needs exactly one host change** (host-validated message attribution); submission, role enforcement and a host-rendered, card-unforgeable confirmation already exist in 0.2.2-rc.1. **`@OpenUrl` is unchanged**: still no plugin-callable external open. Deliverables: `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md`, `evidence/stage-7a/`. **No product code was changed; the action stays refused.** Earlier stages: 6 closed (946/946 CI), v0.1.1 released 2026-11-06, 4B-2 closed 2026-11-06. |
+| Stage | **7C DONE 2026-11-07** — Gate 3 request prepared (not sent); 0.2.2-rc.1 compatibility fixed and verified; daily-trial baseline written and acceptance run on an isolated profile. The owner's daily profile was **not** modified. |
+| Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
+| Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
+| Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
 
 ## 2a. Published, and what publishing cost
 
@@ -100,7 +101,23 @@ have it and approval prompts are disabled, so it could not be done here. The
 exposure is a Windows account name, not a credential; if that is unacceptable,
 run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
 
+## 2b. Stage 7C at a glance
+
+- **A. Gate 3 — upstream provenance request.** Narrowed from ADR-016's four items to one: `origin?: {kind:'tool-call', callId}` on `SessionPromptRequest`, validated by the host against a committed `tool/call`, recorded as an optional field on the existing `'user-rpc'` source. No host UI change (the existing `conversation.chat.user.before` slot renders it plugin-side), no new source kind, no new confirmation API. Repo does not accept external PRs; reports go to Discussions — the draft was **not** sent. `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`, `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`, `evidence/stage-7c/gate3/`.
+- **B. 0.2.2-rc.1 compatibility.** The Gate-2 "peer + cordis" pair was one range-selection bug; devDeps moved to 0.2.2-rc.1 and six `dsh-*` peer ranges gain `|| ^0.2.2-rc.1`. Verified: peers check, both tsc projects, build, full suite, clean isolated-profile resolve (`dsh-*@0.2.2-rc.1` + cordis 4.1.0), real-host load. `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`, `evidence/stage-7c/compat/`.
+- **C. Daily-use baseline.** Daily profile confirmed as `~/.dsh/profiles/desktop` (PID 21788 on :50270), currently loading `@nagi-ovo/dsh-visualize ^0.1.7`; the fork is a **replacement**, and install/rollback steps are written but **not executed**. Isolated real-use acceptance (8/8, 0 failures) covers knowledge, math/slider, sorting/button, refresh restore, session switch, stability, real drag and persistence. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/`.
+
 ## 3. Current progress
+
+### Stage 7C — 2026-11-07 (this session)
+
+**Discussed** — ADR-016 Option B; owner's three workstreams; the narrowed upstream ask (no host UI, no new source kind) and the Discussions-only channel; the daily-profile swap vs add distinction.
+
+**Implemented** — no product source changed. `package.json`: devDependencies 0.2.1-rc.5 → 0.2.2-rc.1 and cordis 4.0.5 → 4.1.0; six `dsh-*` peer ranges gain `|| ^0.2.2-rc.1` (deliberately not `*`, no blanket widening, no `--force`). `pnpm-lock.yaml` refreshed. Docs + evidence added; ADR-016 §13 supplement.
+
+**Verified** — `pnpm peers check` 0; `pnpm run typecheck` 0 (both projects); `pnpm run build` 0; `npx vitest run` **942 passed / 4 skipped / 946**; targeted `stream-assembly` 3/3; clean isolated-profile resolve + `dsh plugin peers check` 0; AGENTS §9 build == installed (`E1BF4A82…`); real-host load on 0.2.2-rc.1 (visualize called, card rendered, console clean, style route 200); isolated daily acceptance 8/8 with 0 console errors, cards restored across refresh and session switch, real slider drag wrote state. Gate-3 source anchors 15/15 re-fetched and asserted; durable-source proof from a real session log (metadata only).
+
+**Not verified** — 0.2.1-rc.5 runtime after the change; HTML backend in the 7C acceptance (previous stages cover it); model choosing `visualize` without an explicit instruction; the daily-profile swap itself (owner gate); two-surface live slider sync (known limitation, reload converges).
 
 **Discussed** — `PLAN.md`, `STAGE.md`, `docs/decisions/`.
 
@@ -295,148 +312,58 @@ This is the host's own pairing (its send button and "1017" badge use the same
 
 | File | Change | Why |
 | --- | --- | --- |
-| `docs/decisions/ADR-006-OPENUI-STATE-PERSISTENCE.md` | new, then **accepted as A′** | Design gate for `$state` persistence; records the audit, the decision and the two fixed details (shared caps, hash from structure) |
-| `src/client/openui-state.ts` | **new, 300 lines** | Record type, `:openui` key suffix, `schemaHash` over names+kinds, per-variable `hydrateState`, `buildRecord`, write-merge |
-| `src/client/OpenUICard.tsx` | hydrate once per program+key; write through the shared store | Closes S04; no `useEffect` on state alone, so a drag does not reload the card |
-| `src/client/VisualizeCard.tsx` | pass `stateKey` to the OpenUI card | The card could not persist anything without an identity |
-| `src/client/index.tsx` | `intelligent_ui` toolview gains `inject: sessionInjection(...)` | Approved in ADR-006; without it a replayed program card has no session and persists nothing |
-| `tests/openui-state.spec.tsx` | **new, 26 tests** | The 18 planned cases: hash, hydrate, repair, isolation, rapid input, storage failure, shared ledger |
-| `tsconfig.json`, `tsconfig.client.json` | new spec listed in both | The host project excludes DOM tests; a spec missing from both lists pulled `card-state.ts` into a DOM-free build |
-| `src/client/TurnCards.tsx` | **P3-06** — reads via `visualizationFrom`; draws `Frame` or `OpenUICard` by discriminant | The tail dropped every OpenUI card, so a persisted card was invisible in the conversation |
-| `tests/turn-cards.spec.tsx` | +8 tests (26 total) | P3-06: both backends on the tail, no duplication, one state key, session isolation |
-| `src/client/openui-actions.ts` | **P3-07, new** — `applyAction` dispatcher | `@Set`/`@Reset`/`Action` against a fixed vocabulary; returns a patch, never writes |
-| `src/client/OpenUICard.tsx` | **P3-07** — action descriptors pass through `drawValue`; `WriteChannel` gains `patch`/`runAction`; Button wired | Without the pass-through the action resolved to `null` and every Button was inert |
-| `tests/openui-actions.spec.tsx` | **new, 24 tests** | A01–A08 plus the ordering contract and every refusal |
-| `tests/frame-state.spec.tsx` | +3 tests (17 total) | Pins the HTML cross-view last-writer-wins hazard, as agreed |
-| `AGENTS.md` | new §9 | A browser run must prove which bundle it loaded before code may be called FAIL |
-| `evidence/phase-3/` | baseline + tsc + suite + manifests + probes | Every claim below has a file |
-| `evidence/browser-phase-3/` | scripts, three manifests, 7 PNGs | P3-05, P3-06 and P3-07 acceptance, on an isolated profile |
-| `docs/architecture/SYSTEM_ARCHITECTURE.md` | two-surfaces and one-state-loop sections; gap table | The display and action paths are architecture now, not accidents |
-| `docs/decisions/ADR-006…`, `STAGE.md`, `session-log.md` | updated | AGENTS §8 documentation matrix |
-| `src/client/OpenUICard.tsx` | **4A-1** — `Box`, `Grid`, `Divider`, `Spacer` renderers + nine argument helpers | Four components the language declared but nothing drew |
-| `src/client/OpenUICard.tsx` | **4A-1** — `unrenderedNotice` + `data-openui-unrendered` | A renderer gap used to draw nothing, indistinguishable from an intentionally empty container |
-| `src/client/OpenUICard.tsx` | **4A-1** — `RENDERED_COMPONENTS` export; `--font-sans` reads `--dsw-font-family`; `--viz-series-4` declared directly | D17/D18: two bridged tokens the host never published; D19: coverage was copied, not measured |
-| `tests/openui-layout-4a1.spec.tsx` | **new, 40 tests** | Nesting, sizing, the three Grid branches, Divider, Spacer, empty-vs-missing, and the three-layer CSS-variable guard |
-| `tests/openui-inventory.spec.tsx` | **new, 6 tests** | Coverage read from the renderer's own table (12 / 48); 4A-1 rows drawn, not just listed |
-| `tests/openui-card.spec.tsx` | 1 assertion corrected + 2 added | It asserted `--dsh-font-family-text-default`, a token the host does not publish (D18) |
-| `tsconfig.json`, `tsconfig.client.json` | both new specs registered | D13 again: a spec in neither list pulls DOM code into the host build |
-| `docs/decisions/ADR-007-STAGE-3-INPUTS-EXIT-CRITERION.md` | **new** | Records the stage-3 scope adjustment the owner asked for |
-| `docs/reports/PHASE-4A-1-REPORT.md` | **new** | Batch verdict, the three defects, and A9 recorded as not verified |
-| `evidence/phase-4a-1/` | probes, manifests, 2 PNGs, baseline | Every 4A-1 claim has a file |
-| **all of the above** | **committed as `5d2a3e9`** | Three accepted phases sat uncommitted on top of `9b46cec` for a session. One commit rather than three because stage 3 and 4A-1 both rewrite `OpenUICard.tsx`; a split would produce intermediate commits that fail `tsc` |
-| `docs/decisions/ADR-008-LINK-PROTOCOL-POLICY.md` | **new (4A-2)** | `Link` is the first component whose output a reader can activate, in the host origin. A positive allowlist of absolute `http:`/`https:`, parsed with `new URL`, decided before the renderer was written |
-| `src/client/OpenUICard.tsx` | **4A-2** — seven renderers: `Label`, `Badge`, `Link`, `List`, `ListItem`, `Quote`, `Code` | The Text group is complete; inventory 12 → 19 of 48 |
-| `src/client/OpenUICard.tsx` | **4A-2** — `safeHref`, `markerNode`, `listRow`, `listEntryRow`, `CodeBlock` | The seven share one URL policy, one marker vocabulary and one row builder, so they cannot drift apart |
-| `src/client/OpenUICard.tsx` | **4A-2 / D20** — `Renderer` gains the raw argument list; `List` reads the descriptor | A nested `ListItem` drew **two** rows: the walker drew a complete row and `List` wrapped it in a second one. Found by reading the live page, not by a test |
-| `src/client/OpenUICard.tsx` | **4A-2 / D21** — `--font-mono` bridged to `--dsw-font-markdown-code-font-family` | The frame vocabulary's `--font-mono` does not exist in the host. Measured first, so this is not D17/D18 a fourth time |
-| `src/client/OpenUICard.tsx` | **4A-2 / D22** — `LINK_LITERAL`, `--link`, `--muted-foreground-strong` | `Link` was 4.23:1 and the 11px supporting text 3.71:1 on white. Both now clear AA in both schemes |
-| `src/client/OpenUICard.tsx` | **4A-2** — `Label` renders; `Badge` carries colour by dot + tint | Tinted text at 11px is what upstream records as having failed contrast |
-| `tests/openui-text-4a2.spec.tsx` | **new, 64 tests** | The seven components, the 17 refused URL forms, and the three-layer variable guard. The `List` assertions were rewritten to check DOM **structure**, not text presence |
-| `tests/openui-dom-structure.ts` | **new (maintenance)** | `countOf` / `shapeOf` / `depthOf` / `describeShape` — the D20 lesson made reusable. `AGENTS.md` §6 makes structure the required assertion for a component claim |
-| `tests/openui-inventory.spec.tsx` | 12 → 19; 4A-2 batch row removed | Measured from `RENDERED_COMPONENTS`; the Text group now asserts *complete*, not *seven added* |
-| `tests/openui-layout-4a1.spec.tsx` | verified-token allowlist + 2 entries | The guard refused `--font-mono` and `--dsw-alias-label-secondary` until each had a measurement. That is the guard working |
-| `evidence/lib/cdp.mjs` | **D23** — `evaluate()` retries transient refusals | The documented policy was implemented in `step()` only, so one repaint could fail a run. `parity.mjs` still exits 0 |
-| `tsconfig.json`, `tsconfig.client.json` | new spec and the structure helper registered in both | D13 again |
-| `docs/reports/PHASE-4A-2-REPORT.md` | **new** | Batch verdict, ADR-008 summary, the three defects, and what is *not* verified |
-| `evidence/phase-4a-2/` | manifest, 4 PNGs, contrast/token/theme JSON, 14 probes | Every 4A-2 claim has a file |
-| `AGENTS.md` | **§2 rewritten** (tree ownership + pre-write check + worktrees); **§6 gained** the DOM-structure rule | Two owner decisions at 4A-2 close: a shared writable tree is a hazard, and a passing unit test is not a correct DOM |
-| `HANDOFF.md` | **downgraded to a navigation index** | It was carrying HEAD, test counts and workflow state — a second source of truth that goes stale and can be trusted over the real one |
-| `session-log.md` | §7 records the two changes above | AGENTS §8 |
+| `package.json` | devDeps → 0.2.2-rc.1, cordis → 4.1.0; six peer ranges gain `\|\| ^0.2.2-rc.1` | Coherent compile baseline with the installed host; the old range could never select 0.2.2 and pulled 0.2.1 copies whose `cordis ~4.0.5` conflicts with the host's 4.1.0 |
+| `pnpm-lock.yaml` | refreshed by `pnpm install` | the 12 packages + closure |
+| `docs/decisions/ADR-016…` | §13 supplement; corrected the "0.2.2 ships no `.d.ts`" compatibility row | Gate 3 narrowed the upstream ask; the type claim was an asar artifact |
+| `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md` | **new** | design, file:line anchors, interfaces, acceptance criteria, trust boundary, VERIFIED/NOT VERIFIED |
+| `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` | **new** | ready-to-send Discussion draft + reference patch plan, **not submitted** |
+| `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md` | **new** | diagnosis, minimal diff, verification table, verified-vs-theoretical split |
+| `docs/reports/STAGE-7C-DAILY-BASELINE.md` | **new** | daily profile identity, install/upgrade + rollback steps, isolated acceptance, residual risks |
+| `STAGE.md` | 7B Gate 3 row + a Stage 7C section with all three workstreams | AGENTS §8 |
+| `evidence/stage-7c/gate3/` | anchors verifier + fetcher, identity, wire/validation, extension points, durable-source proof | every Gate-3 claim has a runnable artifact (15/15 anchors) |
+| `evidence/stage-7c/compat/` | install/peers/typecheck/build/tests transcripts, profile resolve, bundle hash, real-host check + JSON | every compat claim has a runnable artifact |
+| `evidence/stage-7c-daily/` | install, smoke note, bundle hash, acceptance script/run + per-scenario JSON | every daily-baseline claim has a runnable artifact |
 
-**No change under `src/backends/`.** Language semantics are untouched; the
-differential was re-run and still reports **31/31, 0 differences**
-(`evidence/phase-4a-2/differential-4a2.txt`).
+Commits: `f49fdf5` (Gate 3), `96e7c9a` (compat), plus the final docs/evidence commit for this workstream. Nothing pushed; no tag moved; no release.
 
 ## 5. Test results
 
 | Test | Command | Result | Evidence |
 | --- | --- | --- | --- |
-| Suite (4A-3, Linux) | `pnpm run test` | **809 / 809** (40 files) — 43 in the batch spec, up from 37; the one pre-existing failure fixed (D24) | `evidence/phase-4a-3/test-4a3-linux.txt` |
-| Types (4A-3) | `pnpm run typecheck` | PASS, exit 0, both projects | `evidence/phase-4a-3/tsc-linux.txt` |
-| Build (4A-3) | `pnpm run build` | PASS after `unrun` was declared (D23); re-verified with `node_modules` deleted | `evidence/phase-4a-3/build-linux.txt` |
-| Language differential (4A-3) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences**; output byte-identical | `evidence/phase-4a-3/differential-4a3.txt` |
-| Inventory (4A-3) | `pnpm vitest run tests/openui-inventory.spec.tsx` | **30 / 48**, Inputs group complete | `evidence/phase-4a-3/inventory-linux.txt` |
-| Mutation checks (4A-3) | two defects re-introduced on purpose, spec re-run, source restored | **both new guards went red** (Timer cleanup; meta size 205772 > 4096) | `evidence/phase-4a-3/mutation-check.txt` |
-| Suite (4A-4, Windows) | `pnpm run test` | **821 / 15 / 836** — the failing **set** compared name-by-name with the baseline: **zero added, zero removed**; new spec 21/21 | `evidence/phase-4a-4/MANIFEST.json` |
-| Browser 4A-4 — four components | isolated profile, host DOM counted by structure | **PASS** — Table 1/2/3/6; 2 charts (3 bar marks, 2 line paths, legend a+b); 3 icons; **exactly 1 `<img>`** and a `javascript:` src produced none | `evidence/phase-4a-4/C1-four-components.json`, `screenshot-four-components.png` |
-| Browser 4A-4 — V3 themes | host's own 外观 control, both directions | **PASS** — 25 text samples per scheme over chart axis, legend, table head and cells; min contrast **5.8:1 light / 12.11:1 dark** | `evidence/phase-4a-4/V3-themes.json` |
-| Browser 4A-4 — §9 hash gate | `Get-FileHash` before any measurement | **MATCH** `62AD5817…` — after finding a stale 4A-3 bundle (`4D071A86…`); **second consecutive batch §9 caught it** | `evidence/phase-4a-4/MANIFEST.json` → `hashGate` |
-| 4A-4 mutation checks | four defects re-introduced, restored after | **all four went red**: Image scheme (2), chart gap coercion (2), table padding (1), validate-gate stub (2) | `MANIFEST.json` → `mutationChecks` |
-| O1 validate gate | `pnpm vitest run tests/openui-validate-gate.spec.ts` | **6 / 6 PASS** — fixtures now run through `openuiBackend().validate()` | — |
-| Browser 4A-3 — eleven components | isolated profile, host DOM counted by structure | **PASS** — all eleven counted; `data-openui-unrendered` empty | `evidence/phase-4a-3/C1-eleven-components.json`, `screenshot-eleven-components.png` |
-| Browser 4A-3 — V1 IME | genuine `Input.imeSetComposition` over CDP | **PASS** — 5 `input` events with `isComposing=true`; pre-edit `startn→startni→startnih→startnihao` intact; caret 5→6→7→8→10; focus held; commit 你好 reached `$state` | `evidence/phase-4a-3/V1-ime-composition.json` |
-| Browser 4A-3 — V2 Timer focus | real key events across 8 ticks | **PASS** — timer 01:00 → 00:53; six characters all landed in order; focus and node identity held; caret 1→6 | `evidence/phase-4a-3/V2-timer-focus.json` |
-| Browser 4A-3 — V3 themes | host's own 外观 control, both directions | **PASS** — 21 variables per card all resolve; min contrast **5.8:1 light / 12.11:1 dark** | `evidence/phase-4a-3/V3-themes.json` |
-| Browser 4A-3 — V4 hash gate (§9) | `Get-FileHash` build vs installed, before any measurement | **MATCH** `4D071A86…` — after finding and fixing a **stale N-1 bundle** (354465 vs 375564 bytes) | `MANIFEST.json` → `hashGate` |
-| Browser 4A-3 — V5 persistence | real reload + history replay | **PASS** — a typed value survived both; the default is `start` | `evidence/phase-4a-3/V5-persistence.json` |
-| Suite (4A-3, Windows) | `pnpm run test` | **794 / 15 / 809** — the 15-failure **set** compared name-by-name with the recorded baseline: **zero added, zero removed**; batch spec 43/43 | `evidence/phase-4a-3/test-4a3-windows.txt` |
-| Types (host) | `npx tsc -p tsconfig.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-host.txt` |
-| Types (client) | `npx tsc -p tsconfig.client.json --noEmit` | PASS, exit 0 | `evidence/phase-4a-2/tsc-client.txt` |
-| Suite (4A-2) | `npx vitest run` | **749 / 15** (764) — phase verdict was reached on 747; the 2 extra are the structural guards added at close | `evidence/phase-4a-2/test-4a2-maintenance.txt` |
-| Suite (pre-publish, after the history rewrite) | `npx vitest run` | **749 / 15 / 764** — identical to 4A-2 after removing 22 screenshots and the vendored mp4; the rewrite touched no file under `src/` or `tests/` | `evidence/publish/test-before-publish.txt` |
-| Language differential (4A-2) | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences** | `evidence/phase-4a-2/differential-4a2.txt` |
-| New 4A-2 spec | `npx vitest run tests/openui-text-4a2.spec.tsx` | **64 / 64 PASS** | same suite file |
-| **D20 guard validated** | defect re-introduced on purpose, spec re-run, fix restored | **3 of the new structural tests failed on it**, incl. `listitem inside listitem`; then back to 64/64 | this log; no artefact kept, because keeping a deliberately broken build would be worse |
-| Inventory | `npx vitest run tests/openui-inventory.spec.tsx` | **19 / 48**, Text group complete | same suite file |
-| Harness parity | `node evidence/lib/parity.mjs` | exit 0; no capability lost, character typing still forbidden | `evidence/lib/parity-report.json` |
-| Browser 4A-2 | isolated profile, **no CSS overrides**, both schemes | **all six exit items PASS** | `evidence/phase-4a-2/MANIFEST.json` |
-| Bundle hash (§9) | `Get-FileHash` build vs installed | **MATCH** before the accepted run | `MANIFEST.json` |
-| Baseline (pre-commit) | `npx vitest run` | 683 / 15 (698) — matches the committed claim | `evidence/phase-4a-1/test-4a1-final.txt` |
-| Suite | `npx vitest run` | **683 / 15** (698) | `evidence/phase-4a-1/test-4a1-final.txt` |
-| Baseline parity | normalised FAIL-set diff vs baseline | **IDENTICAL** (15 vs 15, diff empty) | same file |
-| New spec | `npx vitest run tests/openui-layout-4a1.spec.tsx` | **40 / 40 PASS** | `evidence/phase-4a-1/test-4a1-final.txt` |
-| New spec | `npx vitest run tests/openui-inventory.spec.tsx` | **6 / 6 PASS** | `evidence/phase-4a-1/component-inventory.txt` |
-| Build | `npx tsdown` | both halves build | — |
-| Bundle hash (AGENTS §9) | `Get-FileHash` on profile vs build | MATCH on both halves, re-checked after the final rebuild | `evidence/phase-4a-1/MANIFEST.json` |
-| Language differential | `node --experimental-strip-types evidence/phase-2/differential.mjs` | **31/31, 0 differences** | `evidence/phase-4a-1/differential-4a1.txt` |
-| Host token scan | live host, all custom properties | **509 declared**; 2 bridged names did not resolve | `evidence/phase-4a-1/host-tokens.json` |
-| Browser 4A-1 | isolated profile `p3web`, **no CSS overrides** | **A1–A8 PASS**; A9 NOT VERIFIED | `evidence/phase-4a-1/MANIFEST.json` |
-| Earlier phases | — | unchanged, not re-run | `evidence/phase-1/`…`evidence/browser-phase-3/` |
+| Peer dependencies (repo) | `pnpm peers check` | exit 0 — "No peer dependency issues found" | `evidence/stage-7c/compat/02-peers-check.txt` |
+| Types | `pnpm run typecheck` | exit 0, both projects | `evidence/stage-7c/compat/03-typecheck.txt` |
+| Build | `pnpm run build` | exit 0; client 450.56 kB / host 244.56 kB; client hash = Gate 2's `E1BF4A82…` | `evidence/stage-7c/compat/04-build.txt`, `07-bundle-hash.txt` |
+| Full suite | `npx vitest run` | **942 passed / 4 skipped / 946**, 48/48 files, exit 0 (same as the stage-6 local baseline) | `evidence/stage-7c/compat/05-tests.txt` |
+| Targeted | `npx vitest run tests/stream-assembly.spec.ts` | 3/3 passed | `evidence/stage-7c/compat/05-tests.txt` |
+| Profile resolve (isolated) | clean `dsh plugin --profile p22web install` + `peers check` | exit 0; `dsh-*@0.2.2-rc.1` + `cordis@4.1.0` | `evidence/stage-7c/compat/06-profile-install.txt` |
+| Real-host load (isolated, 0.2.2-rc.1) | model turn on `:3094` | `visualize` called twice, non-error results; `[data-openui-card]`=4; console errors 0; style route 200 | `evidence/stage-7c/compat/real-host/` |
+| Gate-3 source anchors | `verify-anchors.mjs` | **15/15** verified against tag `66491b05e3` | `evidence/stage-7c/gate3/anchors-verified.json` |
+| Daily acceptance (isolated, `:3095`) | `node evidence/stage-7c-daily/acceptance.mjs` | **8/8 scenarios, 0 failures**; cards 6 on refresh restore and session switch; real drag 速度 1→5; console errors 0 | `evidence/stage-7c-daily/real-use/`, `02-acceptance-run.txt` |
+| Shared probe G0–G3 | `node evidence/lib/probe.mjs --what=smoke` | attempted; the fixed 4-attempt evaluate budget is too small for the repainting page — recorded as an environment/harness limit, not a product failure | `evidence/stage-7c-daily/01-smoke.txt` |
 
 ## 6. Open issues
 
 | Issue | Impact | Status |
 | --- | --- | --- |
-| B05/B10 unverified | Two claims about the card are untested | Later stage |
-| Light Button pair is 4.23:1 | Below AA for body text; matches the host's own pairing | Recorded, not changed |
-| `$state` not persisted | A reload loses what the user set | **Fixed and browser-verified** — S04 PASS |
-| `path` is content-addressed | A regenerated card starts from defaults; only an `update` patch keeps state | Existing behaviour, documented in ADR-006 A3; unchanged by design |
-| State is `localStorage` only | Does not sync across devices, browsers or profiles | Recorded in ADR-006 §Limitation; inherited from the HTML backend |
-| HTML cross-view overwrite risk | Toolview + turn tail share one key and post whole maps | **Not fixed** (as decided). OpenUI has the write-merge; HTML is still last-writer-wins. Now **pinned by 3 regression tests** so it cannot widen unnoticed |
-| Turn tail dropped OpenUI cards | A persisted card was invisible in the folded conversation | **Fixed in P3-06 and browser-verified** (T1–T6) |
-| Button actions inert | `@Set` etc. evaluate but nothing consumes them | **Fixed in P3-07 and browser-verified** (A01–A04, A07, A08, A10) |
-| `@OpenUrl`/`@CopyToClipboard`/`@ToAssistant` refused | A card cannot open, copy or message | Deliberate; each needs a security review (4B) |
-| Two bridged tokens do not exist in the host | `--viz-series-4` and `--font-sans` resolved to nothing and silently used fallbacks | **Fixed in 4A-1 and re-verified in both themes** (D17, D18) |
-| A declared-but-undrawn component drew nothing | A renderer gap looked like an intentionally empty card | **Fixed in 4A-1** — an explicit notice, pinned by tests (A7) |
-| 12 of 48 components render | The language knows all 48; the renderer draws 12 | **Closed** — 19 after 4A-2, 30 after 4A-3, 34 after 4A-4, **48 of 48 after 4A-5** |
-| Cross-generation replay unverified | A9 cannot be run on the profile's older session | Log written by a newer harness; recorded, not counted. **Unchanged by 4A-2** |
-| 15 Windows test failures | Noise that could hide a regression | Accepted; `docs/testing/TEST_PLAN.md` |
-| Small supporting text was 3.71:1 on white | 11px meta text (`Copy`, markers, citations) was below AA | **Fixed in 4A-2** — `--muted-foreground-strong` on the host's secondary tier, 5.8:1 / 12.11:1 (D22) |
-| `--muted-foreground` is still 3.71:1 on white | `Caption` and `color: "muted"` inherit it | **Deliberately not changed.** `Caption` is a browser-verified 4A-1 component; restyling it needs its own decision, not a side effect of 4A-2 |
-| `Link` colour has no host token that passes AA in both schemes | A `var()` bridge would fail in one scheme | Recorded in ADR-008; declared as a measured `light-dark()` pair (`LINK_LITERAL`) |
-| Protocol-relative URLs allowed upstream, refused here | A recorded divergence, not a drift | ADR-008; the fork's allowlist is a strict subset of upstream's |
-| `Mailto:`/`tel:` links degrade to text | A card cannot start an email or a call | Deliberate in ADR-008; nothing in the catalogue needs them, and they invoke OS handlers |
-| A Windows account name survives in two **published** commits | `b2e0064` and `f65cf41` quote it in a session-log sentence. It is a name, not a credential, and `74ca8f7` already reworded the same sentence in later history | **Recorded, deliberately not rewritten.** Rewriting published history was ruled out by the owner; the value is unreachable from any current file |
-| The persisted meta stores the fragment twice | 234 bytes a card; for a html card nothing reads `source` (`visualizeMetaFrom` needs `fragment`, `openuiMetaFrom` returns early when it is present) | **Recorded, deliberately not changed in 4A-3.** Removing it changes the persisted shape and needs an ADR |
-| The build needed an undeclared optional peer | `pnpm install --frozen-lockfile && pnpm run build` failed on any clean machine | **Fixed in 4A-3** — `unrun` declared as a dev dependency (D23) |
-| "15 known failures" was a Windows-rig count | A count carried across platforms hides what actually changed; one of the 15 had never run at all | **Restated in 4A-3** — 14 of the 15 do not exist on Linux, and the 15th was D24. The portable gate is the failure *set*, each entry named and caused |
-| A Timer cleanup test passed for the wrong reason | A leaked interval writes into a store a reload has already replaced, so the leak is invisible to a value-based test | **Fixed in 4A-3** — cleanup asserted by counting pending timers (D25) |
-| The validator rejected the documented `Action([...])` form | The prompt taught a form `checkNames` refused, so an obedient model was rejected and a "correcting" one succeeded | **Fixed in 4A-5** — the action table is consulted for the sigil-less form too; the old test was reversed, not deleted |
-| `Celebration` never fired for a bare-variable condition | `Celebration($done)` passes a binding marker; `boolOf` on that object is constant true, so the transition never happened. Every test used the comparison form, so none touched it | **Fixed in 4A-5** — `fieldOf` unwraps the binding; three regression cases, mutation-verified |
-| An idle bsk session is recycled after 5 minutes | The Agent Window and its browser close with it, which looks like a crashed environment | Recorded in 4A-5; start sessions with a longer `--session-idle` for a long acceptance run |
-| A fresh agent tab is `about:blank` and cannot be synced | `cooperate sync` fails with "Receiving end does not exist" until the tab navigates, because the content script is not injected | Recorded in 4A-5; navigate before the first sync |
-| R2's "an aborted call writes nothing" check did not discriminate | The same assertion passes with the fix absent, because `legacy-tool.ts:339` throws after image resolution in both versions | **Closed 2026-11-07 for the workspace-image create path** — the mutant control shows the pre-fix shape reads the workspace image and leaves an orphan image file; the shipped build does neither (`evidence/stage-7-pre/r2-mutant-control.json`) |
-| Tag `v0.1.1`'s own `CHANGELOG.md` still carries the removed temp-file-leak sentence | Anyone reading the tagged tree sees text that main has corrected | **Deliberate, not a defect to fix by releasing.** The tag was not moved; the corrections are a later commit on main (`cdc9868`) and the GitHub Release page was edited in place. A v0.1.2 would ship byte-identical `lib/` and would not change the v0.1.1 tree |
-| **Host version skew** | The plugin compiles against 0.2.1-rc.5 types but runs on the installed **0.2.2-rc.1** desktop host; 0.2.2 ships no `.d.ts`, and `peerDependencies: ^0.2.1-0` does not admit `0.2.2-rc.1` under strict semver | **Recorded 2026-11-07 (Stage 7A).** Runtime compatibility is unverified; the v0.1.1 browser evidence ran on the 0.2.1-rc.5 host. Needs its own stage before claiming 0.2.2 support |
-| **`@ToAssistant` still refused** | Needs one upstream host change: host-validated message attribution | **ADR-016 Proposed, awaiting owner.** No implementation authorised |
-| **No host-read bytes in the confirmation** | `userQuestions.ask` renders caller-supplied `detail`; the host does not verify it equals a durable message | Accepted residual in ADR-016 §10; the plugin must show the same string it submits, and a test must pin byte equality |
-| **`@OpenUrl` still refused** | No plugin-callable external open in 0.2.2-rc.1 | Unchanged; upstream ask stands (ADR-014 §10.4) |
-| **Confirmation preview clamps long text** | Gate 2 measured: the host question title is visually clipped at **68 px** by default (`scrollHeight` 222 px for 10 lines) with an `展开` toggle; byte parity itself is verified (title text = submitted text) | **New 7B constraint:** the message cap must be chosen to fit the measured preview, or the design accepts one expand click |
-| **`{accepted:true}` is not delivery (verified)** | Gate 2: an archived session accepts the prompt in 13 ms, then `turn/start` + `turn/end {blocked}` with no `user/message` and no error | The plugin must verify delivery from the durable log (`rpcId` in `user/message` + `turn/start`) and otherwise say unconfirmed |
-| **No content-level submission dedupe** | Gate 2: two identical prompts with different `requestId` → two messages | The one-in-flight latch must be plugin-side |
-| **Declared peer range does not admit 0.2.2** | Runtime works (card rendered end to end), but `pnpm peers check` fails: unmet `cordis` 4.1.0 vs `~4.0.5`, and `^0.2.1-0` excludes `0.2.2-rc.1` under strict semver | Manifest update is its own work item before 0.2.2 support is claimed |
+| **`@ToAssistant` needs one upstream host change** | No card→assistant message can carry host-validated provenance | **Gate 3 request prepared, not sent.** Upstream does not accept external PRs; the draft is a Discussion post. Until it ships the action stays refused |
+| **`@OpenUrl`** | A card cannot open an external URL | Unchanged; no plugin-callable external open in 0.2.2-rc.1 (ADR-014) |
+| **Daily-profile swap not performed** | The owner still runs `@nagi-ovo/dsh-visualize ^0.1.7` | Steps + rollback written in `docs/reports/STAGE-7C-DAILY-BASELINE.md`; the installer must quit the app first. Not executed by this agent |
+| **Two surfaces of one card can diverge live** | While interacting, the non-dragged copy may show the old slider value until reload | **Observed 2026-11-07** (daily acceptance; converges after reload). Pre-existing presentation behaviour; fixing it needs its own decision, not a side effect of 7C |
+| **Model-initiated visualization** | An implicit request ("画个图") might not call the tool | NOT VERIFIED; acceptance prompts named the tool. A few real daily prompts will settle it |
+| **HTML backend in daily acceptance** | 7C acceptance exercised OpenUI cards only | NOT re-run; HTML was verified in earlier stages and the build is byte-identical to v0.1.1 |
+| **0.2.1-rc.5 runtime after the compat change** | Users on an older host | Range still admits 0.2.1, but no 0.2.1 host was run after the change — stated, not claimed |
+| **Compile baseline moved to 0.2.2-rc.1** | A 0.2.1-only API change would not be caught by typecheck | Matches the installed host; 0.2.1 support rests on the ranges + prior v0.1.1 evidence |
+| **Gate 2 constraints carried forward for `@ToAssistant`** | Confirmation preview clamps at 68 px; `{accepted:true}` is not delivery; no content dedupe | Already recorded in ADR-016 §12 and the Gate-2 evidence; Gate 4 must honour them |
+| **Older carried-forward items** | A05/A06/A09 not browser-verified; HTML cross-view last-writer-wins pinned by tests; light Button pair 4.23:1; `$state` is localStorage-only; 15 Windows test failures (test-env only) | Unchanged from earlier stages; see History |
 
 ## 7. Next step
+
+**Immediate next steps (Stage 7C close, 2026-11-07):**
+
+1. **Owner decision on Gate 3:** read `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` and either approve sending the Discussion post (it is not sent) or leave it parked. Nothing else in `@ToAssistant` can start before the host change ships.
+2. **Owner decision on the daily swap:** follow `docs/reports/STAGE-7C-DAILY-BASELINE.md` §2 (quit the app first; back up `package.json` + `pnpm-lock.yaml`; replace `@nagi-ovo/dsh-visualize` with this fork; install; peers check; smoke test). Rollback is §3.
+3. **After the upstream change ships:** Stage 7B Gate 4 implementation + the ADR-016 §7 security cases and §8 acceptance, including the `userQuestions.ask` 68 px preview cap and durable `rpcId` delivery check.
+4. **Do not** cut a release for the 7C changes: product code is byte-identical to v0.1.1; only the manifest compile/peer metadata changed.
 
 **v0.1.1 stays the current release; no v0.1.2.** Tag `v0.1.1` at `50b6b54`,
 GitHub Release published 2026-11-06; `main` carries documentation commits after
@@ -451,29 +378,7 @@ byte-identical `lib/` (the version string does not enter the bundle) and would
 announce a change to users while the v0.1.1 tree still reads as before. The
 correction is already on `main` (`cdc9868`) and on the Release page.
 
-**Stage 7B Gate 2 is DONE (2026-11-07). The next step is Gate 3 (upstream ask).**
-The owner chose **ADR-016 Option B** and required the existing confirmation mechanism to be
-validated on a real host *before* asking upstream. That validation passed:
 
-1. **`userQuestions.ask()` works outside a turn** — before any turn (1,340 ms) and after a
-   real turn ended (2,030 ms) on an isolated DSH 0.2.2-rc.1 host, with the host-rendered
-   card and a returned answer. The confirmation half of B is verified, not source-read.
-2. **The confirmation title is byte-equal to the submitted string** (markdown markers,
-   backticks, emoji, newlines preserved as text), and the durable message is byte-equal.
-   New constraint: long text is visually clipped at 68 px by default (expand toggle exists).
-3. **`{accepted:true}` is not delivery** — verified on an archived session: accepted in
-   13 ms, then a blocked turn with no message and no error. The plugin must verify delivery
-   from the durable log before telling the reader "sent".
-4. **No content dedupe** — two identical prompts with different ids produced two messages.
-5. **This plugin runs on 0.2.2-rc.1** — `visualize` called, OpenUI card rendered end to end,
-   style route 200, installed hash = build hash. But the declared peer range still excludes
-   0.2.2-rc.1 and `pnpm peers check` fails; that is its own work item.
-
-**What is left for `@ToAssistant`:** Gate 3, the single upstream provenance change
-(host-validated, persisted, rendered attribution bound to the delivered message), then Gate 4
-implementation against ADR-016 §7/§8. The action stays refused meanwhile.
-**`@OpenUrl`** is unchanged: still no plugin-callable external open in 0.2.2-rc.1, and the
-upstream ask stands (ADR-014 §10.4).
 
 ~~Stage 4A is closed at 48 / 48.~~ — historical, kept for the shape of the note.
 ~~4A-4 is accepted. Next is 4A-5~~ — the fourteen that remain: the ten SVG
@@ -660,6 +565,65 @@ Six things carried forward:
 
 ## History
 
+### Session 31 — 2026-11-07 (Stage 7C: Gate 3 request, 0.2.2 compatibility, daily baseline)
+
+**Scope:** the owner's three workstreams, executed in order. No product code changed; the
+daily profile was not touched; nothing was sent upstream; no tag moved.
+
+**A. Gate 3 — what upstream actually needs.** Re-read the public release source
+(`dsh-v0.2.2-rc.1` = `66491b05e3`, also the installed host; npm `next` = 0.2.2-rc.1, no newer
+release). ADR-016 Option B assumed "schema field + log check + source kind + bubble badge";
+two of those are unnecessary:
+- **No host UI:** `conversation.chat.user.before` is an existing source-aware Chat slot
+  (`client/ui-chat … slots.ts:230,457`, rendered at `MessageItem.tsx:226`, shipped precedent
+  `experimental-liveshare`). The badge is plugin-side from the host-recorded source.
+- **No new source kind:** the existing `'user-rpc'` source gains an optional `origin`, so
+  dedupe/echo (`source.kind==='user'` + `rpcId`) and row classification are untouched.
+- **The host must still change:** the prompt parameter codec is strict
+  (`additionalProperties:false`), so a plugin cannot smuggle the field; and provenance must be
+  host-validated. Ask: `SessionPromptRequest.origin?: {kind:'tool-call', callId}`; validate
+  the id against a committed `tool/call` in the resolved session; record
+  `{kind,callId,tool,turn}` (tool/turn host-derived) on the durable source; reject unknown.
+- **Channel:** the repo accepts reports in Discussions and **not** external PRs. The draft is
+  a Discussion post, not sent.
+- Evidence: `evidence/stage-7c/gate3/` (15/15 anchors re-fetched and asserted; a real Gate-2
+  session log proves `source` durability — metadata only, content never printed).
+
+**B. 0.2.2-rc.1 compatibility.** The two Gate-2 findings were one range-selection bug:
+`^0.2.1-0` cannot admit `0.2.2-rc.1` (semver prerelease tuple rule), so the profile resolved
+0.2.1-rc.5 peer copies whose `cordis ~4.0.5` conflicts with the host's 4.1.0. Minimal fix:
+devDeps → 0.2.2-rc.1, cordis → 4.1.0, six peer ranges gain `|| ^0.2.2-rc.1`. Verified:
+peers check 0, both tsc projects 0, build 0, full suite **942 passed / 4 skipped / 946**,
+clean isolated-profile resolve (`dsh-*@0.2.2-rc.1` + cordis 4.1.0, peers check 0), and a real
+host load (`visualize` called, card rendered, console clean, style route 200). Rebuilt
+`lib/client.js` is **byte-identical** to the v0.1.1/Gate-2 hash `E1BF4A82…`. Corrected the
+ADR-016 claim that 0.2.2 ships no `.d.ts`: the npm tarballs do; the asar extraction omits them.
+
+**C. Daily baseline.** Confirmed the daily profile is `~/.dsh/profiles/desktop` (GUI PID 21788
+on :50270) and that it loads `@nagi-ovo/dsh-visualize ^0.1.7` — so the fork is a **swap**, not
+an addition. Wrote the install/upgrade and rollback procedure (not executed). Built an
+isolated home/profile (`tmp/dsh-7c`, `p7c`) installed the same way and ran real model turns:
+knowledge card 0→2, math card with slider 2→4, sorting card with button 4→6, refresh restore
+6→6 with titles preserved, session switch 6→6 restored, idle stability 6→6 with 0 unrendered
+and 0 console errors, a **real pointer drag** (速度 1→5) and persistence across reload
+(both copies read 5). 8/8 scenarios, 0 failures.
+
+**Setbacks/limits recorded, not hidden.**
+
+- The shared probe's G0–G3 run could not finish: this host repaints continuously and the
+  probe's fixed 4-attempt evaluate retry budget is too small; the same gates were re-run with
+  a larger bounded budget in `acceptance.mjs`. Recorded as an environment/harness limit, never
+  as a product FAIL.
+- bsk sessions got stuck once after a timed-out `fill` (the modal "预览版说明" occluded the
+  composer); diagnosed, modal dismissed, sessions restarted. Killing the daemon closes the
+  agent browser; it must be relaunched and the browser reconnects.
+- The two surfaces of one card can diverge live while interacting; they converge after a
+  reload. Pre-existing presentation behaviour; recorded as a known limitation.
+- Daily-profile swap, HTML backend in 7C, implicit model tool selection and 0.2.1 runtime are
+  **NOT VERIFIED**, each stated with its reason.
+
+**Commits:** `f49fdf5` (Gate 3), `96e7c9a` (compat). Final docs/evidence commit follows.
+No push, no tag move, no release.
 ### Session 30 — 2026-11-07 (Stage 7B Gate 2: real-host pre-validation)
 
 **Owner decision recorded first:** ADR-016 **Option B** (minimal upstream change), with the
@@ -2391,3 +2355,4 @@ and in the renderer, verified server-side.
 Fork created from `cf6b3a3`. Three upstream snapshots pinned. Stage 1 implemented
 and accepted with the openui rendering gap. Fixed the nested-dispatch card loss
 inherited from the base. Documentation system established.
+

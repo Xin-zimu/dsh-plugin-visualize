@@ -1,5 +1,5 @@
 == clean resolve: dsh plugin --profile p22web install @ 15:27:25 ==
-[WARN] The store at C:\Users\86139\AppData\Local\pnpm\store\v11 is not used because packages cannot be hard linked from it into this project. Using the store at D:\.pnpm-store\v11 instead. Set storeDir to choose the store.
+[WARN] The store at C:/Users/<user>\AppData\Local\pnpm\store\v11 is not used because packages cannot be hard linked from it into this project. Using the store at D:\.pnpm-store\v11 instead. Set storeDir to choose the store.
 Progress: resolved 1, reused 0, downloaded 0, added 0
 Progress: resolved 20, reused 20, downloaded 0, added 0
 Progress: resolved 21, reused 20, downloaded 0, added 0

@@ -1,0 +1,12 @@
+{
+  "href": "http://127.0.0.1:3095/",
+  "title": "SMOKE-mw63k7hj — DeepSeek Harness",
+  "composer": true,
+  "cards": 0,
+  "errors": [],
+  "daemon": {
+    "daemonVersion": "0.4.1",
+    "protocolVersion": "1.8",
+    "session": "bazw"
+  }
+}

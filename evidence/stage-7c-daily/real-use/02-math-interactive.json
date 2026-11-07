@@ -1,0 +1,23 @@
+{
+  "marker": "ACCEPT-mw63qv1s",
+  "cardsBefore": 2,
+  "cardsAfter": 4,
+  "grew": true,
+  "sliderCard": {
+    "index": 2,
+    "title": null,
+    "chars": 0,
+    "sliders": 1,
+    "buttons": 0,
+    "svg": 0,
+    "listItems": 0
+  },
+  "interaction": {
+    "kind": "dom-event",
+    "before": "1",
+    "after": "5",
+    "changed": true,
+    "dragError": "bsk step failed:\n{\n  \"code\": null,\n  \"message\": \"invalid action parameters: missing field `source`\",\n  \"hint\": \"is the daemon running? try `bsk daemon start` or `bsk status`\",\n  \"exit_code\": 2\n}\n"
+  },
+  "errors": []
+}

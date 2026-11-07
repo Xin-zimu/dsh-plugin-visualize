@@ -1,0 +1,32 @@
+{
+  "marker": "ACCEPT-mw63rz5d",
+  "cardsBefore": 4,
+  "cardsAfter": 6,
+  "grew": true,
+  "sortingCard": {
+    "index": 4,
+    "title": null,
+    "chars": 0,
+    "sliders": 1,
+    "buttons": 1,
+    "svg": 1,
+    "listItems": 0
+  },
+  "click": {
+    "before": {
+      "html": 3749,
+      "errors": 0,
+      "buttons": [
+        "下一步",
+        "下一步"
+      ]
+    },
+    "button": {
+      "found": true,
+      "label": "下一步"
+    },
+    "afterErrors": 0,
+    "htmlChanged": true
+  },
+  "errors": []
+}

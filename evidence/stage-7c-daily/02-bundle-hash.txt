@@ -1,0 +1,10 @@
+# AGENTS.md §9 bundle-hash gate — isolated daily-like profile
+captured: 
+2026-11-07 15:54:14 +08:00
+build lib/client.js : 
+E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+installed (p7c)   : 
+E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+
+=> match; the browser ran this tree for the acceptance run.
+Product source unchanged by the compat fix (bundle byte-identical to Gate 2).

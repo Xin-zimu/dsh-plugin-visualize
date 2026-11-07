@@ -1,0 +1,17 @@
+{
+  "cardsBefore": 6,
+  "cardsAfter": 6,
+  "titlesBefore": [
+    "勾股定理",
+    "二次函数 y = a·x²",
+    "冒泡排序演示"
+  ],
+  "titlesAfter": [
+    "勾股定理",
+    "二次函数 y = a·x²",
+    "冒泡排序演示"
+  ],
+  "sameCount": true,
+  "titlesPreserved": true,
+  "errors": []
+}

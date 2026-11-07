@@ -1,0 +1,28 @@
+{
+  "marker": "ACCEPT-mw63oym0",
+  "settled": true,
+  "cardsBefore": 0,
+  "cardsAfter": 2,
+  "grew": true,
+  "cardSnapshot": [
+    {
+      "index": 0,
+      "title": null,
+      "chars": 0,
+      "sliders": 0,
+      "buttons": 0,
+      "svg": 0,
+      "listItems": 0
+    },
+    {
+      "index": 1,
+      "title": "勾股定理",
+      "chars": 70,
+      "sliders": 0,
+      "buttons": 0,
+      "svg": 0,
+      "listItems": 0
+    }
+  ],
+  "errors": []
+}

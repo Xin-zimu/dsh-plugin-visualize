@@ -1,7 +1,7 @@
 == pnpm run build @ 15:25:39 ==
 $ tsdown
 ℹ tsdown v0.22.14 powered by rolldown v1.2.3
-ℹ config file: D:\Deepseek WorkSpace\dsh-plugin-visualize\tsdown.config.ts 
+ℹ config file: D:/work/dsh-plugin-visualize\tsdown.config.ts 
 ℹ entry: src/index.ts
 ℹ target: es2024
 ℹ tsconfig: tsconfig.json

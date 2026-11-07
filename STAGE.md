@@ -754,7 +754,7 @@ profile.
 | --- | --- |
 | A. Gate 3 — upstream provenance request | **DONE — request prepared, not sent.** Report + Discussion draft + line-anchor evidence. |
 | B. DSH 0.2.2-rc.1 compatibility (peer ranges, cordis skew) | **DONE — fixed in this repo; product JS unchanged.** devDeps → 0.2.2-rc.1, cordis → 4.1.0, six `dsh-*` peer ranges gain `\|\| ^0.2.2-rc.1`. `pnpm peers check`/typecheck/build/tests green; clean isolated-profile resolve picks 0.2.2-rc.1 + cordis 4.1.0 and passes; real-host load on 0.2.2-rc.1 passes. `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`, `evidence/stage-7c/compat/` |
-| C. Daily-trial baseline (install/rollback steps + isolated acceptance run) | **see below** |
+| C. Daily-trial baseline (install/rollback steps + isolated acceptance run) | **DONE — daily profile untouched.** Daily profile confirmed `~/.dsh/profiles/desktop` (PID 21788/:50270, currently `@nagi-ovo/dsh-visualize ^0.1.7` — the swap is a replacement). Install/rollback written, not executed. Isolated-profile real-use acceptance: **8/8 scenarios, 0 failures, 0 console errors**, cards restored across refresh + session switch, real slider drag writes state. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/` |
 
 ### A. Gate 3 result
 
