@@ -1,0 +1,295 @@
+<!-- Worked example: y = ax² + bx + c with an auto-fitted window.
+     Idioms on display: hand-rolled SVG (a function plot is not a chart), an
+     x-window chosen from the parabola itself instead of a fixed [-10, 10], axes
+     drawn only where y=0 / x=0 are in view (no fake origin), 1-2-5 ticks,
+     vertex + symmetry axis + real roots, dshViz.bind wiring the sliders to one
+     render, data-viz-keep so the reader's parameters survive a reload.
+     Copy this file and change f(x), the marks and the sliders; keep the window
+     and axis logic. -->
+<div id="quad-explorer" data-viz-keep>
+  <style>
+    #quad-explorer { font-variant-numeric: tabular-nums; }
+    #quad-explorer .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 10px; }
+    #quad-explorer .eq { font-family: var(--font-mono); font-size: 20px; font-weight: 600; line-height: 1.4; color: var(--foreground); }
+    #quad-explorer .meta { font-family: var(--font-mono); font-size: var(--font-size-small); color: var(--muted-foreground); }
+    #quad-explorer .plot { position: relative; width: 100%; height: 320px; }
+    #quad-explorer .plot svg { display: block; width: 100%; height: 100%; }
+    #quad-explorer .controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 22px; margin-top: 12px; }
+    @media (max-width: 560px) { #quad-explorer .controls { grid-template-columns: 1fr; } }
+    #quad-explorer .ctrl-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2px; }
+    #quad-explorer .ctrl-head label { font-family: var(--font-mono); font-size: var(--font-size-base); font-weight: 600; }
+    #quad-explorer .ctrl-head output { font-family: var(--font-mono); font-size: var(--font-size-small); color: var(--muted-foreground); }
+    #quad-explorer input[type=range] { width: 100%; margin: 0; accent-color: var(--primary); }
+    #quad-explorer .grid-line { stroke: var(--viz-grid); stroke-width: 1; }
+    #quad-explorer .axis-line { stroke: var(--viz-axis); stroke-width: 1.5; }
+    #quad-explorer .tick-text { fill: var(--muted-foreground); font-family: var(--font-mono); font-size: 11px; }
+    #quad-explorer .axis-label { fill: var(--viz-axis); font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
+    #quad-explorer .curve { fill: none; stroke: var(--viz-series-1); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    #quad-explorer .sym-line { fill: none; stroke: var(--viz-axis); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: .75; }
+    #quad-explorer .vertex-dot { fill: var(--primary); stroke: var(--background); stroke-width: 1.5; }
+    #quad-explorer .vertex-label { fill: var(--muted-foreground); font-family: var(--font-mono); font-size: 11px; }
+    #quad-explorer .root-dot { fill: var(--background); stroke: var(--viz-series-1); stroke-width: 2; }
+    #quad-explorer .root-label { fill: var(--muted-foreground); font-family: var(--font-mono); font-size: 11px; }
+    @media (prefers-reduced-motion: reduce) { #quad-explorer .plot { animation: none !important; } }
+  </style>
+
+  <div class="head">
+    <span class="eq" data-viz-out="equation">y = x²</span>
+    <span class="meta" data-viz-out="readout">顶点 (0, 0) · 对称轴 x = 0</span>
+  </div>
+  <div class="plot"><svg id="quad-explorer-svg" role="img" aria-label="二次函数图像"></svg></div>
+
+  <div class="controls">
+    <div class="control">
+      <div class="ctrl-head"><label for="quad-a">a</label><output data-viz-out="a">1.0</output></div>
+      <input id="quad-a" name="a" type="range" min="-2" max="2" step="0.1" value="1">
+    </div>
+    <div class="control">
+      <div class="ctrl-head"><label for="quad-b">b</label><output data-viz-out="b">0.0</output></div>
+      <input id="quad-b" name="b" type="range" min="-10" max="10" step="0.1" value="0">
+    </div>
+    <div class="control">
+      <div class="ctrl-head"><label for="quad-c">c</label><output data-viz-out="c">0.0</output></div>
+      <input id="quad-c" name="c" type="range" min="-10" max="10" step="0.1" value="0">
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('quad-explorer');
+  if (!root) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  var plot = root.querySelector('.plot');
+  var svg = root.querySelector('svg');
+  var entered = false;
+  var lastParams = null;
+  var lastW = 0, lastH = 0;
+  var reduced = false;
+  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { reduced = false; }
+
+  function el(name, attrs, text) {
+    var node = document.createElementNS(NS, name);
+    if (attrs) for (var k in attrs) if (Object.prototype.hasOwnProperty.call(attrs, k) && attrs[k] !== null && attrs[k] !== undefined) node.setAttribute(k, attrs[k]);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function round(n, d) { var m = Math.pow(10, d === undefined ? 1 : d); var v = Math.round(n * m) / m; return v === 0 ? 0 : v; }
+  function fmt(n, d) {
+    var v = round(n, d === undefined ? 1 : d);
+    if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v));
+    return v.toFixed(d === undefined ? 1 : d);
+  }
+  function niceStep(span, target) {
+    var raw = span / target, mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), norm = raw / mag;
+    return (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+  }
+  function equation(a, b, c) {
+    var out = 'y = ';
+    if (Math.abs(a) < 1e-6) {
+      if (Math.abs(b) < 1e-6) return out + fmt(c);
+      out += b === 1 ? 'x' : b === -1 ? '−x' : fmt(b) + 'x';
+      if (c !== 0) out += (c > 0 ? ' + ' : ' − ') + fmt(Math.abs(c));
+      return out;
+    }
+    out += (a === 1 ? '' : a === -1 ? '−' : fmt(a)) + 'x²';
+    if (b !== 0) out += (b > 0 ? ' + ' : ' − ') + (Math.abs(b) === 1 ? '' : fmt(Math.abs(b))) + 'x';
+    if (c !== 0) out += (c > 0 ? ' + ' : ' − ') + fmt(Math.abs(c));
+    return out;
+  }
+
+  // --- window: the parabola chooses X, with hysteresis ----------------------
+  // The window holds the vertex and every point where the curve leaves the top
+  // edge. While dragging, keep the old window until those points no longer fit
+  // inside it by ~8% — otherwise the plot twitches on every frame.
+  function targetWindow(a, b, c) {
+    if (Math.abs(a) < 1e-6) {
+      // Straight line: centre on the x-range where |y| <= 4 around x=0, then pad.
+      var y0 = c, y1 = b * 4 + c;
+      var lo = Math.min(0, 4), hi = Math.max(0, 4);
+      if (b < 0) { lo = -4; hi = 0; }
+      var xc = (lo + hi) / 2, span = Math.max(4, Math.abs(hi - lo));
+      return { xmin: xc - span / 2, xmax: xc + span / 2, ymin: Math.min(y0, y1) - 2, ymax: Math.max(y0, y1) + 2 };
+    }
+    var h = -b / (2 * a), k = c - b * b / (4 * a);
+    // Half-width: how far from the vertex the curve reaches |y| ≈ 2.2 * |k| of
+    // vertical headroom, i.e. branches leave near the top edge of a plot whose
+    // vertex sits ~25% above the bottom.
+    var up = a > 0;
+    var bottomPad = up ? 0.22 : 0.0;
+    // Aim: vertex at 25% from the bottom (a>0) or 75% (a<0); top edge reached at
+    // 85% of the half-width.
+    var factor = up ? 0.85 : 0.85;
+    var reach, half;
+    if (Math.abs(k) < 1e-9) {
+      half = Math.max(1, Math.sqrt(Math.max(1, Math.abs(c)) / Math.abs(a)) * 2);
+      reach = a * half * half;
+    } else {
+      // Solve a*xs² = ys where ys = k + 0.75*|k|/0.25 = 4|k| (top/bottom edge),
+      // and choose xs so the branch exits at `factor` of the half-width.
+      var ys = up ? k + Math.abs(k) * 2.2 : k - Math.abs(k) * 2.2;
+      var xs = Math.sqrt(Math.abs((ys - k) / a)) / factor;
+      // Ensure the vertex region is not tiny: at least ~2.5 units each side.
+      half = Math.max(2.5, xs);
+      reach = a * half * half;
+    }
+    var pad = 0.06 * half;
+    return { xmin: h - half - pad, xmax: h + half + pad, ymin: k - Math.abs(reach) * (up ? bottomPad : (1 - bottomPad)) , ymax: k + Math.abs(reach) * (up ? (1 - bottomPad) : bottomPad) };
+  }
+
+  function holds(win, a, b, c) {
+    var h = -b / (2 * a), k = c - b * b / (4 * a);
+    var up = a > 0;
+    var xPad = (win.xmax - win.xmin) * 0.08, yPad = (win.ymax - win.ymin) * 0.08;
+    if (h < win.xmin + xPad || h > win.xmax - xPad) return false;
+    if (k < win.ymin + yPad || k > win.ymax - yPad) return false;
+    // Both branch exit points must be inside.
+    var yTop = up ? win.ymax - yPad : win.ymin + yPad;
+    var xEdge = Math.sqrt(Math.abs((yTop - k) / a));
+    return h - xEdge >= win.xmin + xPad && h + xEdge <= win.xmax - xPad;
+  }
+
+  function chooseWindow(a, b, c, prev) {
+    if (prev && Math.abs(a) > 1e-6 && holds(prev, a, b, c)) return prev;
+    return targetWindow(a, b, c);
+  }
+
+  // --- draw ----------------------------------------------------------------
+  function draw(params, animate) {
+    var a = params.a, b = params.b, c = params.c;
+    var w = Math.max(1, Math.round(plot.clientWidth || 0));
+    var h = Math.max(1, Math.round(plot.clientHeight || 0));
+    lastW = w; lastH = h;
+    if (!svg.viewBox || svg.getAttribute('width') !== String(w)) {
+      svg.setAttribute('width', String(w)); svg.setAttribute('height', String(h));
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    }
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    var win = chooseWindow(a, b, c, lastParams ? lastParams.win : null);
+    var padL = 44, padR = 18, padT = 14, padB = 26;
+    var iw = Math.max(20, w - padL - padR), ih = Math.max(20, h - padT - padB);
+    var sx = function (x) { return padL + (x - win.xmin) / (win.xmax - win.xmin) * iw; };
+    var sy = function (y) { return padT + (win.ymax - y) / (win.ymax - win.ymin) * ih; };
+
+    var xStep = niceStep(win.xmax - win.xmin, 9), yStep = niceStep(win.ymax - win.ymin, 7);
+
+    // grid + ticks
+    var g = el('g');
+    var xTicks = [], yTicks = [];
+    for (var x = Math.ceil(win.xmin / xStep) * xStep; x <= win.xmax + 1e-9; x += xStep) xTicks.push(round(x, 6));
+    for (var y = Math.ceil(win.ymin / yStep) * yStep; y <= win.ymax + 1e-9; y += yStep) yTicks.push(round(y, 6));
+    xTicks.forEach(function (tx) {
+      g.appendChild(el('line', { x1: sx(tx), y1: padT, x2: sx(tx), y2: padT + ih, class: 'grid-line' }));
+    });
+    yTicks.forEach(function (ty) {
+      g.appendChild(el('line', { x1: padL, y1: sy(ty), x2: padL + iw, y2: sy(ty), class: 'grid-line' }));
+    });
+
+    // axes: only where 0 is in view; never a fake origin
+    var xAxisY = sy(0), yAxisX = sx(0);
+    var xVisible = win.ymin <= 0 && 0 <= win.ymax;
+    var yVisible = win.xmin <= 0 && 0 <= win.xmax;
+    var xAxisG = el('g'), yAxisG = el('g');
+    if (xVisible) {
+      xAxisG.appendChild(el('line', { x1: padL, y1: xAxisY, x2: padL + iw, y2: xAxisY, class: 'axis-line' }));
+      xAxisG.appendChild(el('path', { d: 'M' + (padL + iw) + ',' + xAxisY + ' l-7,-3.5 v7 z', fill: 'var(--viz-axis)' }));
+      xAxisG.appendChild(el('text', { x: padL + iw, y: xAxisY - 8, 'text-anchor': 'end', class: 'axis-label' }, 'x'));
+    }
+    if (yVisible) {
+      yAxisG.appendChild(el('line', { x1: yAxisX, y1: padT, x2: yAxisX, y2: padT + ih, class: 'axis-line' }));
+      yAxisG.appendChild(el('path', { d: 'M' + yAxisX + ',' + padT + ' l-3.5,7 h7 z', fill: 'var(--viz-axis)' }));
+      yAxisG.appendChild(el('text', { x: yAxisX + 8, y: padT + 10, class: 'axis-label' }, 'y'));
+    }
+    // tick labels: x labels below the axis or bottom; y labels left
+    var zeroDrawn = false;
+    xTicks.forEach(function (tx) {
+      if (Math.abs(tx) < 1e-9) return;
+      g.appendChild(el('text', { x: sx(tx), y: (xVisible ? xAxisY + 15 : padT + ih + 15), 'text-anchor': 'middle', class: 'tick-text' }, fmt(tx, 1)));
+    });
+    yTicks.forEach(function (ty) {
+      if (Math.abs(ty) < 1e-9) return;
+      g.appendChild(el('text', { x: padL - 7, y: sy(ty) + 3.5, 'text-anchor': 'end', class: 'tick-text' }, fmt(ty, 1)));
+    });
+    if (xVisible && yVisible) {
+      g.appendChild(el('text', { x: yAxisX - 6, y: xAxisY + 14, 'text-anchor': 'end', class: 'tick-text' }, '0'));
+      zeroDrawn = true;
+    }
+    void zeroDrawn;
+    svg.appendChild(g);
+    svg.appendChild(xAxisG); svg.appendChild(yAxisG);
+
+    // symmetry axis + vertex + real roots
+    if (Math.abs(a) > 1e-6) {
+      var hx = -b / (2 * a), ky = c - b * b / (4 * a);
+      var sym = el('path', { d: 'M' + sx(hx) + ',' + padT + ' V' + (padT + ih), class: 'sym-line' });
+      svg.appendChild(sym);
+      if (hx >= win.xmin && hx <= win.xmax && ky >= win.ymin && ky <= win.ymax) {
+        svg.appendChild(el('circle', { cx: sx(hx), cy: sy(ky), r: 4, class: 'vertex-dot' }));
+        var label = '顶点 (' + fmt(hx, 1) + ', ' + fmt(ky, 1) + ')';
+        var lx = sx(hx) + 8, ly = sy(ky) - 8;
+        if (lx > padL + iw - 90) { lx = sx(hx) - 8; }
+        svg.appendChild(el('text', { x: lx, y: ly, 'text-anchor': lx < sx(hx) ? 'end' : 'start', class: 'vertex-label' }, label));
+      }
+      var disc = b * b - 4 * a * c;
+      var roots = disc >= 0 ? [(-b - Math.sqrt(disc)) / (2 * a), (-b + Math.sqrt(disc)) / (2 * a)] : [];
+      roots.forEach(function (rx) {
+        if (rx < win.xmin || rx > win.xmax) return;
+        svg.appendChild(el('circle', { cx: sx(rx), cy: sy(0), r: 3.5, class: 'root-dot' }));
+        svg.appendChild(el('text', { x: sx(rx), y: (xVisible ? xAxisY + 15 : padT + ih + 15) + 13, 'text-anchor': 'middle', class: 'root-label' }, 'x=' + fmt(rx, 1)));
+      });
+    }
+
+    // curve: sample per device pixel so thin steep branches stay smooth
+    var d = '', n = Math.min(600, Math.max(120, iw * 2));
+    for (var i = 0; i <= n; i += 1) {
+      var xx = win.xmin + (win.xmax - win.xmin) * (i / n);
+      var yy = a * xx * xx + b * xx + c;
+      var px = sx(xx), py = sy(yy);
+      if (py < padT - 40 || py > padT + ih + 40) { continue; }
+      d += (d === '' ? 'M' : 'L') + px.toFixed(2) + ',' + py.toFixed(2);
+    }
+    var curve = el('path', { d: d === '' ? 'M0,0' : d, class: 'curve' });
+    svg.appendChild(curve);
+    if (animate && !reduced) {
+      try {
+        var len = curve.getTotalLength();
+        curve.style.strokeDasharray = String(len); curve.style.strokeDashoffset = String(len);
+        curve.getBoundingClientRect();
+        curve.style.transition = 'stroke-dashoffset 600ms ease-out';
+        curve.style.strokeDashoffset = '0';
+        curve.addEventListener('transitionend', function () { curve.style.strokeDasharray = ''; curve.style.strokeDashoffset = ''; }, { once: true });
+      } catch (e) { /* measurement unavailable: plain curve */ }
+    }
+    // remember the window for hysteresis
+    lastParams = { a: a, b: b, c: c, win: win };
+  }
+
+  function render(raw) {
+    var a = round(Number(raw.a) || 0, 1), b = round(Number(raw.b) || 0, 1), c = round(Number(raw.c) || 0, 1);
+    var eq = equation(a, b, c);
+    root.querySelector('[data-viz-out="equation"]').textContent = eq;
+    var meta;
+    if (Math.abs(a) < 1e-6) {
+      meta = Math.abs(b) < 1e-6 ? '常数函数' : '一次函数（a≈0）';
+    } else {
+      var h = -b / (2 * a), k = c - b * b / (4 * a);
+      meta = '顶点 (' + fmt(h, 1) + ', ' + fmt(k, 1) + ') · 对称轴 x = ' + fmt(h, 1);
+    }
+    root.querySelector('[data-viz-out="readout"]').textContent = meta;
+    draw({ a: a, b: b, c: c }, !entered);
+    entered = true;
+    return { equation: eq, a: fmt(a, 1), b: fmt(b, 1), c: fmt(c, 1) };
+  }
+
+  dshViz.bind('#quad-explorer', render);
+  if (typeof ResizeObserver === 'function') {
+    var ro = new ResizeObserver(function () {
+      if (!lastParams) return;
+      var w = Math.round(plot.clientWidth || 0), h = Math.round(plot.clientHeight || 0);
+      if (!w || !h || (w === lastW && h === lastH)) return;
+      draw({ a: lastParams.a, b: lastParams.b, c: lastParams.c }, false);
+    });
+    ro.observe(plot);
+  }
+})();
+</script>

@@ -40,7 +40,7 @@ export const FRAME_CSS = `
   --viz-grid: var(--dsh-viz-grid, var(--border));
   --viz-grid-axes: var(--dsh-viz-grid-axes, value);
   --viz-grid-dash: var(--dsh-viz-grid-dash, 0);
-  --viz-axis: var(--dsh-viz-axis, var(--border));
+  --viz-axis: var(--dsh-viz-axis, color-mix(in oklab, var(--foreground) 55%, transparent));
   --viz-line-width: var(--dsh-viz-line-width, 2);
   --font-sans: var(--dsh-viz-font-sans, system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif);
   --font-display: var(--dsh-viz-font-display, var(--font-sans));

@@ -24,12 +24,22 @@ first chart, read `references/charts.md`; before styling anything, read
 
 - `references/design.md` — taste, theme tokens, base classes, layout.
 - `references/charts.md` — Chart.js-first charting, theme-color resolution,
-  hand-rolled SVG rules, entrance animation recipes.
+  math function plot rules, hand-rolled SVG rules, entrance animation recipes.
 - `examples/interactive-simulator.html` — sliders wired with `dshViz.bind`
   driving a `dshViz.chart` area curve: theme colors, gradient fill, in-place
   updates, kept settings. The template for any standard chart.
+- `examples/quadratic-explorer.html` — a hand-rolled SVG function plot with an
+  auto-fitted window, real axes/ticks, vertex/roots and kept sliders. The
+  template for any `y = f(x)` card.
 - `examples/comparison-chart.html` — a hand-rolled SVG comparison with
   direct labels and a hover detail. The template for custom visuals only.
+
+Before any `y = f(x)` card (a function, curve, parabola, plot of a formula):
+read `references/charts.md` §"Math function plots (y = f(x))" and start from
+`examples/quadratic-explorer.html`. Never use Chart.js for a function plot —
+its categorical x-axis cannot express an origin, and a hard-coded domain
+clips the curve. Axes, ticks and the auto-fitted window are mandatory, not
+finishing touches.
 
 ## Calling the tool
 

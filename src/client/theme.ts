@@ -18,6 +18,10 @@ const TOKEN_BRIDGE: readonly (readonly [string, string])[] = [
   ['page', '--dsw-alias-bg-base'],
   ['muted-foreground', '--dsw-alias-label-caption'],
   ['border', '--dsw-alias-border-l2'],
+  // Guides: grid must be fainter than the axis, or a plot has no origin.
+  ['grid', '--dsw-alias-border-l1'],
+  ['axis', '--dsw-alias-label-tertiary'],
+  ['context', '--dsw-alias-label-caption'],
   ['primary', '--dsw-alias-brand-primary-new-colorprimary-new-color'],
   ['primary-foreground', '--dsw-alias-label-primary-inverted'],
 ]

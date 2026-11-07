@@ -76,6 +76,51 @@ dshViz.bind('#my-viz', function (p) {
   `dshViz.chartDefaults(Chart, root)` once and draws after
   `dshViz.fontsReady(labelText, root)`.
 
+## Math function plots (y = f(x))
+
+A function plot is **not** a Chart.js chart: Chart.js measures categories along
+x and owns the axes, which is exactly what a function needs to control itself.
+For any card that plots `y = f(x)` — polynomials, roots, trig, exponentials —
+hand-roll the SVG and start from `../examples/quadratic-explorer.html`.
+
+**The window is the plot.** A fixed `x ∈ [-10, 10]` as a constant is the
+standard way to ship a clipped parabola or one tiny arc in a sea of margin.
+Choose the window from the function and the parameters:
+
+- Quadratic `y = ax² + bx + c`: `h = -b/(2a)`, `k = c - b²/(4a)`. Symmetric
+  x-window around `h`. For `a > 0`, put the vertex at ~22-28% of the plot
+  height above the bottom and let each branch leave the window near the top
+  edge at ~80-90% of the half-width; mirror vertically for `a < 0`. Keep a
+  little room beyond the vertex so `y = 0` can be in view when the curve
+  crosses it. Never centre on `0` when the vertex is far from the origin —
+  centre on `h`.
+- `|a| < 1e-6` is a **line** (`y = bx + c`), a separate 1-2 point branch; do
+  not divide by `a`. `|b| < 1e-6` with `a > 0` is symmetric about `x = 0`.
+- No clipping of the vertex or the branches' exit points, and no large blank
+  margins: every part of the plot area should carry either curve, grid or
+  axis, and the curve should reach the top/bottom edge where it leaves.
+- **Stability while dragging.** Do not recompute the window on every slider
+  frame — it twitches. Keep the current window while it still holds the new
+  vertex and both branch-exit points with ≥8% margin; replace it only when it
+  cannot, and fade ~200ms on a genuine change. Do not add a "fit" button
+  unless the card would otherwise clutter; the auto-window should be enough.
+- **Label the numbers, not a claim.** Ticks state the window; do not write
+  "constant aspect" or a hard-coded range in prose.
+
+**Axes.** Draw the x-axis only when `y = 0` is in the window, the y-axis only
+when `x = 0` is in it — never draw a fake origin at the plot edge. When both
+are visible they meet at the origin and `0` is labelled once. Arrowheads and
+`x`/`y` labels at the positive ends. Nice ticks 1-2-5×10ᵏ: at most ~9 x
+labels and ~7 y labels; skip colliding labels rather than shrinking the text.
+Grid `--viz-grid` at 1px; axes `--viz-axis` at 1.5px so the axes are visibly
+stronger; tick text 11px; every colour from tokens, so light and dark both
+work.
+
+**Marks.** Vertex dot + `顶点 (h, k)` label at 1 decimal. Dashed symmetry axis
+`x = h` in `--viz-axis` (a dash pattern, not a colour). Real roots only when
+they are inside the window. Equation readout is rebuilt from the sliders and
+matches the plotted coefficients at 1 decimal.
+
 ## Hand-rolled SVG rules
 
 - Compute the domain from the data with padding; never hard-code it.
