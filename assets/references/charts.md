@@ -121,10 +121,10 @@ Choose the window from the function and the parameters:
 
 **Axes.** Draw the x-axis only when `y = 0` is in the window, the y-axis only
 when `x = 0` is in it — never draw a fake origin at the plot edge. When both
-are visible they meet at the origin and `0` is labelled once. Arrowheads and
-`x`/`y` labels at the positive ends, emitted as SVG `<text>` elements carrying
-the classes `axis-label-x` / `axis-label-y` (a plot without them is an
-incomplete card). Nice ticks 1-2-5×10ᵏ: at most ~9 x
+are visible they meet at the origin and `0` is labelled once. For each axis that is in view, draw its arrowhead and its `x`/`y` letter,
+emitted as an SVG `<text>` element carrying the classes `axis-label-x` /
+`axis-label-y`. If an axis is out of view, omit its letter; never fake an
+origin and never change the mathematical window just to show a label. Nice ticks 1-2-5×10ᵏ: at most ~9 x
 labels and ~7 y labels; skip colliding labels rather than shrinking the text.
 Grid `--viz-grid` at 1px; axes `--viz-axis` at 1.5px so the axes are visibly
 stronger; **tick numbers 11px in `--foreground`** (never caption grey — they must

@@ -60,29 +60,34 @@ first chart, read `references/charts.md`; before styling anything, read
 - `examples/comparison-chart.html` — a hand-rolled SVG comparison with
   direct labels and a hover detail. The template for custom visuals only.
 
-Before any `y = f(x)` card (a function, curve, parabola, plot of a formula):
-read `references/charts.md` §"Math function plots (y = f(x))" and start from
-`examples/quadratic-explorer.html`. Never use Chart.js for a function plot —
-its categorical x-axis cannot express an origin, and a hard-coded domain
-clips the curve. Axes, ticks and the auto-fitted window are mandatory, not
-finishing touches.
+For a single function `y = f(x)` — especially a quadratic interactive demo —
+read `examples/quadratic-explorer.html` and adapt it; do not read
+`references/charts.md` or `references/design.md` by default. Read them (or
+`references/charts.md` §"Math function plots (y = f(x))") only for complex,
+statistical or multi-panel charts, or when the request is not covered by the
+example. Never use Chart.js for a function plot.
 
-**Axis direction letters are required.** Every function plot
-ends its axes with an arrowhead and a bold `x` at the right end of the x-axis
-and a bold `y` at the top end of the y-axis. Emit them as two real SVG `<text>`
-elements; copy these two lines verbatim into the SVG (adjust coordinates to your
-plot area), then give them these exact classes:
+The example is a **verified composition template**, not code to review: reuse
+its structure and interaction, and replace the function, coefficients, slider
+ranges, labels and copy for the actual request. Do not audit, re-derive or
+re-verify its internals or layout constants; the math you adapt must still be
+correct (compute vertex, roots and symmetry axis from the user's coefficients).
 
+Axes: when an axis is in the current view, draw it with an arrowhead and its
+letter; copy these two lines for the visible axes and keep the exact classes:
 ```html
 <text class="axis-label axis-label-x" x="PLOT_RIGHT" y="AXIS_Y - 10" text-anchor="end">x</text>
 <text class="axis-label axis-label-y" x="AXIS_X + 10" y="PLOT_TOP + 14">y</text>
 ```
+When the origin is outside the window, do not fake an origin and never change
+the mathematical window just to show an axis label.
 
-A plot without them is an incomplete card — do not return it. While composing,
-read your own SVG once and eyeball it: window fits the curve, tick numbers do
-not collide, the `x` and `y` letters sit at the axis ends, vertex / symmetry /
-roots match the equation. This is a static glance at your fragment, **not a test
-to run** — do not build anything to prove it.
+Keep the example's guarantees: auto-fitted window, vertex / roots / symmetry,
+1-2-5 ticks, no tick collisions, grid-vs-axis contrast, light/dark tokens,
+live slider updates and a stable window while dragging. While composing, read
+your own SVG once: window fits, ticks do not collide, visible axes carry their
+letter, vertex / symmetry / roots match the equation. This is a static glance,
+not a test to run — compose the fragment once and call `visualize` once.
 
 ## Calling the tool
 
