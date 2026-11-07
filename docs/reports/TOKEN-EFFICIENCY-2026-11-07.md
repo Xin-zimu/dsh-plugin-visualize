@@ -170,6 +170,12 @@ verifies it locally (not installed to the daily profile).
   composition template** — reuse structure/interaction, replace
   function/coefficients/ranges/labels/copy; do not audit or re-derive internals;
   adapted math must still be correct. The "not a module/test target" parts stay.
+- `assets/visualize-skill.md` **follow-up**: the generic Resources sentence
+  ("before your first chart, read `references/charts.md`") still contradicted the
+  C fast path, so it now says "for a single `y = f(x)` card start from the worked
+  example below; before the first statistical or custom chart, read
+  `references/charts.md`". This removes a duplicate invitation to read
+  `charts.md`; it adds no new instruction and was not re-trialled.
 
 **Verification (isolated p7c host, qwen/deepseek-v4.1-flash parity verified in
 `request/context` + `request/header.config`; fresh 1-turn sessions; exact

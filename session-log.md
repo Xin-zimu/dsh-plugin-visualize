@@ -219,6 +219,12 @@ origin. Evidence `evidence/token-efficiency/followup/`; report §6.
 **Caveats** — n=2, single-run variance 15-20%; T7 average 144.8K vs earlier C
 130.6K and A 207.3K (don't overclaim); T7-t1 read the references dir listing
 (extra call); daily install not performed (local verification only).
+
+**Lead follow-up** — aligned the generic Resources cross-reference with the C
+fast path (removed the "before your first chart, read `charts.md`" invitation for
+single-function cards; read it only for statistical/custom charts). This removes
+a duplicate instruction, adds none, and was not re-trialled. Daily profile still
+has the previous skill (assets not installed yet); commits stay local.
 ### Token-efficiency investigation — 2026-11-07
 
 **Discussed** — the accepted daily quadratic run is 261,067 tokens (uncached

@@ -44,9 +44,10 @@ the whole request in a single quick pass, in about a minute of work.
 
 ## Resources
 
-Read from this skill's resource directory as the task demands — before your
-first chart, read `references/charts.md`; before styling anything, read
-`references/design.md`:
+Read from this skill's resource directory as the task demands — for a single
+`y = f(x)` card start from the worked example below; before the first
+statistical or custom chart, read `references/charts.md`, and before styling a
+custom card read `references/design.md`:
 
 - `references/design.md` — taste, theme tokens, base classes, layout.
 - `references/charts.md` — Chart.js-first charting, theme-color resolution,
