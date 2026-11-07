@@ -1,0 +1,26 @@
+# Compat baseline before change
+captured: 
+2026-11-07 15:24:26 +08:00
+HEAD: 
+f49fdf51d0fc14f53962b3236842ee08ee05dc45 Stage 7C Gate 3: one-item upstream provenance request, evidence and Discussion draft
+package.json sha256: 
+A6DBE985DEAC36D229290FA033B1BD3B98201C81A8C94E135D25D42D60A6C88F
+lockfile sha256: 
+791B758A39D55E4B0BDE0BA7A662744B5D268C4972FFDB4FA3EDEB19851EB3F9
+
+## desktop CLI (the installed host)
+0.2.2-rc.1
+
+## global dsh on PATH (NOT the host under test)
+0.2.1-rc.5
+
+## semver checks (semver 7 from pnpm dist)
+0.2.2-rc.1 satisfies ^0.2.1-0 ? false
+0.2.2-rc.1 satisfies ^0.2.1-0 || ^0.2.2-rc.1 ? true
+0.2.1-rc.5 satisfies ^0.2.1-0 || ^0.2.2-rc.1 ? true
+4.1.0 satisfies ^4.0.1 ? true
+4.1.0 satisfies ~4.0.5 ? false
+
+## profile p22web before fix (Gate 2 state)
+resolved dsh-* copies: 0.2.1-rc.5; cordis 4.1.0; their peer ~4.0.5 => pnpm peers check exit 1
+witness: evidence/stage-7b/real-host/peer-dependencies.txt

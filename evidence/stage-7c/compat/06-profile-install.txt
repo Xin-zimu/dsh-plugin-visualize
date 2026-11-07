@@ -1,0 +1,26 @@
+== clean resolve: dsh plugin --profile p22web install @ 15:27:25 ==
+[WARN] The store at C:\Users\86139\AppData\Local\pnpm\store\v11 is not used because packages cannot be hard linked from it into this project. Using the store at D:\.pnpm-store\v11 instead. Set storeDir to choose the store.
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 20, reused 20, downloaded 0, added 0
+Progress: resolved 21, reused 20, downloaded 0, added 0
+Packages: +29
++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: D:\.pnpm-store\v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 29, reused 29, downloaded 0, added 27
+Progress: resolved 29, reused 29, downloaded 0, added 28
+Progress: resolved 29, reused 29, downloaded 0, added 29, done
+
+dependencies:
++ @dsh-unified/visualize 0.1.1
++ visualize-probe 0.0.0
+
+Done in 4.8s using pnpm v11.28.5
+
+== exit: 0 ==
+
+== dsh plugin --profile p22web peers check @ 15:27:37 ==
+No peer dependency issues found
+
+== exit: 0 ==

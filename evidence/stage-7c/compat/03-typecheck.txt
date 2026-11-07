@@ -1,0 +1,4 @@
+== pnpm run typecheck @ 15:25:17 ==
+$ tsc -p tsconfig.json && tsc -p tsconfig.client.json
+
+== exit: 0 ==

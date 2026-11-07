@@ -1,0 +1,13 @@
+# AGENTS.md §9 bundle-hash gate
+captured: 
+2026-11-07 15:31:24 +08:00
+
+build lib/client.js : 
+E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+installed (p22web):  
+E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+
+Gate 2 recorded : E1BF4A82B3C808899BA868009CF9DEAD15F941E6A3614040DB1E73C031456CEB
+=> match; the browser ran this tree
+
+Product source unchanged: git diff --stat shows package.json + pnpm-lock.yaml only.

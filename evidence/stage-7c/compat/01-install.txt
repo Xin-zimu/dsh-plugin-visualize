@@ -1,0 +1,52 @@
+== pnpm install @ 15:24:47 ==
+✓ Lockfile passes supply-chain policies (verified 2d ago)
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 17, reused 5, downloaded 0, added 0
+Progress: resolved 19, reused 7, downloaded 6, added 0
+Progress: resolved 21, reused 9, downloaded 9, added 0
+Progress: resolved 21, reused 9, downloaded 10, added 0
+Progress: resolved 21, reused 9, downloaded 11, added 0
+Progress: resolved 21, reused 9, downloaded 12, added 0
+Progress: resolved 22, reused 9, downloaded 12, added 0
+Progress: resolved 23, reused 11, downloaded 12, added 0
+Progress: resolved 24, reused 11, downloaded 12, added 0
+Progress: resolved 137, reused 106, downloaded 16, added 0
+Progress: resolved 200, reused 140, downloaded 22, added 0
+[WARN] Tarball download average speed 18 KiB/s (size 19 KiB) is below 50 KiB/s: https://registry.npmjs.org/@deepseek-ai/dsh-user-approval/-/dsh-user-approval-0.2.2-rc.1.tgz (GET)
+[WARN] 25 deprecated subdependencies found: @yuku-codegen/binding-android-arm64@0.8.4, @yuku-codegen/binding-darwin-arm64@0.8.4, @yuku-codegen/binding-darwin-x64@0.8.4, @yuku-codegen/binding-freebsd-x64@0.8.4, @yuku-codegen/binding-linux-arm-gnu@0.8.4, @yuku-codegen/binding-linux-arm-musl@0.8.4, @yuku-codegen/binding-linux-arm64-gnu@0.8.4, @yuku-codegen/binding-linux-arm64-musl@0.8.4, @yuku-codegen/binding-linux-x64-gnu@0.8.4, @yuku-codegen/binding-linux-x64-musl@0.8.4, @yuku-codegen/binding-win32-arm64@0.8.4, @yuku-codegen/binding-win32-x64@0.8.4, @yuku-parser/binding-android-arm64@0.8.4, @yuku-parser/binding-darwin-arm64@0.8.4, @yuku-parser/binding-darwin-x64@0.8.4, @yuku-parser/binding-freebsd-x64@0.8.4, @yuku-parser/binding-linux-arm-gnu@0.8.4, @yuku-parser/binding-linux-arm-musl@0.8.4, @yuku-parser/binding-linux-arm64-gnu@0.8.4, @yuku-parser/binding-linux-arm64-musl@0.8.4, @yuku-parser/binding-linux-x64-gnu@0.8.4, @yuku-parser/binding-linux-x64-musl@0.8.4, @yuku-parser/binding-win32-arm64@0.8.4, @yuku-parser/binding-win32-x64@0.8.4, whatwg-encoding@3.1.1
+Progress: resolved 215, reused 145, downloaded 24, added 0
+Packages: +27 -26
++++++++++++++++++++++++++++--------------------------
+Progress: resolved 215, reused 145, downloaded 24, added 27, done
+
+devDependencies:
+- @deepseek-ai/cordis 4.0.5
++ @deepseek-ai/cordis 4.1.0
+- @deepseek-ai/dsh-client-store 0.2.1-rc.5
++ @deepseek-ai/dsh-client-store 0.2.2-rc.1
+- @deepseek-ai/dsh-client-ui-chat 0.2.1-rc.5
++ @deepseek-ai/dsh-client-ui-chat 0.2.2-rc.1
+- @deepseek-ai/dsh-client-ui-conversation 0.2.1-rc.5
++ @deepseek-ai/dsh-client-ui-conversation 0.2.2-rc.1
+- @deepseek-ai/dsh-client-ui-renderer 0.2.1-rc.5
++ @deepseek-ai/dsh-client-ui-renderer 0.2.2-rc.1
+- @deepseek-ai/dsh-client-ui-slots 0.2.1-rc.5
++ @deepseek-ai/dsh-client-ui-slots 0.2.2-rc.1
+- @deepseek-ai/dsh-client-ui-tool 0.2.1-rc.5
++ @deepseek-ai/dsh-client-ui-tool 0.2.2-rc.1
+- @deepseek-ai/dsh-fs 0.2.1-rc.5
++ @deepseek-ai/dsh-fs 0.2.2-rc.1
+- @deepseek-ai/dsh-llm 0.2.1-rc.5
++ @deepseek-ai/dsh-llm 0.2.2-rc.1
+- @deepseek-ai/dsh-sandbox-policy 0.2.1-rc.5
++ @deepseek-ai/dsh-sandbox-policy 0.2.2-rc.1
+- @deepseek-ai/dsh-session 0.2.1-rc.5
++ @deepseek-ai/dsh-session 0.2.2-rc.1
+- @deepseek-ai/dsh-skill 0.2.1-rc.5
++ @deepseek-ai/dsh-skill 0.2.2-rc.1
+- @deepseek-ai/dsh-tools 0.2.1-rc.5
++ @deepseek-ai/dsh-tools 0.2.2-rc.1
+
+Done in 21.6s using pnpm v11.28.0
+
+== exit: 0 ==

@@ -1,0 +1,144 @@
+== targeted: tests/stream-assembly.spec.ts @ 15:25:55 ==
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ✓ tests/stream-assembly.spec.ts (3 tests) 9ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  15:26:00
+   Duration  4.76s (transform 398ms, setup 0ms, import 3.60s, tests 9ms, environment 0ms)
+
+
+== exit: 0 ==
+
+== full: npx vitest run @ 15:26:10 ==
+
+ RUN  v4.1.10 D:/Deepseek WorkSpace/dsh-plugin-visualize
+
+ ✓ tests/lint.spec.ts (49 tests) 158ms
+ ✓ tests/openui-functions.spec.ts (64 tests) 92ms
+ ✓ tests/style-files.spec.ts (9 tests | 1 skipped) 275ms
+ ✓ tests/images.spec.ts (42 tests | 1 skipped) 593ms
+ ✓ tests/style.spec.ts (13 tests) 235ms
+ ✓ tests/storage.spec.ts (19 tests | 1 skipped) 569ms
+ ✓ tests/style-setting.spec.ts (9 tests) 75ms
+ ✓ tests/lint-gate.spec.ts (15 tests) 59ms
+ ✓ tests/openui-evaluate.spec.ts (25 tests) 48ms
+ ✓ tests/card-images.spec.ts (8 tests | 1 skipped) 1328ms
+     ✓ serves a stored image as an opaque, sandboxed download  876ms
+ ✓ tests/tool.spec.ts (7 tests) 64ms
+ ✓ tests/self-repair.spec.ts (27 tests) 53ms
+ ✓ tests/page-mode.spec.ts (5 tests) 26ms
+ ✓ tests/core.spec.ts (24 tests) 19ms
+ ✓ tests/fragment.spec.ts (28 tests) 19ms
+ ✓ tests/stream-assembly.spec.ts (3 tests) 14ms
+ ✓ tests/openui-validate-gate.spec.ts (7 tests) 11ms
+ ✓ tests/streaming-preview.spec.ts (7 tests) 11ms
+ ✓ tests/capability-consistency.spec.ts (10 tests) 9ms
+ ✓ tests/openui-signatures.spec.ts (6 tests) 8ms
+ ✓ tests/shell.spec.ts (6 tests) 5ms
+ ✓ tests/skill-actions-consistency.spec.ts (4 tests) 5ms
+stdout | tests/lint-adversarial.spec.ts > lintFragment on adversarial input > reports the slowest case
+slowest lint cases (ms): deep template nesting=367.7, deep CSS nesting with colours=349.5, nested fetch(=291.9, many </=276.9, many fetch( calls=259.3
+
+ ✓ tests/lint-adversarial.spec.ts (100 tests) 9370ms
+     ✓ stays under the machine budget (200 ms on the reference machine) and never throws: deep template nesting  370ms
+     ✓ stays under the machine budget (200 ms on the reference machine) and never throws: deep CSS nesting with colours  351ms
+ ✓ tests/card-state.spec.ts (11 tests) 17ms
+ ✓ tests/window-doc.spec.ts (3 tests) 66ms
+stdout | tests/openui-inventory.spec.tsx > component inventory > reports the split by group, which must sum to 48
+Drawing (10): rendered Svg, G, Circle, Ellipse, Rect, Line, Path, Polyline, Polygon, SvgText; missing —
+Inputs (13): rendered Button, IconButton, Pressable, Input, TextArea, Select, SegmentedControl, Slider, Checkbox, RadioGroup, DatePicker, Timer, Form; missing —
+Layout (9): rendered Col, Row, Box, Grid, Card, Carousel, Popover, Divider, Spacer; missing —
+Media and data (4): rendered Image, Icon, Table, Chart; missing —
+Play (2): rendered Flashcard, Celebration; missing —
+Text (10): rendered Title, Text, Caption, Label, Badge, Link, List, ListItem, Quote, Code; missing —
+=== 48 / 48 rendered ===
+
+ ✓ tests/openui-card.spec.tsx (15 tests) 30ms
+ ✓ tests/openui-stage2-render.spec.tsx (7 tests) 56ms
+ ✓ tests/openui-inventory.spec.tsx (11 tests) 59ms
+ ✓ tests/openui-layout-4a1.spec.tsx (41 tests) 62ms
+stderr | tests/openui-interaction.spec.tsx > $state interaction loop > renders a bound Slider as enabled
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/openui-interaction.spec.tsx > $state interaction loop > leaves an unbound Slider read-only rather than pretending
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/openui-interaction.spec.tsx > $state interaction loop > re-evaluates OTHER components when the slider moves
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/celebration-repro.spec.tsx (3 tests) 157ms
+stderr | tests/openui-interaction.spec.tsx > $state interaction loop > keeps the program itself unchanged while state moves
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/openui-interaction.spec.tsx (4 tests) 170ms
+ ✓ tests/openui-clipboard-4b.spec.tsx (21 tests) 298ms
+ ✓ tests/openui-media-4a4.spec.tsx (21 tests) 256ms
+ ✓ tests/openui-actions.spec.tsx (24 tests) 303ms
+ ✓ tests/openui-text-4a2.spec.tsx (64 tests) 270ms
+ ✓ tests/openui-state.spec.tsx (26 tests) 358ms
+ ✓ tests/frame-scheme.spec.tsx (2 tests) 274ms
+ ✓ tests/live-style.spec.tsx (2 tests) 273ms
+stderr | tests/turn-cards.spec.tsx > turn cards view > shows the cards while the host folds
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/turn-cards.spec.tsx > turn cards view > stays empty when the toolview card is already in view
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/turn-cards.spec.tsx > turn tail draws both backends (P3-06) > draws a program card while the host folds (requirement 1)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/openui-disclosure-4a5.spec.tsx (33 tests) 459ms
+stderr | tests/turn-cards.spec.tsx > turn tail draws both backends (P3-06) > keeps HTML cards working alongside program cards (requirement 4)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/turn-cards.spec.tsx > turn tail draws both backends (P3-06) > stays empty when the host does not fold, for either backend (requirement 2)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/frame-images.spec.tsx (8 tests) 362ms
+ ✓ tests/frame-helpers.spec.ts (11 tests) 593ms
+stderr | tests/turn-cards.spec.tsx > one card, one state, either surface (requirement 3) > mounting the turn tail does not overwrite a stored value with the default
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+stderr | tests/turn-cards.spec.tsx > one card, one state, either surface (requirement 3) > an interaction in the turn tail is what the toolview would see
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/prompt-bridge.spec.tsx (18 tests) 283ms
+stderr | tests/turn-cards.spec.tsx > one card, one state, either surface (requirement 3) > keeps two sessions apart on the turn tail
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+ ✓ tests/openui-inputs-4a3.spec.tsx (43 tests) 555ms
+ ✓ tests/turn-cards.spec.tsx (26 tests) 287ms
+ ✓ tests/openui-drawing-4a5.spec.tsx (29 tests) 790ms
+     ✓ never reports a placement that leaves the card, swept on both axes  774ms
+ ✓ tests/frame-state.spec.tsx (17 tests) 643ms
+ ✓ tests/page-launcher.spec.tsx (6 tests) 704ms
+     ✓ opens the page in a new tab whose only content is the sandboxed frame  453ms
+ ✓ tests/settings-section.spec.tsx (13 tests) 757ms
+
+ Test Files  48 passed (48)
+      Tests  942 passed | 4 skipped (946)
+   Start at  15:26:11
+   Duration  22.59s (transform 12.18s, setup 0ms, import 28.56s, tests 21.13s, environment 478.23s)
+
+
+== exit: 0 ==
