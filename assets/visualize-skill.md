@@ -19,9 +19,9 @@ something to work in rather than glance at, as a full page in its own tab.
 ## Scope
 
 A chat visualization request is **one-shot authoring, not software development**.
-Read **at most one** reference file, then call `visualize` with your best fragment
-— that call is the deliverable. Aim to finish the whole request in a single quick
-pass, in about a minute of work.
+Read only the references this card actually needs (usually one or two), then call
+`visualize` with your best fragment — that call is the deliverable. Aim to finish
+the whole request in a single quick pass, in about a minute of work.
 
 - Do **not** create or modify workspace files, scratch scripts, harnesses,
   fixtures or test data. Do **not** run Node, DOM stubs, headless browsers,

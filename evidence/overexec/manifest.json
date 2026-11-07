@@ -1,7 +1,7 @@
 {
   "stage": "7D follow-up (over-execution)",
   "capturedAt": "2026-11-07",
-  "host": "isolated DSH_HOME tmp/dsh-7c profile p7c on 127.0.0.1:3096, reinstall via dsh plugin --profile p7c install (installed skill 18,284 B == repo)",
+  "host": "isolated DSH_HOME tmp/dsh-7c profile p7c on 127.0.0.1:3096; reinstall via dsh plugin --profile p7c install (installed skill 18,319 B == repo)",
   "baseline": {
     "session": "session-6ebab31e-6d40-4ca7-b2ad-6ef2b48cf143",
     "decompressed": "tmp/session-overexec.jsonl",
@@ -26,7 +26,7 @@
   },
   "trials": {
     "1": {
-      "log": "evidence/overexec/trial-1-session.jsonl",
+      "log": "tmp/overexec/raw/trial-1-session.jsonl (machine-local, gitignored)",
       "toolCalls": 5,
       "counts": {
         "skill": 1,
@@ -44,7 +44,7 @@
       "durationMin": 3.05
     },
     "2": {
-      "log": "evidence/overexec/trial-2-session.jsonl",
+      "log": "tmp/overexec/raw/trial-2-session.jsonl (machine-local, gitignored)",
       "toolCalls": 6,
       "counts": {
         "skill": 1,
@@ -63,7 +63,7 @@
       "durationMin": 5.5
     },
     "3": {
-      "log": "evidence/overexec/trial-3-session.jsonl",
+      "log": "tmp/overexec/raw/trial-3-session.jsonl (machine-local, gitignored)",
       "toolCalls": 4,
       "counts": {
         "skill": 1,
@@ -80,7 +80,7 @@
       "durationMin": 4.09
     },
     "4": {
-      "log": "evidence/overexec/trial-4-session.jsonl",
+      "log": "tmp/overexec/raw/trial-4-session.jsonl (machine-local, gitignored)",
       "toolCalls": 4,
       "counts": {
         "skill": 1,
@@ -97,7 +97,7 @@
       "durationMin": 2.61
     },
     "5": {
-      "log": "evidence/overexec/trial-5-session.jsonl",
+      "log": "tmp/overexec/raw/trial-5-session.jsonl (machine-local, gitignored)",
       "toolCalls": 6,
       "counts": {
         "skill": 1,
@@ -148,5 +148,30 @@
     4,
     5
   ],
-  "verdict": "trials 4 and 5 PASS all criteria (<=6 calls, zero pwsh/write/edit, one visualize, rendered, one-sentence Chinese reply, <3 min). Trial 3 (first run after the one allowed wording tightening) passed calls/writes but took 4m01s. Trials 1-2 were run before the tightening; trial 2 also exceeded the time budget (5m25s)."
+  "verdict": "trials 4 and 5 PASS all criteria (<=6 calls, zero pwsh/write/edit, one visualize, rendered, one-sentence Chinese reply, <3 min). Trial 3 (first run after the one allowed wording tightening) passed calls/writes but took 4m01s. Trials 1-2 were run before the tightening; trial 2 also exceeded the time budget (5m25s).",
+  "leadTrial": {
+    "trial": "6",
+    "runBy": "Lead",
+    "calls": [
+      "skill",
+      "read",
+      "read",
+      "read",
+      "visualize"
+    ],
+    "toolCalls": 5,
+    "steps": 4,
+    "durationMin": 6.67,
+    "forbiddenCalls": {
+      "pwsh": 0,
+      "write": 0,
+      "edit": 0
+    },
+    "cardRendered": true,
+    "assistantTextMessages": 1,
+    "verdict": "discipline PASS; wall-clock 6m40s = model reasoning latency",
+    "details": "evidence/overexec/trial-6-lead.json",
+    "rawTranscript": "machine-local: tmp/overexec/raw/trial-6-session.jsonl"
+  },
+  "privacy": "Raw session transcripts are machine-local under tmp/overexec/raw/ (gitignored): they contain local absolute paths. Only counts/summaries are committed."
 }

@@ -1,0 +1,20 @@
+{
+  "trial": "6 (Lead-run, independent)",
+  "when": "2026-11-07T20:02+08:00",
+  "wording": "final (references: one or two)",
+  "host": "isolated DSH_HOME tmp/dsh-7c profile p7c on 127.0.0.1:3096; installed skill 18,319 B == repo",
+  "prompt": "生成一个带 a、b、c 滑块的二次函数交互演示。",
+  "steps": 4,
+  "toolCalls": 5,
+  "counts": { "skill": 1, "read": 3, "visualize": 1 },
+  "calls": ["skill", "read", "read", "read", "visualize"],
+  "forbiddenCalls": { "pwsh": 0, "write": 0, "edit": 0 },
+  "durationMs": 400000,
+  "duration": "6m40s",
+  "cardRendered": true,
+  "finalReply": "拖动 **a、b、c** 三个滑块，即可实时观察：**a** 决定开口方向与宽窄，**b** 移动对称轴，**c** 改变 y 轴截距；图中同时标出顶点、对称轴和与 x 轴的交点。",
+  "assistantTextMessages": 1,
+  "interimNarration": false,
+  "verdict": "discipline PASS (5 calls, zero shell/write/edit, one card, one Chinese sentence); wall-clock 6m40s = model reasoning latency, not a tool-behavior failure",
+  "rawTranscript": "machine-local: tmp/overexec/raw/trial-6-session.jsonl"
+}
