@@ -183,6 +183,20 @@ verbatim). Dark theme **is verified** through the host's own
 dark frame tokens foreground #f9fafb / grid #ffffff0f / axis #adb2b8), captured as
 `tmp/quad-issue/after2-inchat-dark.png`; not a settings-UI toggle because that
 control is not in the accessibility tree.
+
+**Lead verification (2026-11-07)** — independently re-ran `pnpm run typecheck`
+(0), `pnpm run build` (0; `lib/client.js` sha256 `B03974D7…`, 450,727 B) and
+`npx vitest run` (**942 passed / 4 skipped / 946**, 48 files, exit 0). Found and
+fixed one gap in the close-out: the daily copy is a **hard-linked** install, so
+`pnpm run build` + `dsh plugin install` do **not** refresh it — pnpm reports
+"Already up to date" and the installed client keeps the old inode. Verified on a
+clone of the daily profile that deleting
+`profiles/desktop/node_modules/@dsh-unified/visualize` and re-running the install
+restores the new build (hash equals `B03974D7…`) without changing `package.json`
+or `dsh.profile.bundles`; the refresh recipe in
+`docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md` §5 was corrected accordingly. Also
+replaced the one absolute `C:\Users\<name>` host path in that report (privacy
+plan-A rule). The remaining model-card gaps above are unchanged and honest.
 ### Stage 7C — 2026-11-07 (this session)
 
 **Discussed** — ADR-016 Option B; owner's three workstreams; the narrowed upstream ask (no host UI, no new source kind) and the Discussions-only channel; the daily-profile swap vs add distinction.

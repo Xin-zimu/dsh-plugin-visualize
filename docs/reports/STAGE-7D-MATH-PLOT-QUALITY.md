@@ -128,15 +128,27 @@ Host commands used:
 
 ```powershell
 $env:DSH_HOME='D:\Deepseek WorkSpace\dsh-plugin-visualize\tmp\dsh-7c'
-& 'C:\Users\86139\AppData\Local\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd' --profile p7c --no-open --port 3096 --host 127.0.0.1
+& "$env:LOCALAPPDATA\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd" --profile p7c --no-open --port 3096 --host 127.0.0.1
 ```
 
-To refresh the owner's daily copy after this change (the app must be quit first):
+To refresh the owner's daily copy after this change (the app must be quit first).
+A plain `dsh plugin … install` is **not enough**: the `file:` dependency is
+installed as a hard-linked copy, a rebuild replaces the inode, and pnpm then
+reports "Already up to date" without relinking. Verified on a clone of the daily
+profile (2026-11-07): after `pnpm run build` + `dsh plugin install`, the installed
+`lib/client.js` stayed on the old build; deleting the installed package
+directory and installing again restored the new build (hash matches) and left
+`package.json` / `dsh.profile.bundles` unchanged. Use:
 
 ```powershell
-pnpm install; pnpm run build
-& "$env:LOCALAPPDATA\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop install
-& "$env:LOCALAPPDATA\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd" plugin --profile desktop peers check
+pnpm install; pnpm run build          # in the repo
+$profile = "$env:USERPROFILE\.dsh\profiles\desktop"
+Remove-Item -Recurse -Force "$profile\node_modules\@dsh-unified\visualize"
+$cli = "$env:LOCALAPPDATA\Programs\DeepSeek Harness\resources\runtime\cli\bin\dsh.cmd"
+& $cli plugin --profile desktop install
+# verify the copy is this build (must print B03974D7…):
+Get-FileHash "$profile\node_modules\@dsh-unified\visualize\lib\client.js" -Algorithm SHA256
+& $cli plugin --profile desktop peers check
 ```
 
 Then restart the app and re-ask the original prompt. The daily profile was not
