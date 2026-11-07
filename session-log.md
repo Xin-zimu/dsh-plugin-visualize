@@ -22,7 +22,7 @@ to the history. If you are an agent starting work, read this first.
 
 | Field | Value |
 | --- | --- |
-| Stage | **7D DONE 2026-11-07** + follow-ups done: over-execution scope limit; token-efficiency investigation (A/B/C: reference-copy variant C ~130.6K vs current ~207.3K avg, ~35-40% saving; host overhead remains). |
+| Stage | **7D/7D-follow-ups DONE 2026-11-07** + **token-efficiency C adopted & verified 2026-11-08** (assets commits 2, 2 fresh qwen trials: 155.9K/133.7K, quality accepted; daily install pending owner action). |
 | Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
 | Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
 | Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
@@ -197,6 +197,28 @@ or `dsh.profile.bundles`; the refresh recipe in
 `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md` §5 was corrected accordingly. Also
 replaced the one absolute `C:\Users\<name>` host path in that report (privacy
 plan-A rule). The remaining model-card gaps above are unchanged and honest.
+### Task-7 — Option C adopted + verified — 2026-11-08
+
+**Implemented (assets only)** — skill math block replaced by the C fast path
+(single y=f(x) → read only `examples/quadratic-explorer.html`; charts/design
+only for complex/uncovered requests; example is a verified composition template;
+axis letters only when the axis is in view; no fake origin / no window change for
+a label; all quality guarantees kept; compose once, one visualize call);
+`charts.md` axes wording fixed (no "incomplete card" implication); example header
+now calls itself a verified composition template.
+
+**Verified** — isolated p7c host, qwen/deepseek-v4.1-flash parity verified in
+request/context + header: T7-t1 155,859 tok (38,710/97,280/19,869; cache 71.5%;
+5 calls; 5 steps; 131 s), T7-t2 133,680 tok (41,686/67,584/24,410; cache 61.9%;
+3 calls; 4 steps; 158 s). One turn each, one visualize, zero pwsh/write/edit, no
+charts/design/lib reads. Quality: T7-t1 accepted Stage-7D card (axes+letters,
+ticks, auto window, vertex (1,−4), roots −1/3); T7-t2 downward opening, vertex
+(5,3), window [0,10] centred on h=5, symmetry x=5, roots 2.6/7.4, no fake
+origin. Evidence `evidence/token-efficiency/followup/`; report §6.
+
+**Caveats** — n=2, single-run variance 15-20%; T7 average 144.8K vs earlier C
+130.6K and A 207.3K (don't overclaim); T7-t1 read the references dir listing
+(extra call); daily install not performed (local verification only).
 ### Token-efficiency investigation — 2026-11-07
 
 **Discussed** — the accepted daily quadratic run is 261,067 tokens (uncached
@@ -705,7 +727,25 @@ Six things carried forward:
 
 ## History
 
-### Session 34 — 2026-11-07 (token-efficiency 261K investigation + A/B/C)
+### Session 35 — 2026-11-08 (task-7: Option C adopted + wording fixes verified)
+
+**Work** — implemented the owner-approved Option C fast path in the skill, the
+charts.md axes wording fix and the example-header "verified composition template"
+wording (assets only; no src/renderer). Re-applied qwen parity on the isolated
+p7c host (backed up and restored later), verified qwen/deepseek-v4.1-flash in
+request/context + header, and ran two fresh 1-turn trials.
+
+**Results** — T7-t1 (standard prompt): 155,859 tokens, cache 71.5%, calls
+skill/read/read/visualize, 5 steps, 131 s; accepted Stage-7D quality. T7-t2
+(downward, vertex near (5,3)): 133,680 tokens, cache 61.9%, calls
+skill/read/visualize, 4 steps, 158 s; quality correct (downward, vertex (5,3),
+window [0,10] around h=5, symmetry x=5, roots 2.6/7.4, no fake origin). Both:
+exactly one visualize, zero pwsh/write/edit, no charts/design/lib content reads.
+
+**Caveats** — n=2, single-run variance 15-20%; 144.8K T7 average sits between
+earlier C (130.6K) and A (207.3K); T7-t1 read the references directory listing
+(extra call); the "axis out of view → omit letter" rule was not exercised by the
+T7-t2 window. Daily profile not touched/installed; no push.### Session 34 — 2026-11-07 (token-efficiency 261K investigation + A/B/C)
 
 **Trigger:** the accepted daily run showed 261K tokens / 4m18s; decomposition
 showed 98% decode time, one 30.6K-token reasoning step re-sent into the final

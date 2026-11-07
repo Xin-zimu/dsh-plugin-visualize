@@ -144,3 +144,63 @@ variance caveat: A1 224.6K vs A2 190.0K is already an 18% spread, and the daily
   per-request table is baseline-only.
 - Raw transcripts stay machine-local (`tmp/token-variants/results/*.jsonl`); the
   committed evidence is summaries + hashes only.
+## 6. Adopted change + verification (2026-11-08)
+
+The owner approved **Option C + two wording fixes**; this round implements and
+verifies it locally (not installed to the daily profile).
+
+**What changed (assets only).**
+- `assets/visualize-skill.md`: the old math block is replaced by the C fast path —
+  for a single `y=f(x)` (especially a quadratic demo) read **only**
+  `examples/quadratic-explorer.html` and adapt it; `references/charts.md` /
+  `design.md` only for complex, statistical, multi-panel or uncovered requests;
+  the example is a **verified composition template** (reuse structure; do not
+  audit/re-derive internals or layout constants; adapted math must still be
+  correct); axis letters **only when that axis is in view**, no fake origin,
+  never change the window to show a label; all quality guarantees kept (auto
+  window, vertex/roots/symmetry, 1-2-5 ticks, no collisions, grid/axis contrast,
+  light/dark tokens, live sliders, window stability); compose once, call
+  `visualize` once, static glance only. The `## Scope` block is untouched.
+- `assets/references/charts.md`: the "labels are always required / incomplete
+  card" implication is replaced by "for each axis in view, draw its arrowhead and
+  letter; if an axis is out of view omit its letter; never fake an origin and
+  never change the mathematical window just to show a label". Tick/grid/clip/
+  colour rules unchanged.
+- `assets/examples/quadratic-explorer.html`: header now calls it a **verified
+  composition template** — reuse structure/interaction, replace
+  function/coefficients/ranges/labels/copy; do not audit or re-derive internals;
+  adapted math must still be correct. The "not a module/test target" parts stay.
+
+**Verification (isolated p7c host, qwen/deepseek-v4.1-flash parity verified in
+`request/context` + `request/header.config`; fresh 1-turn sessions; exact
+prompts).**
+
+| trial | prompt | total tokens | uncached / cacheRead / output | cache % | calls | steps | wall | footer |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| T7-t1 | 生成一个带 a、b、c 滑块的二次函数交互演示。 | **155,859** | 38,710 / 97,280 / 19,869 | 71.5 | skill, read, read (example + references dir listing), visualize | 5 | 131 s | 156K tok · 72 % |
+| T7-t2 | 生成一个开口向下、顶点在 (5, 3) 附近的二次函数交互演示，带 a、b、c 滑块。 | **133,680** | 41,686 / 67,584 / 24,410 | 61.9 | skill, read (example), visualize | 4 | 158 s | 134K tok · 62 % |
+
+Acceptance: both trials have one turn, exactly **one `visualize`**, **zero**
+`pwsh`/`write`/`edit`, no charts/design/lib reads (T7-t1's second read is a
+directory listing of `assets/references`, not a file), no test scripts.
+
+**Quality.**
+- T7-t1 (`tmp/token-variants/results/T7-t1.png`, sha256
+  `28e0a363…`): accepted Stage-7D quality — x/y axes with letters, ticks,
+  auto-window, vertex (1,−4), symmetry x=1, roots −1/3, live sliders; no visual
+  regression.
+- T7-t2 (`tmp/token-variants/results/T7-t2.png`, sha256 `23d69253…`): opening
+  downward, vertex (5,3), window x≈[0,10] centred on h=5, symmetry x=5, roots
+  2.6/7.4, curve fills the plot, sliders live. Here `x=0` sits on the left edge,
+  so the y-axis and its letter are legitimate (in view) — no fake origin, and the
+  window was not widened for the label. The "axis out of view → omit letter" rule
+  is implemented but not exercised by this card.
+
+**Comparison and caveat.** T7 totals 155.9K / 133.7K average **144.8K**, versus
+A 207.3K avg (224.6K/190.0K), earlier C 130.6K avg (141.3K/119.9K) and the daily
+261K. This is consistent with C's saving (~30-45 % below A) but **n=2 and
+single-run variance is ~15-20 %** (A's own two runs differ by 34.6K; C's by
+21.4K), so do not treat the 144.8K as a precise estimate. Two differences from
+the earlier C runs are worth noting: T7-t1 read the references directory listing
+(+1 call) and this round's wording fixes were in place; T7-t2 was a different
+(offset downward) prompt.

@@ -1,0 +1,39 @@
+{
+  "prompt": "生成一个开口向下、顶点在 (5, 3) 附近的二次函数交互演示，带 a、b、c 滑块。",
+  "wallSec": 158,
+  "turns": 1,
+  "calls": [
+    "skill",
+    "read",
+    "visualize"
+  ],
+  "counts": {
+    "skill": 1,
+    "read": 1,
+    "visualize": 1
+  },
+  "steps": 4,
+  "uncachedInput": 41686,
+  "cacheRead": 67584,
+  "output": 24410,
+  "promptTokens": 109270,
+  "total": 133680,
+  "cacheHitPct": 61.9,
+  "llmMs": 155388,
+  "decodeMs": 151789,
+  "headerConfig": {
+    "provider": "qwen",
+    "model": "deepseek-v4.1-flash",
+    "maxTokens": 256000
+  },
+  "uiFooter": "缓存命中 62%",
+  "bodyText": "口大小和顶点位置，点“回到 (5, 3)”即可复位。 | 开口向下的二次函数演示 | D:\\Deepseek WorkSpace\\dsh-plugin-visualize\\tmp\\dsh-7c\\visualize\\sessions\\session-0701751d-236d-4687-ab60-d8de41149e83\\visualization-02fc8320.whale.html | 用量 134K tok | 03:49 | 发消息或创建任务, / 调用指令, @ 文件或对话 | 工作区内修改 | deepseek-v4.1-flash | 1 轮 4 步·161 tok/s | 134K tok·缓存命中 62% | 5%",
+  "quality": {
+    "axisLabelX": 2,
+    "axisLabelY": 2,
+    "tickMarkers": 5,
+    "vertex": true,
+    "symmetry": true,
+    "roots": false
+  }
+}

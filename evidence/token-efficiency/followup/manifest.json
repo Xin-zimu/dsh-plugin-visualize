@@ -1,0 +1,113 @@
+{
+  "stage": "task-7 adopted Option C + wording fixes",
+  "capturedAt": "2026-11-08",
+  "route": "qwen/deepseek-v4.1-flash (verified request/context + request/header.config on the isolated p7c host)",
+  "trials": {
+    "T7-t1": {
+      "prompt": "生成一个带 a、b、c 滑块的二次函数交互演示。",
+      "wallSec": 131,
+      "turns": 1,
+      "calls": [
+        "skill",
+        "read",
+        "read",
+        "visualize"
+      ],
+      "counts": {
+        "skill": 1,
+        "read": 2,
+        "visualize": 1
+      },
+      "steps": 5,
+      "uncachedInput": 38710,
+      "cacheRead": 97280,
+      "output": 19869,
+      "promptTokens": 135990,
+      "total": 155859,
+      "cacheHitPct": 71.5,
+      "llmMs": 127559,
+      "decodeMs": 123118,
+      "headerConfig": {
+        "provider": "qwen",
+        "model": "deepseek-v4.1-flash",
+        "maxTokens": 256000
+      },
+      "uiFooter": "缓存命中 72%",
+      "bodyText": "零点会实时更新；当 a = 0 时，图像会自动退化为直线。 | 二次函数交互演示 | D:\\Deepseek WorkSpace\\dsh-plugin-visualize\\tmp\\dsh-7c\\visualize\\sessions\\session-5205c6fc-9cc8-4e72-add3-37952001f9ee\\visualization-816fe748.whale.html | 用量 156K tok | 03:46 | 发消息或创建任务, / 调用指令, @ 文件或对话 | 工作区内修改 | deepseek-v4.1-flash | 1 轮 5 步·161 tok/s | 156K tok·缓存命中 72% | 5%",
+      "quality": {
+        "axisLabelX": 2,
+        "axisLabelY": 2,
+        "tickMarkers": 5,
+        "vertex": true,
+        "symmetry": true,
+        "roots": true
+      }
+    },
+    "T7-t2": {
+      "prompt": "生成一个开口向下、顶点在 (5, 3) 附近的二次函数交互演示，带 a、b、c 滑块。",
+      "wallSec": 158,
+      "turns": 1,
+      "calls": [
+        "skill",
+        "read",
+        "visualize"
+      ],
+      "counts": {
+        "skill": 1,
+        "read": 1,
+        "visualize": 1
+      },
+      "steps": 4,
+      "uncachedInput": 41686,
+      "cacheRead": 67584,
+      "output": 24410,
+      "promptTokens": 109270,
+      "total": 133680,
+      "cacheHitPct": 61.9,
+      "llmMs": 155388,
+      "decodeMs": 151789,
+      "headerConfig": {
+        "provider": "qwen",
+        "model": "deepseek-v4.1-flash",
+        "maxTokens": 256000
+      },
+      "uiFooter": "缓存命中 62%",
+      "bodyText": "口大小和顶点位置，点“回到 (5, 3)”即可复位。 | 开口向下的二次函数演示 | D:\\Deepseek WorkSpace\\dsh-plugin-visualize\\tmp\\dsh-7c\\visualize\\sessions\\session-0701751d-236d-4687-ab60-d8de41149e83\\visualization-02fc8320.whale.html | 用量 134K tok | 03:49 | 发消息或创建任务, / 调用指令, @ 文件或对话 | 工作区内修改 | deepseek-v4.1-flash | 1 轮 4 步·161 tok/s | 134K tok·缓存命中 62% | 5%",
+      "quality": {
+        "axisLabelX": 2,
+        "axisLabelY": 2,
+        "tickMarkers": 5,
+        "vertex": true,
+        "symmetry": true,
+        "roots": false
+      }
+    }
+  },
+  "screenshots": {
+    "T7-t1.png": {
+      "path": "tmp/token-variants/results/T7-t1.png",
+      "sha256": "28e0a36331868b7db1c50671cd76033e0bf5ba8cf76fa3b621c288767399e079"
+    },
+    "T7-t2.png": {
+      "path": "tmp/token-variants/results/T7-t2.png",
+      "sha256": "23d69253770e9b09a9cf33ba84333823f4f473bab204e5c6f23937077bd5315c"
+    }
+  },
+  "baseline": {
+    "A": [
+      224559,
+      189954
+    ],
+    "daily261K": 261067,
+    "earlierC": [
+      141325,
+      119938
+    ]
+  },
+  "caveats": [
+    "n=2 per variant; single-run variance ~15-20% (A 224.6K vs 190.0K; C 141.3K vs 119.9K)",
+    "T7-t1 read the example plus the references directory listing (no charts/design/lib content read)",
+    "T7-t2 window is x≈[0,10]: x=0 is in view at the left edge, so the y-axis/letter is legitimate; no fake origin and no window change for the label",
+    "raw transcripts stay machine-local; only summaries and hashes are committed"
+  ]
+}
