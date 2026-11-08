@@ -1,0 +1,42 @@
+Daily-trial deployment state — generated 2026-11-08 13:45:06 +08:00
+
+Owner statement (2026-11-08, reported in the session, not a command run here):
+  after restarting the daily DSH desktop app, it runs normally; the plugin
+  enters the daily trial. Stage 7D math plotting and the token-optimization
+  work are initially accepted.
+
+Profile: ~/.dsh/profiles/desktop
+Profile dependency:  "@dsh-unified/visualize": "file:D:/Deepseek WorkSpace/dsh-plugin-visualize"
+Bundles list: @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app, dsh-context, @wxg-prc-cpg/browser-skill-dsh-plugin, @dsh-unified/visualize, @deepseek-ai/dsh-experimental-agent-team-profile, @deepseek-ai/dsh-experimental-auto-review, @deepseek-ai/dsh-experimental-forge-bundle
+Installed package version: 0.1.1
+Install shape: real installed directory (LinkType: '' — not a symlink/junction);
+its files are standalone copies, not links into the repo (`fsutil hardlink list`
+on the installed lib/client.js shows one link; the repo's shows two). A repo
+rebuild does not refresh the daily copy; refresh by reinstalling/copying, then
+re-run this hash gate.
+
+AGENTS.md §9 gate — installed client bundle vs repo build:
+  installed lib/client.js sha256 = B03974D7B7FCF5DDE9DF0CAA0C5039A13245A85E3820202893C27A73A5DBC756
+  repo      lib/client.js sha256 = B03974D7B7FCF5DDE9DF0CAA0C5039A13245A85E3820202893C27A73A5DBC756
+  equal = True
+
+Installed assets vs repo assets (the three files Task-7 changed):
+  assets\visualize-skill.md                  installed  18867 B  repo  18867 B  match=True  sha256 ACADE15DF5FE646C…
+  assets\references\charts.md                installed   8893 B  repo   8893 B  match=True  sha256 82C78714CE568CAF…
+  assets\examples\quadratic-explorer.html    installed  18046 B  repo  18046 B  match=True  sha256 AA7C8528322B048F…
+
+Git state (repo root):
+  HEAD          = bd67b650b048d8db4c52ec6279aa03fe39a82273  (Task-7 follow-up: align Resources cross-reference with the C fast path)
+  branch        = main
+  status        = clean
+  origin/main   = bd67b650b048d8db4c52ec6279aa03fe39a82273  (equal to HEAD = True)
+
+Product code changed during this round: none (docs + evidence only).
+
+Commands run for this transcript (PowerShell, repo root):
+  Get-Content ~/.dsh/profiles/desktop/package.json -Raw | ConvertFrom-Json
+  Get-FileHash <installed>/lib/client.js -Algorithm SHA256
+  Get-FileHash lib/client.js -Algorithm SHA256
+  Get-FileHash <installed>/<asset> and <repo>/<asset> for the three assets
+  fsutil hardlink list <installed>/lib/client.js and lib/client.js
+  git rev-parse HEAD; git status --porcelain; git rev-parse origin/main

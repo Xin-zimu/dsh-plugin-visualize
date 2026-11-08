@@ -22,6 +22,9 @@ this says what the current slice is allowed to do.
 | 6 | Test reliability and technical debt | **PASS — closed 2026-11-06.** 3 product bugs found and fixed; **946/946 green on CI Linux and CI Windows (0 skipped on either)**, and 942 passed / 4 skipped / 946 locally, where the 4 are the tests that need a symlink privilege this machine lacks. `evidence/stage-6/` |
 | 7A | Host capability investigation + `@ToAssistant` ADR | **CLOSED 2026-11-07 — investigation only, no product code.** Installed host is **0.2.2-rc.1** (4B-2 read stale 0.2.1-rc.5). Confirmation now exists; **one** host change left (message attribution). `docs/reports/STAGE-7A-HOST-CAPABILITIES.md`, `docs/decisions/ADR-016-TO-ASSISTANT-STAGE-7A.md` |
 | 7B | `@ToAssistant` implementation | **Gate 1 done (owner: Option B). Gate 2 done: real-host pre-validation PASSED** for the confirmation half, with three measured limits (`evidence/stage-7b/real-host/`). **Gate 3 request published upstream (Discussion #12542, 2026-11-07):** upstream ask narrowed to one wire+validation item; `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. **No product code yet.** |
+| 7C | Upstream provenance request, 0.2.2-rc.1 compatibility, daily baseline | **DONE 2026-11-07.** Request published (Discussion #12542); compatibility fixed with product JS unchanged; isolated daily acceptance 8/8, 0 console errors. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c*/` |
+| 7D | Math-function plot quality + token optimization | **INITIAL ACCEPTANCE 2026-11-08** — Stage 7D shipped (renderer tokens, math-plot recipe, reference example) and Task-7's Option-C token fast path shipped (assets only; T7 trials 155.9K / 133.7K tokens). Both are deployed to the daily profile and the owner confirmed the restarted daily app runs normally. Model-card tick legibility still NOT VERIFIED. |
+| Trial | Daily trial — real-use validation | **IN PROGRESS from 2026-11-08.** No new development stage: changes only from problems found in real use; math-plot module not modified on our own initiative; minimal issue record; no tag move, no automatic release. See "## Daily trial" at the end |
 
 **Stage 3 is closed.** Accepted 2026-11-03 on 637 passed / 15 failed (failure set
 identical to the upstream baseline), `tsc` clean on both projects, the language
@@ -754,7 +757,7 @@ profile.
 | --- | --- |
 | A. Gate 3 — upstream provenance request | **DONE — request published: Discussion #12542 (2026-11-07).** Report + post + line-anchor evidence. |
 | B. DSH 0.2.2-rc.1 compatibility (peer ranges, cordis skew) | **DONE — fixed in this repo; product JS unchanged.** devDeps → 0.2.2-rc.1, cordis → 4.1.0, six `dsh-*` peer ranges gain `\|\| ^0.2.2-rc.1`. `pnpm peers check`/typecheck/build/tests green; clean isolated-profile resolve picks 0.2.2-rc.1 + cordis 4.1.0 and passes; real-host load on 0.2.2-rc.1 passes. `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`, `evidence/stage-7c/compat/` |
-| C. Daily-trial baseline (install/rollback steps + isolated acceptance run) | **DONE — daily profile untouched.** Daily profile confirmed `~/.dsh/profiles/desktop` (PID 21788/:50270, currently `@nagi-ovo/dsh-visualize ^0.1.7` — the swap is a replacement). Install/rollback written, not executed. Isolated-profile real-use acceptance: **8/8 scenarios, 0 failures, 0 console errors**, cards restored across refresh + session switch, real slider drag writes state. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/` |
+| C. Daily-trial baseline (install/rollback steps + isolated acceptance run) | **DONE — daily profile untouched at the time; swap executed 2026-11-08.** Daily profile confirmed `~/.dsh/profiles/desktop` (PID 21788/:50270, then `@nagi-ovo/dsh-visualize ^0.1.7` — the swap is a replacement). Install/rollback written; **swap executed 2026-11-08** with the owner confirming a normal restart (see the Stage 7D acceptance / `session-log.md` §2e). Isolated-profile real-use acceptance: **8/8 scenarios, 0 failures, 0 console errors**, cards restored across refresh + session switch, real slider drag writes state. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/` |
 
 ### A. Gate 3 result
 
@@ -792,10 +795,67 @@ Report: `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`. Draft:
 | Stale-window quality | **VERIFIED in the reference example** — `holds()` now rejects spans >1.4×/<0.75× the fresh target and vertex drift outside the 10-40% band; sequential a→b→c at 1.1/−6.8/10 gives x [0.44,5.74], y [−2.02,4.85], 0 overlaps, coverage 0.98, vertex 22% above bottom. Model card at the same state still loose → model generation NOT VERIFIED |
 | Tick legibility | **PARTIAL** — reference example uses `--foreground` ticks (18.08:1 light / 16.47:1 dark, 0 collisions); the model's regenerated card still used the caption tier (2.04:1) → tick legibility in model cards NOT VERIFIED |
 | Dark theme | **VERIFIED via the host mechanism** — `body[data-ds-dark-theme]` applied on the isolated host + session switch re-baked the frames (foreground #f9fafb, grid #ffffff0f, axis #adb2b8; body bg 249,250,251 → 27,27,28). Not a settings-UI toggle (the control is not in the accessibility tree). |
+| Over-execution scope limit | **DONE** — assets-only `## Scope` block (one-shot authoring, no files/scripts/harnesses/Node/browser, one visualize call, render = done) + de-graded axis wording + composition-rules sentences in charts/example. Two fresh isolated-host trials pass: 4/6 tool calls, zero pwsh/write/edit, one visualize, rendered card, 1m23s/2m36s, one Chinese sentence. Report `docs/reports/OVEREXEC-2026-11-07.md`; evidence `evidence/overexec/`. Wall-clock remains model-latency dependent (one intermediate trial 4m01s). |
+| Token-efficiency investigation | **DONE** — 261K decomposition verified (64.9% cache; 98% decode; 30.6K reasoning step re-sent; ~15.7K/request host overhead; skill only ~8.3K once). A/B/C fresh qwen trials: A 207.3K avg, B 179.9K (1 trial), **C 130.6K avg with no quality loss** → recommendation: reference-copy skill for standard y=f(x) cards, hybrid for complex; host/reasoning costs are not plugin-fixable. Report `docs/reports/TOKEN-EFFICIENCY-2026-11-07.md`; evidence `evidence/token-efficiency/`. |
+| Token-efficiency Option C adopted | **DONE + VERIFIED 2026-11-08** — skill points single `y=f(x)` cards at the example (verified composition template), axis letters only when in view, charts axes wording + example header fixed; 2 fresh qwen trials: **155,859 / 133,680 tokens** (cache 71.5 %/61.9 %; 5/4 steps; 131/158 s), one visualize each, zero pwsh/write/edit, quality accepted (standard card + downward-offset (5,3) card, no fake origin). n=2 variance 15-20 %. Report §6; evidence `evidence/token-efficiency/followup/`. Daily install done 2026-11-08 (below). |
+| Daily deployment + initial acceptance | **2026-11-08** — the daily profile uses this build; the owner restarted the app and reports it runs normally. Stage 7D + token work **initially accepted**; the plugin enters the daily trial. Installed state: `evidence/daily-trial-2026-11-08/01-installed-state.txt` |
 
 Report: `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md`. Evidence:
 `evidence/stage-7d/manifest.json` (screenshot sha256 + measurements; PNGs in
 gitignored `tmp/quad-issue/`).
-| Over-execution scope limit | **DONE** — assets-only `## Scope` block (one-shot authoring, no files/scripts/harnesses/Node/browser, one visualize call, render = done) + de-graded axis wording + composition-rules sentences in charts/example. Two fresh isolated-host trials pass: 4/6 tool calls, zero pwsh/write/edit, one visualize, rendered card, 1m23s/2m36s, one Chinese sentence. Report `docs/reports/OVEREXEC-2026-11-07.md`; evidence `evidence/overexec/`. Wall-clock remains model-latency dependent (one intermediate trial 4m01s). |
-| Token-efficiency investigation | **DONE** — 261K decomposition verified (64.9% cache; 98% decode; 30.6K reasoning step re-sent; ~15.7K/request host overhead; skill only ~8.3K once). A/B/C fresh qwen trials: A 207.3K avg, B 179.9K (1 trial), **C 130.6K avg with no quality loss** → recommendation: reference-copy skill for standard y=f(x) cards, hybrid for complex; host/reasoning costs are not plugin-fixable. Report `docs/reports/TOKEN-EFFICIENCY-2026-11-07.md`; evidence `evidence/token-efficiency/`. |
-| Token-efficiency Option C adopted | **DONE + VERIFIED 2026-11-08** — skill points single `y=f(x)` cards at the example (verified composition template), axis letters only when in view, charts axes wording + example header fixed; 2 fresh qwen trials: **155,859 / 133,680 tokens** (cache 71.5 %/61.9 %; 5/4 steps; 131/158 s), one visualize each, zero pwsh/write/edit, quality accepted (standard card + downward-offset (5,3) card, no fake origin). n=2 variance 15-20 %. Report §6; evidence `evidence/token-efficiency/followup/`. Daily install pending owner. |
+
+### Initial acceptance and daily deployment — 2026-11-08
+
+- **Installed, checked:** `~/.dsh/profiles/desktop` depends on `file:<repo>`,
+  lists `@dsh-unified/visualize` in `dsh.profile.bundles`, and carries
+  `lib/client.js` sha256 `B03974D7…` = repo build plus the three Task-7 assets =
+  repo. The install is a **copy, not a link** — a rebuild does not update it;
+  refresh = reinstall/copy, then re-run the §9 gate.
+- **Accepted:** the owner restarted the daily DSH desktop app and reports normal
+  operation → daily deployment succeeded; Stage 7D math plotting and the token
+  optimization are **initially accepted**; the plugin is now in the daily trial.
+- **Quality limits that remain open, stated not hidden:** tick legibility in
+  model-generated math cards (caption tier, 2.04:1) and deterministic generation
+  (axis letters needed two attempts before the graded instruction). Both are
+  NOT VERIFIED and are re-tested only when a real request exposes them.
+- **Rollback:** `pwsh -File tools/daily-profile-switch.ps1 -Rollback`; backups in
+  `.plugin-backups\`. No tag moved; no release.
+
+## Daily trial — real-use validation (started 2026-11-08)
+
+**What this phase is.** Validation, not development. The owner's directive:
+no new development stages, test frameworks or large audits; changes only from
+problems found in real use; the working math-plot module is not modified on our
+own initiative. This section tells an agent what it may touch today.
+
+**Focus.** Real everyday requests — signals & systems, algorithm animation,
+knowledge visualization, and ad-hoc explanation/diagram prompts. The question
+is whether the plugin behaves well under normal use, not whether a new feature
+can be built.
+
+**Allowed:**
+
+- Reproduce a real problem, record it in one line (`session-log.md` §6 or the
+  round's entry), then make the smallest fix that addresses it.
+- Fix a defect in the math-plot path only when a real request proves it, with
+  the reproduction in the session log.
+- Refresh the daily copy after a fix: rebuild → reinstall/copy → §9 hash gate →
+  smoke test.
+
+**Not allowed without a new owner decision:**
+
+- New development stages, test frameworks, harnesses or large audits.
+- Unrequested changes to the working math-plot module (tokens, recipe, example)
+  or to already-accepted card behaviour.
+- Moving `v0.1.1` (or any old tag) or publishing a Release automatically.
+- A second documentation system: issues stay in `session-log.md` §6, one row each.
+
+**Blocked / deferred:**
+
+| Item | State |
+| --- | --- |
+| `@ToAssistant` | Refused, unchanged. Waiting on the upstream provenance interface (Discussion #12542; Gate 4 cannot start before it ships) |
+| `@OpenUrl` | Deferred (ADR-014), unchanged in 0.2.2-rc.1 |
+
+**Exit:** none is defined. The trial ends when the owner says so; there is no
+completion criterion that justifies adding infrastructure.

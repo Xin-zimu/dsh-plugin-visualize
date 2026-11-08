@@ -12,20 +12,21 @@ to the history. If you are an agent starting work, read this first.
 | Package | `@dsh-unified/visualize` |
 | Version | `0.1.1` — **released 2026-11-06**, tag `v0.1.1` at `50b6b54` (not moved) |
 | Branch | `main` |
-| **Pushed** | `origin/main` = `dd9affb` (Stage 7C, 2026-11-07, fast-forward). Tag `v0.1.1` = `50b6b54`, not moved; no release. |
+| **Pushed** | `origin/main` = this round's docs/evidence commit (Session 36, 2026-11-08); Task-7 `bd67b65` is its parent. Tag `v0.1.1` = `50b6b54`, not moved; no release. |
 | HEAD | see `git log -1` |
 | Upstream baseline | dsh-visualize `cf6b3a3`, dsh-intelligent-ui `0b08749`, open-intelligent-ui `16ef264` |
 | **Installed DSH host** | **0.2.2-rc.1** (`@deepseek-ai/dsh-desktop`). The desktop CLI reports 0.2.2-rc.1; the **global `dsh` on PATH is 0.2.1-rc.5** and is not the host under test |
+| **Daily profile** | `~/.dsh/profiles/desktop` now loads this repo (`@dsh-unified/visualize` 0.1.1, `file:` install; bundle `B03974D7…` = repo build; skill/charts/example assets = repo). Installed **2026-11-08**; owner-confirmed normal after restart. Transcript: `evidence/daily-trial-2026-11-08/01-installed-state.txt` |
 | **Plugin compile baseline** | **0.2.2-rc.1** (devDeps + cordis 4.1.0), bumped in Stage 7C. The 0.2.2-rc.1 npm packages do ship `.d.ts`; the earlier "no types" claim came from an asar extraction that omits them |
 
 ## 2. Current stage
 
 | Field | Value |
 | --- | --- |
-| Stage | **7D/7D-follow-ups DONE 2026-11-07** + **token-efficiency C adopted & verified 2026-11-08** (assets commits 2, 2 fresh qwen trials: 155.9K/133.7K, quality accepted; daily install pending owner action). |
+| Stage | **7D + token optimization: INITIAL ACCEPTANCE 2026-11-08.** Deployed to the daily profile; owner-confirmed normal after restart. **Daily trial (validation-only) in progress** — real-use problems are the only driver for change. No new development stage opened. |
 | Goal | Get the plugin into real daily use; `@ToAssistant` waits on the one upstream provenance change. |
-| Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`; build byte-identical to v0.1.1 (`E1BF4A82…`). **Daily:** isolated acceptance 8/8 scenarios, 0 console errors; daily-profile swap is an owner step with a written rollback. No product code changed in 7C (manifests + docs + evidence only). |
-| Earlier | 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
+| Status | **Gate 3:** upstream needs one additive host change (optional `origin` on `session/prompt`, host-validated against a durable `tool/call`, recorded on the durable `'user-rpc'` source). **`@ToAssistant` still refused** until it ships. **`@OpenUrl` unchanged** (ADR-014). **Compat:** devDeps 0.2.2-rc.1, six peer ranges admit `^0.2.2-rc.1`. **Daily:** the swap **executed** (profile loads `file:` install, 0.1.1, bundle hash = repo build, assets = repo); owner reports the restarted daily DSH normal. Rollback retained (`tools/daily-profile-switch.ps1 -Rollback`). **Product code unchanged** since Task-7 — this round is docs + evidence only. |
+| Earlier | 7C closed 2026-11-07 (Gate 3 published, compat fixed, isolated daily acceptance 8/8); 7B Gate 2 real-host confirmation PASS 2026-11-07; 7A closed 2026-11-07; 6 closed 946/946 CI; v0.1.1 released 2026-11-06. |
 
 ## 2a. Published, and what publishing cost
 
@@ -106,7 +107,7 @@ run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
 
 - **A. Gate 3 — upstream provenance request.** Narrowed from ADR-016's four items to one: `origin?: {kind:'tool-call', callId}` on `SessionPromptRequest`, validated by the host against a committed `tool/call`, recorded as an optional field on the existing `'user-rpc'` source. No host UI change (the existing `conversation.chat.user.before` slot renders it plugin-side), no new source kind, no new confirmation API. Repo does not accept external PRs; reports go to Discussions — the draft was **not** sent. `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md`, `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md`, `evidence/stage-7c/gate3/`.
 - **B. 0.2.2-rc.1 compatibility.** The Gate-2 "peer + cordis" pair was one range-selection bug; devDeps moved to 0.2.2-rc.1 and six `dsh-*` peer ranges gain `|| ^0.2.2-rc.1`. Verified: peers check, both tsc projects, build, full suite, clean isolated-profile resolve (`dsh-*@0.2.2-rc.1` + cordis 4.1.0), real-host load. `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md`, `evidence/stage-7c/compat/`.
-- **C. Daily-use baseline.** Daily profile confirmed as `~/.dsh/profiles/desktop` (PID 21788 on :50270), currently loading `@nagi-ovo/dsh-visualize ^0.1.7`; the fork is a **replacement**, and install/rollback steps are written but **not executed**. Isolated real-use acceptance (8/8, 0 failures) covers knowledge, math/slider, sorting/button, refresh restore, session switch, stability, real drag and persistence. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/`.
+- **C. Daily-use baseline.** Daily profile confirmed as `~/.dsh/profiles/desktop` (PID 21788 on :50270), then loading `@nagi-ovo/dsh-visualize ^0.1.7`; the fork is a **replacement**, and install/rollback steps were written. **The swap was executed 2026-11-08** (§2e); the owner confirms a normal restart. Isolated real-use acceptance (8/8, 0 failures) covers knowledge, math/slider, sorting/button, refresh restore, session switch, stability, real drag and persistence. `docs/reports/STAGE-7C-DAILY-BASELINE.md`, `evidence/stage-7c-daily/`.
 
 ## 2c. Daily-use handoff — 2026-11-07 (after Stage 7C)
 
@@ -130,6 +131,9 @@ run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
   `peers check` fails on this profile by design (18 missing-host-peer entries
   before and after), so it is diagnostics, not a gate; the gates are install
   exit 0, old-absent / new-present, bundle hash equal, and the smoke test.
+  **Executed 2026-11-08:** the daily profile now loads this repo; the installed
+  bundle and assets equal the repo, and the owner confirms the restarted app
+  runs normally (§2e).
 - **Privacy:** `docs/reports/PRIVACY-2026-11-07.md` records the historical
   profile-path exposure and distinguishes HEAD from history. **Plan A was
   executed 2026-11-07** on the owner's instruction: the 15 HEAD files now use
@@ -146,14 +150,65 @@ run `gh auth refresh -h github.com -s delete_repo` and re-create the repo.
 - **Daily use is the priority.** The owner approved the daily-profile swap but
   requires quitting the app first. This session re-ran the preflight only
   (`evidence/stage-7c-daily/04-preflight.txt`) and **waits** for the explicit
-  "DSH 已退出" signal. The swap is **not** performed yet.
+  "DSH 已退出" signal. The swap was **subsequently executed 2026-11-08** (§2e);
+  the owner confirms the restarted daily app runs normally, and the plugin is
+  now in the **daily trial**.
 - **Upstream Discussion:** published (see §2c). `@ToAssistant` stays Deferred
   until the provenance interface lands; `@OpenUrl` stays deferred.
 - **Privacy plan A:** executed (see §2c); history not rewritten, no force push.
 - **Scope:** no new test frameworks, probes or refactors; no release; `v0.1.1`
   not moved.
 
+## 2e. Daily deployment — 2026-11-08
+
+- **Installed state (checked this round).** The daily profile
+  `~/.dsh/profiles/desktop` now depends on `file:<repo>` and lists
+  `@dsh-unified/visualize` in `dsh.profile.bundles`; `@nagi-ovo/dsh-visualize`
+  is absent. The install is a **real installed directory, not a symlink**, and its
+  files are **standalone copies** (`fsutil hardlink list` shows one link), so a
+  repo rebuild does not refresh it: installed
+  `lib/client.js` sha256 `B03974D7…` equals the repo build, and the three
+  Task-7 assets equal the repo (`visualize-skill.md` `ACADE15D…`,
+  `charts.md` `82C78714…`, `quadratic-explorer.html` `AA7C8528…`). Transcript:
+  `evidence/daily-trial-2026-11-08/01-installed-state.txt`.
+- **Acceptance, as the owner reported it.** After restarting the daily DSH
+  desktop app it runs normally → daily deployment succeeded; **Stage 7D math
+  plotting and the token-optimization work are initially accepted**; the plugin
+  enters the **daily trial**. This is the owner's observation, not a command run
+  in this session; the hash/comparison checks above are what this session ran.
+- **Refresh rule.** Because the daily install is a copy, `pnpm run build` does
+  not refresh it. After any future fix: rebuild → reinstall/copy into the daily
+  profile → re-run the §9 hash gate → smoke test, before judging the fix.
+- **Rollback retained.** `pwsh -File tools/daily-profile-switch.ps1 -Rollback`;
+  backups under `.plugin-backups\`. Chat/session data is not touched by a swap.
+
 ## 3. Current progress
+
+### Daily trial — 2026-11-08 (deployment accepted; no development stage opened)
+
+**Recorded, not re-measured.** The owner reports: after restarting the daily DSH
+desktop app it runs normally; the plugin enters the **daily trial**; **Stage 7D
+math plotting and the token-optimization work are initially accepted**. The
+checks this session actually ran are the installed-state ones in §2e (bundle
+`B03974D7…` = repo build; assets = repo; git clean). No product code changed.
+
+**Working rules adopted this round (owner directive, kept verbatim in intent):**
+
+1. No new development stages, test frameworks or large-scale audits.
+2. Do not modify the working math-plot module on our own initiative.
+3. Later changes are driven only by problems found in real use.
+4. `@ToAssistant` keeps waiting for the DSH upstream provenance interface.
+5. `@OpenUrl` stays **Deferred**.
+6. Keep the simplest issue record; do not add a duplicate documentation system.
+7. Do not move old tags; do not publish a Release automatically.
+
+**Next:** validate real everyday use — signals & systems, algorithm animation,
+knowledge visualization and other ad-hoc requests. A real defect gets one line
+in §6 (or this round's entry), not a new report.
+
+**Not claimed:** the full suite was not re-run (no product code changed); the
+model-card tick legibility and the two-surface divergence stay exactly as
+recorded in §6.
 
 ### Stage 7D — 2026-11-07 (math-function plot quality)
 
@@ -218,13 +273,13 @@ origin. Evidence `evidence/token-efficiency/followup/`; report §6.
 
 **Caveats** — n=2, single-run variance 15-20%; T7 average 144.8K vs earlier C
 130.6K and A 207.3K (don't overclaim); T7-t1 read the references dir listing
-(extra call); daily install not performed (local verification only).
+(extra call). Daily profile received these assets on 2026-11-08 (§2e).
 
 **Lead follow-up** — aligned the generic Resources cross-reference with the C
 fast path (removed the "before your first chart, read `charts.md`" invitation for
 single-function cards; read it only for statistical/custom charts). This removes
-a duplicate instruction, adds none, and was not re-trialled. Daily profile still
-has the previous skill (assets not installed yet); commits stay local.
+a duplicate instruction, adds none, and was not re-trialled. Daily profile now
+carries these assets (§2e); commits are on `origin/main` (`bd67b65`).
 ### Token-efficiency investigation — 2026-11-07
 
 **Discussed** — the accepted daily quadratic run is 261,067 tokens (uncached
@@ -480,71 +535,60 @@ This is the host's own pairing (its send button and "1017" badge use the same
 
 | File | Change | Why |
 | --- | --- | --- |
-| `package.json` | devDeps → 0.2.2-rc.1, cordis → 4.1.0; six peer ranges gain `\|\| ^0.2.2-rc.1` | Coherent compile baseline with the installed host; the old range could never select 0.2.2 and pulled 0.2.1 copies whose `cordis ~4.0.5` conflicts with the host's 4.1.0 |
-| `pnpm-lock.yaml` | refreshed by `pnpm install` | the 12 packages + closure |
-| `docs/decisions/ADR-016…` | §13 supplement; corrected the "0.2.2 ships no `.d.ts`" compatibility row | Gate 3 narrowed the upstream ask; the type claim was an asar artifact |
-| `docs/reports/STAGE-7C-GATE-3-UPSTREAM-PROVENANCE.md` | **new** | design, file:line anchors, interfaces, acceptance criteria, trust boundary, VERIFIED/NOT VERIFIED |
-| `docs/upstream/UPSTREAM-REQUEST-2026-11-07-MESSAGE-PROVENANCE.md` | **new** | Discussion post + reference patch plan, **published** as https://github.com/deepseek-ai/deepseek-harness/discussions/12542 |
-| `docs/reports/STAGE-7C-COMPAT-0.2.2-RC.1.md` | **new** | diagnosis, minimal diff, verification table, verified-vs-theoretical split |
-| `docs/reports/STAGE-7C-DAILY-BASELINE.md` | **new** | daily profile identity, install/upgrade + rollback steps, isolated acceptance, residual risks |
-| `STAGE.md` | 7B Gate 3 row + a Stage 7C section with all three workstreams | AGENTS §8 |
-| `evidence/stage-7c/gate3/` | anchors verifier + fetcher, identity, wire/validation, extension points, durable-source proof | every Gate-3 claim has a runnable artifact (15/15 anchors) |
-| `evidence/stage-7c/compat/` | install/peers/typecheck/build/tests transcripts, profile resolve, bundle hash, real-host check + JSON | every compat claim has a runnable artifact |
-| `evidence/stage-7c-daily/` | install, smoke note, bundle hash, acceptance script/run + per-scenario JSON | every daily-baseline claim has a runnable artifact |
+| `session-log.md` | §1/§2/§2e/§3 rewritten for the daily-trial state; §4–§7 replaced; Session 36 added | AGENTS §8: session ended, stage status changed |
+| `STAGE.md` | stage-status rows 7C/7D/Trial, Stage 7D acceptance rows, new "## Daily trial" section | the current stage changed; an agent must know it may not start a new development stage |
+| `docs/reports/STAGE-7C-DAILY-BASELINE.md` | residual-risk row + §8 note: swap executed 2026-11-08, installed state recorded | the report still said "not executed" |
+| `evidence/stage-7c-daily/README.md` | verdict updated: swap executed 2026-11-08 | same stale statement |
+| `evidence/daily-trial-2026-11-08/01-installed-state.txt` | **new** transcript: profile dependency/bundles, installed bundle vs repo build, assets vs repo, git state | the deployment claim needs a runnable artifact (AGENTS §5) |
 
-Commits: `f49fdf5` (Gate 3), `96e7c9a` (compat), `dd9affb` (daily baseline), `be97d8c` (handoff: published upstream, switch tooling, privacy review), plus the plan-A sanitisation commit. Pushed to `origin/main`; CI green; no tag moved; no release.
+Commit: one docs/evidence commit this round. **No product code changed**
+(`src/`, tests, `assets/` untouched). No tag moved; no release.
 
 ## 5. Test results
 
 | Test | Command | Result | Evidence |
 | --- | --- | --- | --- |
-| Peer dependencies (repo) | `pnpm peers check` | exit 0 — "No peer dependency issues found" | `evidence/stage-7c/compat/02-peers-check.txt` |
-| Types | `pnpm run typecheck` | exit 0, both projects | `evidence/stage-7c/compat/03-typecheck.txt` |
-| Build | `pnpm run build` | exit 0; client 450.56 kB / host 244.56 kB; client hash = Gate 2's `E1BF4A82…` | `evidence/stage-7c/compat/04-build.txt`, `07-bundle-hash.txt` |
-| Full suite | `npx vitest run` | **942 passed / 4 skipped / 946**, 48/48 files, exit 0 (same as the stage-6 local baseline) | `evidence/stage-7c/compat/05-tests.txt` |
-| Targeted | `npx vitest run tests/stream-assembly.spec.ts` | 3/3 passed | `evidence/stage-7c/compat/05-tests.txt` |
-| Profile resolve (isolated) | clean `dsh plugin --profile p22web install` + `peers check` | exit 0; `dsh-*@0.2.2-rc.1` + `cordis@4.1.0` | `evidence/stage-7c/compat/06-profile-install.txt` |
-| Real-host load (isolated, 0.2.2-rc.1) | model turn on `:3094` | `visualize` called twice, non-error results; `[data-openui-card]`=4; console errors 0; style route 200 | `evidence/stage-7c/compat/real-host/` |
-| Gate-3 source anchors | `verify-anchors.mjs` | **15/15** verified against tag `66491b05e3` | `evidence/stage-7c/gate3/anchors-verified.json` |
-| Daily acceptance (isolated, `:3095`) | `node evidence/stage-7c-daily/acceptance.mjs` | **8/8 scenarios, 0 failures**; cards 6 on refresh restore and session switch; real drag 速度 1→5; console errors 0 | `evidence/stage-7c-daily/real-use/`, `02-acceptance-run.txt` |
-| Shared probe G0–G3 | `node evidence/lib/probe.mjs --what=smoke` | attempted; the fixed 4-attempt evaluate budget is too small for the repainting page — recorded as an environment/harness limit, not a product failure | `evidence/stage-7c-daily/01-smoke.txt` |
+| Installed client bundle == repo build | `Get-FileHash <installed>/lib/client.js`; `Get-FileHash lib/client.js` | **equal** — `B03974D7…` both sides, 450,727 B | `evidence/daily-trial-2026-11-08/01-installed-state.txt` |
+| Installed assets == repo assets | SHA-256 of the three Task-7 files | **3/3 equal** (`ACADE15D…`, `82C78714…`, `AA7C8528…`) | same transcript |
+| Working tree / remote | `git status --porcelain`; `git rev-parse HEAD origin/main` | clean; HEAD == `origin/main` = `bd67b65` before this round's commit | this log |
+| Product code | `git diff --stat` | docs/evidence only | this log |
+| Full suite | not run | N/A — no code changed; last run remains **942 passed / 4 skipped / 946** (2026-11-07) | `docs/reports/STAGE-7D-MATH-PLOT-QUALITY.md` |
+| Owner daily restart | owner observation, not a command run here | daily app runs normally; plugin in daily trial | §2e, §3 |
 
 ## 6. Open issues
 
+Minimal on purpose: one row per real open item; no per-issue report.
+
 | Issue | Impact | Status |
 | --- | --- | --- |
-| **`@ToAssistant` needs one upstream host change** | No card→assistant message can carry host-validated provenance | **Gate 3 request published** 2026-11-07 as Discussion #12542 (Ideas); awaiting upstream. Until it ships the action stays refused |
+| **`@ToAssistant` needs one upstream host change** | No card→assistant message can carry host-validated provenance | **Gate 3 request published** 2026-11-07 as Discussion #12542; awaiting upstream. Until it ships the action stays refused |
 | **`@OpenUrl`** | A card cannot open an external URL | Unchanged; no plugin-callable external open in 0.2.2-rc.1 (ADR-014) |
-| **Daily-profile swap approved, not yet executed** | The owner still runs `@nagi-ovo/dsh-visualize ^0.1.7` | Preflight passed (`evidence/stage-7c-daily/04-preflight.txt`); `tools/daily-profile-switch.ps1` + rollback are ready. Blocked only on the owner quitting the app and saying so |
-| **Two surfaces of one card can diverge live** | While interacting, the non-dragged copy may show the old slider value until reload | **Observed 2026-11-07** (daily acceptance; converges after reload). Pre-existing presentation behaviour; fixing it needs its own decision, not a side effect of 7C |
-| **Model-initiated visualization** | An implicit request ("画个图") might not call the tool | NOT VERIFIED; acceptance prompts named the tool. A few real daily prompts will settle it |
-| **HTML backend in daily acceptance** | 7C acceptance exercised OpenUI cards only | NOT re-run; HTML was verified in earlier stages and the build is byte-identical to v0.1.1 |
-| **0.2.1-rc.5 runtime after the compat change** | Users on an older host | Range still admits 0.2.1, but no 0.2.1 host was run after the change — stated, not claimed |
-| **Compile baseline moved to 0.2.2-rc.1** | A 0.2.1-only API change would not be caught by typecheck | Matches the installed host; 0.2.1 support rests on the ranges + prior v0.1.1 evidence |
-| **Gate 2 constraints carried forward for `@ToAssistant`** | Confirmation preview clamps at 68 px; `{accepted:true}` is not delivery; no content dedupe | Already recorded in ADR-016 §12 and the Gate-2 evidence; Gate 4 must honour them |
+| **Tick legibility in model-generated math cards** | Model cards can still use the caption tier (2.04:1) where the reference example is 18.08:1 | NOT VERIFIED (Stage 7D). Re-test on real requests before changing the skill again |
+| **Two surfaces of one card can diverge live** | The non-dragged copy may show the old slider value until reload | Observed 2026-11-07; pre-existing presentation behaviour; fixing needs its own decision |
+| **Model-initiated visualization** | An implicit request ("画个图") might not call the tool | NOT VERIFIED; acceptance prompts named the tool. Real daily prompts will settle it |
+| **HTML backend in daily trial** | The acceptance run exercised OpenUI cards only | NOT re-run; HTML was verified in earlier stages and the build is byte-identical to v0.1.1 |
+| **Daily install is a copy, not a link** | A repo build does not update the running profile | Reinstall/copy + §9 hash gate after any fix (§2e) |
+| **Gate 2 constraints carried forward for `@ToAssistant`** | Preview clamps at 68 px; `{accepted:true}` is not delivery; no content dedupe | In ADR-016 §12 and the Gate-2 evidence; Gate 4 must honour them |
 | **Older carried-forward items** | A05/A06/A09 not browser-verified; HTML cross-view last-writer-wins pinned by tests; light Button pair 4.23:1; `$state` is localStorage-only; 15 Windows test failures (test-env only) | Unchanged from earlier stages; see History |
 
 ## 7. Next step
 
-**Immediate next steps (Stage 7C close, 2026-11-07):**
+**Daily trial — validation only (2026-11-08 →).** No new development stage, no
+test framework, no large audit. The only accepted input for change is a problem
+met in real use.
 
-1. **Gate 3 is published:** no owner action; monitor https://github.com/deepseek-ai/deepseek-harness/discussions/12542 for an upstream response. Nothing in `@ToAssistant` can start before the host change ships.
-2. **Daily swap (owner):** quit the DSH desktop app, then run `pwsh tools/daily-profile-switch.ps1` (`-DryRun` first; §2 of the daily-baseline report). Restart, run the smoke test; rollback is `-Rollback`. The swap is not executed by this agent while the app is running.
-3. **After the upstream change ships:** Stage 7B Gate 4 implementation + the ADR-016 §7 security cases and §8 acceptance, including the `userQuestions.ask` 68 px preview cap and durable `rpcId` delivery check.
-4. **Do not** cut a release for the 7C changes: product code is byte-identical to v0.1.1; only the manifest compile/peer metadata changed.
-
-**v0.1.1 stays the current release; no v0.1.2.** Tag `v0.1.1` at `50b6b54`,
-GitHub Release published 2026-11-06; `main` carries documentation commits after
-it (this session's included). The R2 control that was left open at the v0.1.1
-close is now **discriminating for the workspace-image create path** (Session 28);
-it required no product change, so it also gives no reason to cut a release.
-
-**Why not v0.1.2:** the only outstanding misstatement lives in the *tagged*
-`CHANGELOG.md`, which a new tag cannot edit — the only fix would be moving
-`v0.1.1`, which the owner deliberately declined. A patch release would ship
-byte-identical `lib/` (the version string does not enter the bundle) and would
-announce a change to users while the v0.1.1 tree still reads as before. The
-correction is already on `main` (`cdc9868`) and on the Release page.
+1. Use the plugin in normal work: signals & systems, algorithm animation,
+   knowledge visualization and ad-hoc explanation requests.
+2. When something is wrong: reproduce it, then one line in §6 (or a short
+   session entry), then fix only that. The math-plot module stays untouched
+   unless a real defect is proven.
+3. Treat a failed `visualize` run in the AGENTS §10 order: environment →
+   interaction → product; exit 2 is not a product failure.
+4. `@ToAssistant` waits for the upstream provenance interface; `@OpenUrl` stays
+   Deferred.
+5. No tag move, no automatic release. `v0.1.1` at `50b6b54` remains the release.
+6. If a fix ships: rebuild → reinstall the daily copy → §9 hash gate → smoke,
+   then judge the fix.
 
 
 
@@ -733,6 +777,36 @@ Six things carried forward:
 
 ## History
 
+### Session 36 — 2026-11-08 (daily deployment accepted; trial phase begins)
+
+**Owner record (the acceptance):** the daily DSH desktop app was restarted and
+runs normally; **Stage 7D math plotting and the token-optimization work are
+initially accepted**; the plugin enters the **daily trial**. Seven follow-up
+principles were set: no new development stages / test frameworks / large audits;
+no unrequested change to the working math-plot module; changes only from
+real-use problems; `@ToAssistant` awaits the upstream provenance interface;
+`@OpenUrl` stays Deferred; minimal issue record with no duplicate documentation
+system; no tag move and no automatic Release.
+
+**Checked this session (commands, not inferred):** the daily profile
+`~/.dsh/profiles/desktop` depends on `file:<repo>` and lists the plugin in
+`dsh.profile.bundles`; installed `lib/client.js` sha256 `B03974D7…` equals the
+repo build; the three Task-7 assets equal the repo. Transcript:
+`evidence/daily-trial-2026-11-08/01-installed-state.txt`. Working tree clean;
+`main == origin/main` at `bd67b65` before this round's docs commit.
+
+**Documentation only** — session-log top block (§1, §2, new §2e, §3–§7),
+`STAGE.md` (7C/7D/trial rows + a Daily-trial section), and the stale "swap not
+executed" statements in `STAGE-7C-DAILY-BASELINE.md` and
+`evidence/stage-7c-daily/README.md`. No `src/`, test or asset change; the full
+suite was not re-run because nothing executable changed. No tag moved; no
+release.
+
+**Not claimed** — the 8-point post-swap checklist was not individually
+re-measured; the owner's restart report is the operational acceptance. The two
+known limits stay open and NOT VERIFIED: the two-surface live divergence, and
+tick legibility in *model-generated* math cards.
+
 ### Session 35 — 2026-11-08 (task-7: Option C adopted + wording fixes verified)
 
 **Work** — implemented the owner-approved Option C fast path in the skill, the
@@ -751,7 +825,10 @@ exactly one visualize, zero pwsh/write/edit, no charts/design/lib content reads.
 **Caveats** — n=2, single-run variance 15-20%; 144.8K T7 average sits between
 earlier C (130.6K) and A (207.3K); T7-t1 read the references directory listing
 (extra call); the "axis out of view → omit letter" rule was not exercised by the
-T7-t2 window. Daily profile not touched/installed; no push.### Session 34 — 2026-11-07 (token-efficiency 261K investigation + A/B/C)
+T7-t2 window. Daily profile not touched/installed at the time; the Task-7
+commits were on `origin/main` by 2026-11-08 (§1).
+
+### Session 34 — 2026-11-07 (token-efficiency 261K investigation + A/B/C)
 
 **Trigger:** the accepted daily run showed 261K tokens / 4m18s; decomposition
 showed 98% decode time, one 30.6K-token reasoning step re-sent into the final

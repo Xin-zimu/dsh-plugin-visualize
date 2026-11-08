@@ -193,7 +193,7 @@ Notes and honesty:
 
 | Item | Status |
 | --- | --- |
-| Daily-profile install | **preflight passed 2026-11-07; waiting for the owner to quit the app** (`evidence/stage-7c-daily/04-preflight.txt`) — not executed. Procedure in §2; the swap was **simulated on a clone**: install exit 0, fork 0.1.1, upstream absent, hash equal. |
+| Daily-profile install | **EXECUTED 2026-11-08** — the daily profile depends on `file:<repo>` and loads this build: installed `lib/client.js` sha256 `B03974D7…` = repo build, and the three Task-7 assets equal the repo (`evidence/daily-trial-2026-11-08/01-installed-state.txt`). The owner restarted the app and reports normal operation. Preflight had passed 2026-11-07 (`evidence/stage-7c-daily/04-preflight.txt`); the swap had also been simulated on a clone: install exit 0, fork 0.1.1, upstream absent, hash equal. Procedure in §2, rollback in §3. |
 | Daily-profile `peers check` | **fails by design, before and after**: the desktop profile sets `autoInstallPeers:false` + `hoisted`, so 18 missing-host-peer entries are reported on both sides. Not a gate, not a regression. |
 | HTML backend (`backend: "html"`) cards in daily use | **NOT VERIFIED this run** — the acceptance turns produced OpenUI cards. HTML rendering was verified in earlier stages (B04 etc.) and the build is byte-identical to v0.1.1. |
 | Model calling `visualize` without an explicit instruction (e.g. "画个图解释一下") | **NOT VERIFIED** — every acceptance prompt named the tool. The plugin's skill is installed and this is how earlier stages drove the model; a few real daily prompts will settle it. |
@@ -203,6 +203,10 @@ Notes and honesty:
 | 0.2.1-rc.5 runtime | not re-run after the compatibility change (ranges still admit it). |
 
 ## 6. What the owner should do next
+
+**Done 2026-11-08 — kept as the procedure that was followed.** The swap is
+executed and the owner reports the restarted daily app normal; the installed
+state is recorded in `evidence/daily-trial-2026-11-08/01-installed-state.txt`.
 
 1. Quit the DSH desktop app (this also ends the current agent session).
 2. In a normal PowerShell window: `pwsh -File "<repo>\tools\daily-profile-switch.ps1"`
@@ -243,3 +247,9 @@ One pass; stop and roll back on the first product-level failure.
 **Rollback on any failure:** quit the app, run
 `pwsh -File "<repo>\tools\daily-profile-switch.ps1" -Rollback`, restart. Chat
 and session data are never touched.
+
+**Status 2026-11-08:** the swap is executed and the owner reports the restarted
+app normal. Checks 1–8 above were **not individually re-measured in a probe** —
+the operational acceptance is the owner's restart report; the installed-state
+evidence and the two still-open limits (two-surface live divergence, tick
+legibility in model-generated cards) are in `session-log.md` §2e/§3.

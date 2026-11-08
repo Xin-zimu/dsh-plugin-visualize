@@ -2,8 +2,9 @@
 
 Date: 2026-11-07. Isolated host: `tmp/dsh-7c` (home), profile `p7c` (dsh-base +
 dsh-web-app + this plugin), desktop CLI 0.2.2-rc.1, `127.0.0.1:3095`. The owner's
-daily profile (`~/.dsh/profiles/desktop`, GUI PID 21788 on :50270) was **not**
-modified, installed into, or restarted.
+daily profile (`~/.dsh/profiles/desktop`) was **not** modified, installed into, or
+restarted at the time of this run; the swap happened the next day — see Verdict
+and `evidence/daily-trial-2026-11-08/`.
 
 | File | What it shows |
 | --- | --- |
@@ -28,8 +29,11 @@ modified, installed into, or restarted.
 
 8/8 measured scenarios passed on the isolated profile; 0 console errors; cards
 restored across refresh and session switch; a real pointer drag wrote state. The
-daily-profile swap itself was **not executed** — it is the owner's step, with the
-rollback written in `docs/reports/STAGE-7C-DAILY-BASELINE.md`.
+daily-profile swap was **executed 2026-11-08**: the daily profile now loads this
+build (installed bundle and assets equal the repo —
+`evidence/daily-trial-2026-11-08/01-installed-state.txt`) and the owner reports
+the restarted app normal. Rollback remains in
+`docs/reports/STAGE-7C-DAILY-BASELINE.md` §3.
 
 ## Known limitation recorded here
 
